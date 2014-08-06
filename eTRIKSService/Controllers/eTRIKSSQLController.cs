@@ -20,9 +20,12 @@ namespace eTRIKSService.Controllers
 
         [Route("{Activity}")]
         // GET api/values
-        public IEnumerable<string> GetActivity()
+        public Activity GetActivity(string activity)
         {
-            return new string[] { "value1", "value2" };
+            Activity act = new Activity();
+            act.name = "Test Activity";
+            act.OID = "A100002";
+            return act;
         }
     }
 }

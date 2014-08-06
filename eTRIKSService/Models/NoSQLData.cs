@@ -5,16 +5,7 @@ using System.Web;
 
 namespace eTRIKSService.Models
 {
-    public class eTRIKSModel
-    {
-    }
-
-    public class DerivedVariable
-    { 
-    }
-
-    // Non SQL Model
-    public class RecordList
+    public class NoSQLData
     {
         public List<Record> records = new List<Record>();
     }

@@ -5,14 +5,14 @@ using System.Web;
 
 namespace eTRIKSService.Models
 {
-    public class Domain
+    public class DomainDataset
     {
         public string OID { get; set; }
-        public string domainName { get; set; }
-        public string domainClass { get; set; }
+        public string domainDatasetName { get; set; }
+        public string domainDatasetClass { get; set; }
         public string description { get; set; }
         public string structure { get; set; }
-        public string boolean { get; set; }
+        public Boolean repeating { get; set; }
     }
 
 }

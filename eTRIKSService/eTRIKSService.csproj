@@ -141,9 +141,16 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Activity.cs" />
-    <Compile Include="Models\Domain.cs" />
+    <Compile Include="Models\ActivityDataVariable.cs" />
+    <Compile Include="Models\ControlledTerminology\CVterm.cs" />
+    <Compile Include="Models\ControlledTerminology\DB.cs" />
+    <Compile Include="Models\ControlledTerminology\DBxrefcs.cs" />
+    <Compile Include="Models\ControlledTerminology\Dictionary.cs" />
+    <Compile Include="Models\DerivedVariable.cs" />
+    <Compile Include="Models\DomainDataset.cs" />
     <Compile Include="Models\DomainVariable.cs" />
-    <Compile Include="Models\eTRIKSModel.cs" />
+    <Compile Include="Models\NoSQLData.cs" />
+    <Compile Include="Models\Study.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

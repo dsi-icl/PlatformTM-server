@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using eTRIKSService.Models.ControlledTerminology;
+
 
 namespace eTRIKSService.Models
 {
@@ -11,7 +13,8 @@ namespace eTRIKSService.Models
         public string domainVariableName { get; set; }
         public string description { get; set; }
         public string dataType { get; set; }
-        public string variableType { get; set; }
-        public string role { get; set; }
+        public CVterm variableType { get; set; }
+        public CVterm role { get; set; }
+        public DomainDataset parentDomain { get; set; }
     }
 }
