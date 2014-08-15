@@ -6,24 +6,24 @@
   <MessageClass Name="Error" Label="Error" Option="Show errors" />
   <MessageClass Name="Property" Label="Property" Option="Show metadata" />
   <MessageClass Name="Diagnostic" Label="Message" Option="Show diagnostic messages" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="High" Text="Code generation or text transformation started." />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="Name = ClassTemplate" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="Overwrite = True" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="ProjectPath = ..\ModelingProjecteTRIKSLib\ModelingProjecteTRIKSLib.csproj" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="TargetName = {Name}" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Medium" Text="ModelingProjecteTRIKS's Text Template Binding: 'ClassTemplate' will apply ClassTemplate.t4 to: 'ModelingProjecteTRIKS::DomainVariable' -  (Class) " />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Medium" Text="'ModelingProjecteTRIKS::DomainVariable' -  (Class) : success (file replaced) - C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\GeneratedCode\DomainVariable.cs" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="Name = StructTemplate" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="Overwrite = True" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="ProjectPath = ..\ModelingProjecteTRIKSLib\ModelingProjecteTRIKSLib.csproj" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="TargetName = {Name}" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Medium" Text="ModelingProjecteTRIKS's Text Template Binding: 'StructTemplate' will apply StructTemplate.t4 to: 'ModelingProjecteTRIKS::DomainVariable' -  (Class) " />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="Diagnostic" Text="'ModelingProjecteTRIKS::DomainVariable' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
-  <Message Timestamp="2014-08-05T16:36:17" Importance="High" Text="Code generation complete. Errors: 0. Warnings: 0." />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="High" Text="Code generation or text transformation started." />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="Name = ClassTemplate" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="Overwrite = True" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="ProjectPath = ..\ModelingProjecteTRIKSLib\ModelingProjecteTRIKSLib.csproj" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="TargetName = {Name}" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\ClassTemplate.t4" />
+  <Message Timestamp="2014-08-06T21:36:09" Importance="Medium" Text="ModelingProjecteTRIKS's Text Template Binding: 'ClassTemplate' will apply ClassTemplate.t4 to: 'ModelingProjecteTRIKS::DomainVariable' -  (Class) " />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Medium" Text="'ModelingProjecteTRIKS::DomainVariable' -  (Class) : success (file replaced) - C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\GeneratedCode\DomainVariable.cs" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="Name = StructTemplate" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="Overwrite = True" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="ProjectPath = ..\ModelingProjecteTRIKSLib\ModelingProjecteTRIKSLib.csproj" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="TargetDirectory = GeneratedCode\{PackageStructure}" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="TargetName = {Name}" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="TemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="ResolvedTemplateFilePath = C:\PROGRAM FILES\MICROSOFT VISUAL STUDIO 12.0\COMMON7\IDE\EXTENSIONS\MICROSOFT\ARCHITECTURE TOOLS\EXTENSIBILITY\Templates\Text\StructTemplate.t4" />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Medium" Text="ModelingProjecteTRIKS's Text Template Binding: 'StructTemplate' will apply StructTemplate.t4 to: 'ModelingProjecteTRIKS::DomainVariable' -  (Class) " />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="Diagnostic" Text="'ModelingProjecteTRIKS::DomainVariable' -  (Class): no file generated because the 'AppliesToElement' method of the template 'StructTemplate.t4' evaluated to false." />
+  <Message Timestamp="2014-08-06T21:36:10" Importance="High" Text="Code generation complete. Errors: 0. Warnings: 0." />
 </Log>

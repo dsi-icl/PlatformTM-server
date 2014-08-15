@@ -2,6 +2,7 @@ C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\eTRIKSService.dll.config
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\eTRIKSService.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\eTRIKSService.pdb
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\Antlr3.Runtime.dll
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\EntityFramework.SqlServer.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\Microsoft.Web.Infrastructure.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\Newtonsoft.Json.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Net.Http.Formatting.dll
@@ -15,6 +16,7 @@ C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.WebPages.Deployment
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.WebPages.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.WebPages.Razor.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\WebGrease.dll
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\EntityFramework.SqlServer.xml
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\Newtonsoft.Json.xml
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Net.Http.Formatting.xml
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.Helpers.xml
@@ -27,6 +29,6 @@ C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.WebPages.xml
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.WebPages.Deployment.xml
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\System.Web.WebPages.Razor.xml
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\bin\Antlr3.Runtime.pdb
-C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\obj\Debug\eTRIKSService.csprojResolveAssemblyReference.cache
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\obj\Debug\eTRIKSService.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\obj\Debug\eTRIKSService.pdb
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKSService\obj\Debug\eTRIKSService.csprojResolveAssemblyReference.cache

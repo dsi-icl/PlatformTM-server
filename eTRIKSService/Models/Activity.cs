@@ -10,7 +10,7 @@ namespace eTRIKSService.Models
         public string OID { get; set; }
         public string name { get; set; }
 
-        public void getActivityDataSet()
+        public void getActivityDataSet2()
         { }
         public void getActivityDataVariable()
         {}

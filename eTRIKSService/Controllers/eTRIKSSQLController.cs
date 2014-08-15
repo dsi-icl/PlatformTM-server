@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using eTRIKSService.Models;
+using eTRIKSService.DataAccess;
+
 
 namespace eTRIKSService.Controllers
 {
@@ -25,7 +27,28 @@ namespace eTRIKSService.Controllers
             Activity act = new Activity();
             act.name = "Test Activity";
             act.OID = "A100002";
+
+            Activity_TAB act2 = new Activity_TAB();
+            act2.OID = "A00001";
+            act2.name = "Test Activity";
+            try
+            {
+                eTRIKS_schemaEntitiesNew en = new eTRIKS_schemaEntitiesNew();
+                en.Activity_TAB.Add(act2);
+                en.SaveChanges();
+            }
+            catch (Exception ee)
+            { }
+
             return act;
         }
+
+        public void getActivityDataset()
+        {
+           
+        }
+
+        public void getDataSetVariables()
+        { }
     }
 }

@@ -41,6 +41,8 @@
   <ItemGroup>
     <Compile Include="GeneratedCode\Activity.cs" />
     <Compile Include="GeneratedCode\Class1.cs" />
+    <Compile Include="GeneratedCode\DerivedVariable.cs" />
+    <Compile Include="GeneratedCode\Domain.cs" />
     <Compile Include="GeneratedCode\DomainVariable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
