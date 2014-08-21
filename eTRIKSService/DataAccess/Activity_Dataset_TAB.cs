@@ -12,14 +12,12 @@ namespace eTRIKSService.DataAccess
     using System;
     using System.Collections.Generic;
     
-    public partial class Variable_Ref_TAB
+    public partial class Activity_Dataset_TAB
     {
-        public string variableId { get; set; }
+        public string datasetId { get; set; }
+        public string dataFile { get; set; }
         public string activityId { get; set; }
-        public Nullable<int> orderNo { get; set; }
-        public Nullable<bool> mandatory { get; set; }
-        public Nullable<int> keySequence { get; set; }
     
-        public virtual Variable_Def_TAB Variable_Def_TAB { get; set; }
+        public virtual Activity_TAB Activity_TAB { get; set; }
     }
 }

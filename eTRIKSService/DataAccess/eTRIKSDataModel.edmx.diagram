@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="adf453cd62ac4c2d9877d9a5ef15ae02" Name="Diagram1">
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Activity_Dataset_TAB" Width="1.5" PointX="6" PointY="8.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Activity_TAB" Width="1.5" PointX="3" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.CVterm_TAB" Width="1.5" PointX="10.25" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Db_TAB" Width="1.5" PointX="5.75" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.DBxref_TAB" Width="1.5" PointX="8" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Derived_Variable_Method_TAB" Width="2.25" PointX="3" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Dictionary_TAB" Width="1.5" PointX="8" PointY="5.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Study_TAB" Width="1.5" PointX="0.75" PointY="8.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Variable_Def_TAB" Width="2.125" PointX="0.5" PointY="1.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="eTRIKS_schemaModel.Variable_Ref_TAB" Width="2.875" PointX="3.875" PointY="3.625" IsExpanded="true" />
+        <AssociationConnector Association="eTRIKS_schemaModel.Activity_Dataset_TAB_activity_FK" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.Activity_TAB_study_FK" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.dbref" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.dictionary" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.database" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.FK_Variable" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.variablefk" ManuallyRouted="false" />
+        <AssociationConnector Association="eTRIKS_schemaModel.Derived_Variable_Map_TAB" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
