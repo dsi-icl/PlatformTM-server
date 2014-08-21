@@ -33,7 +33,7 @@ namespace eTRIKSService.Controllers
             act2.name = "Test Activity";
             try
             {
-                eTRIKS_schemaEntitiesNew en = new eTRIKS_schemaEntitiesNew();
+                eTRIKS_schemaEntities en = new eTRIKS_schemaEntities();
                 en.Activity_TAB.Add(act2);
                 en.SaveChanges();
             }
