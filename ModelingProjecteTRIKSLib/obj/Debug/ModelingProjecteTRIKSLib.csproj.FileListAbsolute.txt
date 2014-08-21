@@ -1,5 +1,0 @@
-C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\bin\Debug\ModelingProjecteTRIKSLib.dll
-C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\bin\Debug\ModelingProjecteTRIKSLib.pdb
-C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\obj\Debug\ModelingProjecteTRIKSLib.csprojResolveAssemblyReference.cache
-C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\obj\Debug\ModelingProjecteTRIKSLib.dll
-C:\Dilshan\eTRIKS\eTRIKSService\ModelingProjecteTRIKSLib\obj\Debug\ModelingProjecteTRIKSLib.pdb
