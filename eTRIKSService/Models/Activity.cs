@@ -9,10 +9,9 @@ namespace eTRIKSService.Models
     {
         public string OID { get; set; }
         public string name { get; set; }
+        public string studyId { get; set; }
 
-        public void getActivityDataSet2()
-        { }
-        public void getActivityDataVariable()
-        {}
+        public virtual ICollection<ActivityDataset> activityDatasets { get; set; }
+        public virtual Study Study { get; set; }
     }
 }
