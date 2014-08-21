@@ -22,6 +22,7 @@ namespace eTRIKSService.DataAccess
         public string OID { get; set; }
         public string accession { get; set; }
         public string description { get; set; }
+        public string db { get; set; }
     
         public virtual ICollection<CVterm_TAB> CVterm_TAB { get; set; }
         public virtual Db_TAB Db_TAB { get; set; }

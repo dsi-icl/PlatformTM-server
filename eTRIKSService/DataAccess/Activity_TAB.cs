@@ -21,6 +21,7 @@ namespace eTRIKSService.DataAccess
     
         public string OID { get; set; }
         public string name { get; set; }
+        public string studyId { get; set; }
     
         public virtual ICollection<Activity_Dataset_TAB> Activity_Dataset_TAB { get; set; }
         public virtual Study_TAB Study_TAB { get; set; }

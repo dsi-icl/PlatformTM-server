@@ -19,6 +19,8 @@ namespace eTRIKSService.DataAccess
         public Nullable<int> order { get; set; }
         public Nullable<int> rank { get; set; }
         public Nullable<bool> userSpecified { get; set; }
+        public string dictionartyId { get; set; }
+        public string dbref { get; set; }
     
         public virtual DBxref_TAB DBxref_TAB { get; set; }
         public virtual Dictionary_TAB Dictionary_TAB { get; set; }

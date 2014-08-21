@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="eTRIKS_schemaModelStoreContainer" CdmEntityContainer="eTRIKS_schemaEntitiesNew">
+    <EntitySetMapping Name="Activity_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Activity_TAB">
+        <MappingFragment StoreEntitySet="Activity_TAB">
+          <ScalarProperty Name="studyId" ColumnName="studyId" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="OID" ColumnName="OID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="CVterm_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.CVterm_TAB">
+        <MappingFragment StoreEntitySet="CVterm_TAB">
+          <ScalarProperty Name="dbref" ColumnName="dbref" />
+          <ScalarProperty Name="dictionartyId" ColumnName="dictionartyId" />
+          <ScalarProperty Name="userSpecified" ColumnName="userSpecified" />
+          <ScalarProperty Name="rank" ColumnName="rank" />
+          <ScalarProperty Name="order" ColumnName="order" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="abbrv" ColumnName="abbrv" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Db_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Db_TAB">
+        <MappingFragment StoreEntitySet="Db_TAB">
+          <ScalarProperty Name="url" ColumnName="url" />
+          <ScalarProperty Name="urlPrefix" ColumnName="urlPrefix" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="OID" ColumnName="OID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DBxref_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.DBxref_TAB">
+        <MappingFragment StoreEntitySet="DBxref_TAB">
+          <ScalarProperty Name="db" ColumnName="db" />
+          <ScalarProperty Name="description" ColumnName="description" />
+          <ScalarProperty Name="accession" ColumnName="accession" />
+          <ScalarProperty Name="OID" ColumnName="OID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Derived_Variable_Method_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Derived_Variable_Method_TAB">
+        <MappingFragment StoreEntitySet="Derived_Variable_Method_TAB">
+          <ScalarProperty Name="type" ColumnName="type" />
+          <ScalarProperty Name="methodDescription" ColumnName="methodDescription" />
+          <ScalarProperty Name="derivedVariableId" ColumnName="derivedVariableId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Dictionary_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Dictionary_TAB">
+        <MappingFragment StoreEntitySet="Dictionary_TAB">
+          <ScalarProperty Name="url" ColumnName="url" />
+          <ScalarProperty Name="version" ColumnName="version" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="OID" ColumnName="OID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Study_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Study_TAB">
+        <MappingFragment StoreEntitySet="Study_TAB">
+          <ScalarProperty Name="description" ColumnName="description" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="OID" ColumnName="OID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Variable_Def_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Variable_Def_TAB">
+        <MappingFragment StoreEntitySet="Variable_Def_TAB">
+          <ScalarProperty Name="role" ColumnName="role" />
+          <ScalarProperty Name="variableType" ColumnName="variableType" />
+          <ScalarProperty Name="isCurated" ColumnName="isCurated" />
+          <ScalarProperty Name="studyId" ColumnName="studyId" />
+          <ScalarProperty Name="dataType" ColumnName="dataType" />
+          <ScalarProperty Name="description" ColumnName="description" />
+          <ScalarProperty Name="name" ColumnName="name" />
+          <ScalarProperty Name="variableId" ColumnName="variableId" />
+          <ScalarProperty Name="datasetId" ColumnName="datasetId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Variable_Ref_TAB">
+      <EntityTypeMapping TypeName="eTRIKS_schemaModel.Variable_Ref_TAB">
+        <MappingFragment StoreEntitySet="Variable_Ref_TAB">
+          <ScalarProperty Name="keySequence" ColumnName="keySequence" />
+          <ScalarProperty Name="mandatory" ColumnName="mandatory" />
+          <ScalarProperty Name="orderNo" ColumnName="orderNo" />
+          <ScalarProperty Name="activityId" ColumnName="activityId" />
+          <ScalarProperty Name="variableId" ColumnName="variableId" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="Derived_Variable_Map_TAB" TypeName="eTRIKS_schemaModel.Derived_Variable_Map_TAB" StoreEntitySet="Derived_Variable_Map_TAB">
+      <EndProperty Name="Variable_Def_TAB1">
+        <ScalarProperty Name="variableId" ColumnName="sourceVariableId" />
+      </EndProperty>
+      <EndProperty Name="Variable_Def_TAB">
+        <ScalarProperty Name="variableId" ColumnName="variableId" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping>

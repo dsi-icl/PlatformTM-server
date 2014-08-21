@@ -152,44 +152,47 @@
     <Compile Include="Controllers\eTRIKSSQLController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
+    <Compile Include="DataAccess\Activity_Dataset_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataAccess\Activity_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\CVterm_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DataAccess\DataModel.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DataModel.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DataAccess\DataModel.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DataModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="DataAccess\DataModel.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>DataModel.edmx</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\DBxref_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Db_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Derived_Variable_Method_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Dictionary_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Domain_Dataset_Template_TAB.cs">
       <DependentUpon>ISATemplateModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Domain_Variable_Template_TAB.cs">
       <DependentUpon>ISATemplateModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\eTRIKSDataModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>eTRIKSDataModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\eTRIKSDataModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="DataAccess\eTRIKSDataModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\ISATemplateModel.Context.cs">
       <AutoGen>True</AutoGen>
@@ -207,13 +210,13 @@
       <DependentUpon>ISATemplateModel.edmx</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Study_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Variable_Def_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="DataAccess\Variable_Ref_TAB.cs">
-      <DependentUpon>DataModel.tt</DependentUpon>
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -251,23 +254,6 @@
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\HelpPageApiModel.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\DisplayTemplates\ApiGroup.cshtml" />
     <Content Include="Areas\HelpPage\Views\Help\Api.cshtml" />
-    <EntityDeploy Include="DataAccess\DataModel.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>DataModel.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-    <Content Include="DataAccess\DataModel.Context.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>DataModel.edmx</DependentUpon>
-      <LastGenOutput>DataModel.Context.cs</LastGenOutput>
-    </Content>
-    <Content Include="DataAccess\DataModel.edmx.diagram">
-      <DependentUpon>DataModel.edmx</DependentUpon>
-    </Content>
-    <Content Include="DataAccess\DataModel.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>DataModel.edmx</DependentUpon>
-      <LastGenOutput>DataModel.cs</LastGenOutput>
-    </Content>
     <EntityDeploy Include="DataAccess\ISATemplateModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>ISATemplateModel.Designer.cs</LastGenOutput>
@@ -284,6 +270,23 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ISATemplateModel.edmx</DependentUpon>
       <LastGenOutput>ISATemplateModel.cs</LastGenOutput>
+    </Content>
+    <EntityDeploy Include="DataAccess\eTRIKSDataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>eTRIKSDataModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="DataAccess\eTRIKSDataModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+      <LastGenOutput>eTRIKSDataModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="DataAccess\eTRIKSDataModel.edmx.diagram">
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="DataAccess\eTRIKSDataModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+      <LastGenOutput>eTRIKSDataModel.cs</LastGenOutput>
     </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />

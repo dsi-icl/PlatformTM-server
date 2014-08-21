@@ -13,10 +13,10 @@ namespace eTRIKSService.DataAccess
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class eTRIKS_schemaEntities : DbContext
+    public partial class eTRIKSDataModel_Entities : DbContext
     {
-        public eTRIKS_schemaEntities()
-            : base("name=eTRIKS_schemaEntities")
+        public eTRIKSDataModel_Entities()
+            : base("name=eTRIKSDataModel_Entities")
         {
         }
     
