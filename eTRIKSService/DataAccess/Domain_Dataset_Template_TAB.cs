@@ -7,11 +7,14 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
+
 namespace eTRIKSService.DataAccess
 {
-    using System;
-    using System.Collections.Generic;
-    
+
+
     public partial class Domain_Dataset_Template_TAB
     {
         public Domain_Dataset_Template_TAB()
@@ -26,6 +29,7 @@ namespace eTRIKSService.DataAccess
         public string structure { get; set; }
         public Nullable<bool> repeating { get; set; }
     
-        public virtual ICollection<Domain_Variable_Template_TAB> Domain_Variable_Template_TAB { get; set; }
+        
+        public ICollection<Domain_Variable_Template_TAB> Domain_Variable_Template_TAB { get; set; }
     }
 }

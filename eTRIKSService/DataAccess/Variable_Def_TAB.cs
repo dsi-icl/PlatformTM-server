@@ -16,9 +16,9 @@ namespace eTRIKSService.DataAccess
     {
         public Variable_Def_TAB()
         {
+            this.Derived_Variable_Map_TAB = new HashSet<Derived_Variable_Map_TAB>();
+            this.Derived_Variable_Map_TAB1 = new HashSet<Derived_Variable_Map_TAB>();
             this.Variable_Ref_TAB = new HashSet<Variable_Ref_TAB>();
-            this.Variable_Def_TAB1 = new HashSet<Variable_Def_TAB>();
-            this.Variable_Def_TAB2 = new HashSet<Variable_Def_TAB>();
         }
     
         public string datasetId { get; set; }
@@ -31,9 +31,9 @@ namespace eTRIKSService.DataAccess
         public string variableType { get; set; }
         public string role { get; set; }
     
+        public virtual ICollection<Derived_Variable_Map_TAB> Derived_Variable_Map_TAB { get; set; }
+        public virtual ICollection<Derived_Variable_Map_TAB> Derived_Variable_Map_TAB1 { get; set; }
         public virtual Derived_Variable_Method_TAB Derived_Variable_Method_TAB { get; set; }
         public virtual ICollection<Variable_Ref_TAB> Variable_Ref_TAB { get; set; }
-        public virtual ICollection<Variable_Def_TAB> Variable_Def_TAB1 { get; set; }
-        public virtual ICollection<Variable_Def_TAB> Variable_Def_TAB2 { get; set; }
     }
 }

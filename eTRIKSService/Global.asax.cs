@@ -18,6 +18,13 @@ namespace eTRIKSService
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            //var json = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
+            //json.SerializerSettings.PreserveReferencesHandling =
+            //    Newtonsoft.Json.PreserveReferencesHandling.All;
+
+            //var xml = GlobalConfiguration.Configuration.Formatters.XmlFormatter;
+            //xml.se.SerializerSettings.PreserveReferencesHandling =
+            //    Newtonsoft.Json.PreserveReferencesHandling.All;
         }
     }
 }

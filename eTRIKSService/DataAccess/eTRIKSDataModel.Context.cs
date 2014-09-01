@@ -30,6 +30,7 @@ namespace eTRIKSService.DataAccess
         public virtual DbSet<CVterm_TAB> CVterm_TAB { get; set; }
         public virtual DbSet<Db_TAB> Db_TAB { get; set; }
         public virtual DbSet<DBxref_TAB> DBxref_TAB { get; set; }
+        public virtual DbSet<Derived_Variable_Map_TAB> Derived_Variable_Map_TAB { get; set; }
         public virtual DbSet<Derived_Variable_Method_TAB> Derived_Variable_Method_TAB { get; set; }
         public virtual DbSet<Dictionary_TAB> Dictionary_TAB { get; set; }
         public virtual DbSet<Study_TAB> Study_TAB { get; set; }
