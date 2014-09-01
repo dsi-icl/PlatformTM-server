@@ -167,6 +167,9 @@
     <Compile Include="DataAccess\Db_TAB.cs">
       <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DataAccess\Derived_Variable_Map_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="DataAccess\Derived_Variable_Method_TAB.cs">
       <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
@@ -218,6 +221,8 @@
     <Compile Include="DataAccess\Variable_Ref_TAB.cs">
       <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="DTO\DomainDataset.cs" />
+    <Compile Include="DTO\DomainVariable.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

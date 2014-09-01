@@ -18,6 +18,7 @@ namespace eTRIKSService.DataAccess
         public ISATemplate_schemaEntities()
             : base("name=ISATemplate_schemaEntities")
         {
+            this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
