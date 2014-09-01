@@ -5,7 +5,7 @@ using System.Web;
 using eTRIKSService.Models.ControlledTerminology;
 
 
-namespace eTRIKSService.Models
+namespace eTRIKSService.Models.Templates
 {
     public class DomainVariable
     {
@@ -15,6 +15,6 @@ namespace eTRIKSService.Models
         public string dataType { get; set; }
         public CVterm variableType { get; set; }
         public CVterm role { get; set; }
-        public DomainDataset parentDomain { get; set; }
+        public Domain parentDomain { get; set; }
     }
 }

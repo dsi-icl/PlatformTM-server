@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace eTRIKSService.Models
+namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
 {
-    public class Study
+    public class DB
     {
         public string OID { get; set; }
         public string name { get; set; }
-        public string description { get; set; }
+        public string urlPrefix { get; set; }
+        public string url { get; set; }
 
-        public virtual ICollection<Activity> Activity_TAB { get; set; }
     }
 }

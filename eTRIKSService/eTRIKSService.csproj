@@ -222,16 +222,18 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Activity.cs" />
-    <Compile Include="Models\ActivityDataVariable.cs" />
     <Compile Include="Models\ControlledTerminology\CVterm.cs" />
     <Compile Include="Models\ControlledTerminology\DB.cs" />
     <Compile Include="Models\ControlledTerminology\DBxrefcs.cs" />
     <Compile Include="Models\ControlledTerminology\Dictionary.cs" />
-    <Compile Include="Models\DerivedVariable.cs" />
-    <Compile Include="Models\DomainDataset.cs" />
-    <Compile Include="Models\DomainVariable.cs" />
+    <Compile Include="Models\Dataset.cs" />
+    <Compile Include="Models\DerivedVarMethod.cs" />
+    <Compile Include="Models\Templates\Domain.cs" />
+    <Compile Include="Models\Templates\DomainVariable.cs" />
     <Compile Include="Models\NoSQLData.cs" />
     <Compile Include="Models\Study.cs" />
+    <Compile Include="Models\VariableDefinition.cs" />
+    <Compile Include="Models\VariableReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -288,6 +290,7 @@
       <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
       <LastGenOutput>eTRIKSDataModel.cs</LastGenOutput>
     </Content>
+    <Content Include="ClassDiagram1.cd" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
