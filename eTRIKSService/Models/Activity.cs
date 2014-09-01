@@ -11,7 +11,7 @@ namespace eTRIKSService.Models
         public string name { get; set; }
         public string studyId { get; set; }
 
-        public virtual ICollection<ActivityDataset> activityDatasets { get; set; }
+        public virtual ICollection<Dataset> activityDatasets { get; set; }
         public virtual Study Study { get; set; }
     }
 }
