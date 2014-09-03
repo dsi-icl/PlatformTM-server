@@ -1,8 +1,7 @@
-using eTRIKS.Commons.Core.Domain.Model;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
+using eTRIKS.Commons.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.Persistence.Models.Mapping
+namespace eTRIKS.Commons.Persistence.Mapping
 {
     public class DomainVariableMap : EntityTypeConfiguration<DomainTemplateVariable>
     {

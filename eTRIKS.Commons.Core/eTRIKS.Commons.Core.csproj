@@ -46,7 +46,8 @@
     <Compile Include="Domain\Model\ControlledTerminology\Dictionary.cs" />
     <Compile Include="Domain\Model\Dataset.cs" />
     <Compile Include="Domain\Model\DerivedMethod.cs" />
-    <Compile Include="Domain\Model\Identifiable.cs" />
+    <Compile Include="Domain\Model\Base\Identifiable.cs" />
+    <Compile Include="Domain\Model\Base\IEntity.cs" />
     <Compile Include="Domain\Model\NoSQLData.cs" />
     <Compile Include="Domain\Model\Templates\DomainTemplate.cs">
       <SubType>Code</SubType>
@@ -54,14 +55,15 @@
     <Compile Include="Domain\Model\Templates\DomainTemplateVariable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Interfaces\IeTRIKSservice.cs" />
+    <Compile Include="Interfaces\IRepository.cs" />
+    <Compile Include="Interfaces\ITemplateRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Model\Study.cs" />
     <Compile Include="Domain\Model\VariableDefinition.cs" />
     <Compile Include="Domain\Model\VariableReference.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

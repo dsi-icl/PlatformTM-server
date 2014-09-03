@@ -46,6 +46,8 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -71,12 +73,115 @@
       <DependentUpon>201409010007571_CodeFirstUpdates.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="ModelFirst\Activity_Dataset_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Activity_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\CVterm_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\DBxref_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Db_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Derived_Variable_Map_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Derived_Variable_Method_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Dictionary_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Domain_Dataset_Template_TAB.cs">
+      <DependentUpon>ISATemplateModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Domain_Variable_Template_TAB.cs">
+      <DependentUpon>ISATemplateModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\eTRIKSDataModel.Context.cs">
+      <DependentUpon>eTRIKSDataModel.Context.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ModelFirst\eTRIKSDataModel.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ModelFirst\eTRIKSDataModel.Designer.cs">
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ModelFirst\ISATemplateModel.Context.cs">
+      <DependentUpon>ISATemplateModel.Context.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ModelFirst\ISATemplateModel.cs">
+      <DependentUpon>ISATemplateModel.tt</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ModelFirst\ISATemplateModel.Designer.cs">
+      <DependentUpon>ISATemplateModel.edmx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <Compile Include="ModelFirst\Study_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Variable_Def_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ModelFirst\Variable_Ref_TAB.cs">
+      <DependentUpon>eTRIKSDataModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <EntityDeploy Include="ModelFirst\eTRIKSDataModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>eTRIKSDataModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="ModelFirst\eTRIKSDataModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+      <LastGenOutput>eTRIKSDataModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="ModelFirst\eTRIKSDataModel.edmx.diagram">
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="ModelFirst\eTRIKSDataModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>eTRIKSDataModel.edmx</DependentUpon>
+      <LastGenOutput>eTRIKSDataModel.cs</LastGenOutput>
+    </Content>
+    <EntityDeploy Include="ModelFirst\ISATemplateModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ISATemplateModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <Content Include="ModelFirst\ISATemplateModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ISATemplateModel.edmx</DependentUpon>
+      <LastGenOutput>ISATemplateModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="ModelFirst\ISATemplateModel.edmx.diagram">
+      <DependentUpon>ISATemplateModel.edmx</DependentUpon>
+    </Content>
+    <Content Include="ModelFirst\ISATemplateModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ISATemplateModel.edmx</DependentUpon>
+      <LastGenOutput>ISATemplateModel.cs</LastGenOutput>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -89,6 +194,9 @@
     <EmbeddedResource Include="Migrations\201409010007571_CodeFirstUpdates.resx">
       <DependentUpon>201409010007571_CodeFirstUpdates.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

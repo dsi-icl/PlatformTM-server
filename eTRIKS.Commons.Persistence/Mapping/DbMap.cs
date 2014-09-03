@@ -1,8 +1,7 @@
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data.Entity.ModelConfiguration;
+using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Persistence.Models.Mapping
+namespace eTRIKS.Commons.Persistence.Mapping
 {
     public class DbMap : EntityTypeConfiguration<DB>
     {

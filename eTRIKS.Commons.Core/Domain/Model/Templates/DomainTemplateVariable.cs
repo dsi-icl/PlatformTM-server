@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
-
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {
-    public class DomainTemplateVariable : Identifiable
+    public class DomainTemplateVariable : Identifiable<string>
     {
         //public string OID { get; set; }
         public string Name { get; set; }

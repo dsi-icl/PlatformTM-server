@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using eTRIKS.Commons.Core.Domain.Model.Base;
+using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class Dataset:Identifiable
+    public class Dataset : Identifiable<string>
     {
        // public string DatasetId { get; set; }
         public string DataFile { get; set; }

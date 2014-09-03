@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using eTRIKS.Commons.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {
-    public class DomainTemplate : Identifiable
+    public class DomainTemplate : Identifiable<string>
     {
         //public string OID { get; set; }
         public string Name { get; set; }

@@ -7,7 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using eTRIKS.Commons.Persistence.Models.Mapping;
+using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.Persistence.Mapping;
 
 namespace eTRIKS.Commons.Persistence
 {

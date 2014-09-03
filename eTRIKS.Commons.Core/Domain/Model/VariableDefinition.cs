@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class VariableDefinition : Identifiable
+    public class VariableDefinition : Identifiable<string>
     {
        
         //public string variableId { get; set; }
