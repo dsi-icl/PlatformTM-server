@@ -9,7 +9,7 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Interfaces
 {
-    public interface IRepository<TEntity, in TPrimaryKey> where TEntity : Identifiable<TPrimaryKey>
+    public interface IRepository<TEntity, in TPrimaryKey>
     {
 
        #region Select/Get/Query

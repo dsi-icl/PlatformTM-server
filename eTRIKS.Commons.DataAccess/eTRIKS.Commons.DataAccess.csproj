@@ -46,8 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainRepository.cs" />
     <Compile Include="GenericRepository.cs" />
+    <Compile Include="IDataContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceUoW.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj">

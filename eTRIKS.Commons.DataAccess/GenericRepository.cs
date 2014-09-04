@@ -11,24 +11,22 @@ namespace eTRIKS.Commons.DataAccess
     public class GenericRepository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
     {
-        protected DbContext DbContext { get; set; }
-        protected DbSet<TEntity> DbSet { get; set; }
-
-        //TODO: declare dbContext as Interface instead
-        public GenericRepository(DbContext dbContext)
+        protected IDataContext DataContext { get; set; }
+        protected IDbSet<TEntity> Entities { get; set; }
+        public GenericRepository(IDataContext dataContext)
         {
-            DbContext = dbContext;
-            DbSet = DbContext.Set<TEntity>();
+            DataContext = dataContext;
+            Entities = DataContext.Set<TEntity>();
         }
 
         public IQueryable<TEntity> GetAll()
         {
-            return DbSet;
+            return Entities;
         }
 
         public List<TEntity> GetAllList()
         {
-            return DbSet.ToList();
+            return Entities.ToList();
         }
 
         public List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate)
@@ -43,7 +41,7 @@ namespace eTRIKS.Commons.DataAccess
                                     int? pageSize = null)
         {
            
-            IQueryable<TEntity> query = DbSet;
+            IQueryable<TEntity> query = Entities;
      
             if (includeProperties != null)
                 includeProperties.ForEach(i => query.Include(i));
@@ -64,25 +62,25 @@ namespace eTRIKS.Commons.DataAccess
 
         public TEntity GetById(TPrimaryKey key)
         {
-            return DbSet.Find(key);
+            return Entities.Find(key);
         }
 
         public TEntity Insert(TEntity entity)
         {
-            return DbSet.Add(entity);
+            return Entities.Add(entity);
         }
 
         public TEntity Update(TEntity entity)
         {
-            DbSet.Attach(entity);
-            DbContext.Entry(entity).State = EntityState.Modified;
+            Entities.Attach(entity);
+            DataContext.Entry(entity).State = EntityState.Modified;
             return entity;
         }
 
         public void Delete(TEntity entity)
         {
-            DbSet.Attach(entity);
-            DbSet.Remove(entity);
+            Entities.Attach(entity);
+            Entities.Remove(entity);
         }
 
         public void Delete(TPrimaryKey id)
