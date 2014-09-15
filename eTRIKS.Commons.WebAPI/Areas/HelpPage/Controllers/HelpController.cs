@@ -1,6 +1,7 @@
 using System;
 using System.Web.Http;
 using System.Web.Mvc;
+using eTRIKS.Commons.WebAPI.Areas.HelpPage.ModelDescriptions;
 using eTRIKS.Commons.WebAPI.Areas.HelpPage.Models;
 
 namespace eTRIKS.Commons.WebAPI.Areas.HelpPage.Controllers
@@ -10,6 +11,8 @@ namespace eTRIKS.Commons.WebAPI.Areas.HelpPage.Controllers
     /// </summary>
     public class HelpController : Controller
     {
+        private const string ErrorViewName = "Error";
+
         public HelpController()
             : this(GlobalConfiguration.Configuration)
         {
@@ -39,7 +42,22 @@ namespace eTRIKS.Commons.WebAPI.Areas.HelpPage.Controllers
                 }
             }
 
-            return View("Error");
+            return View(ErrorViewName);
+        }
+
+        public ActionResult ResourceModel(string modelName)
+        {
+            if (!String.IsNullOrEmpty(modelName))
+            {
+                ModelDescriptionGenerator modelDescriptionGenerator = Configuration.GetModelDescriptionGenerator();
+                ModelDescription modelDescription;
+                if (modelDescriptionGenerator.GeneratedModels.TryGetValue(modelName, out modelDescription))
+                {
+                    return View(modelDescription);
+                }
+            }
+
+            return View(ErrorViewName);
         }
     }
 }

@@ -1,13 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
-using eTRIKS.Commons.App.DTOs;
-using eTRIKS.Commons.Persistence.ModelFirst;
 using System.Data.Entity;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [RoutePrefix("api/etriksSQL")]
+    //[RoutePrefix("api/etriksSQL")]
 
     public class eTRIKSSQLController : ApiController
     {
@@ -18,10 +16,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    return new string[] { "value1", "value2" };
         //}
 
-        ISATemplate_schemaEntities isat = new ISATemplate_schemaEntities();
+       // ISATemplate_schemaEntities isat = new ISATemplate_schemaEntities();
 
-        [Route("")]
+      //  [Route("")]
 
+        /*
         public IQueryable<DomainDataset> getDomainDatasets()
         {
 
@@ -41,7 +40,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
            // var book = isat.Domain_Dataset_Template_TAB.Include(b => b.).Select() 
 
         }
-        [Route("{Domain}")]
+         */
+        //[Route("{Domain}")]
+        /*
         public DomainDataset getDomainDatasetVariables(string domain)
         {
             domain = "sdtmig-3-1-3:Dataset.CE";
@@ -90,6 +91,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         }
 
+         */
         /*
         [Route("{Activity}")]
         // GET api/values

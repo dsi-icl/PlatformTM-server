@@ -57,10 +57,6 @@
       <Project>{2b9025cd-68cd-4e1d-8542-2a6acd8c6354}</Project>
       <Name>eTRIKS.Commons.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\eTRIKS.Commons.Persistence\eTRIKS.Commons.Persistence.csproj">
-      <Project>{31c83932-e4e3-40f0-9596-5b99b6213886}</Project>
-      <Name>eTRIKS.Commons.Persistence</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

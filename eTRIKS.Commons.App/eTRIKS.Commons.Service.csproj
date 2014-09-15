@@ -7,8 +7,8 @@
     <ProjectGuid>{C8277543-8C37-42A1-9878-D01B07B349AC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>eTRIKS.Commons.App</RootNamespace>
-    <AssemblyName>eTRIKS.Commons.App</AssemblyName>
+    <RootNamespace>eTRIKS.Commons.Service</RootNamespace>
+    <AssemblyName>eTRIKS.Commons.Service</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

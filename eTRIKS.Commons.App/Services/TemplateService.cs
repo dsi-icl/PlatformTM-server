@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eTRIKS.Commons.App.DTOs;
+using eTRIKS.Commons.Core.Application.Services;
+using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
-using eTRIKS.Commons.Core.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
 
-namespace eTRIKS.Commons.App.Services{
-    class TemplateService : IeTRIKSservice
+namespace eTRIKS.Commons.Service.Services{
+    public class TemplateService : ITemplateService
     {
 
-        private IServiceUoW dataServiceUnit;
+        private IServiceUoW _dataServiceUnit;
 
         //TODO: should be replaced with only one repository to include only the Aggregate Root (i.e. DomainTemplate)
         private readonly IRepository<DomainTemplate,string> _templateRepository;
         private readonly IRepository<DomainTemplateVariable, string> _templateVariableRepository;
 
-        TemplateService(IServiceUoW uoW){
-            dataServiceUnit = uoW;
+        public TemplateService(IServiceUoW uoW){
+            _dataServiceUnit = uoW;
             _templateRepository = uoW.GetRepository<DomainTemplate, string>();
             _templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
         }
@@ -40,5 +36,9 @@ namespace eTRIKS.Commons.App.Services{
            return _templateRepository.GetById(oid);
         }
 
+        public string Gettestdomain(string something)
+        {
+            return something;
+        }
     }
 }

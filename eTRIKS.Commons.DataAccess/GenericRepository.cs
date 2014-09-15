@@ -3,20 +3,31 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Interfaces;
 
 namespace eTRIKS.Commons.DataAccess
 {
     public class GenericRepository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
     {
-        protected IDataContext DataContext { get; set; }
+        //TODO: IS THIS REALLY NEEDED?
+        //THIS AS IT IS RIGHT NOW WITH NO DEPENDENCE ON EF MAKES THIS REPOSITORY IMPLEMENTATION
+        //AN INDEPENDENT IMPLMENETATION THAT COULD BE USED FOR TESTING AS WELL IF A TESTDATACONTEXT IS PASSED
+        //TO DATACONTEXT INSTEAD OF ETRIKSDATACONTEXT
+        // IF THIS GETS CHANGED TO DbContext DataContext instead of IDataContext DataContext
+        // THEN this means we will have to create ANOTHER Repository Implementation for TESTING instead of using
+        // this one and only passnig it a different context (or a different DBset)
+        protected DbContext DataContext { get; set; }
         protected IDbSet<TEntity> Entities { get; set; }
-        public GenericRepository(IDataContext dataContext)
+        public GenericRepository(DbContext dataContext)
         {
             DataContext = dataContext;
             Entities = DataContext.Set<TEntity>();
+        }
+        public GenericRepository(IDbSet<TEntity> entities)
+        {
+            Entities = entities;
         }
 
         public IQueryable<TEntity> GetAll()

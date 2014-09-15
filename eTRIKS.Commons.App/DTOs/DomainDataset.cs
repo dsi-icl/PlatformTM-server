@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace eTRIKS.Commons.App.DTOs
+namespace eTRIKS.Commons.Service.DTOs
 {
     public class DomainDataset
     {

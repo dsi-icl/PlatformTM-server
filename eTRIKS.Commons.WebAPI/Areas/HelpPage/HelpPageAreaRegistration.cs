@@ -1,6 +1,5 @@
 using System.Web.Http;
 using System.Web.Mvc;
-using eTRIKS.Commons.WebAPI.Areas.HelpPage.App_Start;
 
 namespace eTRIKS.Commons.WebAPI.Areas.HelpPage
 {

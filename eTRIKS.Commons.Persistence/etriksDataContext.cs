@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
 
 namespace eTRIKS.Commons.Persistence
 {
-    class eTRIKSDataContext : DbContext
+    //CURRENTLY NOT IN USE
+    public class eTRIKSDataContext : DbContext, IDataContext
     {
-        public eTRIKSDataContext() : base("eTRIKScontext_MySQL")
+        public eTRIKSDataContext() : base("name=eTRIKScontext_MySQL")
         {
             Database.SetInitializer<eTRIKSDataContext>(null);
+            
         }
 
+
+        //TODO: not sure if these DbSet declarations still need to be here.
         public DbSet<DomainTemplate> DomainTemplates { get; set; }
         public DbSet<DomainTemplateVariable> DomainTemplateVariables { get; set; }
 
@@ -51,5 +56,9 @@ namespace eTRIKS.Commons.Persistence
             modelBuilder.Configurations.Add(new VariableRefMap());
         }
 
+        public IDbSet<TEntity> Set<TEntity>() where TEntity : class
+        {
+            return base.Set<TEntity>();
+        }
     }
 }

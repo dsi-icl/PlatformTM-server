@@ -1,7 +1,7 @@
 ﻿using System;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Interfaces
+namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
     public interface IServiceUoW : IDisposable
     {

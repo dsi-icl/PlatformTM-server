@@ -1,4 +1,4 @@
-﻿namespace eTRIKS.Commons.App.DTOs
+﻿namespace eTRIKS.Commons.Service.DTOs
 {
     public class DomainVariable
     {

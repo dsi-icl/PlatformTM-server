@@ -55,10 +55,10 @@
     <Compile Include="Domain\Model\Templates\DomainTemplateVariable.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Interfaces\IeTRIKSservice.cs" />
-    <Compile Include="Interfaces\IRepository.cs" />
-    <Compile Include="Interfaces\IServiceUoW.cs" />
-    <Compile Include="Interfaces\ITemplateRepository.cs" />
+    <Compile Include="Domain\Interfaces\IRepository.cs" />
+    <Compile Include="Domain\Interfaces\IServiceUoW.cs" />
+    <Compile Include="Domain\Interfaces\ITemplateRepository.cs" />
+    <Compile Include="Application\Services\ITemplateService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Model\Study.cs" />
     <Compile Include="Domain\Model\VariableDefinition.cs" />

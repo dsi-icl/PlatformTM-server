@@ -1,4 +1,4 @@
-namespace eTRIKS.Commons.WebAPI.Areas.HelpPage.SampleGeneration
+namespace eTRIKS.Commons.WebAPI.Areas.HelpPage
 {
     /// <summary>
     /// Indicates whether the sample is used for request or response

@@ -9,6 +9,8 @@ namespace eTRIKS.Commons.WebAPI
     {
         protected void Application_Start()
         {
+            
+            
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
@@ -21,6 +23,9 @@ namespace eTRIKS.Commons.WebAPI
             //var xml = GlobalConfiguration.Configuration.Formatters.XmlFormatter;
             //xml.se.SerializerSettings.PreserveReferencesHandling =
             //    Newtonsoft.Json.PreserveReferencesHandling.All;
+
+
         }
+
     }
 }

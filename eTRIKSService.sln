@@ -12,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Core", "eTRI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Persistence", "eTRIKS.Commons.Persistence\eTRIKS.Commons.Persistence.csproj", "{31C83932-E4E3-40F0-9596-5B99B6213886}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.App", "eTRIKS.Commons.App\eTRIKS.Commons.App.csproj", "{C8277543-8C37-42A1-9878-D01B07B349AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Service", "eTRIKS.Commons.App\eTRIKS.Commons.Service.csproj", "{C8277543-8C37-42A1-9878-D01B07B349AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.WebAPI", "eTRIKS.Commons.WebAPI\eTRIKS.Commons.WebAPI.csproj", "{34616181-3FD4-4CA5-978C-39470554D51B}"
 EndProject
