@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatasetRepository.cs" />
     <Compile Include="DomainRepository.cs" />
     <Compile Include="GenericRepository.cs" />
     <Compile Include="IDataContext.cs" />

@@ -42,6 +42,7 @@
     <Compile Include="DTOs\DomainDataset.cs" />
     <Compile Include="DTOs\DomainVariable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DatasetService.cs" />
     <Compile Include="Services\TemplateService.cs" />
   </ItemGroup>
   <ItemGroup />
