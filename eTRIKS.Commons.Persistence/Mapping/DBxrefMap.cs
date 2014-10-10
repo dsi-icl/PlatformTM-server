@@ -3,7 +3,7 @@ using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    public class DBxrefMap : EntityTypeConfiguration<DBxref>
+    public class DBxrefMap : EntityTypeConfiguration<Dbxref>
     {
         public DBxrefMap()
         {
@@ -26,14 +26,14 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("DBxref_TAB", "eTRIKSdata");
-            this.Property(t => t.OID).HasColumnName("OID");
-            this.Property(t => t.Accession).HasColumnName("accession");
-            this.Property(t => t.Description).HasColumnName("description");
-            this.Property(t => t.DBId).HasColumnName("db");
+            this.ToTable("DBxref_TBL");
+            //this.Property(t => t.OID).HasColumnName("OID");
+            //this.Property(t => t.Accession).HasColumnName("accession");
+            //this.Property(t => t.Description).HasColumnName("description");
+            //this.Property(t => t.DBId).HasColumnName("db_id");
 
             // Relationships
-            this.HasRequired(t => t.DB);
+            this.HasRequired(t => t.DB).WithMany().HasForeignKey(t => t.DBId);
 
         }
     }

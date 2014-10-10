@@ -15,21 +15,25 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .IsRequired()
                 .HasMaxLength(200);
 
-            this.Property(t => t.name)
+            this.Property(t => t.Name)
                 .HasMaxLength(200);
 
-            this.Property(t => t.urlPrefix)
+            this.Property(t => t.UrlPrefix)
                 .HasMaxLength(2000);
 
-            this.Property(t => t.url)
+            this.Property(t => t.Url)
                 .HasMaxLength(2000);
+
+            this.Property(t => t.Version)
+               .HasMaxLength(2000);
 
             // Table & Column Mappings
-            this.ToTable("Db_TAB", "eTRIKSdata");
-            this.Property(t => t.OID).HasColumnName("OID");
-            this.Property(t => t.name).HasColumnName("name");
-            this.Property(t => t.urlPrefix).HasColumnName("urlPrefix");
-            this.Property(t => t.url).HasColumnName("url");
+            this.ToTable("Db_TBL");
+            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.Name).HasColumnName("Name");
+            this.Property(t => t.UrlPrefix).HasColumnName("URLPrefix");
+            this.Property(t => t.Url).HasColumnName("URL");
+            this.Property(t => t.Version).HasColumnName("Version");
         }
     }
 }

@@ -72,6 +72,18 @@
     <Compile Include="Mapping\VariableRefMap.cs" />
     <Compile Include="Mapping\DomainDatasetMap.cs" />
     <Compile Include="Mapping\DomainVariableMap.cs" />
+    <Compile Include="Migrations\201410091700141_firstMigration.cs" />
+    <Compile Include="Migrations\201410091700141_firstMigration.Designer.cs">
+      <DependentUpon>201410091700141_firstMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410092029103_testUpdate.cs" />
+    <Compile Include="Migrations\201410092029103_testUpdate.Designer.cs">
+      <DependentUpon>201410092029103_testUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201410092101457_testUpdate2.cs" />
+    <Compile Include="Migrations\201410092101457_testUpdate2.Designer.cs">
+      <DependentUpon>201410092101457_testUpdate2.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="etriksDataContextUoW.cs" />
@@ -92,6 +104,17 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201410091700141_firstMigration.resx">
+      <DependentUpon>201410091700141_firstMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410092029103_testUpdate.resx">
+      <DependentUpon>201410092029103_testUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201410092101457_testUpdate2.resx">
+      <DependentUpon>201410092101457_testUpdate2.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

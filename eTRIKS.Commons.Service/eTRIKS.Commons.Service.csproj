@@ -39,6 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTOs\DatasetDTO.cs" />
     <Compile Include="DTOs\DomainDataset.cs" />
     <Compile Include="DTOs\DomainVariable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.WebAPI", "eT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Service", "eTRIKS.Commons.Service\eTRIKS.Commons.Service.csproj", "{C8277543-8C37-42A1-9878-D01B07B349AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Tests", "eTRIKS.Commons.Tests\eTRIKS.Commons.Tests.csproj", "{8470C143-B479-41D9-8CCA-524D66909F97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{C8277543-8C37-42A1-9878-D01B07B349AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8277543-8C37-42A1-9878-D01B07B349AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8277543-8C37-42A1-9878-D01B07B349AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8470C143-B479-41D9-8CCA-524D66909F97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8470C143-B479-41D9-8CCA-524D66909F97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8470C143-B479-41D9-8CCA-524D66909F97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8470C143-B479-41D9-8CCA-524D66909F97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
