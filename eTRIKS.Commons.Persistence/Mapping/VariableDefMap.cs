@@ -34,15 +34,31 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("Variable_Def_TAB", "eTRIKSdata");
-            this.Property(t => t.OID).HasColumnName("OID");
-            this.Property(t => t.Name).HasColumnName("name");
-            this.Property(t => t.Description).HasColumnName("description");
-            this.Property(t => t.DataType).HasColumnName("dataType");
-            this.Property(t => t.StudyId).HasColumnName("studyId");
-            this.Property(t => t.IsCurated).HasColumnName("isCurated");
-            this.Property(t => t.VariableTypeId).HasColumnName("variableType");
-            this.Property(t => t.RoleId).HasColumnName("role");
+            this.ToTable("Variable_Definition_TBL");
+            //this.Property(t => t.OID).HasColumnName("OID");
+            //this.Property(t => t.Name).HasColumnName("name");
+            //this.Property(t => t.Description).HasColumnName("description");
+            //this.Property(t => t.DataType).HasColumnName("dataType");
+            //this.Property(t => t.StudyId).HasColumnName("studyId");
+            //this.Property(t => t.IsCurated).HasColumnName("isCurated");
+            //this.Property(t => t.VariableTypeId).HasColumnName("variableType");
+            //this.Property(t => t.RoleId).HasColumnName("role");
+
+            this.HasOptional(t => t.Study)
+               .WithMany()
+               .HasForeignKey(t => t.StudyId);
+            
+            this.HasOptional(t => t.Role)
+                .WithMany()
+                .HasForeignKey(t => t.RoleId);
+
+            this.HasOptional(t => t.VariableType)
+               .WithMany()
+               .HasForeignKey(t => t.VariableTypeId);
+
+            //this.HasOptional(t => t.DerivedVariableProperties)
+            //   .WithMany()
+            //   .HasForeignKey(t => t.DerivedVariablePropertiesId);
         }
     }
 }

@@ -11,10 +11,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public string DataType { get; set; }
         public string Label { get; set; }
         public string DomainId { get; set; }
+        public string VariableTypeId { get; set; }
         public string RoleId { get; set; }
         public string UsageId { get; set; }
 
-        public string VariableType { get; set; }
+        public CVterm VariableType { get; set; }
         public CVterm Role { get; set; }
         public CVterm Usage { get; set; }
         public DomainTemplate Domain { get; set; }

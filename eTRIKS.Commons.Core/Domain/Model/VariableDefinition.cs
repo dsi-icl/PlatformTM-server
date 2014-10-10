@@ -20,11 +20,11 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string VariableTypeId { get; set; }
         public CVterm Role { get; set; }
         public string RoleId { get; set; }
-        public Study study { get; set; }
+        public Study Study { get; set; }
         public string StudyId { get; set; }
 
-        public DerivedMethod DerivedVariableProperties { get; set; }
-        public string DerivedVariablePropertiesId { get; set; }
+        //public DerivedMethod DerivedVariableProperties { get; set; }
+        //public string DerivedVariablePropertiesId { get; set; }
 
         
     }

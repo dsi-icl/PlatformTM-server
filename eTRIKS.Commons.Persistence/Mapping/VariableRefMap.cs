@@ -8,10 +8,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public VariableRefMap()
         {
             // Primary Key
-            this.HasKey(t => new { t.VariableId, t.DatasetId });
+            this.HasKey(t => new { t.VariableDefinitionId, t.DatasetId });
 
             // Properties
-            this.Property(t => t.VariableId)
+            this.Property(t => t.VariableDefinitionId)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -20,20 +20,22 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("Variable_Ref_TAB", "eTRIKSdata");
-            this.Property(t => t.VariableId).HasColumnName("variableId");
-            this.Property(t => t.DatasetId).HasColumnName("activityDatasetId");
-            this.Property(t => t.OrderNumber).HasColumnName("orderNo");
-            this.Property(t => t.IsRequired).HasColumnName("mandatory");
-            this.Property(t => t.KeySequence).HasColumnName("keySequence");
+            this.ToTable("Variable_Reference_TBL");
+            this.Property(t => t.VariableDefinitionId).HasColumnName("VariableId");
+            this.Property(t => t.DatasetId).HasColumnName("ActivityDatasetId");
+            //this.Property(t => t.OrderNumber).HasColumnName("orderNo");
+            //this.Property(t => t.IsRequired).HasColumnName("mandatory");
+            //this.Property(t => t.KeySequence).HasColumnName("keySequence");
 
             // Relationships
             this.HasRequired(t => t.Dataset)
                 .WithMany(t => t.Variables)
                 .HasForeignKey(d => d.DatasetId);
-            this.HasRequired(t => t.Variable);
-                //.WithMany(t => t.Variable_Ref_TAB)
-                //.HasForeignKey(d => d.variableId);
+
+            this.HasRequired(t => t.VariableDefinition)
+                .WithMany()
+                .HasForeignKey(t => t.VariableDefinitionId);
+           
 
         }
     }

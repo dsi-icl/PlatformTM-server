@@ -9,9 +9,12 @@ namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
     {
         public string OID { get; set; }
         public string Name { get; set; }
-        public string Version { get; set; }
-        public string URI { get; set; }
-        public virtual ICollection<CVterm> ControlledTerms { get; set; }
+        public string Definition { get; set; }
+
+        public string XrefId { get; set; }
+        public Dbxref Xref { get; set; }
+
+        public virtual ICollection<CVterm> Terms { get; set; }
 
     }
 }

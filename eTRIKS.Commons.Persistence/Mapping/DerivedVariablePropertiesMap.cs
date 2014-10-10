@@ -25,14 +25,13 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("Derived_Method_TAB", "eTRIKSdata");
+            this.ToTable("Derived_Method_TBL");
             this.Property(t => t.DerivedVariableId).HasColumnName("derivedVariableId");
             this.Property(t => t.MethodDescription).HasColumnName("methodDescription");
             this.Property(t => t.DerivedValueTypeId).HasColumnName("type");
 
             // Relationships
-            this.HasRequired(t => t.DerivedVariable)
-                .WithOptional(dv => dv.DerivedVariableProperties);
+            //this.HasRequired(t => t.DerivedVariable);
 
         }
     }

@@ -11,7 +11,10 @@ namespace eTRIKS.Commons.Persistence.Migrations
         {
             AutomaticMigrationsEnabled = false;
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
+           
         }
+
+        
 
         protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContextUoW context)
         {
