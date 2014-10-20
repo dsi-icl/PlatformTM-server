@@ -37,7 +37,7 @@ namespace eTRIKS.Commons.Persistence
 
         public DbSet<CVterm> CVterms { get; set; }
         public DbSet<DB> DBs { get; set; }
-        public DbSet<DBxref> DBxrefs { get; set; }
+        public DbSet<Dbxref> DBxrefs { get; set; }
         public DbSet<Dictionary> Dictionaries { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

@@ -11,9 +11,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
        #region Select/Get/Query
 
         /// <summary>
-        /// Used to get a IQueryable that is used to retrive entities from entire table.
-        /// <see cref="UnitOfWorkAttribute"/> attrbute must be used to be able to call this method since this method
-        /// returns IQueryable and it requires open database connection to use it.
+        ///
         /// </summary>
         /// <returns>IQueryable to be used to select entities from database</returns>
         IQueryable<TEntity> GetAll();

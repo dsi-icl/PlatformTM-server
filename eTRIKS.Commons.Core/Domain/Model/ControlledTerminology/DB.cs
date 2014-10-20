@@ -8,9 +8,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
     public class DB
     {
         public string OID { get; set; }
-        public string name { get; set; }
-        public string urlPrefix { get; set; }
-        public string url { get; set; }
+        public string Name { get; set; }
+        public string Version { get; set; }
+        public string Url { get; set; }
+        public string UrlPrefix { get; set; }
+        
 
     }
 }

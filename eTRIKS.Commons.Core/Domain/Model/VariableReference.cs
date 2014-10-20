@@ -7,12 +7,12 @@ namespace eTRIKS.Commons.Core.Domain.Model
 {
     public class VariableReference
     {
-        public Nullable<int> OrderNumber { get; set; }
-        public Nullable<bool> IsRequired { get; set; }
-        public Nullable<int> KeySequence { get; set; }
+        public int? OrderNumber { get; set; }
+        public bool? IsRequired { get; set; }
+        public int? KeySequence { get; set; }
 
-        public VariableDefinition Variable { get; set; }
-        public string VariableId { get; set; }
+        public VariableDefinition VariableDefinition { get; set; }
+        public string VariableDefinitionId { get; set; }
 
         public Dataset Dataset { get; set; }
         public string DatasetId { get; set; }

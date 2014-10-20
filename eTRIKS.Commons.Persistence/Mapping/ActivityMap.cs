@@ -23,10 +23,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("Activity_TAB", "eTRIKSdata");
+            this.ToTable("Activity_TBL");
             this.Property(t => t.OID).HasColumnName("OID");
-            this.Property(t => t.Name).HasColumnName("name");
-            this.Property(t => t.StudyId).HasColumnName("studyId");
+            this.Property(t => t.Name).HasColumnName("Name");
+            this.Property(t => t.StudyId).HasColumnName("StudyId");
 
             // Relationships
             this.HasRequired(t => t.Study)

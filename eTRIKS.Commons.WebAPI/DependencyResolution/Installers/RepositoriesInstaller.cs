@@ -33,6 +33,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                 Classes
                      .FromAssemblyNamed("eTRIKS.Commons.Service")
                      .InNamespace("eTRIKS.Commons.Service.Services")
+                     .WithServiceSelf()
                      .WithServiceDefaultInterfaces());
             
 

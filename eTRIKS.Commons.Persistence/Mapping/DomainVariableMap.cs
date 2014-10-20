@@ -24,37 +24,58 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.Property(t => t.DataType)
                 .HasMaxLength(200);
 
+            this.Property(t => t.Label)
+                .HasMaxLength(2000);
+
             this.Property(t => t.DomainId)
+                .IsRequired()
                 .HasMaxLength(200);
 
-            this.Property(t => t.VariableType)
+            this.Property(t => t.VariableTypeId)
                 .HasMaxLength(200);
 
             this.Property(t => t.RoleId)
                 .HasMaxLength(200);
-
-            this.Property(t => t.Label)
-                .HasMaxLength(2000);
-
+            
             this.Property(t => t.UsageId)
                 .HasMaxLength(200);
 
+            this.Property(t => t.controlledTerminologyId)
+                .HasMaxLength(200);
+
             // Table & Column Mappings
-            this.ToTable("Variable_Template_TAB", "eTRIKSdata");
-            this.Property(t => t.OID).HasColumnName("OID");
-            this.Property(t => t.Name).HasColumnName("Name");
-            this.Property(t => t.Description).HasColumnName("Description");
-            this.Property(t => t.DataType).HasColumnName("DataType");
-            this.Property(t => t.DomainId).HasColumnName("DomainId");
-            this.Property(t => t.VariableType).HasColumnName("VariableType");
-            this.Property(t => t.RoleId).HasColumnName("Role");
-            this.Property(t => t.Label).HasColumnName("Label");
-            this.Property(t => t.UsageId).HasColumnName("Usage");
+            this.ToTable("DomainVariable_TBL", "Templates");
+            //this.Property(t => t.OID).HasColumnName("OID");
+            //this.Property(t => t.Name).HasColumnName("Name");
+            //this.Property(t => t.Description).HasColumnName("Description");
+            //this.Property(t => t.DataType).HasColumnName("DataType");
+            //this.Property(t => t.DomainId).HasColumnName("DomainId");
+            this.Property(t => t.VariableTypeId).HasColumnName("VariableTypeId");
+            this.Property(t => t.RoleId).HasColumnName("RoleTermId");
+            //this.Property(t => t.Label).HasColumnName("Label");
+            this.Property(t => t.UsageId).HasColumnName("UsageTermId");
+            this.Property(t => t.controlledTerminologyId).HasColumnName("DictionaryId");
 
             // Relationships
-            this.HasOptional(t => t.Domain)
+            this.HasRequired(t => t.Domain)
                 .WithMany(t => t.Variables)
                 .HasForeignKey(d => d.DomainId);
+
+            this.HasOptional(t => t.Role)
+                .WithMany()
+                .HasForeignKey(t => t.RoleId);
+
+            this.HasOptional(t => t.Usage)
+                .WithMany()
+                .HasForeignKey(t => t.UsageId);
+
+            this.HasOptional(t => t.VariableType)
+                .WithMany()
+                .HasForeignKey(t => t.VariableTypeId);
+
+            this.HasOptional(t => t.controlledTerminology)
+                .WithMany()
+                .HasForeignKey(t => t.controlledTerminologyId);
 
         }
     }
