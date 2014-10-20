@@ -29,7 +29,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             this.Property(t => t.IsUserSpecified);
 
-            this.Property(t => t.DictionartyId)
+            this.Property(t => t.DictionaryId)
                 .HasMaxLength(200);
 
             this.Property(t => t.XrefId)
@@ -44,7 +44,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
             //this.Property(t => t.Order).HasColumnName("order");
             //this.Property(t => t.Rank).HasColumnName("rank");
             //this.Property(t => t.IsUserSpecified).HasColumnName("userSpecified");
-            //this.Property(t => t.DictionartyId).HasColumnName("dictionartyId");
+            //this.Property(t => t.DictionartyId).HasColumnName("dictionaryId");
             //this.Property(t => t.XrefId).HasColumnName("xref_id");
 
             // Relationships
@@ -54,7 +54,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
                
             this.HasRequired(t => t.Dictionary)
                 .WithMany(d => d.Terms)
-                .HasForeignKey(d => d.DictionartyId);
+                .HasForeignKey(d => d.DictionaryId);
 
         }
     }
