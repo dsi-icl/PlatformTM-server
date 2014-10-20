@@ -15,7 +15,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
         //public Nullable<int> Rank { get; set; }
         public Nullable<bool> IsUserSpecified { get; set; }
         public String Synonyms { get; set; }
-        public string DictionartyId { get; set; }
+        public string DictionaryId { get; set; }
         public string XrefId { get; set; }
         public virtual Dbxref Xref { get; set; }
         public virtual Dictionary Dictionary { get; set; }

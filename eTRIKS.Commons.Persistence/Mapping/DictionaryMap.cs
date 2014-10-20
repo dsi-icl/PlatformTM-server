@@ -34,7 +34,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             this.HasMany(t => t.Terms)
                 .WithRequired(t => t.Dictionary)
-                .HasForeignKey(t => t.DictionartyId);
+                .HasForeignKey(t => t.DictionaryId);
 
         }
     }

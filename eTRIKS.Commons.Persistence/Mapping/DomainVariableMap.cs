@@ -24,7 +24,11 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.Property(t => t.DataType)
                 .HasMaxLength(200);
 
+            this.Property(t => t.Label)
+                .HasMaxLength(2000);
+
             this.Property(t => t.DomainId)
+                .IsRequired()
                 .HasMaxLength(200);
 
             this.Property(t => t.VariableTypeId)
@@ -32,11 +36,11 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             this.Property(t => t.RoleId)
                 .HasMaxLength(200);
-
-            this.Property(t => t.Label)
-                .HasMaxLength(2000);
-
+            
             this.Property(t => t.UsageId)
+                .HasMaxLength(200);
+
+            this.Property(t => t.controlledTerminologyId)
                 .HasMaxLength(200);
 
             // Table & Column Mappings
@@ -50,9 +54,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.Property(t => t.RoleId).HasColumnName("RoleTermId");
             //this.Property(t => t.Label).HasColumnName("Label");
             this.Property(t => t.UsageId).HasColumnName("UsageTermId");
+            this.Property(t => t.controlledTerminologyId).HasColumnName("DictionaryId");
 
             // Relationships
-            this.HasOptional(t => t.Domain)
+            this.HasRequired(t => t.Domain)
                 .WithMany(t => t.Variables)
                 .HasForeignKey(d => d.DomainId);
 
@@ -67,6 +72,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.HasOptional(t => t.VariableType)
                 .WithMany()
                 .HasForeignKey(t => t.VariableTypeId);
+
+            this.HasOptional(t => t.controlledTerminology)
+                .WithMany()
+                .HasForeignKey(t => t.controlledTerminologyId);
 
         }
     }
