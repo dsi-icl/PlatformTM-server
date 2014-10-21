@@ -54,8 +54,12 @@ namespace eTRIKS.Commons.DataAccess
            
             IQueryable<TEntity> query = Entities;
      
-            if (includeProperties != null)
-                includeProperties.ForEach(i => query.Include(i));
+            //if (includeProperties != null)
+            //    includeProperties.ForEach(i => query.Include(i));
+
+            //Apply eager loading
+            //foreach (Expression<Func<TEntity, object>> navigationProperty in includeProperties)
+            //    query.Include<TEntity, object>(navigationProperty);
  
             if (filter != null)
                 query = query.Where(filter);

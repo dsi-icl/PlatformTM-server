@@ -36,7 +36,7 @@ namespace eTRIKS.Commons.Service.Services
                 null,
                 new List<Expression<Func<DomainTemplate, object>>>()
                 {
-                    d => d.Variables
+                    d => d.Variables.Select(t => t.controlledTerminologyId)
                         
                 }).FirstOrDefault();
 
