@@ -44,7 +44,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("DomainVariable_TBL", "Templates");
+            this.ToTable("Templates.DomainVariable_TBL", "Templates");
             //this.Property(t => t.OID).HasColumnName("OID");
             //this.Property(t => t.Name).HasColumnName("Name");
             //this.Property(t => t.Description).HasColumnName("Description");
