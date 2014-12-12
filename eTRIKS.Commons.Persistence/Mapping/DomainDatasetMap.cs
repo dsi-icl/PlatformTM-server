@@ -3,7 +3,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    public class DomainDatasetMap : EntityTypeConfiguration<DomainTemplate>
+    public class DomainDatasetMap : EntityTypeConfiguration<DomainDataset>
     {
         public DomainDatasetMap()
         {
@@ -31,7 +31,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            this.ToTable("DomainDataset_TBL","Templates");
+            this.ToTable("Templates.DomainDataset_TBL", "Templates");
             //this.Property(t => t.OID).HasColumnName("OID");
             //this.Property(t => t.Name).HasColumnName("domainName");
             //this.Property(t => t.Class).HasColumnName("class");

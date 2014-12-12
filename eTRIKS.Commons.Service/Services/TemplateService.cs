@@ -11,26 +11,33 @@ namespace eTRIKS.Commons.Service.Services{
         private IServiceUoW _dataServiceUnit;
 
         //TODO: should be replaced with only one repository to include only the Aggregate Root (i.e. DomainTemplate)
-        private readonly IRepository<DomainTemplate,string> _templateRepository;
+        private readonly IRepository<DomainDataset, string> _templateRepository;
         private readonly IRepository<DomainTemplateVariable, string> _templateVariableRepository;
 
         public TemplateService(IServiceUoW uoW){
             _dataServiceUnit = uoW;
-            _templateRepository = uoW.GetRepository<DomainTemplate, string>();
+            _templateRepository = uoW.GetRepository<DomainDataset, string>();
             _templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
         }
 
-        public IEnumerable<DomainTemplate> GetAllDomains()
+        public IEnumerable<DomainDataset> GetAllDomains()
         {
             return _templateRepository.GetAll().ToList();
         }
 
-        public DomainTemplate GetDomainTemplateById(string oid)
+        public DomainDataset GetDomainTemplateById(string oid)
         {
             return _templateRepository.GetById(oid);
         }
 
-        public DomainTemplate GetDomainWithVariables(string oid)
+        // Customised Code
+        public DomainDataset GetDomainTemplateDetailsById(string oid)
+        {
+            return null;
+        }
+
+
+        public DomainDataset GetDomainWithVariables(string oid)
         {
             //TODO:figure out the query for that in IRepository
            return _templateRepository.GetById(oid);

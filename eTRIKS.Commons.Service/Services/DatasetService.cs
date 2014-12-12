@@ -14,7 +14,7 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IServiceUoW _dataServiceUnit;
         private IRepository<Dataset, string> _datasetRepository;
-        private IRepository<DomainTemplate, string> _domainRepository; 
+        private IRepository<DomainDataset, string> _domainRepository; 
 
         public DatasetService(IServiceUoW uoW)
         {
@@ -22,23 +22,38 @@ namespace eTRIKS.Commons.Service.Services
             //_templateRepository = uoW.GetRepository<DomainTemplate, string>();
             //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, string>();
-            _domainRepository = uoW.GetRepository<DomainTemplate, string>();
+            _domainRepository = uoW.GetRepository<DomainDataset, string>();
         }
 
         /// <summary>
         /// Retrieves Domain dataset from Template Tables for "New" datasets
         /// </summary>
         /// <param name="domainId"></param>
-        public DomainTemplate GetTemplateDataset(string domainId)
+        public DomainDataset GetTemplateDataset(string domainId)
         {
-            DomainTemplate domainTemplate = _domainRepository.Get(
+            DomainDataset domainTemplate = _domainRepository.Get(
                 d => d.OID == domainId,
                 null,
-                new List<Expression<Func<DomainTemplate, object>>>()
+                new List<Expression<Func<DomainDataset, object>>>()
                 {
                     d => d.Variables
                         
                 }).FirstOrDefault();
+
+            return domainTemplate;
+        }
+
+
+        public DomainDataset GetTemplateDatasetNew(string domainId)
+        {
+            //IList<Templates_DomainDataset_TBL> tempDomVar3 = chkExist.GetList(o => o.OID.Equals("D-SDTM-LB"), d => d.Templates_DomainVariable_TBL.Select(t => t.Dictionary_TBL));
+
+            //IList<DomainDataset> domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId));
+            
+            ///DomainDataset domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId), d => d.Variables);
+            //DomainDataset domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId), d => d.Variables.Select(t => t.controlledTerminology));
+            DomainDataset domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId));
+            _dataServiceUnit.Dispose();
 
             return domainTemplate;
         }
@@ -66,5 +81,7 @@ namespace eTRIKS.Commons.Service.Services
             //for each variable create new variable_Ref (use createOrRetrieve) add to datasets var_def collection
             //
         }
+
+
     }
 }

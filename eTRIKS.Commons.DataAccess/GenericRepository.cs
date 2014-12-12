@@ -23,6 +23,7 @@ namespace eTRIKS.Commons.DataAccess
         public GenericRepository(DbContext dataContext)
         {
             DataContext = dataContext;
+            DataContext.Configuration.ProxyCreationEnabled = false;
             Entities = DataContext.Set<TEntity>();
         }
         public GenericRepository(IDbSet<TEntity> entities)
@@ -43,6 +44,30 @@ namespace eTRIKS.Commons.DataAccess
         public List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate)
         {
             return GetAll().Where(predicate).ToList();
+        }
+
+        public  TEntity GetList(Func<TEntity, bool> where,
+                 params Expression<Func<TEntity, object>>[] navigationProperties)
+        {
+            
+            TEntity data = null;
+            //using (var context = new DataContext())
+            //{
+           //IQueryable<TEntity> dbQuery = DataContext.Set<TEntity>();
+            IQueryable<TEntity> query = Entities;
+                //Apply eager loading
+                foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
+                    query = query.Include<TEntity, object>(navigationProperty);
+                try
+                {
+                    data = query
+                        .AsNoTracking()
+                        .FirstOrDefault(where);
+                }
+                catch (Exception e) { }
+            //}
+
+            return data;
         }
 
         public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, 
@@ -77,7 +102,7 @@ namespace eTRIKS.Commons.DataAccess
         }
 
         public TEntity Insert(TEntity entity)
-        {
+        {    
             return Entities.Add(entity);
         }
 

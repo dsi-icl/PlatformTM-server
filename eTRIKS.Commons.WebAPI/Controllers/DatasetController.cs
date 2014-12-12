@@ -25,10 +25,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return new string[] { "value1", "value2" };
         }
 
-        // GET: api/Dataset/5
-        public DomainTemplate Get(string id)
+        //// GET: api/Dataset/5
+        //public DomainDataset Get(string id)
+        //{
+        //    return _datasetService.GetTemplateDataset(id);
+        //}
+
+        //Customisation (Dilshan)
+
+        public DomainDataset GetDomain(string id)
         {
-            return _datasetService.GetTemplateDataset(id);
+            return _datasetService.GetTemplateDatasetNew(id);
         }
 
         // POST: api/Dataset

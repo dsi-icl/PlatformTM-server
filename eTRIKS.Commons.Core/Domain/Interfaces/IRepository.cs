@@ -37,6 +37,8 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
             int? page = null,
             int? pageSize = null);
 
+        TEntity GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties);
+
         /// <summary>
         /// Gets an entity with given primary key.
         /// </summary>

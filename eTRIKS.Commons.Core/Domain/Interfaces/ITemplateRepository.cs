@@ -2,7 +2,7 @@
 
 namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
-    public interface ITemplateRepository : IRepository<DomainTemplate,string>
+    public interface ITemplateRepository : IRepository<DomainDataset,string>
     {
     }
 }

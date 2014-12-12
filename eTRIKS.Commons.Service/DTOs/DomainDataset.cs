@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Service.DTOs
 {
-    public class DomainDataset
+    class DomainDataset
     {
         public string OID { get; set; }
         public string domainDatasetName { get; set; }

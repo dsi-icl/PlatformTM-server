@@ -18,14 +18,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _templateService = templateService;
         }
 
-        public IEnumerable<DomainTemplate> Get()
+        public IEnumerable<DomainDataset> Get()
         {
             return _templateService.GetAllDomains();
             //return new string[] { "value1", "value2" };
         }
 
         // GET: api/Test/5
-        public DomainTemplate Get(string id)
+        public DomainDataset Get(string id)
         {
             return _templateService.GetDomainTemplateById(id);
         }

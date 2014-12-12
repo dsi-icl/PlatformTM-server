@@ -14,7 +14,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string ActivityId { get; set; }
         public string DomainId { get; set; }
         public Activity Activity { get; set; }
-        public DomainTemplate Domain { get; set; }
+        public DomainDataset Domain { get; set; }
         public ICollection<VariableReference> Variables { get; set; }
 
     }

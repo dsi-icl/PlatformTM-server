@@ -24,7 +24,7 @@ namespace eTRIKS.Commons.Persistence
 
 
         //TODO: not sure if these DbSet declarations still need to be here.
-        public DbSet<DomainTemplate> DomainTemplates { get; set; }
+        public DbSet<DomainDataset> DomainTemplates { get; set; }
         public DbSet<DomainTemplateVariable> DomainTemplateVariables { get; set; }
 
         public DbSet<Study> Studies { get; set; }

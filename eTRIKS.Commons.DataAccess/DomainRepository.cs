@@ -10,7 +10,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.DataAccess
 {
-    class DomainRepository : GenericRepository<DomainTemplate, string>
+    class DomainRepository : GenericRepository<DomainDataset, string>
     {
         public DomainRepository(DbContext dataContext) : base(dataContext)
         {
@@ -18,6 +18,8 @@ namespace eTRIKS.Commons.DataAccess
 
             
         }
+
+
 
         public void getDomainWithVariables()
         {
