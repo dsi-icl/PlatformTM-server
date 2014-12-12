@@ -42,7 +42,7 @@ namespace eTRIKS.Commons.Persistence {
 
             return repository;
         }
-
+          
         public void Save() {
             base.SaveChanges();
         }

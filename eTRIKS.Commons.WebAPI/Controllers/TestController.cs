@@ -30,19 +30,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _templateService.GetDomainTemplateById(id);
         }
 
-        // POST: api/Test
-        public void Post([FromBody]string value)
-        {
-        }
 
-        // PUT: api/Test/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/Test/5
-        public void Delete(int id)
-        {
-        }
     }
 }

@@ -7,6 +7,8 @@ using System.Web.Http;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
+using eTRIKS.Commons.Core.Domain.Model;
+
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -18,39 +20,27 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             _datasetService = datasetService;
         }
-        
-        // GET: api/Dataset
-        public IEnumerable<string> Get()
+
+        [HttpPost]
+        public void Add([FromBody] List<VariableReferenceDTO> varRefDTOList)
         {
-            return new string[] { "value1", "value2" };
+            List<VariableReference> varRefList = new List<VariableReference>();
+            for (int i = 0; i < varRefDTOList.Count; i++)
+            {
+                VariableReference varRef = new VariableReference();
+                varRef.VariableDefinitionId = varRefDTOList[i].VariableDefinitionId;
+                varRef.DatasetId = varRefDTOList[i].DatasetId;
+                varRef.OID = varRefDTOList[i].VariableDefinitionId;
+                // Continue for the rest of the fields
+                varRefList.Add(varRef);
+            }
+            _datasetService.addDatasetReferences(varRefList);
         }
 
-        //// GET: api/Dataset/5
-        //public DomainDataset Get(string id)
+        //public DomainDataset GetDomain(string id)
         //{
-        //    return _datasetService.GetTemplateDataset(id);
+        //    return _datasetService.GetTemplateDatasetNew(id);
         //}
 
-        //Customisation (Dilshan)
-
-        public DomainDataset GetDomain(string id)
-        {
-            return _datasetService.GetTemplateDatasetNew(id);
-        }
-
-        // POST: api/Dataset
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT: api/Dataset/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE: api/Dataset/5
-        public void Delete(int id)
-        {
-        }
     }
 }
