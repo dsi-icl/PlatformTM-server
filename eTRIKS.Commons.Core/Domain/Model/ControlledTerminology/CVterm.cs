@@ -18,7 +18,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
         public string DictionaryId { get; set; }
         public string XrefId { get; set; }
         public virtual Dbxref Xref { get; set; }
-        public virtual Dictionary Dictionary { get; set; }
+        public virtual Dictionary Dictionary { get; private set; }
 
     }
 }

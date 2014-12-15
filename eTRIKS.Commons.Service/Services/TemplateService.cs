@@ -12,12 +12,12 @@ namespace eTRIKS.Commons.Service.Services{
 
         //TODO: should be replaced with only one repository to include only the Aggregate Root (i.e. DomainTemplate)
         private readonly IRepository<DomainTemplate,string> _templateRepository;
-        private readonly IRepository<DomainTemplateVariable, string> _templateVariableRepository;
+        private readonly IRepository<DomainVariableTemplate, string> _templateVariableRepository;
 
         public TemplateService(IServiceUoW uoW){
             _dataServiceUnit = uoW;
             _templateRepository = uoW.GetRepository<DomainTemplate, string>();
-            _templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
+            _templateVariableRepository = uoW.GetRepository<DomainVariableTemplate,string>();
         }
 
         public IEnumerable<DomainTemplate> GetAllDomains()

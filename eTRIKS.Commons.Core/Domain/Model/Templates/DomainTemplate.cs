@@ -14,7 +14,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public string Structure { get; set; }
         public Boolean IsRepeating { get; set; }
 
-        public ICollection<DomainTemplateVariable> Variables { get; set; }
+        public virtual ICollection<DomainVariableTemplate> Variables { get; set; }
     }
 
 }

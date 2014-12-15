@@ -22,7 +22,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
             // Table & Column Mappings
             this.ToTable("Variable_Reference_TBL");
             this.Property(t => t.VariableDefinitionId).HasColumnName("VariableId");
-            this.Property(t => t.DatasetId).HasColumnName("ActivityDatasetId");
+            this.Property(t => t.DatasetId).HasColumnName("DatasetId");
             //this.Property(t => t.OrderNumber).HasColumnName("orderNo");
             //this.Property(t => t.IsRequired).HasColumnName("mandatory");
             //this.Property(t => t.KeySequence).HasColumnName("keySequence");

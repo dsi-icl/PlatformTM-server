@@ -59,7 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="etriksDataContext.cs" />
+    <Compile Include="etriksDataContext_dev.cs" />
     <Compile Include="Mapping\DatasetMap.cs" />
     <Compile Include="Mapping\ActivityMap.cs" />
     <Compile Include="Mapping\CVtermMap.cs" />
@@ -89,8 +89,18 @@
       <DependentUpon>201410170729114_addingVarCVFK.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Migrations_local\201412051841017_Initial.cs" />
+    <Compile Include="Migrations_local\201412051841017_Initial.Designer.cs">
+      <DependentUpon>201412051841017_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_local\Configuration.cs" />
+    <Compile Include="Migrations_prod\201412052017246_Initial.cs" />
+    <Compile Include="Migrations_prod\201412052017246_Initial.Designer.cs">
+      <DependentUpon>201412052017246_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="etriksDataContextUoW.cs" />
+    <Compile Include="etriksDataContext_prod.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -121,6 +131,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201410170729114_addingVarCVFK.resx">
       <DependentUpon>201410170729114_addingVarCVFK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_local\201412051841017_Initial.resx">
+      <DependentUpon>201412051841017_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201412052017246_Initial.resx">
+      <DependentUpon>201412052017246_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

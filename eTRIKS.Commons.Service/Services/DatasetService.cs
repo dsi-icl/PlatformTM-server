@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -14,7 +15,8 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IServiceUoW _dataServiceUnit;
         private IRepository<Dataset, string> _datasetRepository;
-        private IRepository<DomainTemplate, string> _domainRepository; 
+        private IRepository<DomainTemplate, string> _domainRepository;
+        private IRepository<Activity, string> _activityRepository;
 
         public DatasetService(IServiceUoW uoW)
         {
@@ -23,31 +25,62 @@ namespace eTRIKS.Commons.Service.Services
             //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, string>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
+            //_activityRepository = uoW.GetRepository<Activity, string>();
         }
 
         /// <summary>
         /// Retrieves Domain dataset from Template Tables for "New" datasets
         /// </summary>
         /// <param name="domainId"></param>
-        public DomainTemplate GetTemplateDataset(string domainId)
+        public DatasetDTO GetTemplateDataset(string domainId)
         {
             DomainTemplate domainTemplate = _domainRepository.Get(
-                d => d.OID == domainId,
+                d => d.OID.Equals(domainId),
+                new List<Expression<Func<DomainTemplate, object>>>(){
+                    d => d.Variables.Select(c => c.controlledTerminology)
+                },
                 null,
-                new List<Expression<Func<DomainTemplate, object>>>()
-                {
-                    d => d.Variables.Select(t => t.controlledTerminologyId)
-                        
-                }).FirstOrDefault();
+                null
+                ).FirstOrDefault<DomainTemplate>();
 
-            return domainTemplate;
+            //_dataServiceUnit.Dispose();
+
+            //TODO: USE AutoMapper instead of this manual mapping
+
+            DatasetDTO dto = new DatasetDTO();
+
+            dto.Class = domainTemplate.Class;
+            dto.Description = domainTemplate.Description;
+            dto.Name = domainTemplate.Name;
+            List<DatasetVariableDTO> vars = new List<DatasetVariableDTO>();
+            foreach (DomainVariableTemplate vt in domainTemplate.Variables)
+            {
+                DatasetVariableDTO dv = new DatasetVariableDTO();
+                dv.Name = vt.Name;
+                dv.Description = vt.Description;
+                dv.Label = vt.Label;
+                if(vt.controlledTerminology!=null)
+                    dv.CVdictionary = vt.controlledTerminology.Name;
+                vars.Add(dv);
+            }
+            dto.variables = vars;
+
+            return dto;
         }
 
+
+        public List<DomainTemplate> GetAllDomainTemplates()
+        {
+            return _domainRepository.GetAllList();
+        }
+
+        
+
         /// <summary>
-        /// Retrives dataset for selected activity, which includes Variable_Defs, DomainVariables and Variable_Refs
+        /// Retrieves dataset for selected activity, which includes Variable_Defs, DomainVariables and Variable_Refs
         /// </summary>
-        /// <param name="datasetId"></param>
-        public void GetActivityDataset(string datasetId)
+        /// <param name="activityId"></param>
+        public void GetActivityDataset(string activityId)
         {
             //getActivityDataset including var_refs and var_defs
 
@@ -59,12 +92,13 @@ namespace eTRIKS.Commons.Service.Services
         public void addDataset()
         {
             //For a new dataset 
-            //input: datasetSTO
+            //input: datasetDTO
             //Extract from datasetDTO the variables
             //new dataset
             //Iterate over datasetDTO variables
             //for each variable create new variable_Ref (use createOrRetrieve) add to datasets var_def collection
-            //
+            
+
         }
     }
 }

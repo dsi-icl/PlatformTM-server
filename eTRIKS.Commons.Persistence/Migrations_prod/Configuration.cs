@@ -1,4 +1,4 @@
-namespace eTRIKS.Commons.Persistence.Migrations
+namespace eTRIKS.Commons.Persistence.Migrations_prod
 {
     using System;
     using System.Data.Entity;
@@ -10,11 +10,9 @@ namespace eTRIKS.Commons.Persistence.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            MigrationsDirectory = @"Migrations_prod";
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
-           
         }
-
-        
 
         protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContext_prod context)
         {

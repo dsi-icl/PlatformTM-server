@@ -8,7 +8,7 @@ using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Service.DTOs
 {
-    class DatasetDTO
+    public class DatasetDTO
     {
         public string Name { get; set; }
         public string Class { get; set; }
@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public List<DatasetVariableDTO> variables { get; set; }
     }
 
-    class DatasetVariableDTO
+    public class DatasetVariableDTO
     {
         public string Name { get; set; }
         public string Label { get; set; }

@@ -1,22 +1,20 @@
-namespace eTRIKS.Commons.Persistence.Migrations
+namespace eTRIKS.Commons.Persistence.Migrations_local
 {
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContext_prod>
+    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContext_dev>
     {
         public Configuration()
         {
             AutomaticMigrationsEnabled = false;
+            MigrationsDirectory = @"Migrations_local";
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
-           
         }
 
-        
-
-        protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContext_prod context)
+        protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContext_dev context)
         {
             //  This method will be called after migrating to the latest version.
 
