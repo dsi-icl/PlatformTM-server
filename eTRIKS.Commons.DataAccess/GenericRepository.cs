@@ -49,7 +49,7 @@ namespace eTRIKS.Commons.DataAccess
         public  TEntity GetList(Func<TEntity, bool> where,
                  params Expression<Func<TEntity, object>>[] navigationProperties)
         {
-            
+             
             TEntity data = null;
             //using (var context = new DataContext())
             //{

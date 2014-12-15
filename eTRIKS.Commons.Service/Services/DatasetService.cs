@@ -84,7 +84,7 @@ namespace eTRIKS.Commons.Service.Services
             //
         }
 
-        public void addDatasetReferences(List<VariableReference> variableReferences)
+        public void addDatasetVariableReferences(List<VariableReference> variableReferences)
         {
             for (int i = 0; i < variableReferences.Count; i++)
             {

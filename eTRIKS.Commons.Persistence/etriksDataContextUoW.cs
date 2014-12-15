@@ -44,7 +44,11 @@ namespace eTRIKS.Commons.Persistence {
         }
           
         public void Save() {
-            base.SaveChanges();
+            try
+            {
+                base.SaveChanges();
+            }
+            catch (Exception e) { }
         }
 
         public void Dispose() {

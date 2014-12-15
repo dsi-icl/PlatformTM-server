@@ -30,11 +30,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 VariableReference varRef = new VariableReference();
                 varRef.VariableDefinitionId = varRefDTOList[i].VariableDefinitionId;
                 varRef.DatasetId = varRefDTOList[i].DatasetId;
-                varRef.OID = varRefDTOList[i].VariableDefinitionId;
+                //varRef.OID = varRefDTOList[i].VariableDefinitionId;
                 // Continue for the rest of the fields
                 varRefList.Add(varRef);
             }
-            _datasetService.addDatasetReferences(varRefList);
+            _datasetService.addDatasetVariableReferences(varRefList);
         }
 
         //public DomainDataset GetDomain(string id)
