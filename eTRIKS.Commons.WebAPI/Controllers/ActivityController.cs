@@ -60,7 +60,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _activityService.getActivity(studyId, activityId);
         }
-
+           
         public IEnumerable<Activity> getStudyActivities(string studyId)
         {
             return _activityService.getStudyActivities(studyId);
