@@ -6,10 +6,7 @@ using System.Runtime.Serialization;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {
-
-    //[KnownType(typeof(DomainTemplateVariable))]
-    //[DataContract]
-    public class DomainDataset : Identifiable<string>
+    public class DomainTemplate : Identifiable<string>
     {
 
         //public string OID { get; set; }
@@ -20,8 +17,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public string Structure { get; set; }
         public Boolean IsRepeating { get; set; }
 
-
-        public virtual ICollection<DomainTemplateVariable> Variables { get; set; }
+        public virtual ICollection<DomainVariableTemplate> Variables { get; set; }
     }
 
 }

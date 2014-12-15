@@ -4,9 +4,7 @@ using System.Runtime.Serialization;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {
-    //[KnownType(typeof(DomainDataset))]
-    //[DataContract]
-    public class DomainTemplateVariable : Identifiable<string>
+    public class DomainVariableTemplate : Identifiable<string>
     {
         //public string OID { get; set; }
         public string Name { get; set; }
@@ -19,10 +17,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public string UsageId { get; set; }
         public string controlledTerminologyId { get; set; }
 
-        public virtual CVterm VariableType { get; private set; }
-        public virtual CVterm Role { get; private set; }
-        public virtual CVterm Usage { get; private set; }
-        public virtual DomainDataset Domain { get; private set; }
-        public virtual Dictionary controlledTerminology { get; private set; }
+        public  CVterm VariableType { get; set; }
+        public CVterm Role { get; set; }
+        public CVterm Usage { get; set; }
+        public  DomainTemplate Domain { get; set; }
+        public  Dictionary controlledTerminology { get; set; }
     }
 }

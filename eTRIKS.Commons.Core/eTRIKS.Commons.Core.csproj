@@ -53,7 +53,7 @@
     <Compile Include="Domain\Model\Templates\DomainTemplate.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\Model\Templates\DomainTemplateVariable.cs">
+    <Compile Include="Domain\Model\Templates\DomainVariableTemplate.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Domain\Interfaces\IRepository.cs" />

@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 
+
 namespace eTRIKS.Commons.DataAccess
 {
     public class GenericRepository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
@@ -19,16 +20,17 @@ namespace eTRIKS.Commons.DataAccess
         // THEN this means we will have to create ANOTHER Repository Implementation for TESTING instead of using
         // this one and only passnig it a different context (or a different DBset)
         protected DbContext DataContext { get; set; }
-        protected IDbSet<TEntity> Entities { get; set; }
+        protected DbSet<TEntity> Entities { get; set; }
         public GenericRepository(DbContext dataContext)
         {
             DataContext = dataContext;
             DataContext.Configuration.ProxyCreationEnabled = false;
             Entities = DataContext.Set<TEntity>();
+            
         }
         public GenericRepository(IDbSet<TEntity> entities)
         {
-            Entities = entities;
+            Entities = (DbSet<TEntity>)entities;
         }
 
         public IQueryable<TEntity> GetAll()
@@ -46,45 +48,22 @@ namespace eTRIKS.Commons.DataAccess
             return GetAll().Where(predicate).ToList();
         }
 
-        public  TEntity GetList(Func<TEntity, bool> where,
-                 params Expression<Func<TEntity, object>>[] navigationProperties)
-        {
-             
-            TEntity data = null;
-            //using (var context = new DataContext())
-            //{
-           //IQueryable<TEntity> dbQuery = DataContext.Set<TEntity>();
-            IQueryable<TEntity> query = Entities;
-                //Apply eager loading
-                foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
-                    query = query.Include<TEntity, object>(navigationProperty);
-                try
-                {
-                    data = query
-                        .AsNoTracking()
-                        .FirstOrDefault(where);
-                }
-                catch (Exception e) { }
-            //}
-
-            return data;
-        }
-
-        public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, 
-                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+        public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
                                     List<Expression<Func<TEntity, object>>> includeProperties = null,
+                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,
                                     int? pageSize = null)
         {
            
             IQueryable<TEntity> query = Entities;
-     
+
             if (includeProperties != null)
-                includeProperties.ForEach(i => query.Include(i));
- 
+                includeProperties.ForEach(i => 
+                    query = query.Include<TEntity, object>(i));
+
             if (filter != null)
                 query = query.Where(filter);
- 
+
             if (orderBy != null)
                 query = orderBy(query);
  
@@ -92,8 +71,8 @@ namespace eTRIKS.Commons.DataAccess
                 query = query
                     .Skip((page.Value - 1)*pageSize.Value)
                     .Take(pageSize.Value);
- 
-            return query.ToList();
+
+            return query.ToList<TEntity>();
         }
 
         public TEntity GetById(TPrimaryKey key)
@@ -101,8 +80,10 @@ namespace eTRIKS.Commons.DataAccess
             return Entities.Find(key);
         }
 
+        
+
         public TEntity Insert(TEntity entity)
-        {    
+        {
             return Entities.Add(entity);
         }
 

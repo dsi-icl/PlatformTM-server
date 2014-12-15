@@ -21,7 +21,7 @@ namespace eTRIKS.Commons.WebAPI
             //    Newtonsoft.Json.PreserveReferencesHandling.All;
 
             //var xml = GlobalConfiguration.Configuration.Formatters.XmlFormatter;
-            //xml.se.SerializerSettings.PreserveReferencesHandling =
+            //xml.SerializerSettings.PreserveReferencesHandling =
             //    Newtonsoft.Json.PreserveReferencesHandling.All;
 
 

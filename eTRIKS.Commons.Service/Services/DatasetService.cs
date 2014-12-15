@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -14,7 +15,8 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IServiceUoW _dataServiceUnit;
         private IRepository<Dataset, string> _datasetRepository;
-        private IRepository<DomainDataset, string> _domainRepository;
+        private IRepository<DomainTemplate, string> _domainRepository;
+        private IRepository<Activity, string> _activityRepository;
         private IRepository<VariableReference, string> _variableReferenceRepository; 
 
         public DatasetService(IServiceUoW uoW)
@@ -23,7 +25,7 @@ namespace eTRIKS.Commons.Service.Services
             //_templateRepository = uoW.GetRepository<DomainTemplate, string>();
             //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, string>();
-            _domainRepository = uoW.GetRepository<DomainDataset, string>();
+            _domainRepository = uoW.GetRepository<DomainTemplate, string>();
             _variableReferenceRepository = uoW.GetRepository<VariableReference, string>();
         }
 
@@ -31,40 +33,63 @@ namespace eTRIKS.Commons.Service.Services
         /// Retrieves Domain dataset from Template Tables for "New" datasets
         /// </summary>
         /// <param name="domainId"></param>
-        public DomainDataset GetTemplateDataset(string domainId)
+        public DatasetDTO GetTemplateDataset(string domainId)
         {
-            DomainDataset domainTemplate = _domainRepository.Get(
-                d => d.OID == domainId,
+            DomainTemplate domainTemplate = _domainRepository.Get(
+                d => d.OID.Equals(domainId),
+                new List<Expression<Func<DomainTemplate, object>>>(){
+                    d => d.Variables.Select(c => c.controlledTerminology.Xref)
+                },
                 null,
-                new List<Expression<Func<DomainDataset, object>>>()
+                null
+                ).FirstOrDefault<DomainTemplate>();
+
+
+            //TODO: USE AutoMapper instead of this manual mapping
+
+            DatasetDTO dto = new DatasetDTO();
+
+            dto.Class = domainTemplate.Class;
+            dto.Description = domainTemplate.Description;
+            dto.Name = domainTemplate.Name;
+            List<DatasetVariableDTO> vars = new List<DatasetVariableDTO>();
+            foreach (DomainVariableTemplate vt in domainTemplate.Variables)
+            {
+                DatasetVariableDTO dv = new DatasetVariableDTO();
+                dv.Name = vt.Name;
+                dv.Description = vt.Description;
+                dv.Label = vt.Label;
+
+                if (vt.controlledTerminology != null)
                 {
-                    d => d.Variables
-                        
-                }).FirstOrDefault();
+                    dv.DictionaryName = vt.controlledTerminology.Name;
+                    dv.DictionaryDefinition = vt.controlledTerminology.Definition;
+                    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.Accession;
+                }
+                dv.IsRequired = null;
+                dv.KeySequence = null;
+                dv.OrderNumber = null;
+                    
+                vars.Add(dv);
+            }
+            dto.variables = vars;
 
-            return domainTemplate;
+            return dto;
         }
 
 
-        public DomainDataset GetTemplateDatasetNew(string domainId)
+        public List<DomainTemplate> GetAllDomainTemplates()
         {
-            //IList<Templates_DomainDataset_TBL> tempDomVar3 = chkExist.GetList(o => o.OID.Equals("D-SDTM-LB"), d => d.Templates_DomainVariable_TBL.Select(t => t.Dictionary_TBL));
-
-            //IList<DomainDataset> domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId));
-            
-            ///DomainDataset domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId), d => d.Variables);
-            //DomainDataset domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId), d => d.Variables.Select(t => t.controlledTerminology));
-            DomainDataset domainTemplate = _domainRepository.GetList(d => d.OID.Equals(domainId));
-            _dataServiceUnit.Dispose();
-
-            return domainTemplate;
+            return _domainRepository.GetAllList();
         }
+
+        
 
         /// <summary>
-        /// Retrives dataset for selected activity, which includes Variable_Defs, DomainVariables and Variable_Refs
+        /// Retrieves dataset for selected activity, which includes Variable_Defs, DomainVariables and Variable_Refs
         /// </summary>
-        /// <param name="datasetId"></param>
-        public void GetActivityDataset(string datasetId)
+        /// <param name="activityId"></param>
+        public void GetActivityDataset(string activityId)
         {
             //getActivityDataset including var_refs and var_defs
 
@@ -76,7 +101,7 @@ namespace eTRIKS.Commons.Service.Services
         public void addDataset()
         {
             //For a new dataset 
-            //input: datasetSTO
+            //input: datasetDTO
             //Extract from datasetDTO the variables
             //new dataset
             //Iterate over datasetDTO variables

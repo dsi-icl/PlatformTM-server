@@ -8,17 +8,21 @@ using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
 
 namespace eTRIKS.Commons.Persistence {
-    public class etriksDataContextUoW : DbContext, IServiceUoW {
+    public class etriksDataContext_prod : DbContext, IServiceUoW {
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
         private bool _disposed;
 
-        public etriksDataContextUoW() : base("name=eTRIKScontext_MySQL"){
+        public etriksDataContext_prod()
+            : base("name=eTRIKScontext_MySQL")
+        {
             //_dataContext = context;
-            Database.SetInitializer<etriksDataContextUoW>(null);
+            Configuration.ProxyCreationEnabled = false;
+            Database.SetInitializer<etriksDataContext_prod>(null);
             
             _repositories = new Dictionary<Type, object>();
+            this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             _disposed = false;
         }
 
@@ -34,8 +38,8 @@ namespace eTRIKS.Commons.Persistence {
             }
 
             // If the repository for that Model class doesn't exist, create it
-           // var repository = new GenericRepository<TEntity,TPrimaryKey>(_dataContext);
-            var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
+           var repository = new GenericRepository<TEntity,TPrimaryKey>(this);
+            //var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
 
             // Add it to the dictionary
             _repositories.Add(typeof(TEntity), repository);
