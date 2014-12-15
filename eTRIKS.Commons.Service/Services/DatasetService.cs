@@ -25,7 +25,6 @@ namespace eTRIKS.Commons.Service.Services
             //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, string>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
-            //_activityRepository = uoW.GetRepository<Activity, string>();
         }
 
         /// <summary>
@@ -37,13 +36,12 @@ namespace eTRIKS.Commons.Service.Services
             DomainTemplate domainTemplate = _domainRepository.Get(
                 d => d.OID.Equals(domainId),
                 new List<Expression<Func<DomainTemplate, object>>>(){
-                    d => d.Variables.Select(c => c.controlledTerminology)
+                    d => d.Variables.Select(c => c.controlledTerminology.Xref)
                 },
                 null,
                 null
                 ).FirstOrDefault<DomainTemplate>();
 
-            //_dataServiceUnit.Dispose();
 
             //TODO: USE AutoMapper instead of this manual mapping
 
@@ -59,8 +57,17 @@ namespace eTRIKS.Commons.Service.Services
                 dv.Name = vt.Name;
                 dv.Description = vt.Description;
                 dv.Label = vt.Label;
-                if(vt.controlledTerminology!=null)
-                    dv.CVdictionary = vt.controlledTerminology.Name;
+
+                if (vt.controlledTerminology != null)
+                {
+                    dv.DictionaryName = vt.controlledTerminology.Name;
+                    dv.DictionaryDefinition = vt.controlledTerminology.Definition;
+                    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.Accession;
+                }
+                dv.IsRequired = null;
+                dv.KeySequence = null;
+                dv.OrderNumber = null;
+                    
                 vars.Add(dv);
             }
             dto.variables = vars;

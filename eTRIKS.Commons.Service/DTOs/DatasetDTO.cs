@@ -35,7 +35,9 @@ namespace eTRIKS.Commons.Service.DTOs
         public Nullable<bool> IsRequired { get; set; }
         public Nullable<int> KeySequence { get; set; }
         public bool isSelected { get; set; }
-        public string CVdictionary { get; set; }
+        public string DictionaryName { get; set; }
+        public string DictionaryDefinition { get; set; }
+        public string DictionaryXrefURL { get; set; }
         //public DerivedMethod DerivedVariableProperties { get; set; }
         //public string DerivedVariablePropertiesId { get; set; }
     }
