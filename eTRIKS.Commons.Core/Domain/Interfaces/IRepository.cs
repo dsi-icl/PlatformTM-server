@@ -46,7 +46,9 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         /// <returns>Entity</returns>
         TEntity GetById(TPrimaryKey key);
 
-       
+        IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter);
+
+        TEntity GetRecord(Func<TEntity, bool> predicate);
 
         #endregion
 

@@ -51,20 +51,42 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _datasetService.GetTemplateDataset(domainId);
         }
 
+        //[HttpPost]
+        //public void Add([FromBody] List<VariableReferenceDTO> varRefDTOList)
+        //{
+        //    List<VariableReference> varRefList = new List<VariableReference>();
+        //    for (int i = 0; i < varRefDTOList.Count; i++)
+        //    {
+        //        VariableReference varRef = new VariableReference();
+        //        varRef.VariableDefinitionId = varRefDTOList[i].VariableDefinitionId;
+        //        varRef.DatasetId = varRefDTOList[i].DatasetId;
+        //        //varRef.OID = varRefDTOList[i].VariableDefinitionId;
+        //        // Continue for the rest of the fields
+        //        varRefList.Add(varRef);
+        //    }
+        //    _datasetService.addDatasetVariableReferences(varRefList);
+        //}
+
+
         [HttpPost]
-        public void Add([FromBody] List<VariableReferenceDTO> varRefDTOList)
+        public void addDataset(string activityId, [FromBody] DatasetDTO datasetDTO)
         {
+            Dataset dataset = new Dataset();
+            List<VariableDefinition> varDefList = new List<VariableDefinition>();
             List<VariableReference> varRefList = new List<VariableReference>();
-            for (int i = 0; i < varRefDTOList.Count; i++)
+            for (int i = 0; i < datasetDTO.variables.Count; i++)
             {
-                VariableReference varRef = new VariableReference();
-                varRef.VariableDefinitionId = varRefDTOList[i].VariableDefinitionId;
-                varRef.DatasetId = varRefDTOList[i].DatasetId;
-                //varRef.OID = varRefDTOList[i].VariableDefinitionId;
-                // Continue for the rest of the fields
-                varRefList.Add(varRef);
+                if (datasetDTO.variables[i].isSelected)
+                {
+                    //1. add to the varRefList and varDef
+                }
             }
-            _datasetService.addDatasetVariableReferences(varRefList);
+            //2. Load the vardef's
+
+            //3. Load the dataset
+            dataset.Variables = varRefList;
+            _datasetService.addDataset(dataset);
+
         }
 
         //public DomainDataset GetDomain(string id)
