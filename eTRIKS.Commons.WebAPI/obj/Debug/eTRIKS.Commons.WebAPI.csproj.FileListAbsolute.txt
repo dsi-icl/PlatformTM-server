@@ -49,3 +49,6 @@ C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.WebPages.Ra
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\obj\Debug\eTRIKS.Commons.WebAPI.csprojResolveAssemblyReference.cache
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\obj\Debug\eTRIKS.Commons.WebAPI.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\obj\Debug\eTRIKS.Commons.WebAPI.pdb
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.Cors.dll
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.Http.Cors.dll
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.Http.Cors.xml

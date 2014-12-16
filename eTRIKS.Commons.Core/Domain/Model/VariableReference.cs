@@ -7,7 +7,7 @@ using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class VariableReference : Identifiable<string>
+    public class VariableReference 
     { 
         public int? OrderNumber { get; set; }
         public bool? IsRequired { get; set; }

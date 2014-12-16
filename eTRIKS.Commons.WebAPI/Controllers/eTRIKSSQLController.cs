@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         private ITemplateService _templateService;
 
         [Route("{id}")]
-        public DomainDataset Get(string id)
+        public DomainTemplate Get(string id)
         {
 
             return _templateService.GetDomainTemplateById(id);

@@ -26,7 +26,6 @@ namespace eTRIKS.Commons.Service.Services
             //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, string>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
-            _variableReferenceRepository = uoW.GetRepository<VariableReference, string>();
         }
 
         /// <summary>

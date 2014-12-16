@@ -7,7 +7,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
     {
         public override void Up()
         {
-//            DropForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainDataset_TBL");
+//            DropForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainTemplate_TBL");
 //            DropIndex("Templates.DomainVariable_TBL", new[] { "DomainId" });
 
 //            Sql(@"SET FOREIGN_KEY_CHECKS = 0;
@@ -21,12 +21,12 @@ namespace eTRIKS.Commons.Persistence.Migrations
 //            CreateIndex("Templates.DomainVariable_TBL", "DomainId");
 //            CreateIndex("Templates.DomainVariable_TBL", "DictionaryId");
 //            AddForeignKey("Templates.DomainVariable_TBL", "DictionaryId", "dbo.Dictionary_TBL", "OID");
-//            AddForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainDataset_TBL", "OID", cascadeDelete: true);
+//            AddForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainTemplate_TBL", "OID", cascadeDelete: true);
         }
         
         public override void Down()
         {
-            DropForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainDataset_TBL");
+            DropForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainTemplate_TBL");
             DropForeignKey("Templates.DomainVariable_TBL", "DictionaryId", "dbo.Dictionary_TBL");
             DropIndex("Templates.DomainVariable_TBL", new[] { "DictionaryId" });
             DropIndex("Templates.DomainVariable_TBL", new[] { "DomainId" });
@@ -35,7 +35,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
             RenameIndex(table: "dbo.CVterm_TBL", name: "IX_DictionaryId", newName: "IX_DictionartyId");
             RenameColumn(table: "dbo.CVterm_TBL", name: "DictionaryId", newName: "DictionartyId");
             CreateIndex("Templates.DomainVariable_TBL", "DomainId");
-            AddForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainDataset_TBL", "OID");
+            AddForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainTemplate_TBL", "OID");
         }
     }
 }

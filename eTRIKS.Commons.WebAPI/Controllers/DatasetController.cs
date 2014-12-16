@@ -10,6 +10,7 @@ using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.DTOs;
 
 using System.Web.Http.Cors;
+using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -85,11 +86,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             //3. Load the dataset
             dataset.Variables = varRefList;
-            _datasetService.addDataset(dataset);
+            //_datasetService.addDataset(dataset);
 
         }
 
-        //public DomainDataset GetDomain(string id)
+        //public DomainTemplate GetDomain(string id)
         //{
         //    return _datasetService.GetTemplateDatasetNew(id);
         //}
