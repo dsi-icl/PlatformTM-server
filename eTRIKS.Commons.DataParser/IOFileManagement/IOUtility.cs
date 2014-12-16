@@ -16,7 +16,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
     {
         public List<string> getDataSourceColumns(string dataSource)
         {
-
+             //
             //Type myType = Type.GetType("eTRIKS.Commons.Core.Domain.Model." + dataSource);
 
             Type myType = typeof(Activity);
