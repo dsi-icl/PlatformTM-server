@@ -41,8 +41,6 @@
   <ItemGroup>
     <Compile Include="DTOs\ActivityDTO.cs" />
     <Compile Include="DTOs\DatasetDTO.cs" />
-    <Compile Include="DTOs\DomainDataset.cs" />
-    <Compile Include="DTOs\DomainVariable.cs" />
     <Compile Include="DTOs\VariableDefinitionDTO.cs" />
     <Compile Include="DTOs\VariableReferenceDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
