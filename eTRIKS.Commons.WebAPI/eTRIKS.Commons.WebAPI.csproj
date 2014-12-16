@@ -150,6 +150,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Controllers\ActivityController.cs" />
+    <Compile Include="Controllers\DataLoaderController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
     <Compile Include="Controllers\StudyController.cs" />
     <Compile Include="DependencyResolution\ContainerBootstrapper.cs">
@@ -284,6 +285,10 @@
     <ProjectReference Include="..\eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj">
       <Project>{5c7f6a70-9395-4dcf-8223-f1ae65f77c0f}</Project>
       <Name>eTRIKS.Commons.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\eTRIKS.Commons.DataParser\eTRIKS.Commons.DataLoader.csproj">
+      <Project>{e04990d7-2b8a-4452-9e4f-484eb1dba968}</Project>
+      <Name>eTRIKS.Commons.DataLoader</Name>
     </ProjectReference>
     <ProjectReference Include="..\eTRIKS.Commons.Persistence\eTRIKS.Commons.Persistence.csproj">
       <Project>{31C83932-E4E3-40F0-9596-5B99B6213886}</Project>

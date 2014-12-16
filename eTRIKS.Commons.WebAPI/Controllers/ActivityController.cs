@@ -51,16 +51,19 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    return Request.CreateResponse(HttpStatusCode.NotFound);
         //}
 
+        [HttpGet]
         public Activity GetActivityByKey(string activityId)
         {
             return _activityService.getActivityById(activityId);
         }
 
+        [HttpGet]
         public Activity getActivity(string studyId, string activityId)
         {
             return _activityService.getActivity(studyId, activityId);
         }
-           
+
+        [HttpGet]
         public IEnumerable<Activity> getStudyActivities(string studyId)
         {
             return _activityService.getStudyActivities(studyId);

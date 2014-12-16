@@ -52,3 +52,5 @@ C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\obj\Debug\eTRIKS.Commons.W
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.Cors.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.Http.Cors.dll
 C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\System.Web.Http.Cors.xml
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\eTRIKS.Commons.DataParser.exe
+C:\Dilshan\eTRIKS\eTRIKSService\eTRIKS.Commons.WebAPI\bin\eTRIKS.Commons.DataParser.pdb

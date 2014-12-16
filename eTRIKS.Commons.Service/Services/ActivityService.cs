@@ -56,8 +56,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public Activity getActivity(string studyId, string activityId)
         {
-            //return _activityRepository.GetRecord(o => o.OID.Equals(activityId) && o.StudyId.Equals(studyId), d=> d.Datasets);
-            return null;
+            return _activityRepository.GetList(o => o.OID.Equals(activityId) && o.StudyId.Equals(studyId), d=> d.Datasets);
         }
 
         public IEnumerable<Activity> getStudyActivities(string studyId)

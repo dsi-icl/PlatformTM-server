@@ -93,7 +93,6 @@ namespace eTRIKS.Commons.DataAccess
 
 
 
-
         public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, 
                                     List<Expression<Func<TEntity, object>>> includeProperties = null,
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
