@@ -36,7 +36,7 @@ namespace eTRIKS.Commons.Service.Services
             DomainTemplate domainTemplate = _domainRepository.Get(
                 d => d.OID.Equals(domainId),
                 new List<Expression<Func<DomainTemplate, object>>>(){
-                    d => d.Variables.Select(c => c.controlledTerminology.Xref)
+                    d => d.Variables.Select(c => c.controlledTerminology.Xref.DB)
                 },
                 null,
                 null
@@ -50,6 +50,8 @@ namespace eTRIKS.Commons.Service.Services
             dto.Class = domainTemplate.Class;
             dto.Description = domainTemplate.Description;
             dto.Name = domainTemplate.Name;
+            dto.DomainId = domainTemplate.OID;
+            dto.Structure = domainTemplate.Structure;
             List<DatasetVariableDTO> vars = new List<DatasetVariableDTO>();
             foreach (DomainVariableTemplate vt in domainTemplate.Variables)
             {
@@ -57,12 +59,12 @@ namespace eTRIKS.Commons.Service.Services
                 dv.Name = vt.Name;
                 dv.Description = vt.Description;
                 dv.Label = vt.Label;
-
+                dv.Id = vt.OID;
                 if (vt.controlledTerminology != null)
                 {
                     dv.DictionaryName = vt.controlledTerminology.Name;
                     dv.DictionaryDefinition = vt.controlledTerminology.Definition;
-                    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.Accession;
+                    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.DB.UrlPrefix+vt.controlledTerminology.Xref.Accession;
                 }
                 dv.IsRequired = null;
                 dv.KeySequence = null;
