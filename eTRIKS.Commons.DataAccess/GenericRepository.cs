@@ -48,7 +48,52 @@ namespace eTRIKS.Commons.DataAccess
             return GetAll().Where(predicate).ToList();
         }
 
-        public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
+        public IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter)
+        {
+            IQueryable<TEntity> dbQuery = Entities;
+            return dbQuery.Where(filter);
+        }
+
+        public TEntity GetRecord(Func<TEntity, bool> predicate)
+        {
+            try
+            {
+                IQueryable<TEntity> dbQuery = Entities;
+                return dbQuery.Single(predicate);
+            }
+            catch (Exception e) 
+            {
+                return null;
+            }
+        }
+
+        public  TEntity GetList(Func<TEntity, bool> where,
+                 params Expression<Func<TEntity, object>>[] navigationProperties)
+        {
+             
+            TEntity data = null;
+            //using (var context = new DataContext())
+            //{
+           //IQueryable<TEntity> dbQuery = DataContext.Set<TEntity>();
+            IQueryable<TEntity> query = Entities;
+                //Apply eager loading
+                foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
+                    query = query.Include<TEntity, object>(navigationProperty);
+                try
+                {
+                    data = query
+                        .AsNoTracking()
+                        .FirstOrDefault(where);
+                }
+                catch (Exception e) { }
+            //}
+
+            return data;
+        }
+
+
+
+        public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, 
                                     List<Expression<Func<TEntity, object>>> includeProperties = null,
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,

@@ -19,6 +19,8 @@ namespace eTRIKS.Commons.DataAccess
             
         }
 
+
+
         public void getDomainWithVariables()
         {
             

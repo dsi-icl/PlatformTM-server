@@ -17,6 +17,7 @@ namespace eTRIKS.Commons.Service.Services
         private IRepository<Dataset, string> _datasetRepository;
         private IRepository<DomainTemplate, string> _domainRepository;
         private IRepository<Activity, string> _activityRepository;
+        private IRepository<VariableReference, string> _variableReferenceRepository; 
 
         public DatasetService(IServiceUoW uoW)
         {
@@ -98,16 +99,26 @@ namespace eTRIKS.Commons.Service.Services
             //add variables which are not in the var_def collection
         }
 
-        public void addDataset()
+        public void addDataset(Dataset dataset)
         {
-            //For a new dataset 
-            //input: datasetDTO
-            //Extract from datasetDTO the variables
-            //new dataset
-            //Iterate over datasetDTO variables
-            //for each variable create new variable_Ref (use createOrRetrieve) add to datasets var_def collection
-            
-
+            _datasetRepository.Insert(dataset);
+            _dataServiceUnit.Save();
         }
+
+        public void addDatasetVariableReferences(List<VariableReference> variableReferences)
+        {
+            for (int i = 0; i < variableReferences.Count; i++)
+            {
+                _variableReferenceRepository.Insert(variableReferences[i]);
+            }
+            _dataServiceUnit.Save();
+        }
+
+        public DomainTemplate getTemplateDomainVariables(string domainId)
+        {
+            return _domainRepository.GetList(o => o.OID.Equals(domainId), d=>d.Variables);
+        }
+
+
     }
 }

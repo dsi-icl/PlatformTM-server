@@ -69,7 +69,7 @@ namespace eTRIKS.Commons.Persistence {
            // modelBuilder.Entity<HistoryRow>().Property(h => h.MigrationId).HasMaxLength(100).IsRequired();
            // modelBuilder.Entity<HistoryRow>().Property(h => h.ContextKey).HasMaxLength(200).IsRequired();
     
-            modelBuilder.Configurations.Add(new DomainDatasetMap());
+            modelBuilder.Configurations.Add(new DomainTemplateMap());
             modelBuilder.Configurations.Add(new DomainVariableMap());
             modelBuilder.Configurations.Add(new DatasetMap());
             modelBuilder.Configurations.Add(new ActivityMap());

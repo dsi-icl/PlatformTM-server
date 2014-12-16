@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
+using System.Runtime.Serialization;
+
 
 namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {
     public class DomainTemplate : Identifiable<string>
     {
+
         //public string OID { get; set; }
         public string Name { get; set; }
         public string Class { get; set; }

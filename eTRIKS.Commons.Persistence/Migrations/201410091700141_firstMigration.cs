@@ -8,7 +8,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
         public override void Up()
         {
             CreateTable(
-                "Templates.DomainDataset_TBL",
+                "Templates.DomainTemplate_TBL",
                 c => new
                     {
                         OID = c.String(nullable: false, maxLength: 200, storeType: "nvarchar"),
@@ -36,7 +36,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
                         UsageTermId = c.String(maxLength: 200, storeType: "nvarchar"),
                     })
                 .PrimaryKey(t => t.OID)
-                .ForeignKey("Templates.DomainDataset_TBL", t => t.DomainId)
+                .ForeignKey("Templates.DomainTemplate_TBL", t => t.DomainId)
                 .ForeignKey("CVterm_TBL", t => t.RoleTermId)
                 .ForeignKey("CVterm_TBL", t => t.UsageTermId)
                 .ForeignKey("CVterm_TBL", t => t.VariableTypeId)
@@ -112,7 +112,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
                     })
                 .PrimaryKey(t => t.OID)
                 .ForeignKey("Activity_TBL", t => t.ActivityId, cascadeDelete: true)
-                .ForeignKey("Templates.DomainDataset_TBL", t => t.DomainId, cascadeDelete: true)
+                .ForeignKey("Templates.DomainTemplate_TBL", t => t.DomainId, cascadeDelete: true)
                 .Index(t => t.ActivityId)
                 .Index(t => t.DomainId);
             
@@ -210,7 +210,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
             DropForeignKey("Variable_Definition_TBL", "StudyId", "Study_TBL");
             DropForeignKey("Variable_Definition_TBL", "RoleId", "CVterm_TBL");
             DropForeignKey("Variable_Reference_TBL", "ActivityDatasetId", "Dataset_TBL");
-            DropForeignKey("Dataset_TBL", "DomainId", "Templates.DomainDataset_TBL");
+            DropForeignKey("Dataset_TBL", "DomainId", "Templates.DomainTemplate_TBL");
             DropForeignKey("Dataset_TBL", "ActivityId", "Activity_TBL");
             DropForeignKey("Activity_TBL", "StudyId", "Study_TBL");
             DropForeignKey("Templates.DomainVariable_TBL", "VariableTypeId", "CVterm_TBL");
@@ -220,7 +220,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
             DropForeignKey("CVterm_TBL", "DictionartyId", "Dictionary_TBL");
             DropForeignKey("Dictionary_TBL", "XrefId", "DBxref_TBL");
             DropForeignKey("DBxref_TBL", "DBId", "Db_TBL");
-            DropForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainDataset_TBL");
+            DropForeignKey("Templates.DomainVariable_TBL", "DomainId", "Templates.DomainTemplate_TBL");
             DropIndex("Derived_Method_TBL", new[] { "DerivedVariable_OID" });
             DropIndex("Derived_Method_TBL", new[] { "DerivedValueType_OID" });
             DropIndex("Variable_Definition_TBL", new[] { "DerivedMethod_OID" });
@@ -251,7 +251,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
             DropTable("Dictionary_TBL");
             DropTable("CVterm_TBL");
             DropTable("Templates.DomainVariable_TBL");
-            DropTable("Templates.DomainDataset_TBL");
+            DropTable("Templates.DomainTemplate_TBL");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using System.Runtime.Serialization;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {

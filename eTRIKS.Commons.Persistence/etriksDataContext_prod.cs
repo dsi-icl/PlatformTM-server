@@ -46,9 +46,13 @@ namespace eTRIKS.Commons.Persistence {
 
             return repository;
         }
-
+          
         public void Save() {
-            base.SaveChanges();
+            try
+            {
+                base.SaveChanges();
+            }
+            catch (Exception e) { }
         }
 
         public void Dispose() {
@@ -65,7 +69,7 @@ namespace eTRIKS.Commons.Persistence {
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Configurations.Add(new DomainDatasetMap());
+            modelBuilder.Configurations.Add(new DomainTemplateMap());
             modelBuilder.Configurations.Add(new DomainVariableMap());
             modelBuilder.Configurations.Add(new DatasetMap());
             modelBuilder.Configurations.Add(new ActivityMap());

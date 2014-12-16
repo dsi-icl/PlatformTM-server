@@ -7,14 +7,14 @@ namespace eTRIKS.Commons.Persistence.Migrations
     {
         public override void Up()
         {
-            RenameColumn(table: "Templates.DomainDataset_TBL", name: "domainName", newName: "Name");
-            RenameColumn(table: "Templates.DomainDataset_TBL", name: "repeating", newName: "IsRepeating");
+            RenameColumn(table: "Templates.DomainTemplate_TBL", name: "domainName", newName: "Name");
+            RenameColumn(table: "Templates.DomainTemplate_TBL", name: "repeating", newName: "IsRepeating");
         }
         
         public override void Down()
         {
-            RenameColumn(table: "Templates.DomainDataset_TBL", name: "IsRepeating", newName: "repeating");
-            RenameColumn(table: "Templates.DomainDataset_TBL", name: "Name", newName: "domainName");
+            RenameColumn(table: "Templates.DomainTemplate_TBL", name: "IsRepeating", newName: "repeating");
+            RenameColumn(table: "Templates.DomainTemplate_TBL", name: "Name", newName: "domainName");
         }
     }
 }

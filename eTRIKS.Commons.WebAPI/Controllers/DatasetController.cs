@@ -10,6 +10,7 @@ using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.DTOs;
 
 using System.Web.Http.Cors;
+using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -26,7 +27,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         // GET: api/Dataset
         //[EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")]
         [HttpGet]
-        [Route("api/Dataset")]
+        //[Route("api/Dataset")]
         public IEnumerable<DomainTemplate> Get()
         {
             //List<DomainTemplate> ts = new List<DomainTemplate>();
@@ -45,21 +46,55 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         // GET: api/Dataset/5
         //[EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")]
         [HttpGet]
-        [Route("api/Dataset/{domainId}")]
+        //[Route("api/Dataset/{domainId}")]
         public DatasetDTO Get(string domainId)
         {
             return _datasetService.GetTemplateDataset(domainId);
         }
 
-        // POST: api/Dataset
-        public void Post([FromBody]string value)
+        //[HttpPost]
+        //public void Add([FromBody] List<VariableReferenceDTO> varRefDTOList)
+        //{
+        //    List<VariableReference> varRefList = new List<VariableReference>();
+        //    for (int i = 0; i < varRefDTOList.Count; i++)
+        //    {
+        //        VariableReference varRef = new VariableReference();
+        //        varRef.VariableDefinitionId = varRefDTOList[i].VariableDefinitionId;
+        //        varRef.DatasetId = varRefDTOList[i].DatasetId;
+        //        //varRef.OID = varRefDTOList[i].VariableDefinitionId;
+        //        // Continue for the rest of the fields
+        //        varRefList.Add(varRef);
+        //    }
+        //    _datasetService.addDatasetVariableReferences(varRefList);
+        //}
+
+
+        [HttpPost]
+        public void addDataset([FromBody] DatasetDTO datasetDTO)
         {
+            Dataset dataset = new Dataset();
+            List<VariableDefinition> varDefList = new List<VariableDefinition>();
+            List<VariableReference> varRefList = new List<VariableReference>();
+            for (int i = 0; i < datasetDTO.variables.Count; i++)
+            {
+                if (datasetDTO.variables[i].isSelected)
+                {
+                    //1. add to the varRefList and varDef
+                }
+            }
+            //2. Load the vardef's
+            DomainTemplate templates = new DomainTemplate();
+            templates = _datasetService.getTemplateDomainVariables(datasetDTO.DomainId);
+            //3. Load the dataset
+            dataset.Variables = varRefList;
+            _datasetService.addDataset(dataset);
+
         }
 
-        // PUT: api/Dataset/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
+        //public DomainTemplate GetDomain(string id)
+        //{
+        //    return _datasetService.GetTemplateDatasetNew(id);
+        //}
 
         // DELETE: api/Dataset/5
         public void Delete(int id)
