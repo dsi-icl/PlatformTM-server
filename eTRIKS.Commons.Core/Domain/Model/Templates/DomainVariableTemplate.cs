@@ -11,6 +11,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public string Description { get; set; }
         public string DataType { get; set; }
         public string Label { get; set; }
+        public int Order { get; set; }
         public string DomainId { get; set; }
         public string VariableTypeId { get; set; }
         public string RoleId { get; set; }

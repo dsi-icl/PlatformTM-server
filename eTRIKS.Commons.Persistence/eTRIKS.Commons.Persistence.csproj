@@ -93,10 +93,18 @@
     <Compile Include="Migrations_local\201412051841017_Initial.Designer.cs">
       <DependentUpon>201412051841017_Initial.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_local\201412171431331_addOrderToVariableTemplate.cs" />
+    <Compile Include="Migrations_local\201412171431331_addOrderToVariableTemplate.Designer.cs">
+      <DependentUpon>201412171431331_addOrderToVariableTemplate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_local\Configuration.cs" />
     <Compile Include="Migrations_prod\201412052017246_Initial.cs" />
     <Compile Include="Migrations_prod\201412052017246_Initial.Designer.cs">
       <DependentUpon>201412052017246_Initial.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201412171424331_addOrderToVariableTemplate.cs" />
+    <Compile Include="Migrations_prod\201412171424331_addOrderToVariableTemplate.Designer.cs">
+      <DependentUpon>201412171424331_addOrderToVariableTemplate.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations_prod\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -135,8 +143,14 @@
     <EmbeddedResource Include="Migrations_local\201412051841017_Initial.resx">
       <DependentUpon>201412051841017_Initial.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_local\201412171431331_addOrderToVariableTemplate.resx">
+      <DependentUpon>201412171431331_addOrderToVariableTemplate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201412052017246_Initial.resx">
       <DependentUpon>201412052017246_Initial.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201412171424331_addOrderToVariableTemplate.resx">
+      <DependentUpon>201412171424331_addOrderToVariableTemplate.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
