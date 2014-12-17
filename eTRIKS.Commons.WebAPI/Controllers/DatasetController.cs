@@ -27,7 +27,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         // GET: api/Dataset
         //[EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")]
         [HttpGet]
-        //[Route("api/Dataset")]
+        [Route("api/Dataset")]
         public IEnumerable<DomainTemplate> Get()
         {
             //List<DomainTemplate> ts = new List<DomainTemplate>();
@@ -46,7 +46,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         // GET: api/Dataset/5
         //[EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")]
         [HttpGet]
-        //[Route("api/Dataset/{domainId}")]
+        [Route("api/Dataset/{domainId}")]
         public DatasetDTO Get(string domainId)
         {
             return _datasetService.GetTemplateDataset(domainId);
