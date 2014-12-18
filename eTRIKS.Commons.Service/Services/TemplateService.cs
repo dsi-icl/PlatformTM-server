@@ -40,5 +40,11 @@ namespace eTRIKS.Commons.Service.Services{
         {
             return something;
         }
+
+        public void addDomainTemplate(DomainTemplate dt)
+        {
+            _templateRepository.Insert(dt);
+            _dataServiceUnit.Save();
+        }
     }
 }

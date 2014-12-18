@@ -35,7 +35,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                      .InNamespace("eTRIKS.Commons.Service.Services")
                      .WithServiceSelf()
                      .WithServiceDefaultInterfaces());
-            
+
 
             //container.Register(
             //    );

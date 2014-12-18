@@ -18,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Service", "e
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Tests", "eTRIKS.Commons.Tests\eTRIKS.Commons.Tests.csproj", "{8470C143-B479-41D9-8CCA-524D66909F97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.DataLoader", "eTRIKS.Commons.DataParser\eTRIKS.Commons.DataLoader.csproj", "{E04990D7-2B8A-4452-9E4F-484EB1DBA968}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.DataParser", "eTRIKS.Commons.DataParser\eTRIKS.Commons.DataParser.csproj", "{E04990D7-2B8A-4452-9E4F-484EB1DBA968}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
