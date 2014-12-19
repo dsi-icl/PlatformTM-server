@@ -1,11 +1,12 @@
-﻿using System;
+﻿using eTRIKS.Commons.Core.Domain.Model.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
 {
-    public class CVterm
+    public class CVterm : Identifiable<string>
     {
         public string OID { get; set; }
         public string Code { get; set; }

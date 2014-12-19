@@ -14,7 +14,7 @@ using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "GET,POST")]
+    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "GET,POST")] 
     public class DatasetController : ApiController
     {
         private DatasetService _datasetService;

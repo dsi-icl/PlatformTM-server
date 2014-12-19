@@ -51,7 +51,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
                 File.WriteAllBytes(@"C:\temp\" + fileName, File.ReadAllBytes(fileLocalName));
 
-                // Clean up App__Data folder
+                // Clean up App__Data folder 
                 File.Delete(fileLocalName);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
@@ -89,8 +89,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet]
         public string getData(string datSource, string fileName, string page, string mapping)
         {
-            IOUtility iOUtility = new IOUtility();;
-
+            IOUtility iOUtility = new IOUtility();
             string ext = Path.GetExtension(fileName);
             if (ext == ".csv")
             {

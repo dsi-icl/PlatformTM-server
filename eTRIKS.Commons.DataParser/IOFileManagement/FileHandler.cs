@@ -23,12 +23,9 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
 
         public string loadDataFromFile(string dataSource, DataSet ds)
         {
-            string status = "";
-            string currentOID = "";
+            string status = string.Empty;
+            string currentOID = string.Empty;
             List<string> successfullyInsertedRecords = new List<string>();
-            //Remove Column Headers
-            //DataRow row = ds.Tables[0].Rows[0];
-            //ds.Tables[0].Rows.Remove(row);
 
             if (dataSource == "DomainTemplate")
             {
@@ -62,21 +59,30 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             }
             else if (dataSource == "DomainVariableTemplate")
             {
+                //Remove Column Headers
+                DataRow row = ds.Tables[0].Rows[0];
+                ds.Tables[0].Rows.Remove(row);
                 //Check for FKs
                 //checkTemplateDataFK(ds);
-
-                Auxiliary aux = new Auxiliary();
-                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)   
                 {
-                    currentOID = ds.Tables[0].Rows[i][0].ToString().Trim();
-                    //status = daAPI.loadRecordToDomainVariable(ds.Tables[0].Rows[i][0].ToString().Trim(), ds.Tables[0].Rows[i][1].ToString().Trim(), ds.Tables[0].Rows[i][2].ToString().Trim(),
-                    //                            ds.Tables[0].Rows[i][3].ToString().Trim(), ds.Tables[0].Rows[i][4].ToString().Trim(), aux.getIdOfCVTerm(ds.Tables[0].Rows[i][5].ToString().Trim()),
-                    //                            aux.getIdOfCVTerm(ds.Tables[0].Rows[i][6].ToString().Trim()), ds.Tables[0].Rows[i][7].ToString().Trim(), ds.Tables[0].Rows[i][8].ToString().Trim());
-                    if (status == "RECORD SUCCESSFULLY INSERTED")
+                    try
                     {
+                        currentOID = ds.Tables[0].Rows[i][0].ToString().Trim();
+                        DomainVariableTemplate dvt = new DomainVariableTemplate();
+                        dvt.OID = currentOID;
+                        dvt.Name = ds.Tables[0].Rows[i][1].ToString().Trim();
+                        dvt.Label = ds.Tables[0].Rows[i][2].ToString().Trim();
+                        dvt.Description = ds.Tables[0].Rows[i][3].ToString().Trim();
+                        dvt.DataType = ds.Tables[0].Rows[i][4].ToString().Trim();
+                        dvt.RoleId = _templateService.getOIDOfCVterm(ds.Tables[0].Rows[i][5].ToString().Trim());
+                        dvt.UsageId = _templateService.getOIDOfCVterm(ds.Tables[0].Rows[i][6].ToString().Trim());
+                        dvt.controlledTerminologyId = ds.Tables[0].Rows[i][7].ToString().Trim();
+                        dvt.DomainId = ds.Tables[0].Rows[i][8].ToString().Trim();
+
                         successfullyInsertedRecords.Add(ds.Tables[0].Rows[i][0].ToString().Trim());
                     }
-                    else
+                    catch (Exception e)
                     {
                         status = "Line: " + (i + 1) + ", OID: " + currentOID + ":" + status;
                         // CLEAN UP: Delete the successfully inserted records to preserve Atomicity
@@ -115,25 +121,18 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
         //  CLEAN UP
         public void cleanUpPartialInserts(List<string> successfullyInsertedRecords, string dataSource)
         {
-            if (dataSource == "Templates_DomainDataset_TBL")
+            if (dataSource == "DomainTemplate")
             {
                 for (int j = 0; j < successfullyInsertedRecords.Count; j++)
                 {
                     //daAPI.deleteTemplateDomain(successfullyInsertedRecords[j]);
                 }
             }
-            else if (dataSource == "Templates_DomainVariable_TBL")
+            else if (dataSource == "DomainVariableTemplate")
             {
                 for (int j = 0; j < successfullyInsertedRecords.Count; j++)
                 {
                     //daAPI.deleteTemplateDomainVariable(successfullyInsertedRecords[j]);
-                }
-            }
-            else if (dataSource == "Activity_TBL")
-            {
-                for (int j = 0; j < successfullyInsertedRecords.Count; j++)
-                {
-                    //daAPI.deleteActivity(successfullyInsertedRecords[j]);
                 }
             }
         }

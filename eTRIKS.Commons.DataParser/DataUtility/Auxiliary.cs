@@ -21,20 +21,6 @@ namespace eTRIKS.Commons.DataParser.DataUtility
             return null;
         }
 
-        public string getIdOfCVTerm(string field)
-        {
-            if (field.Length < 1)
-                return null;
-            //IGenericDataService<CVterm_TBL> chkExist = new DataManagementService<CVterm_TBL>();
-
-            //CVterm_TBL Cvterm = chkExist.GetSingleOptimised(o => o.Name.Equals(field));
-
-            ////CVterm_TBL Cvterm = chkExist.GetSingle(o => o.Name.Equals(field));
-            //if (Cvterm != null)
-            //{
-            //    return Cvterm.OID.ToString();
-            //}
-            return "Record Not Found";
-        }
+      
     }
 }
