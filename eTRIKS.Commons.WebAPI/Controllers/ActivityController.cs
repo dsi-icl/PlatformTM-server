@@ -15,6 +15,7 @@ using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    //[RoutePrefix("api/activities")]
     public class ActivityController : ApiController
     {
         private ActivityService _activityService;
@@ -25,10 +26,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
+        [Route("api/activities")]
         public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
         {
             Activity activity = new Activity();
-            activity.OID = activityDTO.OID;
+            activity.OID = "ACT-TST-01";//activityDTO.OID;
             activity.Name = activityDTO.Name;
             activity.StudyId = activityDTO.StudyID;
 
@@ -52,18 +54,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //}
 
         [HttpGet]
+        [Route("api/activities/{activityId}")]
         public Activity GetActivityByKey(string activityId)
         {
             return _activityService.getActivityById(activityId);
         }
 
         [HttpGet]
+        [Route("api/studies/{studyId}/activities/{activityId}")]
         public Activity getActivity(string studyId, string activityId)
         {
             return _activityService.getActivity(studyId, activityId);
         }
 
         [HttpGet]
+        [Route("api/studies/{studyId}/activities")]
         public IEnumerable<Activity> getStudyActivities(string studyId)
         {
             return _activityService.getStudyActivities(studyId);
