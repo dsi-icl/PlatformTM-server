@@ -29,8 +29,9 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Name { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
-       
-        //public string DataType { get; set; }
+
+        public string StudyId { get; set; }
+        public string DataType { get; set; }
         //public Nullable<bool> IsCurated { get; set; }
         //public CVterm VariableType { get; set; }
         //public string VariableTypeId { get; set; }

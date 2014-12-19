@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.Service.Services
         private IRepository<Dataset, string> _datasetRepository;
         private IRepository<DomainTemplate, string> _domainRepository;
         private IRepository<Activity, string> _activityRepository;
-        private IRepository<VariableReference, string> _variableReferenceRepository; 
+        private IRepository<VariableDefinition, string> _variableDefinitionRepository;
 
         public DatasetService(IServiceUoW uoW)
         {
@@ -26,6 +26,7 @@ namespace eTRIKS.Commons.Service.Services
             //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, string>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
+            _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, string>();
         }
 
         /// <summary>
@@ -90,13 +91,11 @@ namespace eTRIKS.Commons.Service.Services
         /// Retrieves dataset for selected activity, which includes Variable_Defs, DomainVariables and Variable_Refs
         /// </summary>
         /// <param name="activityId"></param>
-        public void GetActivityDataset(string activityId)
+        public Dataset GetActivityDataset(string datasetId)
         {
             //getActivityDataset including var_refs and var_defs
-
-            //create datasetDTO which includes domain metadata, a list of variables defs adding var_ref attributes to them
-            //getDomainVariables where domain_id = dataset.domain_id
-            //add variables which are not in the var_def collection
+            return _datasetRepository.GetList(o => o.OID.Equals(datasetId), d => d.Variables);
+            
         }
 
         public void addDataset(Dataset dataset)
@@ -105,11 +104,11 @@ namespace eTRIKS.Commons.Service.Services
             _dataServiceUnit.Save();
         }
 
-        public void addDatasetVariableReferences(List<VariableReference> variableReferences)
+        public void addDatasetVariabledefinitions(List<VariableDefinition> variableDefinitions)
         {
-            for (int i = 0; i < variableReferences.Count; i++)
+            for (int i = 0; i < variableDefinitions.Count; i++)
             {
-                _variableReferenceRepository.Insert(variableReferences[i]);
+                _variableDefinitionRepository.Insert(variableDefinitions[i]);
             }
             _dataServiceUnit.Save();
         }
@@ -117,6 +116,17 @@ namespace eTRIKS.Commons.Service.Services
         public DomainTemplate getTemplateDomainVariables(string domainId)
         {
             return _domainRepository.GetList(o => o.OID.Equals(domainId), d=>d.Variables);
+        }
+
+        public string getDataSetOID()
+        {
+            var latestDataset = _datasetRepository.Get(null, null, d => d.OrderByDescending(o => o.OID), null, null).First();
+            return latestDataset.OID;
+        }
+
+        public IEnumerable<VariableDefinition> getVariableDefinitionsOfStudy(string studyId)
+        {
+           return _variableDefinitionRepository.GetRecords(d => d.StudyId.Equals(studyId));
         }
 
 

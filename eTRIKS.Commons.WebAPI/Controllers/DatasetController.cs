@@ -14,7 +14,7 @@ using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "GET,POST")]
+    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "GET,POST")] 
     public class DatasetController : ApiController
     {
         private DatasetService _datasetService;
@@ -70,22 +70,102 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
 
         [HttpPost]
+        [Route("api/Dataset")]
         public void addDataset([FromBody] DatasetDTO datasetDTO)
         {
+            // create an OID for dataset
+            // DAT-UBP-01
+            _datasetService.getDataSetOID();
+
+            //1. Fields for Dataset
             Dataset dataset = new Dataset();
+            dataset.OID = "DAT-UBP-0T";
+            dataset.ActivityId = "ACT-UBP-01";
+            dataset.DomainId = datasetDTO.DomainId;
+
             List<VariableDefinition> varDefList = new List<VariableDefinition>();
             List<VariableReference> varRefList = new List<VariableReference>();
             for (int i = 0; i < datasetDTO.variables.Count; i++)
             {
                 if (datasetDTO.variables[i].isSelected)
                 {
-                    //1. add to the varRefList and varDef
+                    //2. Fields for varDef
+                    VariableDefinition varDef = new VariableDefinition();
+                    varDef.OID = datasetDTO.variables[i].Id;
+                    varDef.Name= datasetDTO.variables[i].Name;
+                    varDef.Label = datasetDTO.variables[i].Label;
+                    varDef.Description = datasetDTO.variables[i].Description;
+                    varDef.DataType = datasetDTO.variables[i].DataType;
+                    varDef.StudyId = datasetDTO.variables[i].StudyId;
+                    varDefList.Add(varDef);
+
+                    //3. Fields for varRefList
+                    VariableReference varRef = new VariableReference();
+                    varRef.DatasetId = "DAT-UBP-0T";
+                    varRef.VariableDefinitionId = datasetDTO.variables[i].Id;
+                    varRef.OrderNumber = datasetDTO.variables[i].OrderNumber;
+                    varRef.IsRequired = datasetDTO.variables[i].IsRequired;
+                    varRefList.Add(varRef);
                 }
             }
-            //2. Load the vardef's
-            DomainTemplate templates = new DomainTemplate();
-            templates = _datasetService.getTemplateDomainVariables(datasetDTO.DomainId);
-            //3. Load the dataset
+
+            //4. Load the VarDef
+            _datasetService.addDatasetVariabledefinitions(varDefList);
+
+            //5. Load the dataset
+            dataset.Variables = varRefList;
+            _datasetService.addDataset(dataset);
+
+        }
+
+
+        [HttpPost]
+        [Route("api/Dataset")]
+        public void updateDataset(string studyId, [FromBody] DatasetDTO datasetDTO)
+        {
+            Dataset dataset = new Dataset();
+            dataset.OID = "DAT-UBP-0T";
+            dataset.ActivityId = "ACT-UBP-01";
+            dataset.DomainId = datasetDTO.DomainId;
+
+            List<VariableDefinition> variableDefsOfStudy = _datasetService.getVariableDefinitionsOfStudy(studyId).ToList();
+            List<VariableReference> variableRefsOfActivity = _datasetService.GetActivityDataset(dataset.OID).Variables.ToList();
+
+            List<VariableDefinition> varDefList = new List<VariableDefinition>();
+            List<VariableReference> varRefList = new List<VariableReference>();
+            for (int i = 0; i < datasetDTO.variables.Count; i++)
+            {
+                if (datasetDTO.variables[i].isSelected)
+                {
+                    if (!variableDefsOfStudy.Exists(d => d.OID.Equals(datasetDTO.variables[i].Id)))
+                    {
+                        //2. Fields for varDef
+                        VariableDefinition varDef = new VariableDefinition();
+                        varDef.OID = datasetDTO.variables[i].Id;
+                        varDef.Name = datasetDTO.variables[i].Name;
+                        varDef.Label = datasetDTO.variables[i].Label;
+                        varDef.Description = datasetDTO.variables[i].Description;
+                        varDef.DataType = datasetDTO.variables[i].DataType;
+                        varDef.StudyId = studyId;
+                        varDefList.Add(varDef);
+                    }
+                    if (!variableRefsOfActivity.Exists(d => d.VariableDefinitionId.Equals(datasetDTO.variables[i].Id)))
+                    {
+                        //3. Fields for varRefList
+                        VariableReference varRef = new VariableReference();
+                        varRef.DatasetId = "DAT-UBP-0T";
+                        varRef.VariableDefinitionId = datasetDTO.variables[i].Id;
+                        varRef.OrderNumber = datasetDTO.variables[i].OrderNumber;
+                        varRef.IsRequired = datasetDTO.variables[i].IsRequired;
+                        varRefList.Add(varRef);
+                    }
+                }
+            }
+
+            //4. Load the VarDef
+            _datasetService.addDatasetVariabledefinitions(varDefList);
+
+            //5. Load the dataset
             dataset.Variables = varRefList;
             _datasetService.addDataset(dataset);
 

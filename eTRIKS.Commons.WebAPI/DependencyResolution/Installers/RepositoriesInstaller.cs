@@ -4,6 +4,7 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Persistence;
+using eTRIKS.Commons.DataParser.IOFileManagement;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 {
@@ -18,12 +19,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                 Component.For<DbContext, IServiceUoW>()
                     .ImplementedBy<etriksDataContext_prod>(),
 
-
-                    //Classes
-                    //.FromAssemblyNamed("eTRIKS.Commons.Persistence")
-                    //.InNamespace("eTRIKS.Commons.Persistence")
-                    //.WithServiceFromInterface(),
-
+                Component.For<FileHandler>(),
 
                 Classes
                     .FromAssemblyNamed("eTRIKS.Commons.DataAccess")
@@ -35,7 +31,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                      .InNamespace("eTRIKS.Commons.Service.Services")
                      .WithServiceSelf()
                      .WithServiceDefaultInterfaces());
-            
+
 
             //container.Register(
             //    );

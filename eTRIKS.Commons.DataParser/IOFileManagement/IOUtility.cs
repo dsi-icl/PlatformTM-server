@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using System.Reflection;
+using System.Text.RegularExpressions;
+
 
 namespace eTRIKS.Commons.DataParser.IOFileManagement
 {
@@ -25,6 +27,45 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             //object created = Activator.CreateInstance(myType);
             //return created.GetType().GetProperties().Select(a => a.Name).ToList();
         }
+
+
+        //1. Read Excel Pages
+        public List<string> getExcelWorkbookNames(string fileLocation)
+        {
+            Microsoft.Office.Interop.Excel.Application xlApp = new Microsoft.Office.Interop.Excel.Application();
+            Microsoft.Office.Interop.Excel.Workbook excelBook = xlApp.Workbooks.Open(fileLocation);
+
+            List<string> excelSheets = new List<string>();
+            foreach (Microsoft.Office.Interop.Excel.Worksheet wSheet in excelBook.Worksheets)
+            {
+               excelSheets.Add(wSheet.Name);
+            }
+            return excelSheets;
+        }
+
+        //2. Read Fields of an Excel Page
+        public List<string> getExcelFiledsInWorkbook(string fileLocation, string workbook)
+        {
+            var connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + fileLocation + ";Extended Properties=\"Excel 12.0;IMEX=1;HDR=NO;TypeGuessRows=0;ImportMixedTypes=Text\"";
+            OleDbDataAdapter adapter = new OleDbDataAdapter("SELECT * FROM [" + workbook + "$]", connectionString);
+            DataSet ds = new DataSet();
+            adapter.Fill(ds);
+
+            int columnCount = ds.Tables[0].Columns.Count;
+            List<string> columnList = new List<string>();
+
+            for (int i = 0; i < columnCount; i++)
+            {
+                if (ds.Tables[0].Rows[0][i].ToString().Length > 0)
+                {
+                    columnList.Add(ds.Tables[0].Rows[0][i].ToString() + " [F" + (i + 1) + "]");
+                }
+            }
+            return columnList;
+        }
+
+
+
 
         public DataTable convertByteArraytoExcelDataTable(byte[] file)
         {
@@ -116,5 +157,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             DataTable pages = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
             return pages;
         }
+
+        
     }
 }
