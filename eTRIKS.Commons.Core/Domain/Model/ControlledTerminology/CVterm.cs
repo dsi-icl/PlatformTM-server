@@ -8,7 +8,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
 {
     public class CVterm : Identifiable<string>
     {
-        public string OID { get; set; }
+       // public string OID { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
         public string Definition { get; set; }

@@ -51,6 +51,7 @@ namespace eTRIKS.Commons.Persistence {
                 base.SaveChanges();
         }
 
+
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);

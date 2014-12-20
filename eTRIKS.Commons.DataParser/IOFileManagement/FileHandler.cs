@@ -79,6 +79,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                         dvt.UsageId = _templateService.getOIDOfCVterm(ds.Tables[0].Rows[i][6].ToString().Trim());
                         dvt.controlledTerminologyId = ds.Tables[0].Rows[i][7].ToString().Trim();
                         dvt.DomainId = ds.Tables[0].Rows[i][8].ToString().Trim();
+                        _templateService.addDomainTemplateVariables(dvt);
 
                         successfullyInsertedRecords.Add(ds.Tables[0].Rows[i][0].ToString().Trim());
                     }

@@ -101,21 +101,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
                     //3. Fields for varRefList
                     VariableReference varRef = new VariableReference();
-                    varRef.DatasetId = "DAT-UBP-0T";
+                    varRef.DatasetId = dataset.OID;
                     varRef.VariableDefinitionId = datasetDTO.variables[i].Id;
                     varRef.OrderNumber = datasetDTO.variables[i].OrderNumber;
                     varRef.IsRequired = datasetDTO.variables[i].IsRequired;
                     varRefList.Add(varRef);
                 }
             }
-
-            //4. Load the VarDef
-            _datasetService.addDatasetVariabledefinitions(varDefList);
-
-            //5. Load the dataset
+            //4. Load the VarDef and 5. Load the dataset & VarRef
             dataset.Variables = varRefList;
-            _datasetService.addDataset(dataset);
-
+            _datasetService.addDataset(dataset, varDefList);
         }
 
 
@@ -153,7 +148,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                     {
                         //3. Fields for varRefList
                         VariableReference varRef = new VariableReference();
-                        varRef.DatasetId = "DAT-UBP-0T";
+                        varRef.DatasetId = dataset.OID;
                         varRef.VariableDefinitionId = datasetDTO.variables[i].Id;
                         varRef.OrderNumber = datasetDTO.variables[i].OrderNumber;
                         varRef.IsRequired = datasetDTO.variables[i].IsRequired;
@@ -161,14 +156,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                     }
                 }
             }
-
-            //4. Load the VarDef
-            _datasetService.addDatasetVariabledefinitions(varDefList);
-
-            //5. Load the dataset
+            //4. Load the VarDef and 5. Load the dataset & VarRef
             dataset.Variables = varRefList;
-            _datasetService.addDataset(dataset);
-
+            _datasetService.updateDataset(dataset, varDefList);
         }
 
         //public DomainTemplate GetDomain(string id)

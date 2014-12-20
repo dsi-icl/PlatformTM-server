@@ -98,20 +98,28 @@ namespace eTRIKS.Commons.Service.Services
             
         }
 
-        public void addDataset(Dataset dataset)
+        public void addDataset(Dataset dataset, List<VariableDefinition> variableDefinitions)
         {
             _datasetRepository.Insert(dataset);
-            _dataServiceUnit.Save();
-        }
 
-        public void addDatasetVariabledefinitions(List<VariableDefinition> variableDefinitions)
-        {
             for (int i = 0; i < variableDefinitions.Count; i++)
             {
                 _variableDefinitionRepository.Insert(variableDefinitions[i]);
             }
             _dataServiceUnit.Save();
         }
+
+        public void updateDataset(Dataset dataset, List<VariableDefinition> variableDefinitions)
+        {
+            _datasetRepository.Update(dataset);
+
+            for (int i = 0; i < variableDefinitions.Count; i++)
+            {
+                _variableDefinitionRepository.Insert(variableDefinitions[i]);
+            }
+            _dataServiceUnit.Save();
+        }
+
 
         public DomainTemplate getTemplateDomainVariables(string domainId)
         {
