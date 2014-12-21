@@ -48,8 +48,19 @@ namespace eTRIKS.Commons.Persistence {
             return repository;
         }
 
-        public void Save() {
-            base.SaveChanges();
+        public string Save()
+        {
+            try
+            {
+                base.SaveChanges();
+                return "CREATED";
+            }
+            catch (Exception e)
+            {
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                return e.Message;
+            }
         }
 
         public void Dispose() {

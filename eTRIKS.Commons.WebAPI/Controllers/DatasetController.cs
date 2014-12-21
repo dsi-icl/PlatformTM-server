@@ -71,11 +71,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/Dataset")]
-        public void addDataset([FromBody] DatasetDTO datasetDTO)
+        public string addDataset([FromBody] DatasetDTO datasetDTO)
         {
             // create an OID for dataset
             // DAT-UBP-01
-            _datasetService.getDataSetOID();
+            string lastOID = _datasetService.getDataSetOID("DAT-UBP");
 
             //1. Fields for Dataset
             Dataset dataset = new Dataset();
@@ -110,13 +110,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
             //4. Load the VarDef and 5. Load the dataset & VarRef
             dataset.Variables = varRefList;
-            _datasetService.addDataset(dataset, varDefList);
+            return _datasetService.addDataset(dataset, varDefList);
         }
 
 
         [HttpPost]
         [Route("api/Dataset")]
-        public void updateDataset(string studyId, [FromBody] DatasetDTO datasetDTO)
+        public string updateDataset(string studyId, [FromBody] DatasetDTO datasetDTO)
         {
             Dataset dataset = new Dataset();
             dataset.OID = "DAT-UBP-0T";
@@ -158,7 +158,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
             //4. Load the VarDef and 5. Load the dataset & VarRef
             dataset.Variables = varRefList;
-            _datasetService.updateDataset(dataset, varDefList);
+            return _datasetService.updateDataset(dataset, varDefList);
         }
 
         //public DomainTemplate GetDomain(string id)

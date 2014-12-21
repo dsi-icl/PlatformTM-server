@@ -98,7 +98,7 @@ namespace eTRIKS.Commons.Service.Services
             
         }
 
-        public void addDataset(Dataset dataset, List<VariableDefinition> variableDefinitions)
+        public string addDataset(Dataset dataset, List<VariableDefinition> variableDefinitions)
         {
             _datasetRepository.Insert(dataset);
 
@@ -106,10 +106,10 @@ namespace eTRIKS.Commons.Service.Services
             {
                 _variableDefinitionRepository.Insert(variableDefinitions[i]);
             }
-            _dataServiceUnit.Save();
+            return _dataServiceUnit.Save();
         }
 
-        public void updateDataset(Dataset dataset, List<VariableDefinition> variableDefinitions)
+        public string updateDataset(Dataset dataset, List<VariableDefinition> variableDefinitions)
         {
             _datasetRepository.Update(dataset);
 
@@ -117,7 +117,7 @@ namespace eTRIKS.Commons.Service.Services
             {
                 _variableDefinitionRepository.Insert(variableDefinitions[i]);
             }
-            _dataServiceUnit.Save();
+            return _dataServiceUnit.Save();
         }
 
 
@@ -126,9 +126,9 @@ namespace eTRIKS.Commons.Service.Services
             return _domainRepository.GetList(o => o.OID.Equals(domainId), d=>d.Variables);
         }
 
-        public string getDataSetOID()
+        public string getDataSetOID(string OIDPrefix)
         {
-            var latestDataset = _datasetRepository.Get(null, null, d => d.OrderByDescending(o => o.OID), null, null).First();
+            var latestDataset = _datasetRepository.Get(o => o.OID.Contains(OIDPrefix), null, d => d.OrderByDescending(o => o.OID), null, null).First();
             return latestDataset.OID;
         }
 
