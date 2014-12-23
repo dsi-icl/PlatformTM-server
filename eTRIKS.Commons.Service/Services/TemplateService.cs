@@ -49,10 +49,22 @@ namespace eTRIKS.Commons.Service.Services{
             return something;
         }
 
-        public void addDomainTemplate(DomainTemplate dt)
+        public string addDomainTemplate(List<DomainTemplate> dtList)
         {
-            _templateRepository.Insert(dt);
-            _dataServiceUnit.Save();
+            for (int i = 0; i < dtList.Count; i++)
+            {
+                _templateRepository.Insert(dtList[i]);
+            }
+            return _dataServiceUnit.Save();
+        }
+
+        public string addDomainTemplateVariables(List<DomainVariableTemplate> dvtList)
+        {
+            for (int i = 0; i < dvtList.Count; i++)
+            {
+                _templateVariableRepository.Insert(dvtList[i]);
+            }
+            return _dataServiceUnit.Save();
         }
     }
 }

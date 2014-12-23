@@ -76,6 +76,7 @@ namespace eTRIKS.Commons.DataAccess
             //{
            //IQueryable<TEntity> dbQuery = DataContext.Set<TEntity>();
             IQueryable<TEntity> query = Entities;
+           
                 //Apply eager loading
                 foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
                     query = query.Include<TEntity, object>(navigationProperty);
@@ -134,7 +135,8 @@ namespace eTRIKS.Commons.DataAccess
 
         public TEntity Update(TEntity entity)
         {
-            Entities.Attach(entity);
+            Entities.Add(entity);
+            //Entities.Attach(entity);
             DataContext.Entry(entity).State = EntityState.Modified;
             return entity;
         }

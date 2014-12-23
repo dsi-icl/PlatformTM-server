@@ -6,6 +6,7 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
+using System.Transactions;
 
 namespace eTRIKS.Commons.Persistence {
     public class etriksDataContext_prod : DbContext, IServiceUoW {
@@ -47,9 +48,26 @@ namespace eTRIKS.Commons.Persistence {
             return repository;
         }
           
-        public void Save() {
-                base.SaveChanges();
+        public string Save() {
+
+            using (var tran = new TransactionScope())
+            {
+                try
+                {
+                    base.SaveChanges();
+                    tran.Complete();
+                    return "CREATED";
+                }
+                catch (Exception e)
+                {
+                    tran.Dispose();
+                    while (e.InnerException != null)
+                        e = e.InnerException;
+                    return e.Message;
+                }
+            }
         }
+
 
         public void Dispose() {
             Dispose(true);
