@@ -10,24 +10,31 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.Service.Services
 {
     public class ActivityService
     {
-        private IRepository<Activity, string> _activityRepository;
+        private IRepository<Activity, int> _activityRepository;
         private IRepository<Dataset, string> _dataSetRepository;
         private IServiceUoW _activityServiceUnit;
 
         public ActivityService(IServiceUoW uoW)
         {
             _activityServiceUnit = uoW;
-            _activityRepository = uoW.GetRepository<Activity, string>();
+            _activityRepository = uoW.GetRepository<Activity, int>();
             _dataSetRepository = uoW.GetRepository<Dataset, string>();
         }
 
-        public void addActivity(Activity activity)
+        public void addActivity(ActivityDTO activityDTO)
         {
+            Activity activity = new Activity();
+            //activity.OID = "ACT-TST-02";//activityDTO.OID;
+            activity.Name = activityDTO.Name;
+            activity.StudyId = activityDTO.StudyID;
+
+
             _activityRepository.Insert(activity);
             _activityServiceUnit.Save();
         }
@@ -38,7 +45,7 @@ namespace eTRIKS.Commons.Service.Services
             _activityServiceUnit.Save();
         }
 
-        public bool checkExist(string activityId)
+        public bool checkExist(int activityId)
         {
             Activity activity = new Activity();
             activity =_activityRepository.GetById(activityId);
@@ -49,7 +56,7 @@ namespace eTRIKS.Commons.Service.Services
             return true;
         }
 
-        public Activity getActivityById(string activityId)
+        public Activity getActivityById(int activityId)
         {
             return _activityRepository.GetById(activityId);
         }

@@ -29,12 +29,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/activities")]
         public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
         {
-            Activity activity = new Activity();
-            activity.OID = "ACT-TST-01";//activityDTO.OID;
-            activity.Name = activityDTO.Name;
-            activity.StudyId = activityDTO.StudyID;
 
-            _activityService.addActivity(activity);
+
+            _activityService.addActivity(activityDTO);
             return Request.CreateResponse(HttpStatusCode.Created);
         }
 
@@ -55,7 +52,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/activities/{activityId}")]
-        public Activity GetActivityByKey(string activityId)
+        public Activity GetActivityByKey(int activityId)
         {
             return _activityService.getActivityById(activityId);
         }

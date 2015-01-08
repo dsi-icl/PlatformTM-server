@@ -19,6 +19,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Description { get; set; }
         public string Structure { get; set; }
         public string DomainId { get; set; }
+        public int ActivityId { get; set; }
 
         public List<DatasetVariableDTO> variables { get; set; }
     }

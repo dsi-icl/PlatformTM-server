@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 
                 //TODO: remove EF and Persistence dependencies
                 Component.For<DbContext, IServiceUoW>()
-                    .ImplementedBy<etriksDataContext_prod>(),
+                    .ImplementedBy<etriksDataContext_dev>(),
 
                 Component.For<FileHandler>(),
 

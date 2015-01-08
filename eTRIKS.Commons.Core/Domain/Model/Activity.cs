@@ -8,7 +8,7 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class Activity : Identifiable<string>
+    public class Activity : Identifiable<int>
     {
         //public string OID { get; set; }
         public string Name { get; set; }

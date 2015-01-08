@@ -75,12 +75,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             // create an OID for dataset
             // DAT-UBP-01
-            string lastOID = _datasetService.getDataSetOID("DAT-UBP");
+            //string lastOID = _datasetService.getDataSetOID("DAT-UBP");
 
             //1. Fields for Dataset
             Dataset dataset = new Dataset();
-            dataset.OID = "DAT-UBP-0T";
-            dataset.ActivityId = "ACT-UBP-01";
+            //dataset.OID = "DAT-UBP-0T";
+            dataset.ActivityId = datasetDTO.ActivityId;
             dataset.DomainId = datasetDTO.DomainId;
 
             List<VariableDefinition> varDefList = new List<VariableDefinition>();
@@ -120,7 +120,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             Dataset dataset = new Dataset();
             dataset.OID = "DAT-UBP-0T";
-            dataset.ActivityId = "ACT-UBP-01";
+            //dataset.ActivityId = "ACT-UBP-01";
             dataset.DomainId = datasetDTO.DomainId;
 
             List<VariableDefinition> variableDefsOfStudy = _datasetService.getVariableDefinitionsOfStudy(studyId).ToList();
