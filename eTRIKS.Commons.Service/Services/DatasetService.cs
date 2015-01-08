@@ -128,8 +128,14 @@ namespace eTRIKS.Commons.Service.Services
 
         public string getDataSetOID(string OIDPrefix)
         {
-            var latestDataset = _datasetRepository.Get(o => o.OID.Contains(OIDPrefix), null, d => d.OrderByDescending(o => o.OID), null, null).First();
-            return latestDataset.OID;
+            try
+            {
+                string latestDataset = _datasetRepository.Get(o => o.OID.Contains(OIDPrefix), null, d => d.OrderByDescending(o => o.OID), null, null).First().OID;
+                return latestDataset.Substring(latestDataset.LastIndexOf('-') + 1, latestDataset.Length - latestDataset.LastIndexOf('-') - 1);
+            }
+            catch (Exception e) { 
+                return "01";
+            }   
         }
 
         public IEnumerable<VariableDefinition> getVariableDefinitionsOfStudy(string studyId)

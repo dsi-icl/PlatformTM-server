@@ -87,7 +87,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        public string getData(string datSource, string fileName, string page, string mapping)
+        public string loadData(string datSource, string fileName, string page, string mapping)
         {
             IOUtility iOUtility = new IOUtility();
             string ext = Path.GetExtension(fileName);

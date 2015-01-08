@@ -65,7 +65,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         #region Update
 
         /// <summary>
-        /// Updates an existing entity.
+        /// Modify an existing entity.
         /// </summary>
         /// <param name="entity">Entity</param>
         TEntity Update(TEntity entity);

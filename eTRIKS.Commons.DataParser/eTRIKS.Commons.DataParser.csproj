@@ -91,6 +91,7 @@
     <Compile Include="DataUtility\Auxiliary.cs" />
     <Compile Include="IOFileManagement\FileHandler.cs" />
     <Compile Include="IOFileManagement\IOUtility.cs" />
+    <Compile Include="IOFileManagement\ValidateTableReferences.cs" />
     <Compile Include="MongoDBAccess\MongoDbDataServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

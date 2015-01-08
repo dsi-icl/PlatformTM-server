@@ -75,7 +75,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             // create an OID for dataset
             // DAT-UBP-01
-            string lastOID = _datasetService.getDataSetOID("DAT-UBP");
+            string lastOIDSequence = _datasetService.getDataSetOID("DAT-XXXv");
 
             //1. Fields for Dataset
             Dataset dataset = new Dataset();
@@ -83,22 +83,28 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             dataset.ActivityId = "ACT-UBP-01";
             dataset.DomainId = datasetDTO.DomainId;
 
+            // Get any exisiting variable definitions for that study
+            // datasetDTO.variables[0] must contain the study Id or would be ideal is the header contained it
+            List<VariableDefinition> variableDefsOfStudy = _datasetService.getVariableDefinitionsOfStudy(datasetDTO.variables[0].StudyId).ToList();
+
             List<VariableDefinition> varDefList = new List<VariableDefinition>();
             List<VariableReference> varRefList = new List<VariableReference>();
             for (int i = 0; i < datasetDTO.variables.Count; i++)
             {
                 if (datasetDTO.variables[i].isSelected)
                 {
-                    //2. Fields for varDef
-                    VariableDefinition varDef = new VariableDefinition();
-                    varDef.OID = datasetDTO.variables[i].Id;
-                    varDef.Name= datasetDTO.variables[i].Name;
-                    varDef.Label = datasetDTO.variables[i].Label;
-                    varDef.Description = datasetDTO.variables[i].Description;
-                    varDef.DataType = datasetDTO.variables[i].DataType;
-                    varDef.StudyId = datasetDTO.variables[i].StudyId;
-                    varDefList.Add(varDef);
-
+                    if (!variableDefsOfStudy.Exists(d => d.OID.Equals(datasetDTO.variables[i].Id)))
+                    {
+                        //2. Fields for varDef
+                        VariableDefinition varDef = new VariableDefinition();
+                        varDef.OID = datasetDTO.variables[i].Id;
+                        varDef.Name = datasetDTO.variables[i].Name;
+                        varDef.Label = datasetDTO.variables[i].Label;
+                        varDef.Description = datasetDTO.variables[i].Description;
+                        varDef.DataType = datasetDTO.variables[i].DataType;
+                        varDef.StudyId = datasetDTO.variables[i].StudyId;
+                        varDefList.Add(varDef);
+                    }
                     //3. Fields for varRefList
                     VariableReference varRef = new VariableReference();
                     varRef.DatasetId = dataset.OID;
