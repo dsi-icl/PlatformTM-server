@@ -54,7 +54,6 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 List<DomainVariableTemplate> domainTemplateVariableList = new List<DomainVariableTemplate>();
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
-
                     DomainVariableTemplate dvt = new DomainVariableTemplate();
                     dvt.OID = ds.Tables[0].Rows[i][0].ToString().Trim();
                     dvt.Name = ds.Tables[0].Rows[i][1].ToString().Trim();
@@ -63,11 +62,16 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                     dvt.DataType = ds.Tables[0].Rows[i][4].ToString().Trim();
                     dvt.RoleId = _templateService.getOIDOfCVterm(ds.Tables[0].Rows[i][5].ToString().Trim());
                     dvt.UsageId = _templateService.getOIDOfCVterm(ds.Tables[0].Rows[i][6].ToString().Trim());
-                    dvt.controlledTerminologyId = ds.Tables[0].Rows[i][7].ToString().Trim();
+
+                    IOUtility iou = new IOUtility();
+                    dvt.controlledTerminologyId = iou.processDictionaryIdForTemplateVariable(ds.Tables[0].Rows[i][7].ToString().Trim());
                     dvt.DomainId = ds.Tables[0].Rows[i][8].ToString().Trim();
+                    dvt.Order = Convert.ToInt32(ds.Tables[0].Rows[i][9]);
                     domainTemplateVariableList.Add(dvt);
                 }
                 return _templateService.addDomainTemplateVariables(domainTemplateVariableList);
+                //For updating (move to new method)
+                //return _templateService.updateDomainTemplateVariables(domainTemplateVariableList);
             }
            
             else if (dataSource == "NOSQL")
