@@ -3,10 +3,13 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+
 
 namespace eTRIKS.Commons.DataParser.MongoDBAccess
 {
@@ -123,11 +126,20 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         //    catch (Exception e) { }
         //}
 
-        public List<NoSQLRecord> getNoSQLRecord(string field, string value)
+        public List<NoSQLRecord> getNoSQLRecord(string queryString)
         {
             List<NoSQLRecord> records = new List<NoSQLRecord>();
             MongoDatabase dbETriks = GetDatabase();
-            var query = Query.And(Query.EQ(field, BsonValue.Create(value)));
+
+            var parsedString = HttpUtility.HtmlDecode(queryString);
+            NameValueCollection coll = HttpUtility.ParseQueryString(parsedString);
+            QueryDocument query = new QueryDocument();
+
+            for (int i = 0; i < coll.Count; i++)
+            {
+                query.Add(coll.AllKeys[i], coll.GetValues(coll.AllKeys[i])[0]);
+            }
+
             var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query);
             DataSet ds = new DataSet();
 
