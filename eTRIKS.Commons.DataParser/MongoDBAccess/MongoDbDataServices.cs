@@ -49,21 +49,21 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         }
 
         // The Generic Update
-        public string updateDataGeneric(List<NoSQLRecord> record)
+        public string updateDataGeneric(NoSQLRecordForUpdate updateRecord)
         {
             MongoDatabase dbETriks = GetDatabase();
             var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
 
             QueryDocument query = new QueryDocument();
-            for (int i = 0; i < record[0].RecordItems.Count; i++)
+            for (int i = 0; i < updateRecord.CurrentRecord.Count; i++)
             {
-                query.Add(record[0].RecordItems[i].fieldName, record[0].RecordItems[i].value);
+                query.Add(updateRecord.CurrentRecord[i].fieldName, updateRecord.CurrentRecord[i].value);
             }
 
             UpdateBuilder update = new UpdateBuilder();
-            for (int i = 0; i < record[1].RecordItems.Count; i++)
+            for (int i = 0; i < updateRecord.NewRecord.Count; i++)
             {
-                update = Update.Set(record[1].RecordItems[i].fieldName, record[1].RecordItems[i].value);
+                update = Update.Set(updateRecord.NewRecord[i].fieldName, updateRecord.NewRecord[i].value);
             }
 
             try
@@ -172,6 +172,12 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string studyId { get; set; }
         public string itemGroup { get; set; }
         public List<RecordItem> recordItem = new List<RecordItem>();
+    }
+
+    public class NoSQLRecordForUpdate
+    {
+        public List<RecordItem> CurrentRecord = new List<RecordItem>();
+        public List<RecordItem> NewRecord = new List<RecordItem>();
     }
 
     public class RecordItem

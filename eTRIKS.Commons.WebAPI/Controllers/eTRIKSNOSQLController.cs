@@ -37,7 +37,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        public string updateRecord(List<NoSQLRecord> updateDetails)
+        public string updateRecord(string OID, NoSQLRecordForUpdate updateDetails)
         {
             return _mongoDbService.updateDataGeneric(updateDetails);
         }
