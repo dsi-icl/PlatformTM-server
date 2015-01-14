@@ -126,21 +126,45 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         //    catch (Exception e) { }
         //}
 
+        public void exctractFromQueryString(string queryString, out QueryDocument query, out string[] filteredColumnList)
+        {
+            var parsedString = HttpUtility.HtmlDecode(queryString);
+            NameValueCollection coll = HttpUtility.ParseQueryString(parsedString);
+            query = new QueryDocument();
+            int countConditions = 0;
+
+            // Extract conditions from the query string
+            for (int i = 0; i < coll.Count; i++)
+            {
+                if (coll.GetValues(coll.AllKeys[i])[0] != "*")
+                {
+                    query.Add(coll.AllKeys[i], coll.GetValues(coll.AllKeys[i])[0]);
+                    countConditions++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Extract select columns from query string
+            filteredColumnList = new string[coll.Count - countConditions];
+            for (int j = 0; j < coll.Count - countConditions; j++)
+            {
+                filteredColumnList[j] = coll.AllKeys[countConditions + j];
+            }
+        }
+
         public List<NoSQLRecord> getNoSQLRecord(string queryString)
         {
             List<NoSQLRecord> records = new List<NoSQLRecord>();
             MongoDatabase dbETriks = GetDatabase();
 
-            var parsedString = HttpUtility.HtmlDecode(queryString);
-            NameValueCollection coll = HttpUtility.ParseQueryString(parsedString);
-            QueryDocument query = new QueryDocument();
+            QueryDocument query;
+            string[] filteredColumnList;
+            exctractFromQueryString(queryString,out query, out filteredColumnList);
 
-            for (int i = 0; i < coll.Count; i++)
-            {
-                query.Add(coll.AllKeys[i], coll.GetValues(coll.AllKeys[i])[0]);
-            }
-
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query);
+            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query).SetFields(Fields.Include(filteredColumnList));
             DataSet ds = new DataSet();
 
             foreach (var rec in eTRIKSRecords)
