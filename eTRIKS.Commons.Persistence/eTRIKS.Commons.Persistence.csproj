@@ -102,6 +102,10 @@
     <Compile Include="Migrations_local\201412231842224_ChangeActPKtoINT.Designer.cs">
       <DependentUpon>201412231842224_ChangeActPKtoINT.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_local\201501131700486_PKtoINT_Dataset_VarDEF.cs" />
+    <Compile Include="Migrations_local\201501131700486_PKtoINT_Dataset_VarDEF.Designer.cs">
+      <DependentUpon>201501131700486_PKtoINT_Dataset_VarDEF.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_local\Configuration.cs" />
     <Compile Include="Migrations_prod\201412052017246_Initial.cs" />
     <Compile Include="Migrations_prod\201412052017246_Initial.Designer.cs">
@@ -154,12 +158,18 @@
     <EmbeddedResource Include="Migrations_local\201412231842224_ChangeActPKtoINT.resx">
       <DependentUpon>201412231842224_ChangeActPKtoINT.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_local\201501131700486_PKtoINT_Dataset_VarDEF.resx">
+      <DependentUpon>201501131700486_PKtoINT_Dataset_VarDEF.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201412052017246_Initial.resx">
       <DependentUpon>201412052017246_Initial.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201412171424331_addOrderToVariableTemplate.resx">
       <DependentUpon>201412171424331_addOrderToVariableTemplate.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Migrations_local\201501131700486_PKtoINT_Dataset_VarDEF.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -54,45 +54,6 @@ namespace eTRIKS.Commons.DataAccess
             return dbQuery.Where(filter);
         }
 
-        public TEntity GetRecord(Func<TEntity, bool> predicate)
-        {
-            try
-            {
-                IQueryable<TEntity> dbQuery = Entities;
-                return dbQuery.Single(predicate);
-            }
-            catch (Exception e) 
-            {
-                return null;
-            }
-        }
-
-        public  TEntity GetList(Func<TEntity, bool> where,
-                 params Expression<Func<TEntity, object>>[] navigationProperties)
-        {
-             
-            TEntity data = null;
-            //using (var context = new DataContext())
-            //{
-           //IQueryable<TEntity> dbQuery = DataContext.Set<TEntity>();
-            IQueryable<TEntity> query = Entities;
-           
-                //Apply eager loading
-                foreach (Expression<Func<TEntity, object>> navigationProperty in navigationProperties)
-                    query = query.Include<TEntity, object>(navigationProperty);
-                try
-                {
-                    data = query
-                        .AsNoTracking()
-                        .FirstOrDefault(where);
-                }
-                catch (Exception e) { }
-            //}
-
-            return data;
-        }
-
-
 
         public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, 
                                     List<Expression<Func<TEntity, object>>> includeProperties = null,
@@ -121,6 +82,14 @@ namespace eTRIKS.Commons.DataAccess
             return query.ToList<TEntity>();
         }
 
+
+
+        public TEntity GetSingle(Expression<Func<TEntity, bool>> filter = null,
+                                    List<Expression<Func<TEntity, object>>> includeProperties = null)
+        {
+            return Get(filter, includeProperties).SingleOrDefault();
+        }
+
         public TEntity GetById(TPrimaryKey key)
         {
             return Entities.Find(key);
@@ -135,7 +104,6 @@ namespace eTRIKS.Commons.DataAccess
 
         public TEntity Update(TEntity entity)
         {
-            Entities.Add(entity);
             //Entities.Attach(entity);
             DataContext.Entry(entity).State = EntityState.Modified;
             return entity;

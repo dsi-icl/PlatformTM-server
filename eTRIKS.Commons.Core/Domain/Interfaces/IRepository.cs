@@ -37,8 +37,8 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
                                     int? page = null,
                                     int? pageSize = null);
 
-        TEntity GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties);
-
+        TEntity GetSingle(Expression<Func<TEntity, bool>> filter = null,
+                                    List<Expression<Func<TEntity, object>>> includeProperties = null);
         /// <summary>
         /// Gets an entity with given primary key.
         /// </summary>
@@ -47,8 +47,6 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         TEntity GetById(TPrimaryKey key);
 
         IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter);
-
-        TEntity GetRecord(Func<TEntity, bool> predicate);
 
         #endregion
 

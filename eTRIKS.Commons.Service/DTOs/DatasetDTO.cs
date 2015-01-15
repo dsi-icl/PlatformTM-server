@@ -14,24 +14,30 @@ namespace eTRIKS.Commons.Service.DTOs
 {
     public class DatasetDTO
     {
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Class { get; set; }
         public string Description { get; set; }
+        public string Code { get; set; }
         public string Structure { get; set; }
         public string DomainId { get; set; }
         public string StudyId { get; set; }
         public int ActivityId { get; set; }
         public List<DatasetVariableDTO> variables { get; set; }
+
+        public DatasetDTO()
+        {
+            variables = new List<DatasetVariableDTO>();
+        }
     }
 
     public class DatasetVariableDTO
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
+        public string Accession { get; set; }
         public string Name { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
-
-        
         public string DataType { get; set; }
         //public Nullable<bool> IsCurated { get; set; }
         //public CVterm VariableType { get; set; }
@@ -40,7 +46,6 @@ namespace eTRIKS.Commons.Service.DTOs
         //public string RoleId { get; set; }
         //public Study study { get; set; }
         //public string StudyId { get; set; }
-
         public Nullable<int> OrderNumber { get; set; }
         public Nullable<bool> IsRequired { get; set; }
         public Nullable<int> KeySequence { get; set; }

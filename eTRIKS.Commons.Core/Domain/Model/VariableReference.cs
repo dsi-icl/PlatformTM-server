@@ -14,9 +14,9 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int? KeySequence { get; set; }
 
         public VariableDefinition VariableDefinition { get; set; }
-        public string VariableDefinitionId { get; set; }
+        public int VariableDefinitionId { get; set; }
 
         public Dataset Dataset { get; set; }
-        public string DatasetId { get; set; }
+        public int DatasetId { get; set; }
     }
 }

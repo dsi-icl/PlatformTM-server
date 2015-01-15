@@ -7,10 +7,11 @@ using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class VariableDefinition : Identifiable<string>
+    public class VariableDefinition : Identifiable<int>
     {
        
         //public string variableId { get; set; }
+        public string Accession { get; set; }
         public string Name { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }

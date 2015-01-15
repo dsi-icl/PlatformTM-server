@@ -12,12 +12,12 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Properties
             this.Property(t => t.VariableDefinitionId)
-                .IsRequired()
-                .HasMaxLength(200);
+                .IsRequired();
+                //.HasMaxLength(200);
 
             this.Property(t => t.DatasetId)
-                .IsRequired()
-                .HasMaxLength(200);
+                .IsRequired();
+                //.HasMaxLength(200);
 
             // Table & Column Mappings
             this.ToTable("Variable_Reference_TBL");
