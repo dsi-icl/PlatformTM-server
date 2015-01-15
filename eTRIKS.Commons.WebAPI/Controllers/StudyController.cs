@@ -24,6 +24,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _studyService = studyService;
         }
 
+        /*
         [HttpPost]
         public void AddDatasetVariables([FromBody] List<VariableDefinitionDTO> varDefDTOList)
         {
@@ -31,14 +32,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             for (int i = 0; i < varDefDTOList.Count; i++)
             {
                 VariableDefinition varDef = new VariableDefinition();
-                varDef.OID = varDefDTOList[i].OID;
+                varDef.Accession = varDefDTOList[i].;
                 varDef.Name = varDefDTOList[i].Name;
                 varDef.StudyId = varDefDTOList[i].StudyId;
                 // Continue for the rest of the fields
                 varDefList.Add(varDef);
             }
             _studyService.addDatasetVariables(varDefList);
-        }
+        }*/
 
     }
 }

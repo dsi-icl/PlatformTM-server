@@ -12,9 +12,11 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using eTRIKS.Commons.Service.DTOs;
+using System.Web.Http.Cors;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    //[RoutePrefix("api/activities")]
     public class ActivityController : ApiController
     {
         private ActivityService _activityService;
@@ -24,52 +26,55 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _activityService = activityService;
         }
 
-        [HttpPost]
-        public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
-        {
-            Activity activity = new Activity();
-            activity.OID = activityDTO.OID;
-            activity.Name = activityDTO.Name;
-            activity.StudyId = activityDTO.StudyID;
-
-            _activityService.addActivity(activity);
-            return Request.CreateResponse(HttpStatusCode.Created);
-        }
-
-        //[HttpPost]
-        //public HttpResponseMessage AddDataSet(string activityOID, [FromBody] DatasetDTO datasetDTO)
-        //{
-        //    if (_activityService.checkExist(activityOID))
-        //    {
-        //        Dataset dataset = new Dataset();
-        //        dataset.OID = datasetDTO.OID;
-        //        dataset.ActivityId = datasetDTO.Activity;
-        //        dataset.DomainId = datasetDTO.Domain;
-        //        _activityService.addDataset(dataset);
-        //        return Request.CreateResponse(HttpStatusCode.Created);
-        //    }
-        //    return Request.CreateResponse(HttpStatusCode.NotFound);
-        //}
-
         [HttpGet]
-        public Activity GetActivityByKey(string activityId)
+        [Route("api/activities/{activityId}", Name="GetActivityById")]
+        public ActivityDTO getActivity(int activityId)
         {
-            return _activityService.getActivityById(activityId);
+            return _activityService.getActivityDTOById(activityId);
         }
 
         [HttpGet]
-        public Activity getActivity(string studyId, string activityId)
-        {
-            return _activityService.getActivity(studyId, activityId);
-        }
-
-        [HttpGet]
-        public IEnumerable<Activity> getStudyActivities(string studyId)
+        [Route("api/studies/{studyId}/activities")]
+        public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
         {
             return _activityService.getStudyActivities(studyId);
         }
 
+        [HttpPost]
+        [Route("api/activities")]
+        public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
+        {
+            var addedActivity = _activityService.addActivity(activityDTO);
 
+            if (addedActivity != null)
+            {
+                var response = Request.CreateResponse<Activity>(HttpStatusCode.Created, addedActivity);
+                string uri = Url.Link("GetActivityById", new { activityId = addedActivity.OID });
+                response.Headers.Location = new Uri(uri);
+                return response;
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                return response;
+            }
+        }
 
+        [HttpPut]
+        [Route("api/activities/{activityId}")]
+        public HttpResponseMessage updateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
+        {
+            try{
+                _activityService.updateActivity(activityDTO, activityId);
+                var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Accepted, activityDTO);
+                string uri = Url.Link("GetActivityById", new { activityId = activityDTO.Id });
+                response.Headers.Location = new Uri(uri);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict);
+            }
+        }
     }
 }

@@ -14,7 +14,7 @@ using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "GET,POST")] 
+    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")] 
     public class DatasetController : ApiController
     {
         private DatasetService _datasetService;
@@ -25,26 +25,15 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
         
         // GET: api/Dataset
-        //[EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")]
         [HttpGet]
         [Route("api/Dataset")]
-        public IEnumerable<DomainTemplate> Get()
+        public IEnumerable<DatasetDTO> Get()
         {
-            //List<DomainTemplate> ts = new List<DomainTemplate>();
-            //DomainTemplate dt = new DomainTemplate();
-            //dt.Class = "test1";
-            //ts.Add(dt);
-            //dt = new DomainTemplate();
-            //dt.Class = "test2";
-            //ts.Add(dt);
-            //return ts;
             return _datasetService.GetAllDomainTemplates();
         }
 
-       
-
+      
         // GET: api/Dataset/5
-        //[EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")]
         [HttpGet]
         [Route("api/Dataset/{domainId}")]
         public DatasetDTO Get(string domainId)
@@ -52,124 +41,42 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _datasetService.GetTemplateDataset(domainId);
         }
 
-        //[HttpPost]
-        //public void Add([FromBody] List<VariableReferenceDTO> varRefDTOList)
-        //{
-        //    List<VariableReference> varRefList = new List<VariableReference>();
-        //    for (int i = 0; i < varRefDTOList.Count; i++)
-        //    {
-        //        VariableReference varRef = new VariableReference();
-        //        varRef.VariableDefinitionId = varRefDTOList[i].VariableDefinitionId;
-        //        varRef.DatasetId = varRefDTOList[i].DatasetId;
-        //        //varRef.OID = varRefDTOList[i].VariableDefinitionId;
-        //        // Continue for the rest of the fields
-        //        varRefList.Add(varRef);
-        //    }
-        //    _datasetService.addDatasetVariableReferences(varRefList);
-        //}
-
-
-        [HttpPost]
-        [Route("api/Dataset")]
-        public string addDataset([FromBody] DatasetDTO datasetDTO)
+        [HttpGet]
+        [Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]
+        public DatasetDTO GetActivityDataset(int datasetId)
         {
-            // create an OID for dataset
-            // DAT-UBP-01
-            //string lastOIDSequence = _datasetService.getDataSetOID("DAT-XXXv");
-
-            //1. Fields for Dataset
-            Dataset dataset = new Dataset();
-            dataset.OID = "DAT-UBP-0T";
-            dataset.ActivityId = "ACT-UBP-01";
-            dataset.DomainId = datasetDTO.DomainId;
-
-            // Get any exisiting variable definitions for that study
-            List<VariableDefinition> variableDefsOfStudy = _datasetService.getVariableDefinitionsOfStudy(datasetDTO.StudyId).ToList();
-
-            List<VariableDefinition> varDefList = new List<VariableDefinition>();
-            List<VariableReference> varRefList = new List<VariableReference>();
-            for (int i = 0; i < datasetDTO.variables.Count; i++)
-            {
-                if (datasetDTO.variables[i].isSelected)
-                {
-                    if (!variableDefsOfStudy.Exists(d => d.OID.Equals(datasetDTO.variables[i].Id)))
-                    {
-                        //2. Fields for varDef
-                        VariableDefinition varDef = new VariableDefinition();
-                        varDef.OID = datasetDTO.variables[i].Id;
-                        varDef.Name = datasetDTO.variables[i].Name;
-                        varDef.Label = datasetDTO.variables[i].Label;
-                        varDef.Description = datasetDTO.variables[i].Description;
-                        varDef.DataType = datasetDTO.variables[i].DataType;
-                        varDef.StudyId = datasetDTO.StudyId;
-                        varDefList.Add(varDef);
-                    }
-                    //3. Fields for varRefList
-                    VariableReference varRef = new VariableReference();
-                    varRef.DatasetId = dataset.OID;
-                    varRef.VariableDefinitionId = datasetDTO.variables[i].Id;
-                    varRef.OrderNumber = datasetDTO.variables[i].OrderNumber;
-                    varRef.IsRequired = datasetDTO.variables[i].IsRequired;
-                    varRefList.Add(varRef);
-                }
-            }
-            //4. Load the VarDef and 5. Load the dataset & VarRef
-            dataset.Variables = varRefList;
-            return _datasetService.addDataset(dataset, varDefList);
+            return _datasetService.GetActivityDatasetDTO(datasetId);
         }
 
 
         [HttpPost]
         [Route("api/Dataset")]
-        public string updateDataset(string studyId, [FromBody] DatasetDTO datasetDTO)
+        public HttpResponseMessage addDataset([FromBody] DatasetDTO datasetDTO)
         {
-            Dataset dataset = new Dataset();
-            dataset.OID = "DAT-UBP-0T";
-            dataset.ActivityId = "ACT-UBP-01";
-            dataset.DomainId = datasetDTO.DomainId;
-
-            List<VariableDefinition> variableDefsOfStudy = _datasetService.getVariableDefinitionsOfStudy(studyId).ToList();
-            List<VariableReference> variableRefsOfActivity = _datasetService.GetActivityDataset(dataset.OID).Variables.ToList();
-
-            List<VariableDefinition> varDefList = new List<VariableDefinition>();
-            List<VariableReference> varRefList = new List<VariableReference>();
-            for (int i = 0; i < datasetDTO.variables.Count; i++)
+            var addedDataset = _datasetService.addDataset(datasetDTO);
+            datasetDTO.Id = addedDataset.OID;
+            if (addedDataset != null)
             {
-                if (datasetDTO.variables[i].isSelected)
-                {
-                    if (!variableDefsOfStudy.Exists(d => d.OID.Equals(datasetDTO.variables[i].Id)))
-                    {
-                        //2. Fields for varDef
-                        VariableDefinition varDef = new VariableDefinition();
-                        varDef.OID = datasetDTO.variables[i].Id;
-                        varDef.Name = datasetDTO.variables[i].Name;
-                        varDef.Label = datasetDTO.variables[i].Label;
-                        varDef.Description = datasetDTO.variables[i].Description;
-                        varDef.DataType = datasetDTO.variables[i].DataType;
-                        varDef.StudyId = studyId;
-                        varDefList.Add(varDef);
-                    }
-                    if (!variableRefsOfActivity.Exists(d => d.VariableDefinitionId.Equals(datasetDTO.variables[i].Id)))
-                    {
-                        //3. Fields for varRefList
-                        VariableReference varRef = new VariableReference();
-                        varRef.DatasetId = dataset.OID;
-                        varRef.VariableDefinitionId = datasetDTO.variables[i].Id;
-                        varRef.OrderNumber = datasetDTO.variables[i].OrderNumber;
-                        varRef.IsRequired = datasetDTO.variables[i].IsRequired;
-                        varRefList.Add(varRef);
-                    }
-                }
+                var response = Request.CreateResponse<DatasetDTO>(HttpStatusCode.Created, datasetDTO);
+                string uri = Url.Link("GetDatasetById", new { datasetId = addedDataset.OID, activityId = datasetDTO.ActivityId });
+                response.Headers.Location = new Uri(uri);
+                return response;
             }
-            //4. Load the VarDef and 5. Load the dataset & VarRef
-            dataset.Variables = varRefList;
-            return _datasetService.updateDataset(dataset, varDefList);
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                return response;
+            }
         }
 
-        //public DomainTemplate GetDomain(string id)
-        //{
-        //    return _datasetService.GetTemplateDatasetNew(id);
-        //}
+
+        [HttpPut]
+        [Route("api/Dataset/{datasetId}")]
+        public string updateDataset(string datasetId, [FromBody] DatasetDTO datasetDTO)
+        {
+
+            return _datasetService.updateDataset(datasetDTO, datasetId);
+        }
 
         // DELETE: api/Dataset/5
         public void Delete(int id)

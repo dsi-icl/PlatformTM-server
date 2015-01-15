@@ -9,7 +9,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.DataAccess
 {
-    class DatasetRepository : GenericRepository<Dataset, string>
+    class DatasetRepository : GenericRepository<Dataset, int>
     {
        
         

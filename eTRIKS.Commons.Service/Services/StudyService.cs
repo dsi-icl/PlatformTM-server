@@ -14,13 +14,13 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class StudyService
     {
-        private IRepository<VariableDefinition, string> _variableDefinitionRepository;
+        private IRepository<VariableDefinition, int> _variableDefinitionRepository;
         private IServiceUoW _studyServiceUnit;
 
         public StudyService(IServiceUoW uoW)
         {
             _studyServiceUnit = uoW;
-            _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, string>();
+            _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
         }
 
         public void addDatasetVariables(List<VariableDefinition> variableDefinitions)

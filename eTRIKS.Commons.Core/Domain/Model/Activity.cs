@@ -8,7 +8,7 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class Activity : Identifiable<string>
+    public class Activity : Identifiable<int>
     {
         //public string OID { get; set; }
         public string Name { get; set; }
@@ -17,9 +17,5 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public ICollection<Dataset> Datasets { get; set; }
         public Study Study { get; set; }
 
-        public void addDataset(Dataset ds)
-        {
-            Datasets.Add(ds);
-        }
     }
 }
