@@ -5,7 +5,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContextUoW>
+    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContext_prod>
     {
         public Configuration()
         {
@@ -16,7 +16,7 @@ namespace eTRIKS.Commons.Persistence.Migrations
 
         
 
-        protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContextUoW context)
+        protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContext_prod context)
         {
             //  This method will be called after migrating to the latest version.
 

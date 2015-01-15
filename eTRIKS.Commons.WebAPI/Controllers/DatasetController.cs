@@ -5,11 +5,16 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
-using eTRIKS.Commons.Service.DTOs;
+
 using eTRIKS.Commons.Service.Services;
+using eTRIKS.Commons.Service.DTOs;
+
+using System.Web.Http.Cors;
+using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")] 
     public class DatasetController : ApiController
     {
         private DatasetService _datasetService;
@@ -20,25 +25,57 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
         
         // GET: api/Dataset
-        public IEnumerable<string> Get()
+        [HttpGet]
+        [Route("api/Dataset")]
+        public IEnumerable<DatasetDTO> Get()
         {
-            return new string[] { "value1", "value2" };
+            return _datasetService.GetAllDomainTemplates();
         }
 
+      
         // GET: api/Dataset/5
-        public DomainTemplate Get(string id)
+        [HttpGet]
+        [Route("api/Dataset/{domainId}")]
+        public DatasetDTO Get(string domainId)
         {
-            return _datasetService.GetTemplateDataset(id);
+            return _datasetService.GetTemplateDataset(domainId);
         }
 
-        // POST: api/Dataset
-        public void Post([FromBody]string value)
+        [HttpGet]
+        [Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]
+        public DatasetDTO GetActivityDataset(int datasetId)
         {
+            return _datasetService.GetActivityDatasetDTO(datasetId);
         }
 
-        // PUT: api/Dataset/5
-        public void Put(int id, [FromBody]string value)
+
+        [HttpPost]
+        [Route("api/Dataset")]
+        public HttpResponseMessage addDataset([FromBody] DatasetDTO datasetDTO)
         {
+            var addedDataset = _datasetService.addDataset(datasetDTO);
+            datasetDTO.Id = addedDataset.OID;
+            if (addedDataset != null)
+            {
+                var response = Request.CreateResponse<DatasetDTO>(HttpStatusCode.Created, datasetDTO);
+                string uri = Url.Link("GetDatasetById", new { datasetId = addedDataset.OID, activityId = datasetDTO.ActivityId });
+                response.Headers.Location = new Uri(uri);
+                return response;
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                return response;
+            }
+        }
+
+
+        [HttpPut]
+        [Route("api/Dataset/{datasetId}")]
+        public string updateDataset(string datasetId, [FromBody] DatasetDTO datasetDTO)
+        {
+
+            return _datasetService.updateDataset(datasetDTO, datasetId);
         }
 
         // DELETE: api/Dataset/5

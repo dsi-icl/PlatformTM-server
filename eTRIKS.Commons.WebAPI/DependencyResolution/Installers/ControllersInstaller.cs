@@ -15,14 +15,15 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                     FromThisAssembly().
                     BasedOn<IController>().
                     If(c => c.Name.EndsWith("Controller")).
-                    LifestyleTransient());
-
-            container.Register(
+                    LifestyleTransient(),
+                    
+                    
                 Classes.
                     FromThisAssembly().
                     BasedOn<ApiController>().
                     If(c => c.Name.EndsWith("Controller")).
-                    LifestyleTransient());
+                    LifestyleTransient()
+                    );
 
            
         }

@@ -11,8 +11,8 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.HasKey(t => t.OID);
 
             this.Property(t => t.OID)
-               .IsRequired()
-               .HasMaxLength(200);
+               .IsRequired();
+               //.HasMaxLength(200);
 
             // Properties
             this.Property(t => t.DomainId)
@@ -22,9 +22,9 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.Property(t => t.DataFile)
                 .HasMaxLength(2000);
 
-            this.Property(t => t.ActivityId)
-                .IsRequired()
-                .HasMaxLength(200);
+            //this.Property(t => t.ActivityId)
+            //    .IsRequired()
+            //    .HasMaxLength(200);
 
            
             // Table & Column Mappings

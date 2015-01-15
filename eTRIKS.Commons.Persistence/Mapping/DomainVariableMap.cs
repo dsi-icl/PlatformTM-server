@@ -3,7 +3,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    public class DomainVariableMap : EntityTypeConfiguration<DomainTemplateVariable>
+    public class DomainVariableMap : EntityTypeConfiguration<DomainVariableTemplate>
     {
         public DomainVariableMap()
         {

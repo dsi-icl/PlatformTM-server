@@ -32,6 +32,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,7 +53,7 @@
     <Compile Include="Domain\Model\Templates\DomainTemplate.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Domain\Model\Templates\DomainTemplateVariable.cs">
+    <Compile Include="Domain\Model\Templates\DomainVariableTemplate.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Domain\Interfaces\IRepository.cs" />

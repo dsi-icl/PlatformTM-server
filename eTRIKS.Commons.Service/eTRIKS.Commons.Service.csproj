@@ -30,6 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper">
+      <HintPath>..\packages\AutoMapper.3.3.0\lib\net40\AutoMapper.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper.Net4">
+      <HintPath>..\packages\AutoMapper.3.3.0\lib\net40\AutoMapper.Net4.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,14 +45,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DTOs\ActivityDTO.cs" />
     <Compile Include="DTOs\DatasetDTO.cs" />
-    <Compile Include="DTOs\DomainDataset.cs" />
-    <Compile Include="DTOs\DomainVariable.cs" />
+    <Compile Include="DTOs\VariableDefinitionDTO.cs" />
+    <Compile Include="DTOs\VariableReferenceDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ActivityService.cs" />
+    <Compile Include="Services\DataManagementServices.cs" />
     <Compile Include="Services\DatasetService.cs" />
+    <Compile Include="Services\StudyService.cs" />
     <Compile Include="Services\TemplateService.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj">
       <Project>{2b9025cd-68cd-4e1d-8542-2a6acd8c6354}</Project>

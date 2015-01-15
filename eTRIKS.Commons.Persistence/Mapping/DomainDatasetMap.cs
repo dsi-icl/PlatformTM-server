@@ -3,9 +3,9 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    public class DomainDatasetMap : EntityTypeConfiguration<DomainTemplate>
+    public class DomainTemplateMap : EntityTypeConfiguration<DomainTemplate>
     {
-        public DomainDatasetMap()
+        public DomainTemplateMap()
         {
             // Primary Key
             this.HasKey(t => t.OID);

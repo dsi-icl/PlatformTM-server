@@ -29,20 +29,24 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         /// <returns>List of all entities</returns>
         List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate);
 
+        //TEntity GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties);
 
-        IEnumerable<TEntity> Get(
-            Expression<Func<TEntity, bool>> filter = null,
-            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            List<Expression<Func<TEntity, object>>> includeProperties = null,
-            int? page = null,
-            int? pageSize = null);
+        IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null,
+                                    List<Expression<Func<TEntity, object>>> includeProperties = null,
+                                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+                                    int? page = null,
+                                    int? pageSize = null);
 
+        TEntity GetSingle(Expression<Func<TEntity, bool>> filter = null,
+                                    List<Expression<Func<TEntity, object>>> includeProperties = null);
         /// <summary>
         /// Gets an entity with given primary key.
         /// </summary>
         /// <param name="key">Primary key of the entity to get</param>
         /// <returns>Entity</returns>
         TEntity GetById(TPrimaryKey key);
+
+        IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter);
 
         #endregion
 
@@ -59,7 +63,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         #region Update
 
         /// <summary>
-        /// Updates an existing entity.
+        /// Modify an existing entity.
         /// </summary>
         /// <param name="entity">Entity</param>
         TEntity Update(TEntity entity);

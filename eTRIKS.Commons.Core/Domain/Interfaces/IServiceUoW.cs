@@ -5,7 +5,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
     public interface IServiceUoW : IDisposable
     {
-        void Save();
+        string Save();
         IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>()
             where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>;
     }
