@@ -148,6 +148,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             }
 
             // Extract select columns from query string
+            // The * signifies the start of the column selection
             filteredColumnList = new string[coll.Count - countConditions];
             for (int j = 0; j < coll.Count - countConditions; j++)
             {
@@ -155,8 +156,9 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             }
         }
 
-        public List<NoSQLRecord> getNoSQLRecord(string queryString)
+        public NoSQLRecordSet getNoSQLRecord(string queryString)
         {
+            NoSQLRecordSet recordSet = new NoSQLRecordSet();
             List<NoSQLRecord> records = new List<NoSQLRecord>();
             MongoDatabase dbETriks = GetDatabase();
 
@@ -179,13 +181,19 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
                 }
                 records.Add(noSQLRec);
             }
-            return records;
+            recordSet.RecordSet = records;
+            return recordSet;
         }
     }
 
 
 
     //The NOSQL classes are located here until its moved to the data model
+    public class NoSQLRecordSet
+    {
+        public List<NoSQLRecord> RecordSet = new List<NoSQLRecord>();
+    }
+
     public class NoSQLRecord
     {
         public List<RecordItem> RecordItems = new List<RecordItem>();

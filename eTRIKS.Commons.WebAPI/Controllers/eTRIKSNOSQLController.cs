@@ -24,7 +24,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //[Route("{id}")]
         // GET api/values/5
         [HttpGet]
-        public List<NoSQLRecord> GetData()
+        public NoSQLRecordSet GetData()
         {
             string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
             return _mongoDbService.getNoSQLRecord(queryString);
