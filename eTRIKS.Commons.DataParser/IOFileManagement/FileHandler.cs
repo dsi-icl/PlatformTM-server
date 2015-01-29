@@ -80,22 +80,41 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 MongoDbDataServices ms = new MongoDbDataServices();
                 NoSQLRecord record = new NoSQLRecord();
 
-                //string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { ' ', ',', '.', ':', '\t' });
-                string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { '\t' });
-                for (int i = 1; i < ds.Tables[0].Rows.Count; i++)
+                ////string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { ' ', ',', '.', ':', '\t' });
+                ////if text file (tab delimited)
+                //string[] headers = ds.Tables[0].Columns.ToString().Split(new Char[] { '\t' });
+                //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                //{
+                //    record.RecordItems.Clear();
+                //    string[] rowElements = ds.Tables[0].Rows[i][0].ToString().Split(new Char[] { '\t' });
+
+                //    for (int j = 0; j < headers.Length; j++)
+                //    {
+                //        RecordItem recordItem = new RecordItem();
+                //        recordItem.fieldName = headers[j];
+                //        recordItem.value = rowElements[j];
+                //        record.RecordItems.Add(recordItem);
+                //    }
+                //    ms.loadDataGeneric(record);
+                //}
+
+                //if CSV file
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     record.RecordItems.Clear();
-                    string[] rowElements = ds.Tables[0].Rows[i][0].ToString().Split(new Char[] { '\t' });
-
-                    for (int j = 0; j < headers.Length; j++)
+                    for (int j = 0; j < ds.Tables[0].Columns.Count; j++)
                     {
                         RecordItem recordItem = new RecordItem();
-                        recordItem.fieldName = headers[j];
-                        recordItem.value = rowElements[j];
-                        record.RecordItems.Add(recordItem);
+                        recordItem.fieldName = ds.Tables[0].Columns[j].ToString();
+                        recordItem.value = ds.Tables[0].Rows[i][j].ToString();
+                        if (recordItem.value != "")
+                        {
+                            record.RecordItems.Add(recordItem);
+                        }
                     }
                     ms.loadDataGeneric(record);
                 }
+                status = "CREATED";
             }
             return status;
         }

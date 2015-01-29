@@ -89,6 +89,24 @@ namespace eTRIKS.Commons.Service.Services
             return activityDTO;
         }
 
+
+        // Method for data Visulaiser
+        public IEnumerable<Activity> getActivityData(string studyId)
+        {
+            //&& d.Name.Equals(role))
+            string role = "CL-Role-T-2";
+            IEnumerable<Activity> activity = _activityRepository.Get(
+                d => d.StudyId.Equals(studyId),
+                  new List<Expression<Func<Activity, object>>>(){
+                        d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(t=>t.Variables),
+                         d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(t=>t.Variables.Select(k=>k.VariableDefinition))
+                }
+            );
+
+
+            return activity;
+        }
+
         public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
         {
             IEnumerable<Activity> activities;

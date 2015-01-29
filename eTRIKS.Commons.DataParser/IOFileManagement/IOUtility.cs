@@ -114,7 +114,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
 
             OleDbConnection connection = new OleDbConnection("Provider=Microsoft.Jet.OleDb.4.0; Data Source = " +
                                            Path.GetDirectoryName(fileLocation) +
-                                               "; Extended Properties = \"text;HDR=NO;FMT=Delimited\"");
+                                               "; Extended Properties = \"text;ImportMixedTypes=Text;HDR=NO;IMEX=1;FMT=Delimited;\"");
             connection.Open();
             OleDbDataAdapter adapter = new OleDbDataAdapter("SELECT " + mapping + " FROM " + fileName, connection);
             DataSet ds = new DataSet();

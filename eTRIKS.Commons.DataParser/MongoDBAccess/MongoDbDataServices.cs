@@ -15,6 +15,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
 {
     public class MongoDbDataServices
     {
+        public const string mongoCollectionName = "BioSpeak_Data";
         public MongoDatabase GetDatabase()
         {
             // Create server settings to pass connection string, timeout, etc.
@@ -28,7 +29,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string loadDataGeneric(NoSQLRecord record)
         {
             MongoDatabase dbETriks = GetDatabase();
-            MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>("dataStream_temp");
+            MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>(mongoCollectionName);
             BsonDocument eTricksDatarecord = new BsonDocument();
 
             for (int i = 0; i < record.RecordItems.Count; i++)
@@ -52,7 +53,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string updateDataGeneric(NoSQLRecordForUpdate updateRecord)
         {
             MongoDatabase dbETriks = GetDatabase();
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName);
 
             QueryDocument query = new QueryDocument();
             for (int i = 0; i < updateRecord.CurrentRecord.Count; i++)
@@ -84,7 +85,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string deleteDataGeneric(NoSQLRecord record)
         {
             MongoDatabase dbETriks = GetDatabase();
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName);
 
             QueryDocument query = new QueryDocument();
             for (int i = 0; i < record.RecordItems.Count; i++)
@@ -166,7 +167,9 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             string[] filteredColumnList;
             exctractFromQueryString(queryString,out query, out filteredColumnList);
 
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query).SetFields(Fields.Include(filteredColumnList));
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).SetFields(Fields.Include(filteredColumnList));
+            eTRIKSRecords.Distinct();
+
             DataSet ds = new DataSet();
 
             foreach (var rec in eTRIKSRecords)

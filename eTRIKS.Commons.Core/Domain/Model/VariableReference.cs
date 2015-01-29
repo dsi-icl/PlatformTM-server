@@ -16,7 +16,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public VariableDefinition VariableDefinition { get; set; }
         public int VariableDefinitionId { get; set; }
 
-        public Dataset Dataset { get; set; }
+        public Dataset Dataset { get; private set; }
         public int DatasetId { get; set; }
     }
 }
