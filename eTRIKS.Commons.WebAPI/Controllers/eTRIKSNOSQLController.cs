@@ -14,20 +14,20 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _mongoDbService = mongoDbService;
         }
 
-        //[Route("")]
-        // GET api/values
-        //public IEnumerable<string> getRecordsOfStudy()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
 
-        //[Route("{id}")]
-        // GET api/values/5
         [HttpGet]
         public NoSQLRecordSet GetData()
         {
             string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
-            return _mongoDbService.getNoSQLRecord(queryString);
+            return _mongoDbService.getNoSQLRecords(queryString);
+        }
+
+        [HttpGet]
+        [Route("Distinct")]
+        public NoSQLRecordSet GetDistinctData()
+        {
+            string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
+            return _mongoDbService.getDistinctNoSQLRecords(queryString);
         }
 
         [HttpDelete]

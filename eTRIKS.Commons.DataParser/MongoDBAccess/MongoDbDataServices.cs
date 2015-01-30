@@ -157,7 +157,33 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             }
         }
 
-        public NoSQLRecordSet getNoSQLRecord(string queryString)
+        public NoSQLRecordSet getDistinctNoSQLRecords(string queryString)
+        {
+            NoSQLRecordSet recordSet = new NoSQLRecordSet();
+            List<NoSQLRecord> records = new List<NoSQLRecord>();
+            MongoDatabase dbETriks = GetDatabase();
+
+            QueryDocument query;
+            string[] filteredColumnList;
+            exctractFromQueryString(queryString, out query, out filteredColumnList);
+
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Distinct(filteredColumnList[0],
+                                                                            query);
+            NoSQLRecord noSQLRec = new NoSQLRecord();
+            for (int i = 0; i < eTRIKSRecords.Count(); i++)
+            {
+                RecordItem ri = new RecordItem();
+                ri.fieldName = filteredColumnList[0];
+                ri.value = eTRIKSRecords.ElementAt(i).ToString();
+                noSQLRec.RecordItems.Add(ri);
+            }
+            records.Add(noSQLRec);
+            recordSet.RecordSet = records;
+            return recordSet;
+        }
+
+
+        public NoSQLRecordSet getNoSQLRecords(string queryString)
         {
             NoSQLRecordSet recordSet = new NoSQLRecordSet();
             List<NoSQLRecord> records = new List<NoSQLRecord>();
@@ -168,9 +194,6 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             exctractFromQueryString(queryString,out query, out filteredColumnList);
 
             var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).SetFields(Fields.Include(filteredColumnList));
-            eTRIKSRecords.Distinct();
-
-            DataSet ds = new DataSet();
 
             foreach (var rec in eTRIKSRecords)
             {

@@ -19,6 +19,7 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IRepository<Activity, int> _activityRepository;
         private IRepository<Dataset, int> _dataSetRepository;
+        private IRepository<VariableDefinition, int> _variableDefinition;
         private IServiceUoW _activityServiceUnit;
 
         public ActivityService(IServiceUoW uoW)
@@ -26,6 +27,7 @@ namespace eTRIKS.Commons.Service.Services
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
             _dataSetRepository = uoW.GetRepository<Dataset, int>();
+            _variableDefinition = uoW.GetRepository<VariableDefinition, int>();
         }
 
         private static readonly Expression<Func<Activity, ActivityDTO>> AsBookDto =
@@ -99,9 +101,20 @@ namespace eTRIKS.Commons.Service.Services
                 d => d.StudyId.Equals(studyId),
                   new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(t=>t.Variables),
-                         d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(t=>t.Variables.Select(k=>k.VariableDefinition))
+                         d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(
+                                                                    t=>t.Variables.Select(k=>k.VariableDefinition))
                 }
             );
+
+
+            IEnumerable<VariableDefinition> varDefinition = 
+                                                    _variableDefinition.Get( (d=>d.RoleId.Equals(role) 
+                                                                           && d.StudyId.Equals(studyId))
+                
+                );
+
+
+
 
 
             return activity;
