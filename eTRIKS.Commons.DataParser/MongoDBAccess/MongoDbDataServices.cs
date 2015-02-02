@@ -147,7 +147,6 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
                     break;
                 }
             }
-
             // Extract select columns from query string
             // The * signifies the start of the column selection
             filteredColumnList = new string[coll.Count - countConditions];
@@ -193,7 +192,8 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             string[] filteredColumnList;
             exctractFromQueryString(queryString,out query, out filteredColumnList);
 
-            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).SetFields(Fields.Include(filteredColumnList));
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).
+                                SetFields(Fields.Include(filteredColumnList).Exclude("_id"));
 
             foreach (var rec in eTRIKSRecords)
             {
@@ -205,7 +205,11 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
                     ri.value = rec.GetElement(i).Value.ToString();
                     noSQLRec.RecordItems.Add(ri);
                 }
-                records.Add(noSQLRec);
+                // Check if mongo record didnt have a matching column vale
+                if (noSQLRec.RecordItems.Count != 0)
+                {
+                    records.Add(noSQLRec);
+                }
             }
             recordSet.RecordSet = records;
             return recordSet;

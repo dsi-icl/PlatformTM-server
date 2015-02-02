@@ -27,7 +27,7 @@ namespace eTRIKS.Commons.Service.Services
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
             _dataSetRepository = uoW.GetRepository<Dataset, int>();
-            _variableDefinition = uoW.GetRepository<VariableDefinition, int>();
+            _variableDefinition =  uoW.GetRepository<VariableDefinition, int>();
         }
 
         private static readonly Expression<Func<Activity, ActivityDTO>> AsBookDto =
