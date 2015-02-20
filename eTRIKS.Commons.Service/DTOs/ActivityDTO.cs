@@ -16,7 +16,10 @@ namespace eTRIKS.Commons.Service.DTOs
         public int Id { get; set; }
         public string StudyID { get; set; }
         public ICollection<DatasetBriefDTO> datasets { get; set; }
-        //public Dictionary<string,string> datasets { get; set; }
+        public ActivityDTO()
+        {
+            datasets = new List<DatasetBriefDTO>();
+        }
     }
 
     public class DatasetBriefDTO

@@ -39,13 +39,11 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Label { get; set; }
         public string Description { get; set; }
         public string DataType { get; set; }
-        //public Nullable<bool> IsCurated { get; set; }
+        public Nullable<bool> IsCurated { get; set; }
         //public CVterm VariableType { get; set; }
         //public string VariableTypeId { get; set; }
         //public CVterm Role { get; set; }
-        //public string RoleId { get; set; }
-        //public Study study { get; set; }
-        //public string StudyId { get; set; }
+        public string RoleId { get; set; }
         public Nullable<int> OrderNumber { get; set; }
         public Nullable<bool> IsRequired { get; set; }
         public Nullable<int> KeySequence { get; set; }
