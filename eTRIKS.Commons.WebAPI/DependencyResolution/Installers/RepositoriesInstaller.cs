@@ -5,7 +5,7 @@ using Castle.Windsor;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Persistence;
 using eTRIKS.Commons.DataParser.IOFileManagement;
-using eTRIKS.Commons.DataParser.MongoDBAccess;
+using eTRIKS.Commons.DataAccess.MongoDB;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 {
@@ -22,7 +22,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 
                 Component.For<FileHandler>(),
 
-                Component.For<MongoDbDataServices>(),
+                Component.For<MongoDbDataRepository>(),
 
                 Classes
                     .FromAssemblyNamed("eTRIKS.Commons.DataAccess")

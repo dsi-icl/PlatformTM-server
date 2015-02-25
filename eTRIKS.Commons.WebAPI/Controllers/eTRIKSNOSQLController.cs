@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
-using eTRIKS.Commons.DataParser.MongoDBAccess;
+using eTRIKS.Commons.DataAccess.MongoDB;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [RoutePrefix("api/etriksNOSQL")]
     public class eTRIKSNOSQLController : ApiController
     {
-        private MongoDbDataServices _mongoDbService;
+        private MongoDbDataRepository _mongoDbService;
 
-        public eTRIKSNOSQLController(MongoDbDataServices mongoDbService)
+        public eTRIKSNOSQLController(MongoDbDataRepository mongoDbService)
         {
             _mongoDbService = mongoDbService;
         }

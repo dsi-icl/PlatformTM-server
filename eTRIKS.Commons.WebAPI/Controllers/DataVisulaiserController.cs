@@ -22,7 +22,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/DataVisulaiser/{studyId}")]
-        public IEnumerable<Activity> getActivityData(string studyId)
+        public IEnumerable<ClinicalDataTreeDTO> getActivityData(string studyId)
         {
             return _activityService.getActivityData(studyId);
         }
