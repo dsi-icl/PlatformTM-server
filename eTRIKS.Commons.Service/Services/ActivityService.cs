@@ -12,6 +12,8 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
+using eTRIKS.Commons.DataAccess.MongoDB;
+
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -21,6 +23,7 @@ namespace eTRIKS.Commons.Service.Services
         private IRepository<Dataset, int> _dataSetRepository;
         private IRepository<VariableDefinition, int> _variableDefinition;
         private IServiceUoW _activityServiceUnit;
+
 
         public ActivityService(IServiceUoW uoW)
         {
@@ -93,10 +96,11 @@ namespace eTRIKS.Commons.Service.Services
 
 
         // Method for data Visulaiser
-        public IEnumerable<Activity> getActivityData(string studyId)
+        public IEnumerable<ClinicalDataTreeDTO> getActivityData(string studyId)
         {
             //&& d.Name.Equals(role))
             string role = "CL-Role-T-2";
+
             IEnumerable<Activity> activity = _activityRepository.Get(
                 d => d.StudyId.Equals(studyId),
                   new List<Expression<Func<Activity, object>>>(){
@@ -107,17 +111,65 @@ namespace eTRIKS.Commons.Service.Services
             );
 
 
-            IEnumerable<VariableDefinition> varDefinition = 
-                                                    _variableDefinition.Get( (d=>d.RoleId.Equals(role) 
-                                                                           && d.StudyId.Equals(studyId))
-                
-                );
+            List<Activity> activity_list = activity.ToList();
 
+            //Extract data for clinical tree
+            List<ClinicalDataTreeRecordSummary> extractedClinicalTreeRecordList = new List<ClinicalDataTreeRecordSummary>();
+            for (int i = 0; i < activity_list.Count; i++)
+            {
+                for (int j = 0; j < activity_list[i].Datasets.Count; j++)
+                {
+                    ClinicalDataTreeRecordSummary clinicalTreeRecord = new ClinicalDataTreeRecordSummary();
+                    clinicalTreeRecord.Class = activity_list[i].Datasets.Select(f => f.Domain.Class).ToList()[j];
+                    clinicalTreeRecord.Name = activity_list[i].Name.ToString();
+                    clinicalTreeRecord.Domain = activity_list[i].Datasets.Select(k => k.Domain.Name).ToList()[j];
+                    clinicalTreeRecord.code = activity_list[i].Datasets.Select(f => f.Domain.Code).ToList()[j];
 
+                    List<VariableDefinition> datasetList = activity_list[i].Datasets.Select(g => g.Variables.Select(l => l.VariableDefinition))
+                                                                    .ToList()[0].ToList();
+                    for (int k = 0; k < datasetList.Count(); k++)
+                    {
+                        if (datasetList[k].RoleId.ToString() == role)
+                        {
 
+                            clinicalTreeRecord.variableDefinition = datasetList[k].Name.ToString();
+                        }
+                    }
+                    extractedClinicalTreeRecordList.Add(clinicalTreeRecord);
+                }
+            }
 
+            // Group extractedClinicalTreeRecordList on attribute class
+            List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
 
-            return activity;
+            var groupedClinicalTreeRecordList = extractedClinicalTreeRecordList.GroupBy(u => u.Class).Select(grp => grp.ToList()).ToList();
+            for (int i = 0; i < groupedClinicalTreeRecordList.Count(); i++)
+            {
+                ClinicalDataTreeDTO cdTree = new ClinicalDataTreeDTO();
+                cdTree.Class = groupedClinicalTreeRecordList[i][0].Class;
+                for (int j = 0; j < groupedClinicalTreeRecordList[i].Count(); j++)
+                {
+                    ClinicalDataTreeActivityDTO cdTreeActivity = new ClinicalDataTreeActivityDTO();
+                    cdTreeActivity.Name = groupedClinicalTreeRecordList[i][j].Name;
+                    cdTreeActivity.Domain = groupedClinicalTreeRecordList[i][j].Domain;
+                    cdTreeActivity.code = groupedClinicalTreeRecordList[i][j].code;
+                    cdTree.Activities.Add(cdTreeActivity);
+
+                    List<string> observationList = new List<string>();
+                    string queryString = "?DOMAIN=" + cdTreeActivity.code + "&" + groupedClinicalTreeRecordList[i][j].variableDefinition + "=*";
+                    // Call NOSQL to get list
+                    MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
+                    NoSQLRecordSet recordSet = mongoDataService.getDistinctNoSQLRecords(queryString);
+
+                    for (int g = 0; g < recordSet.RecordSet[0].RecordItems.Count; g++)
+                    {
+                        observationList.Add(recordSet.RecordSet[0].RecordItems[g].value);
+                    }
+                    cdTreeActivity.Observations = observationList; 
+                }
+                cdTreeList.Add(cdTree);
+            }
+            return cdTreeList;
         }
 
         public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
