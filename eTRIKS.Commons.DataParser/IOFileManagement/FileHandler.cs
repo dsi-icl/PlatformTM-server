@@ -1,6 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.DataParser.DataUtility;
-using eTRIKS.Commons.DataParser.MongoDBAccess;
+using eTRIKS.Commons.DataAccess.MongoDB;
 using eTRIKS.Commons.Service.Services;
 using System;
 using System.Collections.Generic;
@@ -77,7 +77,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             else if (dataSource == "NOSQL")
             {
                 // undo the remove first line
-                MongoDbDataServices ms = new MongoDbDataServices();
+                MongoDbDataRepository ms = new MongoDbDataRepository();
                 NoSQLRecord record = new NoSQLRecord();
 
                 ////string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { ' ', ',', '.', ':', '\t' });
