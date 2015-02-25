@@ -22,11 +22,24 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Name;
         public string Domain;
         public string code;
-        public ICollection<string> Observations;
+        public ICollection<Observation> Observations;
         public ClinicalDataTreeActivityDTO()
         {
-            Observations = new List<string>();
+            Observations = new List<Observation>();
         }
+    }
+
+
+    public class Observation
+    {
+        public string Name;
+        public string code;
+        public ICollection<string> ObservationList;
+        public Observation()
+        {
+            ObservationList = new List<string>();
+        }
+
     }
 
     public class ClinicalDataTreeRecordSummary

@@ -113,7 +113,7 @@ namespace eTRIKS.Commons.Service.Services
 
             List<Activity> activity_list = activity.ToList();
 
-            //Extract data for clinical tree
+            //1. Extract data for clinical tree
             List<ClinicalDataTreeRecordSummary> extractedClinicalTreeRecordList = new List<ClinicalDataTreeRecordSummary>();
             for (int i = 0; i < activity_list.Count; i++)
             {
@@ -131,7 +131,6 @@ namespace eTRIKS.Commons.Service.Services
                     {
                         if (datasetList[k].RoleId.ToString() == role)
                         {
-
                             clinicalTreeRecord.variableDefinition = datasetList[k].Name.ToString();
                         }
                     }
@@ -139,7 +138,7 @@ namespace eTRIKS.Commons.Service.Services
                 }
             }
 
-            // Group extractedClinicalTreeRecordList on attribute class
+            //2.  Group extractedClinicalTreeRecordList on attribute class
             List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
 
             var groupedClinicalTreeRecordList = extractedClinicalTreeRecordList.GroupBy(u => u.Class).Select(grp => grp.ToList()).ToList();
@@ -155,17 +154,48 @@ namespace eTRIKS.Commons.Service.Services
                     cdTreeActivity.code = groupedClinicalTreeRecordList[i][j].code;
                     cdTree.Activities.Add(cdTreeActivity);
 
-                    List<string> observationList = new List<string>();
-                    string queryString = "?DOMAIN=" + cdTreeActivity.code + "&" + groupedClinicalTreeRecordList[i][j].variableDefinition + "=*";
-                    // Call NOSQL to get list
                     MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
-                    NoSQLRecordSet recordSet = mongoDataService.getDistinctNoSQLRecords(queryString);
-
-                    for (int g = 0; g < recordSet.RecordSet[0].RecordItems.Count; g++)
+                    NoSQLRecordSet recordSet = null;
+                    
+                    //3.  IF Code = LB then get category data from NOSQL
+                    if (cdTreeActivity.code == "LB")
                     {
-                        observationList.Add(recordSet.RecordSet[0].RecordItems[g].value);
+                        string queryString = "?DOMAIN=" + cdTreeActivity.code + "&" + groupedClinicalTreeRecordList[i][j].variableDefinition + "=*&LBCAT=*";
+                        recordSet = mongoDataService.getNoSQLRecords(queryString);
+                        var filteredRecordSet = recordSet.RecordSet.Select(u => new { code =  u.RecordItems[0].value, category= u.RecordItems[1].value}).Distinct();
+                        var groupedRecordSet = filteredRecordSet.GroupBy(k => k.category).Select(grp => grp.ToList()).ToList();
+
+                        string code = "LB-CAT";
+                        for (int k = 0; k < groupedRecordSet.Count(); k++)
+                        {
+                            Observation observation = new Observation();
+                            observation.Name = groupedRecordSet[k][0].category;
+                            observation.code = code + k;
+                            List<string> observationList = new List<string>();
+                            for (int m = 0; m < groupedRecordSet[k].Count(); m++)
+                            {
+                               observationList.Add(groupedRecordSet[k][m].code);
+                            }
+                            observation.ObservationList = observationList;
+                            cdTreeActivity.Observations.Add(observation); 
+                        }
                     }
-                    cdTreeActivity.Observations = observationList; 
+                    // 4. For Code = VS or AE category are not used
+                    else
+                    {
+                        string queryString = "?DOMAIN=" + cdTreeActivity.code + "&" + groupedClinicalTreeRecordList[i][j].variableDefinition + "=*";
+                        // Call NOSQL to get list
+                        recordSet = mongoDataService.getDistinctNoSQLRecords(queryString);
+                        Observation observation = new Observation();
+                        observation.code = "TEST";
+                        List<string> observationList = new List<string>();
+                        for (int g = 0; g < recordSet.RecordSet[0].RecordItems.Count; g++)
+                        {
+                            observationList.Add(recordSet.RecordSet[0].RecordItems[g].value);
+                        }
+                        observation.ObservationList = observationList;
+                        cdTreeActivity.Observations.Add(observation); 
+                    } 
                 }
                 cdTreeList.Add(cdTree);
             }
