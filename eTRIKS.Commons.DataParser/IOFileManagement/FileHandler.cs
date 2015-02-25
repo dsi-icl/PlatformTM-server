@@ -84,7 +84,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { '\t' });
                 for (int i = 1; i < ds.Tables[0].Rows.Count; i++)
                 {
-                    record.recordItem.Clear();
+                    record.RecordItems.Clear();
                     string[] rowElements = ds.Tables[0].Rows[i][0].ToString().Split(new Char[] { '\t' });
 
                     for (int j = 0; j < headers.Length; j++)
@@ -92,7 +92,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                         RecordItem recordItem = new RecordItem();
                         recordItem.fieldName = headers[j];
                         recordItem.value = rowElements[j];
-                        record.recordItem.Add(recordItem);
+                        record.RecordItems.Add(recordItem);
                     }
                     ms.loadDataGeneric(record);
                 }

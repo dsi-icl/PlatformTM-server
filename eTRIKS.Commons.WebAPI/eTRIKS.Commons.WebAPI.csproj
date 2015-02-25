@@ -151,6 +151,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="Controllers\ActivityController.cs" />
+    <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\DataParserController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
     <Compile Include="Controllers\StudyController.cs" />

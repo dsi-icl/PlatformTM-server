@@ -3,14 +3,17 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
+
 
 namespace eTRIKS.Commons.DataParser.MongoDBAccess
 {
-    class MongoDbDataServices
+    public class MongoDbDataServices
     {
         public MongoDatabase GetDatabase()
         {
@@ -24,71 +27,158 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         // The Generic loader
         public string loadDataGeneric(NoSQLRecord record)
         {
-            string status = "ERROR";
             MongoDatabase dbETriks = GetDatabase();
             MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>("dataStream_temp");
             BsonDocument eTricksDatarecord = new BsonDocument();
 
-            for (int i = 0; i < record.recordItem.Count; i++)
+            for (int i = 0; i < record.RecordItems.Count; i++)
             {
-                eTricksDatarecord.Add(record.recordItem[i].fieldName, record.recordItem[i].value);
+                eTricksDatarecord.Add(record.RecordItems[i].fieldName, record.RecordItems[i].value);
             }
             try
             {
                 eTriksCollection.Insert(eTricksDatarecord);
-                status = "RECORD(s) SUCCESSFULLY INSERTED";
+                return "RECORD(s) SUCCESSFULLY INSERTED";
             }
-            catch (Exception e) { return status; }
-            return status;
-
+            catch (Exception e)
+            {
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                return e.Message;
+            }
         }
 
-        public void loadDataForControlledDataset(NoSQLRecordForControlledDataset rec)
+        // The Generic Update
+        public string updateDataGeneric(NoSQLRecordForUpdate updateRecord)
         {
             MongoDatabase dbETriks = GetDatabase();
-            MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>("dataStream_temp");
-            BsonDocument eTricksDatarecord = new BsonDocument {
-                { "StudyId", rec.studyId},
-                { "ItemGroup", rec.itemGroup }
-                };
+            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
 
-            //Get the Dynamic fields
-            for (int i = 0; i < rec.recordItem.Count; i++)
+            QueryDocument query = new QueryDocument();
+            for (int i = 0; i < updateRecord.CurrentRecord.Count; i++)
             {
-                eTricksDatarecord.Add(rec.recordItem[i].fieldName, rec.recordItem[i].value);
+                query.Add(updateRecord.CurrentRecord[i].fieldName, updateRecord.CurrentRecord[i].value);
+            }
+
+            UpdateBuilder update = new UpdateBuilder();
+            for (int i = 0; i < updateRecord.NewRecord.Count; i++)
+            {
+                update = Update.Set(updateRecord.NewRecord[i].fieldName, updateRecord.NewRecord[i].value);
             }
 
             try
             {
-                eTriksCollection.Insert(eTricksDatarecord);
+                var result = eTRIKSRecords.FindAndModify(query, null, update, true);
+                return "RECORD UPDATED";
             }
-            catch (Exception e) { }
+
+            catch (Exception e)
+            {
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                return e.Message;
+            }
         }
 
-        public List<NoSQLRecordForControlledDataset> getNoSQLRecord(string field, string value)
+        // The Generic Delete
+        public string deleteDataGeneric(NoSQLRecord record)
         {
-            List<NoSQLRecordForControlledDataset> records = new List<NoSQLRecordForControlledDataset>();
             MongoDatabase dbETriks = GetDatabase();
-            var query = Query.And(Query.EQ(field, BsonValue.Create(value)));
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query);
+            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
+
+            QueryDocument query = new QueryDocument();
+            for (int i = 0; i < record.RecordItems.Count; i++)
+            {
+                query.Add(record.RecordItems[i].fieldName, record.RecordItems[i].value);
+            }
+            try
+            {
+                eTRIKSRecords.Remove(query);
+                return "RECORD DELETED";
+            }
+            catch (Exception e)
+            {
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                return e.Message;
+            }
+        }
+
+        //public void loadDataForControlledDataset(NoSQLRecordForControlledDataset rec)
+        //{
+        //    MongoDatabase dbETriks = GetDatabase();
+        //    MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>("dataStream_temp");
+        //    BsonDocument eTricksDatarecord = new BsonDocument {
+        //        { "StudyId", rec.studyId},
+        //        { "ItemGroup", rec.itemGroup }
+        //        };
+
+        //    //Get the Dynamic fields
+        //    for (int i = 0; i < rec.recordItem.Count; i++)
+        //    {
+        //        eTricksDatarecord.Add(rec.recordItem[i].fieldName, rec.recordItem[i].value);
+        //    }
+
+        //    try
+        //    {
+        //        eTriksCollection.Insert(eTricksDatarecord);
+        //    }
+        //    catch (Exception e) { }
+        //}
+
+        public void exctractFromQueryString(string queryString, out QueryDocument query, out string[] filteredColumnList)
+        {
+            var parsedString = HttpUtility.HtmlDecode(queryString);
+            NameValueCollection coll = HttpUtility.ParseQueryString(parsedString);
+            query = new QueryDocument();
+            int countConditions = 0;
+
+            // Extract conditions from the query string
+            for (int i = 0; i < coll.Count; i++)
+            {
+                if (coll.GetValues(coll.AllKeys[i])[0] != "*")
+                {
+                    query.Add(coll.AllKeys[i], coll.GetValues(coll.AllKeys[i])[0]);
+                    countConditions++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            // Extract select columns from query string
+            filteredColumnList = new string[coll.Count - countConditions];
+            for (int j = 0; j < coll.Count - countConditions; j++)
+            {
+                filteredColumnList[j] = coll.AllKeys[countConditions + j];
+            }
+        }
+
+        public List<NoSQLRecord> getNoSQLRecord(string queryString)
+        {
+            List<NoSQLRecord> records = new List<NoSQLRecord>();
+            MongoDatabase dbETriks = GetDatabase();
+
+            QueryDocument query;
+            string[] filteredColumnList;
+            exctractFromQueryString(queryString,out query, out filteredColumnList);
+
+            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query).SetFields(Fields.Include(filteredColumnList));
             DataSet ds = new DataSet();
 
             foreach (var rec in eTRIKSRecords)
             {
-                NoSQLRecordForControlledDataset noSQLRec = new NoSQLRecordForControlledDataset();
-                noSQLRec.studyId = rec.GetElement("StudyId").ToString();
-                noSQLRec.itemGroup = rec.GetElement("ItemGroup").ToString();
-
-                for (int i = 2; i < rec.ElementCount; i++)
+                NoSQLRecord noSQLRec = new NoSQLRecord();
+                for (int i = 0; i < rec.ElementCount; i++)
                 {
                     RecordItem ri = new RecordItem();
                     ri.fieldName = rec.GetElement(i).Name.ToString();
                     ri.value = rec.GetElement(i).Value.ToString();
-                    noSQLRec.recordItem.Add(ri);
+                    noSQLRec.RecordItems.Add(ri);
                 }
                 records.Add(noSQLRec);
             }
-
             return records;
         }
     }
@@ -96,19 +186,25 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
 
 
     //The NOSQL classes are located here until its moved to the data model
-    class NoSQLRecord
+    public class NoSQLRecord
     {
-        public List<RecordItem> recordItem = new List<RecordItem>();
+        public List<RecordItem> RecordItems = new List<RecordItem>();
     }
 
-    class NoSQLRecordForControlledDataset
+    public class NoSQLRecordForControlledDataset
     {
         public string studyId { get; set; }
         public string itemGroup { get; set; }
         public List<RecordItem> recordItem = new List<RecordItem>();
     }
 
-    class RecordItem
+    public class NoSQLRecordForUpdate
+    {
+        public List<RecordItem> CurrentRecord = new List<RecordItem>();
+        public List<RecordItem> NewRecord = new List<RecordItem>();
+    }
+
+    public class RecordItem
     {
         public string fieldName { get; set; }
         public string value { get; set; }
