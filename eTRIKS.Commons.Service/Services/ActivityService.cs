@@ -93,24 +93,34 @@ namespace eTRIKS.Commons.Service.Services
             return activityDTO;
         }
 
+        //Method to check if category or subcategory exist
+        public bool checkForFieldInNoSQL(NoSQLRecordSet recordSet , string fieldName)
+        {
+            for (int k = 0; k < recordSet.RecordSet.Count(); k++)
+            {
+                if (recordSet.RecordSet[k].RecordItems.Exists(f => f.fieldName.Equals(fieldName)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
 
         // Method for data Visulaiser
         public IEnumerable<ClinicalDataTreeDTO> getActivityData(string studyId)
         {
-            //&& d.Name.Equals(role))
+            //Get data from SQL
             string role = "CL-Role-T-2";
 
-            IEnumerable<Activity> activity = _activityRepository.Get(
+            List<Activity> activity_list = _activityRepository.Get(
                 d => d.StudyId.Equals(studyId),
                   new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(t=>t.Variables),
                          d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(
                                                                     t=>t.Variables.Select(k=>k.VariableDefinition))
                 }
-            );
-
-
-            List<Activity> activity_list = activity.ToList();
+            ).ToList();
 
             //1. Extract data for clinical tree
             List<ClinicalDataTreeRecordSummary> extractedClinicalTreeRecordList = new List<ClinicalDataTreeRecordSummary>();
@@ -141,10 +151,12 @@ namespace eTRIKS.Commons.Service.Services
             List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
 
             var groupedClinicalTreeRecordList = extractedClinicalTreeRecordList.GroupBy(u => u.Class).Select(grp => grp.ToList()).ToList();
+            // For each acitivity
             for (int i = 0; i < groupedClinicalTreeRecordList.Count(); i++)
             {
                 ClinicalDataTreeDTO cdTree = new ClinicalDataTreeDTO();
                 cdTree.Class = groupedClinicalTreeRecordList[i][0].Class;
+                // For each 
                 for (int j = 0; j < groupedClinicalTreeRecordList[i].Count(); j++)
                 {
                     ClinicalDataTreeActivityDTO cdTreeActivity = new ClinicalDataTreeActivityDTO();
@@ -155,46 +167,68 @@ namespace eTRIKS.Commons.Service.Services
 
                     MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
                     NoSQLRecordSet recordSet = null;
-                    
-                    //3.  IF Code = LB then get category data from NOSQL
-                    if (cdTreeActivity.code == "LB")
-                    {
-                        string queryString = "?DOMAIN=" + cdTreeActivity.code + "&" + groupedClinicalTreeRecordList[i][j].variableDefinition + "=*&LBCAT=*";
-                        recordSet = mongoDataService.getNoSQLRecords(queryString);
-                        var filteredRecordSet = recordSet.RecordSet.Select(u => new { code =  u.RecordItems[0].value, category= u.RecordItems[1].value}).Distinct();
-                        var groupedRecordSet = filteredRecordSet.GroupBy(k => k.category).Select(grp => grp.ToList()).ToList();
 
-                        string code = "LB-CAT";
-                        for (int k = 0; k < groupedRecordSet.Count(); k++)
+                    // Generic Grouping
+                    string code = cdTreeActivity.code;
+                    string variableDefinition = groupedClinicalTreeRecordList[i][j].variableDefinition;
+                    string queryString = "?DOMAIN=" + code + "&" + variableDefinition + "=*&"+code+"CAT=*&"+code+"SCAT=*";
+                    recordSet = mongoDataService.getNoSQLRecords(queryString);
+
+                    if (recordSet.RecordSet.Any())
+                    {
+                        bool categoryExist = checkForFieldInNoSQL(recordSet, code + "CAT");
+                        bool subCategoryExist = checkForFieldInNoSQL(recordSet, code + "SCAT");
+
+                        if (categoryExist)
                         {
-                            Observation observation = new Observation();
-                            observation.Name = groupedRecordSet[k][0].category;
-                            observation.code = code + k;
-                            List<string> observationList = new List<string>();
-                            for (int m = 0; m < groupedRecordSet[k].Count(); m++)
+                            if (subCategoryExist)
                             {
-                               observationList.Add(groupedRecordSet[k][m].code);
+                                var filteredRecordSet = recordSet.RecordSet.Select(u =>
+                                               new
+                                               {
+                                                   code = u.RecordItems[0].value,
+                                                   category = u.RecordItems[1].value,
+                                                   subCategory = u.RecordItems[2].value
+                                               }).Distinct();
+                                var groupedRecordSet = filteredRecordSet.GroupBy(k => new { k.category, k.subCategory }).
+                                                        Select(grp => grp.ToList()).ToList();
+                                // ************* To be Completed *****************
+
+                            }
+                            else
+                            {
+                                var filteredRecordSet = recordSet.RecordSet.Select(u =>
+                                                new { code = u.RecordItems[0].value, category = u.RecordItems[1].value }).Distinct();
+                                var groupedRecordSet = filteredRecordSet.GroupBy(k => k.category).Select(grp => grp.ToList()).ToList();
+                                for (int k = 0; k < groupedRecordSet.Count(); k++)
+                                {
+                                    Observation observation = new Observation();
+                                    observation.Name = groupedRecordSet[k][0].category;
+                                    observation.code = code+"-CAT" + k;
+                                    List<string> observationList = new List<string>();
+                                    for (int m = 0; m < groupedRecordSet[k].Count(); m++)
+                                    {
+                                        observationList.Add(groupedRecordSet[k][m].code);
+                                    }
+                                    observation.ObservationList = observationList;
+                                    cdTreeActivity.Observations.Add(observation);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var filteredRecordSet = recordSet.RecordSet.Select(u => new { code = u.RecordItems[0].value }).Distinct().ToList();
+                            Observation observation = new Observation();
+                            observation.code = "TEST";
+                            List<string> observationList = new List<string>();
+                            for (int g = 0; g <  filteredRecordSet.Count(); g++)
+                            {
+                                observationList.Add(filteredRecordSet[g].code);
                             }
                             observation.ObservationList = observationList;
-                            cdTreeActivity.Observations.Add(observation); 
+                            cdTreeActivity.Observations.Add(observation);
                         }
                     }
-                    // 4. For Code = VS or AE category are not used
-                    else
-                    {
-                        string queryString = "?DOMAIN=" + cdTreeActivity.code + "&" + groupedClinicalTreeRecordList[i][j].variableDefinition + "=*";
-                        // Call NOSQL to get list
-                        recordSet = mongoDataService.getDistinctNoSQLRecords(queryString);
-                        Observation observation = new Observation();
-                        observation.code = "TEST";
-                        List<string> observationList = new List<string>();
-                        for (int g = 0; g < recordSet.RecordSet[0].RecordItems.Count; g++)
-                        {
-                            observationList.Add(recordSet.RecordSet[0].RecordItems[g].value);
-                        }
-                        observation.ObservationList = observationList;
-                        cdTreeActivity.Observations.Add(observation); 
-                    } 
                 }
                 cdTreeList.Add(cdTree);
             }
