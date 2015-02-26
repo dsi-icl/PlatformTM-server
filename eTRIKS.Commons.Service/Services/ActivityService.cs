@@ -156,7 +156,7 @@ namespace eTRIKS.Commons.Service.Services
             {
                 ClinicalDataTreeDTO cdTree = new ClinicalDataTreeDTO();
                 cdTree.Class = groupedClinicalTreeRecordList[i][0].Class;
-                // For each 
+                // For each dataset 
                 for (int j = 0; j < groupedClinicalTreeRecordList[i].Count(); j++)
                 {
                     ClinicalDataTreeActivityDTO cdTreeActivity = new ClinicalDataTreeActivityDTO();
