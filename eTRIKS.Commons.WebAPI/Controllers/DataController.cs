@@ -21,9 +21,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/studies/{studyId}/data/clinical/observations")]
         public string getObservations(string studyId, [FromBody] List<string> observations)
         {
-            Console.Out.WriteLine(studyId);
 
-            Console.Out.WriteLine(observations);
             return "OK";
         }
 

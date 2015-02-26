@@ -115,6 +115,10 @@
     <Compile Include="Migrations_prod\201412171424331_addOrderToVariableTemplate.Designer.cs">
       <DependentUpon>201412171424331_addOrderToVariableTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_prod\201501160027261_PKtoINT_Dataset_VarDEF.cs" />
+    <Compile Include="Migrations_prod\201501160027261_PKtoINT_Dataset_VarDEF.Designer.cs">
+      <DependentUpon>201501160027261_PKtoINT_Dataset_VarDEF.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_prod\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="etriksDataContext_prod.cs" />
@@ -166,6 +170,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201412171424331_addOrderToVariableTemplate.resx">
       <DependentUpon>201412171424331_addOrderToVariableTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201501160027261_PKtoINT_Dataset_VarDEF.resx">
+      <DependentUpon>201501160027261_PKtoINT_Dataset_VarDEF.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

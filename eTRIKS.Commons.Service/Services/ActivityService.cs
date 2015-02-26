@@ -83,14 +83,13 @@ namespace eTRIKS.Commons.Service.Services
             activityDTO.Name = activity.Name;
             activityDTO.Id = activity.OID;
             activityDTO.StudyID = activity.StudyId;
-            Dataset ds = activity.Datasets.FirstOrDefault();
-            if (ds != null){
+
+            foreach (var ds in activity.Datasets){
                 DatasetBriefDTO dst = new DatasetBriefDTO();
                 dst.Name = ds.Domain.Name;
-                dst.Id = ds.OID; 
-            activityDTO.datasets = new List<DatasetBriefDTO>{dst};
+                dst.Id = ds.OID;
+                activityDTO.datasets.Add(dst);
             }
-            
             return activityDTO;
         }
 
