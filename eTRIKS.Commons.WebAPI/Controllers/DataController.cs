@@ -4,25 +4,27 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using eTRIKS.Commons.Service.Services;
+using System.Collections;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     //[RoutePrefix("api/studies")]
     public class DataController : ApiController
     {
-        //private ActivityService _activityService;
+        private DataService _dataService;
 
-        //public DataController(ActivityService activityService)
-        //{
-        //    _activityService = activityService;
-        //}
+        public DataController(DataService dataService)
+        {
+            _dataService = dataService;
+        }
 
         [HttpPost]
         [Route("api/studies/{studyId}/data/clinical/observations")]
-        public string getObservations(string studyId, [FromBody] List<string> observations)
+        public List<Hashtable> getObservations(string studyId, [FromBody] List<string> observations)
         {
 
-            return "OK";
+            return _dataService.getObservationsData(studyId, observations);
         }
 
     }
