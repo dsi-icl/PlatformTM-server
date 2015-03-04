@@ -127,6 +127,51 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
         //    catch (Exception e) { }
         //}
 
+
+        public NoSQLRecordSet getNoSQLRecordsForGraph(List<RecordItem> where, List<string> observation, List <string> filter, string code)
+        {
+            var observationList = new BsonValue[observation.Count()];
+            for (int i = 0; i < observation.Count(); i++)
+            {
+                observationList[i] = observation[i];
+            }
+
+            QueryDocument whereList = new QueryDocument();
+            for (int i = 0; i < where.Count(); i++)
+            {
+                whereList.Add(where[i].fieldName, where[i].value);
+            }
+
+            var query = Query.And(Query.In(code+"TESTCD", observationList), Query.And(whereList));
+            MongoDatabase dbETriks = GetDatabase();
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).
+                              SetFields(Fields.Include(filter.ToArray()).Exclude("_id"));
+
+            NoSQLRecordSet recordSet = new NoSQLRecordSet();
+            List<NoSQLRecord> records = new List<NoSQLRecord>();
+
+            foreach (var rec in eTRIKSRecords)
+            {
+                NoSQLRecord noSQLRec = new NoSQLRecord();
+                for (int i = 0; i < rec.ElementCount; i++)
+                {
+                    RecordItem ri = new RecordItem();
+                    ri.fieldName = rec.GetElement(i).Name.ToString();
+                    ri.value = rec.GetElement(i).Value.ToString();
+                    noSQLRec.RecordItems.Add(ri);
+                }
+                // Check if mongo record didnt have a matching column vale
+                if (noSQLRec.RecordItems.Count != 0)
+                {
+                    records.Add(noSQLRec);
+                }
+            }
+            recordSet.RecordSet = records;
+            return recordSet;
+        }
+
+        
+
         public void exctractFromQueryString(string queryString, out QueryDocument query, out string[] filteredColumnList)
         {
             var parsedString = HttpUtility.HtmlDecode(queryString);
