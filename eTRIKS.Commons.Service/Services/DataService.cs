@@ -23,21 +23,28 @@ namespace eTRIKS.Commons.Service.Services
         {
             // Simulate input (START)
             List<RecordItem> where = new List<RecordItem>();
-            RecordItem ri = new RecordItem();
-            ri.fieldName = "DOMAIN";
-            ri.value = domain; // VS
-            where.Add(ri);
+            RecordItem ri_1 = new RecordItem();
+            ri_1.fieldName = "DOMAIN";
+            ri_1.value = domain;
+            where.Add(ri_1);
+
+            RecordItem ri_2 = new RecordItem();
+            ri_2.fieldName = "STUDYID";
+            ri_2.value = studyId;
+            where.Add(ri_2);
 
             //List<string> observation = new List<string>();
             //observation.Add("BMI");
             //observation.Add("HEIGHT");
             //observation.Add("WEIGHT");
+            // Simulate input (END)
 
+            // Fields needed for the graphs
             List<string> filter = new List<string>();
             filter.Add(domain + "ORRES");
             filter.Add("USUBJID");
             filter.Add(domain + "TESTCD");
-            // Simulate input (END)
+
 
             MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
             NoSQLRecordSet recordSet = null;
@@ -113,10 +120,15 @@ namespace eTRIKS.Commons.Service.Services
             // Simulate input (START)
             string code = "VS";
             List<RecordItem> where = new List<RecordItem>();
-            RecordItem ri = new RecordItem();
-            ri.fieldName = "DOMAIN";
-            ri.value   = code;
-            where.Add(ri);
+            RecordItem ri_1 = new RecordItem();
+            ri_1.fieldName = "DOMAIN";
+            ri_1.value = code;
+            where.Add(ri_1);
+
+            RecordItem ri_2 = new RecordItem();
+            ri_2.fieldName = "STUDYID";
+            ri_2.value = "CRC305C";
+            where.Add(ri_2);
 
             List<string> observation = new List<string>();
             observation.Add("BMI");
