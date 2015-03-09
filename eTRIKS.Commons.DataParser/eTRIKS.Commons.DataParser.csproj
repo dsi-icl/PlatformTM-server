@@ -62,15 +62,6 @@
       <HintPath>..\packages\Excel-DNA.Interop.14.0.1\lib\Microsoft.Vbe.Interop.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="Mongo.Context">
-      <HintPath>..\packages\MongOData.1.2.0\lib\net40\Mongo.Context.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Bson">
-      <HintPath>..\packages\mongocsharpdriver.1.9.2\lib\net35\MongoDB.Bson.dll</HintPath>
-    </Reference>
-    <Reference Include="MongoDB.Driver">
-      <HintPath>..\packages\mongocsharpdriver.1.9.2\lib\net35\MongoDB.Driver.dll</HintPath>
-    </Reference>
     <Reference Include="Office">
       <HintPath>..\packages\Excel-DNA.Interop.14.0.1\lib\Office.dll</HintPath>
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -93,7 +84,6 @@
     <Compile Include="IOFileManagement\FileHandler.cs" />
     <Compile Include="IOFileManagement\IOUtility.cs" />
     <Compile Include="IOFileManagement\ValidateTableReferences.cs" />
-    <Compile Include="MongoDBAccess\MongoDbDataServices.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +94,10 @@
     <ProjectReference Include="..\eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj">
       <Project>{2b9025cd-68cd-4e1d-8542-2a6acd8c6354}</Project>
       <Name>eTRIKS.Commons.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj">
+      <Project>{5c7f6a70-9395-4dcf-8223-f1ae65f77c0f}</Project>
+      <Name>eTRIKS.Commons.DataAccess</Name>
     </ProjectReference>
     <ProjectReference Include="..\eTRIKS.Commons.Service\eTRIKS.Commons.Service.csproj">
       <Project>{c8277543-8c37-42a1-9878-d01b07b349ac}</Project>
@@ -138,9 +132,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="MongoDataService.svc" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

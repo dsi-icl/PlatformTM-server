@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTOs\ActivityDTO.cs" />
+    <Compile Include="DTOs\ClinicalDataTreeDTO.cs" />
     <Compile Include="DTOs\DatasetDTO.cs" />
     <Compile Include="DTOs\VariableDefinitionDTO.cs" />
     <Compile Include="DTOs\VariableReferenceDTO.cs" />
@@ -64,6 +65,10 @@
     <ProjectReference Include="..\eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj">
       <Project>{2b9025cd-68cd-4e1d-8542-2a6acd8c6354}</Project>
       <Name>eTRIKS.Commons.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj">
+      <Project>{5c7f6a70-9395-4dcf-8223-f1ae65f77c0f}</Project>
+      <Name>eTRIKS.Commons.DataAccess</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

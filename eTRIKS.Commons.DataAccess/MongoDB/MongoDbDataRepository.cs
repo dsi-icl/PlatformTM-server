@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 using System.Web;
 
 
-namespace eTRIKS.Commons.DataParser.MongoDBAccess
+namespace eTRIKS.Commons.DataAccess.MongoDB
 {
-    public class MongoDbDataServices
+    public class MongoDbDataRepository
     {
+        public const string mongoCollectionName = "BioSpeak_Data";
         public MongoDatabase GetDatabase()
         {
             // Create server settings to pass connection string, timeout, etc.
@@ -28,7 +29,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string loadDataGeneric(NoSQLRecord record)
         {
             MongoDatabase dbETriks = GetDatabase();
-            MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>("dataStream_temp");
+            MongoCollection<BsonDocument> eTriksCollection = dbETriks.GetCollection<BsonDocument>(mongoCollectionName);
             BsonDocument eTricksDatarecord = new BsonDocument();
 
             for (int i = 0; i < record.RecordItems.Count; i++)
@@ -52,7 +53,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string updateDataGeneric(NoSQLRecordForUpdate updateRecord)
         {
             MongoDatabase dbETriks = GetDatabase();
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName);
 
             QueryDocument query = new QueryDocument();
             for (int i = 0; i < updateRecord.CurrentRecord.Count; i++)
@@ -84,7 +85,7 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         public string deleteDataGeneric(NoSQLRecord record)
         {
             MongoDatabase dbETriks = GetDatabase();
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp");
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName);
 
             QueryDocument query = new QueryDocument();
             for (int i = 0; i < record.RecordItems.Count; i++)
@@ -126,6 +127,51 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
         //    catch (Exception e) { }
         //}
 
+
+        public NoSQLRecordSet getNoSQLRecordsForGraph(List<RecordItem> where, List<string> observation, List <string> filter, string code)
+        {
+            var observationList = new BsonValue[observation.Count()];
+            for (int i = 0; i < observation.Count(); i++)
+            {
+                observationList[i] = observation[i];
+            }
+
+            QueryDocument whereList = new QueryDocument();
+            for (int i = 0; i < where.Count(); i++)
+            {
+                whereList.Add(where[i].fieldName, where[i].value);
+            }
+
+            var query = Query.And(Query.In(code+"TESTCD", observationList), Query.And(whereList));
+            MongoDatabase dbETriks = GetDatabase();
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).
+                              SetFields(Fields.Include(filter.ToArray()).Exclude("_id"));
+
+            NoSQLRecordSet recordSet = new NoSQLRecordSet();
+            List<NoSQLRecord> records = new List<NoSQLRecord>();
+
+            foreach (var rec in eTRIKSRecords)
+            {
+                NoSQLRecord noSQLRec = new NoSQLRecord();
+                for (int i = 0; i < rec.ElementCount; i++)
+                {
+                    RecordItem ri = new RecordItem();
+                    ri.fieldName = rec.GetElement(i).Name.ToString();
+                    ri.value = rec.GetElement(i).Value.ToString();
+                    noSQLRec.RecordItems.Add(ri);
+                }
+                // Check if mongo record didnt have a matching column vale
+                if (noSQLRec.RecordItems.Count != 0)
+                {
+                    records.Add(noSQLRec);
+                }
+            }
+            recordSet.RecordSet = records;
+            return recordSet;
+        }
+
+        
+
         public void exctractFromQueryString(string queryString, out QueryDocument query, out string[] filteredColumnList)
         {
             var parsedString = HttpUtility.HtmlDecode(queryString);
@@ -146,8 +192,8 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
                     break;
                 }
             }
-
             // Extract select columns from query string
+            // The * signifies the start of the column selection
             filteredColumnList = new string[coll.Count - countConditions];
             for (int j = 0; j < coll.Count - countConditions; j++)
             {
@@ -155,17 +201,44 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
             }
         }
 
-        public List<NoSQLRecord> getNoSQLRecord(string queryString)
+        public NoSQLRecordSet getDistinctNoSQLRecords(string queryString)
         {
+            NoSQLRecordSet recordSet = new NoSQLRecordSet();
             List<NoSQLRecord> records = new List<NoSQLRecord>();
             MongoDatabase dbETriks = GetDatabase();
 
             QueryDocument query;
             string[] filteredColumnList;
-            exctractFromQueryString(queryString,out query, out filteredColumnList);
+            exctractFromQueryString(queryString, out query, out filteredColumnList);
 
-            var eTRIKSRecords = dbETriks.GetCollection("dataStream_temp").Find(query).SetFields(Fields.Include(filteredColumnList));
-            DataSet ds = new DataSet();
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Distinct(filteredColumnList[0],
+                                                                            query);
+            NoSQLRecord noSQLRec = new NoSQLRecord();
+            for (int i = 0; i < eTRIKSRecords.Count(); i++)
+            {
+                RecordItem ri = new RecordItem();
+                ri.fieldName = filteredColumnList[0];
+                ri.value = eTRIKSRecords.ElementAt(i).ToString();
+                noSQLRec.RecordItems.Add(ri);
+            }
+            records.Add(noSQLRec);
+            recordSet.RecordSet = records;
+            return recordSet;
+        }
+
+
+        public NoSQLRecordSet getNoSQLRecords(string queryString)
+        {
+            NoSQLRecordSet recordSet = new NoSQLRecordSet();
+            List<NoSQLRecord> records = new List<NoSQLRecord>();
+            MongoDatabase dbETriks = GetDatabase();
+
+            QueryDocument query;
+            string[] filteredColumnList;
+            exctractFromQueryString(queryString, out query, out filteredColumnList);
+
+            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).
+                                SetFields(Fields.Include(filteredColumnList).Exclude("_id"));
 
             foreach (var rec in eTRIKSRecords)
             {
@@ -177,15 +250,25 @@ namespace eTRIKS.Commons.DataParser.MongoDBAccess
                     ri.value = rec.GetElement(i).Value.ToString();
                     noSQLRec.RecordItems.Add(ri);
                 }
-                records.Add(noSQLRec);
+                // Check if mongo record didnt have a matching column vale
+                if (noSQLRec.RecordItems.Count != 0)
+                {
+                    records.Add(noSQLRec);
+                }
             }
-            return records;
+            recordSet.RecordSet = records;
+            return recordSet;
         }
     }
 
 
 
     //The NOSQL classes are located here until its moved to the data model
+    public class NoSQLRecordSet
+    {
+        public List<NoSQLRecord> RecordSet = new List<NoSQLRecord>();
+    }
+
     public class NoSQLRecord
     {
         public List<RecordItem> RecordItems = new List<RecordItem>();

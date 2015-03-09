@@ -154,6 +154,7 @@
     <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\DataParserController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
+    <Compile Include="Controllers\DataVisulaiserController.cs" />
     <Compile Include="Controllers\StudyController.cs" />
     <Compile Include="DependencyResolution\ContainerBootstrapper.cs">
       <SubType>Code</SubType>

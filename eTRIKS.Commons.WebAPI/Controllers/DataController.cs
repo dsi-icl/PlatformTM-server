@@ -27,5 +27,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _dataService.getObservationsData(studyId, observations);
         }
 
+        [HttpGet]
+        [Route("api/studies/{studyId}/data/clinical/observations")]
+        public string getObservations(string studyId)
+        {
+            _dataService.getObservationsDataTemp();
+            return "OK";
+        }
+
     }
 }

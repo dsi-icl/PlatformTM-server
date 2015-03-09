@@ -12,6 +12,8 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
+using eTRIKS.Commons.DataAccess.MongoDB;
+
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -19,13 +21,16 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IRepository<Activity, int> _activityRepository;
         private IRepository<Dataset, int> _dataSetRepository;
+        private IRepository<VariableDefinition, int> _variableDefinition;
         private IServiceUoW _activityServiceUnit;
+
 
         public ActivityService(IServiceUoW uoW)
         {
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
             _dataSetRepository = uoW.GetRepository<Dataset, int>();
+            _variableDefinition =  uoW.GetRepository<VariableDefinition, int>();
         }
 
         private static readonly Expression<Func<Activity, ActivityDTO>> AsBookDto =
@@ -86,6 +91,148 @@ namespace eTRIKS.Commons.Service.Services
                 activityDTO.datasets.Add(dst);
             }
             return activityDTO;
+        }
+
+        //Method to check if category or subcategory exist
+        public bool checkForFieldInNoSQL(NoSQLRecordSet recordSet , string fieldName)
+        {
+            for (int k = 0; k < recordSet.RecordSet.Count(); k++)
+            {
+                if (recordSet.RecordSet[k].RecordItems.Exists(f => f.fieldName.Equals(fieldName)))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        // Method for data Visulaiser
+        public IEnumerable<ClinicalDataTreeDTO> getActivityData(string studyId)
+        {
+            //Get data from SQL
+            string role = "CL-Role-T-2";
+
+            List<Activity> activity_list = _activityRepository.Get(
+                d => d.StudyId.Equals(studyId),
+                  new List<Expression<Func<Activity, object>>>(){
+                        d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(t=>t.Variables),
+                         d => d.Datasets.Select(t => t.Domain), d=>d.Datasets.Select(
+                                                                    t=>t.Variables.Select(k=>k.VariableDefinition))
+                }
+            ).ToList();
+
+            //1. Extract data for clinical tree
+            List<ClinicalDataTreeRecordSummary> extractedClinicalTreeRecordList = new List<ClinicalDataTreeRecordSummary>();
+            for (int i = 0; i < activity_list.Count; i++)
+            {
+                for (int j = 0; j < activity_list[i].Datasets.Count; j++)
+                {
+                    ClinicalDataTreeRecordSummary clinicalTreeRecord = new ClinicalDataTreeRecordSummary();
+                    clinicalTreeRecord.Class = activity_list[i].Datasets.Select(f => f.Domain.Class).ToList()[j];
+                    clinicalTreeRecord.Name = activity_list[i].Name.ToString();
+                    clinicalTreeRecord.Domain = activity_list[i].Datasets.Select(k => k.Domain.Name).ToList()[j];
+                    clinicalTreeRecord.code = activity_list[i].Datasets.Select(f => f.Domain.Code).ToList()[j];
+
+                    List<VariableDefinition> datasetList = activity_list[i].Datasets.Select(g => g.Variables.Select(l => l.VariableDefinition))
+                                                                    .ToList()[0].ToList();
+                    for (int k = 0; k < datasetList.Count(); k++)
+                    {
+                        if (datasetList[k].RoleId.ToString() == role)
+                        {
+                            clinicalTreeRecord.variableDefinition = datasetList[k].Name.ToString();
+                        }
+                    }
+                    extractedClinicalTreeRecordList.Add(clinicalTreeRecord);
+                }
+            }
+
+            //2.  Group extractedClinicalTreeRecordList on attribute class
+            List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
+
+            var groupedClinicalTreeRecordList = extractedClinicalTreeRecordList.GroupBy(u => u.Class).Select(grp => grp.ToList()).ToList();
+            // For each acitivity
+            for (int i = 0; i < groupedClinicalTreeRecordList.Count(); i++)
+            {
+                ClinicalDataTreeDTO cdTree = new ClinicalDataTreeDTO();
+                cdTree.Class = groupedClinicalTreeRecordList[i][0].Class;
+                // For each dataset 
+                for (int j = 0; j < groupedClinicalTreeRecordList[i].Count(); j++)
+                {
+                    ClinicalDataTreeActivityDTO cdTreeActivity = new ClinicalDataTreeActivityDTO();
+                    cdTreeActivity.Name = groupedClinicalTreeRecordList[i][j].Name;
+                    cdTreeActivity.Domain = groupedClinicalTreeRecordList[i][j].Domain;
+                    cdTreeActivity.code = groupedClinicalTreeRecordList[i][j].code;
+                    cdTree.Activities.Add(cdTreeActivity);
+
+                    MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
+                    NoSQLRecordSet recordSet = null;
+
+                    // Generic Grouping
+                    string code = cdTreeActivity.code;
+                    string variableDefinition = groupedClinicalTreeRecordList[i][j].variableDefinition;
+                    string queryString = "?DOMAIN=" + code + "&" + variableDefinition + "=*&"+code+"CAT=*&"+code+"SCAT=*";
+                    recordSet = mongoDataService.getNoSQLRecords(queryString);
+
+                    if (recordSet.RecordSet.Any())
+                    {
+                        bool categoryExist = checkForFieldInNoSQL(recordSet, code + "CAT");
+                        bool subCategoryExist = checkForFieldInNoSQL(recordSet, code + "SCAT");
+
+                        if (categoryExist)
+                        {
+                            if (subCategoryExist)
+                            {
+                                var filteredRecordSet = recordSet.RecordSet.Select(u =>
+                                               new
+                                               {
+                                                   code = u.RecordItems[0].value,
+                                                   category = u.RecordItems[1].value,
+                                                   subCategory = u.RecordItems[2].value
+                                               }).Distinct();
+                                var groupedRecordSet = filteredRecordSet.GroupBy(k => new { k.category, k.subCategory }).
+                                                        Select(grp => grp.ToList()).ToList();
+                                // ************* To be Completed *****************
+
+                            }
+                            else
+                            {
+                                var filteredRecordSet = recordSet.RecordSet.Select(u =>
+                                                new { code = u.RecordItems[0].value, category = u.RecordItems[1].value }).Distinct();
+                                var groupedRecordSet = filteredRecordSet.GroupBy(k => k.category).Select(grp => grp.ToList()).ToList();
+                                for (int k = 0; k < groupedRecordSet.Count(); k++)
+                                {
+                                    Observation observation = new Observation();
+                                    observation.Name = groupedRecordSet[k][0].category;
+                                    observation.code = code+"-CAT" + k;
+                                    List<string> observationList = new List<string>();
+                                    for (int m = 0; m < groupedRecordSet[k].Count(); m++)
+                                    {
+                                        observationList.Add(groupedRecordSet[k][m].code);
+                                    }
+                                    observation.ObservationList = observationList;
+                                    cdTreeActivity.Observations.Add(observation);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            var filteredRecordSet = recordSet.RecordSet.Select(u => new { code = u.RecordItems[0].value }).Distinct().ToList();
+                            Observation observation = new Observation();
+                            observation.code = "TEST";
+                            List<string> observationList = new List<string>();
+                            for (int g = 0; g <  filteredRecordSet.Count(); g++)
+                            {
+                                observationList.Add(filteredRecordSet[g].code);
+                            }
+                            observation.ObservationList = observationList;
+                            cdTreeActivity.Observations.Add(observation);
+                        }
+                    }
+                }
+                cdTreeList.Add(cdTree);
+            }
+            return cdTreeList;
         }
 
         public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
