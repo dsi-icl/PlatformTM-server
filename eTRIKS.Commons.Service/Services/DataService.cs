@@ -1,5 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Interfaces;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        public void getObservationsData(String studyId, String domain, List<string> observations)
+        public List<Hashtable> getObservationsData(String studyId, String domain, List<string> observations)
         {
             // Simulate input (START)
             List<RecordItem> where = new List<RecordItem>();
@@ -44,6 +45,9 @@ namespace eTRIKS.Commons.Service.Services
             filter.Add(domain + "ORRES");
             filter.Add("USUBJID");
             filter.Add(domain + "TESTCD");
+
+            //TEMP 
+            observations = observations.ConvertAll(d => d.ToUpper());
 
 
             MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
@@ -113,8 +117,66 @@ namespace eTRIKS.Commons.Service.Services
              * { subjId: “xxx”,  BMI: 26, Height: 1.62, Weight: 75 },
              * { subjId: “xxx”,  BMI: 21, Height: 1.73, Weight: 80 },
             ]*/
+
+            //double[] heights = {1.8,1.71,1.85,1.7,1.62,1.73};
+            //int[] weights = { 80, 70, 83, 87, 65, 91 };
+            //double[] bmis = { 22.5, 24.2, 20.5, 23.2, 26, 21 };
+
+            //List<Hashtable> observation_list = new List<Hashtable>();
+            //Hashtable obs;
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    obs = new Hashtable();
+            //    obs.Add("subjId", "subj_"+i);
+            //    obs.Add("BMI", bmis[i]);
+            //    obs.Add("Height", heights[i]);
+            //    obs.Add("Weight", weights[i]);
+            //    observation_list.Add(obs);
+            //}
+
+            return observation_list;
+
         }
 
+        public List<Hashtable> getSubjectData(String studyId, List<string> subjCharacteristics)
+        {
+            //For each observation in observations 
+            // query its results column from NoSQL collection
+            // IF observations was an array like this one:
+            //['AGE','SEX','RACE','ETHNIC','ARM']
+            //return an object that looks like that
+            /*[
+               { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
+             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
+             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
+             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
+             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
+             * 
+             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
+            ]*/
+
+            string Domain = "DM";
+
+            int[] ages = {23,34,21,56,43,76,87,34,54,66};
+            string[] sexes = { "M", "F", "M", "F", "M", "F", "M", "F", "M", "F" };
+            string[] arms = { "V", "P", "V", "P", "V", "P", "V", "P", "V", "P" };
+
+            List<Hashtable> observation_list = new List<Hashtable>();
+            Hashtable obs;
+            for (int i = 0; i < 11; i++)
+            {
+                obs = new Hashtable();
+                obs.Add("subjId", "subj_"+i);
+                obs.Add("AGE", ages[i]);
+                obs.Add("SEX", sexes[i]);
+                obs.Add("ARM", arms[i]);
+                observation_list.Add(obs);
+            }
+            return observation_list;
+        }
+
+    
+        
         public void getObservationsDataTemp()
         {
             // Simulate input (START)
