@@ -140,48 +140,32 @@ namespace eTRIKS.Commons.Service.Services
 
         public List<Hashtable> getSubjectData(String studyId, List<string> subjCharacteristics)
         {
-            //For each observation in observations 
-            // query its results column from NoSQL collection
-            // IF observations was an array like this one:
-            //['AGE','SEX','RACE','ETHNIC','ARM']
-            //return an object that looks like that
-            /*[
-               { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
-             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
-             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
-             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
-             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
-             * 
-             * { subjId: “xxx”,  AGE: 22.5, SEX: 1.8, RACE: 80, ETHNIC:xx, ARM:xx },
-            ]*/
+            string query = "?STUDYID=" + studyId + "&DOMAIN=DM";
+            for (int i = 0; i < subjCharacteristics.Count(); i++)
+            {
+                query += "&"+subjCharacteristics[i] + "=*";
+            }
 
-            string Domain = "DM";
-
-            int[] ages = {23,34,21,56,43,76,87,34,54,66};
-            string[] sexes = { "M", "F", "M", "F", "M", "F", "M", "F", "M", "F" };
-            string[] arms = { "V", "P", "V", "P", "V", "P", "V", "P", "V", "P" };
-            string[] races = { "WHITE", "WHITE", "WHITE", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN" };
-            string[] ethnics = { "WHITE", "WHITE", "WHITE", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN" };
+            MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
+            NoSQLRecordSet recordSet = null;
+            recordSet = mongoDataService.getNoSQLRecords(query);
 
             List<Hashtable> observation_list = new List<Hashtable>();
             Hashtable obs;
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < recordSet.RecordSet.Count(); i++)
             {
                 obs = new Hashtable();
-                obs.Add("subjId", "subj_"+i);
-                obs.Add("AGE", ages[i]);
-                obs.Add("SEX", sexes[i]);
-                obs.Add("ARM", arms[i]);
-                obs.Add("RACE",races[i]);
-                obs.Add("ETHNIC",ethnics[i]);
-                observation_list.Add(obs);
+                for (int k = 0; k < recordSet.RecordSet[i].RecordItems.Count(); k++)
+                {
+                    obs.Add(recordSet.RecordSet[i].RecordItems[k].fieldName, 
+                            recordSet.RecordSet[i].RecordItems[k].value);
+                }
+                observation_list.Add(obs); 
             }
             return observation_list;
         }
 
-    
-        
-        public void getObservationsDataTemp()
+        public List<Hashtable> getObservationsDataTemp()
         {
             // Simulate input (START)
             string code = "VS";
@@ -197,14 +181,17 @@ namespace eTRIKS.Commons.Service.Services
             where.Add(ri_2);
 
             List<string> observation = new List<string>();
-            observation.Add("BMI");
-            observation.Add("HEIGHT");
-            observation.Add("WEIGHT");
+            //observation.Add("BMI");
+            //observation.Add("HEIGHT");
+            //observation.Add("WEIGHT");
+            observation.Add("DIABP");
 
             List<string> filter = new List<string>();
             filter.Add(code+"ORRES");
             filter.Add("USUBJID");
             filter.Add(code+"TESTCD");
+            filter.Add(code + "STAT");
+            filter.Add("VISIT");
             // Simulate input (END)
 
             MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
@@ -216,30 +203,62 @@ namespace eTRIKS.Commons.Service.Services
             for (int i = 0; i < recordSet.RecordSet.Count(); i++)
             {
                 List<RecordItem> sublist = new List<RecordItem>();
+                string stat = null; // staus on if a result exists
                 for (int j = 0; j < recordSet.RecordSet[i].RecordItems.Count(); j++)
                 {
-                    RecordItem recordItem = new RecordItem();
-                    recordItem.fieldName = recordSet.RecordSet[i].RecordItems[j].fieldName;
-                    recordItem.value = recordSet.RecordSet[i].RecordItems[j].value;
-                    sublist.Add(recordItem);
+                    if (recordSet.RecordSet[i].RecordItems[j].fieldName != code + "STAT")
+                    {
+                        RecordItem recordItem = new RecordItem();
+                        recordItem.fieldName = recordSet.RecordSet[i].RecordItems[j].fieldName;
+                        recordItem.value = recordSet.RecordSet[i].RecordItems[j].value;
+                        sublist.Add(recordItem);
+                    }
+                    else
+                    {
+                        stat = recordSet.RecordSet[i].RecordItems[j].value;
+                    }
                 }
-                combinedList.Add(sublist);
+                if (stat != "NOT DONE")
+                {
+                    combinedList.Add(sublist);
+                }
             }
 
-            // Group the data based on SubjectId
+
+            //Group by the data based on SubjectId, Vist, Date
+            //List<List<RecordItem>> groupedList =
+            //                    (
+            //                        from records in combinedList
+            //                        from subject in records.Take(1)
+            //                        let USUBJID = subject.value
+            //                        let VISIT = records.ToArray().ElementAt(3).value
+            //                        let Subjects = records.Skip(1)
+            //                        group Subjects by new
+            //                        {
+            //                            USUBJID,
+            //                            VISIT
+            //                        }
+            //                        into gss
+            //                        select new[]
+            //                        {
+            //                            new RecordItem() { fieldName = "USUBJID", value = gss.Key.USUBJID },
+            //                            new RecordItem() {fieldName = "VISIT", value = gss.Key.VISIT }
+            //                        }.Concat(gss.SelectMany(x => x)).ToList()
+            //                    ).ToList();
+
+
             List<List<RecordItem>> groupedList =
-                                (
-                                    from records in combinedList
-                                    from subject in records.Take(1)
-                                    let USUBJID = subject.value
-                                    let Subjects = records.Skip(1)
-                                    group Subjects by USUBJID into gss
-                                    select new[]
+                               (
+                                   from records in combinedList
+                                   from subject in records.Take(1)
+                                   let USUBJID = subject.value
+                                   let Subjects = records.Skip(1)
+                                   group Subjects by USUBJID into gss
+                                   select new[]
                                     {
                                         new RecordItem() { fieldName = "USUBJID", value = gss.Key },
                                     }.Concat(gss.SelectMany(x => x)).ToList()
-                                ).ToList();
-
+                               ).ToList();
 
             // Format data (remove field names) and input to Hash table
             List<Hashtable> observation_list = new List<Hashtable>();
@@ -260,7 +279,7 @@ namespace eTRIKS.Commons.Service.Services
                 }
                 observation_list.Add(obs);       
             }
-
+            return observation_list;
         }
     }
 }

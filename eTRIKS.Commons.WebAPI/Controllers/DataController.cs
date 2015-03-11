@@ -31,17 +31,29 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/studies/{studyId}/data/subjects/characteristics")]
         public List<Hashtable> getSubjectData(string studyId, [FromBody] List<string> characs)
         {
-
             return _dataService.getSubjectData(studyId, characs);
         }
-        /*
-        [HttpGet]
-        [Route("api/studies/{studyId}/data/clinical/observations")]
-        public string getObservations(string studyId)
+
+        /*[HttpGet]
+        [Route("api/studies/{studyId}/data/subjects/characteristics")]
+        public List<Hashtable> getSubjectData(string studyId)
         {
-            _dataService.getObservationsDataTemp();
-            return "OK";
-        }
-        */
+            List<string> characs = new List<string>();
+            characs.Add("AGE");
+            characs.Add("SEX");
+            characs.Add("RACE");
+            characs.Add("ETHNIC");
+            characs.Add("ARM");
+            return _dataService.getSubjectData(studyId, characs);
+        }*/
+
+        /*[HttpGet]
+        [Route("api/studies/{studyId}/data/clinical/observations")]
+        public List<Hashtable> getObservations(string studyId)
+        {
+            return _dataService.getObservationsDataTemp();
+        }*/
+
+        
     }
 }
