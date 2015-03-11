@@ -160,16 +160,20 @@ namespace eTRIKS.Commons.Service.Services
             int[] ages = {23,34,21,56,43,76,87,34,54,66};
             string[] sexes = { "M", "F", "M", "F", "M", "F", "M", "F", "M", "F" };
             string[] arms = { "V", "P", "V", "P", "V", "P", "V", "P", "V", "P" };
+            string[] races = { "WHITE", "WHITE", "WHITE", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN" };
+            string[] ethnics = { "WHITE", "WHITE", "WHITE", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN", "ASIAN", "WHITE", "WHITE", "BLACK OR AFRICAN AMERICAN" };
 
             List<Hashtable> observation_list = new List<Hashtable>();
             Hashtable obs;
-            for (int i = 0; i < 11; i++)
+            for (int i = 0; i < 10; i++)
             {
                 obs = new Hashtable();
                 obs.Add("subjId", "subj_"+i);
                 obs.Add("AGE", ages[i]);
                 obs.Add("SEX", sexes[i]);
                 obs.Add("ARM", arms[i]);
+                obs.Add("RACE",races[i]);
+                obs.Add("ETHNIC",ethnics[i]);
                 observation_list.Add(obs);
             }
             return observation_list;
