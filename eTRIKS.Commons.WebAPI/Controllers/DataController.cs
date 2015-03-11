@@ -37,10 +37,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         /*
         [HttpGet]
         [Route("api/studies/{studyId}/data/clinical/observations")]
-        public string getObservations(string studyId)
+        public List<Hashtable> getObservations(string studyId)
         {
-            _dataService.getObservationsDataTemp();
-            return "OK";
+            return _dataService.getObservationsDataTemp();
         }
         */
     }

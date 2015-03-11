@@ -175,9 +175,7 @@ namespace eTRIKS.Commons.Service.Services
             return observation_list;
         }
 
-    
-        
-        public void getObservationsDataTemp()
+        public List<Hashtable> getObservationsDataTemp()
         {
             // Simulate input (START)
             string code = "VS";
@@ -193,14 +191,16 @@ namespace eTRIKS.Commons.Service.Services
             where.Add(ri_2);
 
             List<string> observation = new List<string>();
-            observation.Add("BMI");
-            observation.Add("HEIGHT");
-            observation.Add("WEIGHT");
+            //observation.Add("BMI");
+            //observation.Add("HEIGHT");
+            //observation.Add("WEIGHT");
+            observation.Add("DIABP");
 
             List<string> filter = new List<string>();
             filter.Add(code+"ORRES");
             filter.Add("USUBJID");
             filter.Add(code+"TESTCD");
+            filter.Add("VISIT");
             // Simulate input (END)
 
             MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
@@ -222,20 +222,41 @@ namespace eTRIKS.Commons.Service.Services
                 combinedList.Add(sublist);
             }
 
-            // Group the data based on SubjectId
+
+            // Group by the data based on SubjectId, Visti, Date
+            //List<List<RecordItem>> groupedList =
+            //                    (
+            //                        from records in combinedList
+            //                        from subject in records.Take(1)
+            //                        let USUBJID = subject.value
+            //                        let VISIT = records.ToArray().ElementAt(3).value
+            //                        let Subjects = records.Skip(1)
+            //                        group Subjects by new
+            //                        {
+            //                            USUBJID,
+            //                            VISIT
+            //                        }
+            //                        into gss
+            //                        select new[]
+            //                        {
+            //                            new RecordItem() { fieldName = "USUBJID", value = gss.Key.USUBJID },
+            //                            new RecordItem() {fieldName = "VISIT", value = gss.Key.VISIT }
+            //                        }.Concat(gss.SelectMany(x => x)).ToList()
+            //                    ).ToList();
+
+
             List<List<RecordItem>> groupedList =
-                                (
-                                    from records in combinedList
-                                    from subject in records.Take(1)
-                                    let USUBJID = subject.value
-                                    let Subjects = records.Skip(1)
-                                    group Subjects by USUBJID into gss
-                                    select new[]
+                               (
+                                   from records in combinedList
+                                   from subject in records.Take(1)
+                                   let USUBJID = subject.value
+                                   let Subjects = records.Skip(1)
+                                   group Subjects by USUBJID into gss
+                                   select new[]
                                     {
                                         new RecordItem() { fieldName = "USUBJID", value = gss.Key },
                                     }.Concat(gss.SelectMany(x => x)).ToList()
-                                ).ToList();
-
+                               ).ToList();
 
             // Format data (remove field names) and input to Hash table
             List<Hashtable> observation_list = new List<Hashtable>();
@@ -256,7 +277,7 @@ namespace eTRIKS.Commons.Service.Services
                 }
                 observation_list.Add(obs);       
             }
-
+            return observation_list;
         }
     }
 }
