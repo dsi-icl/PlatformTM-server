@@ -20,13 +20,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/studies/{studyId}/data/clinical/observations")]
-        public List<Hashtable> getObservations(string studyId, [FromBody] List<string> observations)
+        [Route("api/studies/{studyId}/data/clinical/{domainCode}/observations")]
+        public List<Hashtable> getObservations(string studyId, string domainCode, [FromBody] List<string> observations)
         {
 
-            return _dataService.getObservationsData(studyId, observations);
+            return _dataService.getObservationsData(studyId, domainCode, observations);
         }
 
+        [HttpPost]
+        [Route("api/studies/{studyId}/data/subjects/characteristics")]
+        public List<Hashtable> getSubjectData(string studyId, [FromBody] List<string> characs)
+        {
+
+            return _dataService.getSubjectData(studyId, characs);
+        }
+        /*
         [HttpGet]
         [Route("api/studies/{studyId}/data/clinical/observations")]
         public string getObservations(string studyId)
@@ -34,6 +42,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _dataService.getObservationsDataTemp();
             return "OK";
         }
-
+        */
     }
 }
