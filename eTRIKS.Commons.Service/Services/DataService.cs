@@ -315,7 +315,8 @@ namespace eTRIKS.Commons.Service.Services
             // Simulate input (END)
 
             List<List<RecordItem>> combinedList_compound = getNOSQLData(where, observation_compund, filter_compund_groupBy, code, true);
-            List<List<RecordItem>> groupedList_compound = groupNOSQLData(combinedList_compound, true);
+          //  List<List<RecordItem>> groupedList_compound = groupNOSQLData(combinedList_compound, true);
+            List<List<RecordItem>> groupedList_compound = combinedList_compound;
 
             List<List<RecordItem>> combinedList = getNOSQLData(where, observation, filter_groupBy, code, false);
             List<List<RecordItem>> groupedList = groupNOSQLData(combinedList, false);
@@ -329,7 +330,7 @@ namespace eTRIKS.Commons.Service.Services
             {
                 obs = new Hashtable();
                 List<string> singleRecord = new List<string>();
-                singleRecord.Add("SubjId");
+                singleRecord.Add("USUBJID");
                 for (int j = 0; j < groupedList[i].Count(); j++)
                 {
                     singleRecord.Add(groupedList[i][j].value);  
@@ -348,19 +349,10 @@ namespace eTRIKS.Commons.Service.Services
                 
                 for (int j = 0; j < groupedList_compound[i].Count(); j++)
                 {
-                    singleRecord.Add(groupedList_compound[i][j].fieldName);
-                    singleRecord.Add(groupedList_compound[i][j].value);
-                }
-                for (int k = 0; k < singleRecord.Count(); k = k + 2)
-                {
-                    obs.Add(singleRecord[k], singleRecord[k + 1]);
+                    obs.Add(groupedList_compound[i][j].fieldName, groupedList_compound[i][j].value);
                 }
                 observation_list.Add(obs);
             }
-
-
-
-
             return observation_list;
         }
     }
