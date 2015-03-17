@@ -140,6 +140,9 @@ namespace eTRIKS.Commons.Service.Services
 
         public List<Hashtable> getSubjectData(String studyId, List<string> subjCharacteristics)
         {
+            //TEMP 
+            subjCharacteristics = subjCharacteristics.ConvertAll(d => d.ToUpper());
+            
             string query = "?STUDYID=" + studyId + "&DOMAIN=DM";
             for (int i = 0; i < subjCharacteristics.Count(); i++)
             {
