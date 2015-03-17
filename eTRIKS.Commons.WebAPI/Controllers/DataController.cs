@@ -47,12 +47,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _dataService.getSubjectData(studyId, characs);
         }*/
 
-        /*[HttpGet]
+        [HttpGet]
         [Route("api/studies/{studyId}/data/clinical/observations")]
         public List<Hashtable> getObservations(string studyId)
         {
             return _dataService.getObservationsDataTemp();
-        }*/
+        }
 
         
     }
