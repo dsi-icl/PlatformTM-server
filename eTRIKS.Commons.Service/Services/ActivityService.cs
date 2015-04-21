@@ -128,8 +128,11 @@ namespace eTRIKS.Commons.Service.Services
             {
                 for (int j = 0; j < activity_list[i].Datasets.Count; j++)
                 {
+                    
                     ClinicalDataTreeRecordSummary clinicalTreeRecord = new ClinicalDataTreeRecordSummary();
                     clinicalTreeRecord.Class = activity_list[i].Datasets.Select(f => f.Domain.Class).ToList()[j];
+                    if (clinicalTreeRecord.Class.Equals("Relationship"))
+                        continue;
                     clinicalTreeRecord.Name = activity_list[i].Name.ToString();
                     clinicalTreeRecord.Domain = activity_list[i].Datasets.Select(k => k.Domain.Name).ToList()[j];
                     clinicalTreeRecord.code = activity_list[i].Datasets.Select(f => f.Domain.Code).ToList()[j];
@@ -156,6 +159,8 @@ namespace eTRIKS.Commons.Service.Services
             {
                 ClinicalDataTreeDTO cdTree = new ClinicalDataTreeDTO();
                 cdTree.Class = groupedClinicalTreeRecordList[i][0].Class;
+
+                //Console.Out.WriteLine(cdTree.Class);
                 // For each dataset 
                 for (int j = 0; j < groupedClinicalTreeRecordList[i].Count(); j++)
                 {
@@ -163,6 +168,7 @@ namespace eTRIKS.Commons.Service.Services
                     cdTreeActivity.Name = groupedClinicalTreeRecordList[i][j].Name;
                     cdTreeActivity.Domain = groupedClinicalTreeRecordList[i][j].Domain;
                     cdTreeActivity.code = groupedClinicalTreeRecordList[i][j].code;
+                    //Console.Out.WriteLine(cdTreeActivity.code);
                     cdTree.Activities.Add(cdTreeActivity);
 
                     MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
@@ -171,7 +177,10 @@ namespace eTRIKS.Commons.Service.Services
                     // Generic Grouping
                     string code = cdTreeActivity.code;
                     string variableDefinition = groupedClinicalTreeRecordList[i][j].variableDefinition;
-                    string queryString = "?DOMAIN=" + code + "&" + variableDefinition + "=*&"+code+"CAT=*&"+code+"SCAT=*";
+                    //TEMP HACK
+
+                    string testName = variableDefinition.TrimEnd('C', 'D');
+                    string queryString = "?DOMAIN=" + code + "&" + variableDefinition + "=*&" + code + "CAT=*&" + code + "SCAT=*&" + testName + "=*";
                     recordSet = mongoDataService.getNoSQLRecords(queryString);
 
                     if (recordSet.RecordSet.Any())
@@ -197,36 +206,49 @@ namespace eTRIKS.Commons.Service.Services
                             }
                             else
                             {
-                                var filteredRecordSet = recordSet.RecordSet.Select(u =>
-                                                new { code = u.RecordItems[0].value, category = u.RecordItems[1].value }).Distinct();
-                                var groupedRecordSet = filteredRecordSet.GroupBy(k => k.category).Select(grp => grp.ToList()).ToList();
+                                var filteredRecordSet = recordSet.RecordSet
+                                                        .Select(u =>
+                                                            new { code = u.RecordItems[0].value,
+                                                                  name = u.RecordItems[1].value,
+                                                                  category = u.RecordItems[2].value })
+                                                        .Distinct();
+
+                                var groupedRecordSet = filteredRecordSet
+                                                        .GroupBy(k => k.category)
+                                                        .Select(grp => grp.ToList())
+                                                        .ToList();
+                                
                                 for (int k = 0; k < groupedRecordSet.Count(); k++)
                                 {
-                                    Observation observation = new Observation();
-                                    observation.Name = groupedRecordSet[k][0].category;
-                                    observation.code = code+"-CAT" + k;
-                                    List<string> observationList = new List<string>();
+                                    ObservationGroup obsGrp = new ObservationGroup();
+                                    obsGrp.Name = groupedRecordSet[k][0].category;
+                                    obsGrp.Code = code + "-CAT" + k;
+                                    
                                     for (int m = 0; m < groupedRecordSet[k].Count(); m++)
                                     {
-                                        observationList.Add(groupedRecordSet[k][m].code);
+                                        Observation observation = new Observation();
+                                        observation.Name = groupedRecordSet[k][m].name.ToLower();
+                                        observation.Code = groupedRecordSet[k][m].code.ToLower();
+                                        obsGrp.Observations.Add(observation); 
                                     }
-                                    observation.ObservationList = observationList;
-                                    cdTreeActivity.Observations.Add(observation);
+                                    cdTreeActivity.Observations.Add(obsGrp);
+
                                 }
                             }
                         }
                         else
                         {
-                            var filteredRecordSet = recordSet.RecordSet.Select(u => new { code = u.RecordItems[0].value }).Distinct().ToList();
-                            Observation observation = new Observation();
-                            observation.code = "TEST";
-                            List<string> observationList = new List<string>();
+                            var filteredRecordSet = recordSet.RecordSet.Select(u => new { 
+                                 code = u.RecordItems[0].value,
+                                 name = u.RecordItems.ElementAtOrDefault(1) != null ? u.RecordItems[1].value : u.RecordItems[0].value
+                                }).Distinct().ToList();
                             for (int g = 0; g <  filteredRecordSet.Count(); g++)
                             {
-                                observationList.Add(filteredRecordSet[g].code);
+                                Observation observation = new Observation();
+                                observation.Name = filteredRecordSet[g].name.ToLower();
+                                observation.Code = filteredRecordSet[g].code.ToLower();
+                                cdTreeActivity.Observations.Add(observation);
                             }
-                            observation.ObservationList = observationList;
-                            cdTreeActivity.Observations.Add(observation);
                         }
                     }
                 }

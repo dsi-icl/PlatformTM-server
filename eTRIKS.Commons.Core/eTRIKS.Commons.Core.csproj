@@ -60,6 +60,7 @@
     <Compile Include="Domain\Interfaces\IServiceUoW.cs" />
     <Compile Include="Domain\Interfaces\ITemplateRepository.cs" />
     <Compile Include="Application\Services\ITemplateService.cs" />
+    <Compile Include="Domain\Model\Observation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Model\Study.cs" />
     <Compile Include="Domain\Model\VariableDefinition.cs" />

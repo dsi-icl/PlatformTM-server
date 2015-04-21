@@ -150,14 +150,14 @@ namespace eTRIKS.Commons.Service.Services
                     {
                         RecordItem recordItem = new RecordItem();
                         recordItem.fieldName = code + "DY";
-                        recordItem.value = "DEFAULT";
+                        recordItem.value = null;
                         sublist.Add(recordItem);
                     }
                     if (!sublist.Exists(item => item.fieldName.Equals(code + "TPT")))
                     {
                         RecordItem recordItem = new RecordItem();
                         recordItem.fieldName = code + "TPT";
-                        recordItem.value = "DEFAULT";
+                        recordItem.value = null;
                         sublist.Add(recordItem);
                     }
                     combinedList.Add(sublist);

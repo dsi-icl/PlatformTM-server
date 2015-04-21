@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
 
 namespace eTRIKS.Commons.Service.DTOs
 {
@@ -22,24 +23,37 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Name;
         public string Domain;
         public string code;
-        public ICollection<Observation> Observations;
+        public ICollection<ClinicalDataTreeObs> Observations;
         public ClinicalDataTreeActivityDTO()
         {
-            Observations = new List<Observation>();
+            Observations = new List<ClinicalDataTreeObs>();
         }
     }
 
-
-    public class Observation
+    [KnownType(typeof(Observation))]
+    [KnownType(typeof(ObservationGroup))]
+    public class ClinicalDataTreeObs
     {
-        public string Name;
-        public string code;
-        public ICollection<string> ObservationList;
-        public Observation()
-        {
-            ObservationList = new List<string>();
-        }
+        public string Name {get;set;}
+        public string Code { get; set; }
+    }
 
+    public class Observation : ClinicalDataTreeObs
+    {
+        public string DomainCode;
+        public string KeyVariable;
+        public string ValueVariable;
+    }
+
+    public class ObservationGroup : ClinicalDataTreeObs
+    {
+
+        public ICollection<Observation> Observations;
+
+        public ObservationGroup()
+        {
+            Observations = new List<Observation>();
+        }
     }
 
     public class ClinicalDataTreeRecordSummary
