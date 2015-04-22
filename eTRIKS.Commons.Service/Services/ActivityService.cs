@@ -226,7 +226,7 @@ namespace eTRIKS.Commons.Service.Services
                                     
                                     for (int m = 0; m < groupedRecordSet[k].Count(); m++)
                                     {
-                                        Observation observation = new Observation();
+                                        ObservationDTO observation = new ObservationDTO();
                                         observation.Name = groupedRecordSet[k][m].name.ToLower();
                                         observation.Code = groupedRecordSet[k][m].code.ToLower();
                                         obsGrp.Observations.Add(observation); 
@@ -244,7 +244,7 @@ namespace eTRIKS.Commons.Service.Services
                                 }).Distinct().ToList();
                             for (int g = 0; g <  filteredRecordSet.Count(); g++)
                             {
-                                Observation observation = new Observation();
+                                ObservationDTO observation = new ObservationDTO();
                                 observation.Name = filteredRecordSet[g].name.ToLower();
                                 observation.Code = filteredRecordSet[g].code.ToLower();
                                 cdTreeActivity.Observations.Add(observation);

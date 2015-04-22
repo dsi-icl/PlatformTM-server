@@ -1,4 +1,6 @@
-﻿using MongoDB.Bson;
+﻿using eTRIKS.Commons.Core.Domain.Model;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using System;
@@ -240,53 +242,6 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
             var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Find(query).
                                 SetFields(Fields.Include(filteredColumnList).Exclude("_id"));
 
-            
-            //var match = new BsonDocument {
-            //                { "$match",   new BsonDocument {{"DOMAIN","VS"}} }
-            //            };
-
-            //var group = new BsonDocument{
-            //            {
-            //                "$group", new BsonDocument{
-            //                    {"_id", new BsonDocument 
-            //                                 { 
-            //                                     { "Topic","$LBTESTCD" }, 
-            //                                     { "Name","$LBTEST" },
-            //                                     { "Category","$LBCAT" },
-            //                                     { "Subcategory","$LBSCAT" },
-            //                                 } } 
-            //                }
-            //            }
-            //        };
-
-            //AggregateArgs aggregateArgs = new AggregateArgs()
-            //{
-            //    Pipeline = new[]
-            //        {
-            //            new BsonDocument ("$match",   query.ToBsonDocument()),
-            //            group
-            //        }
-            //};
-
-
-
-            //var pipeline = new[] { match, group };
-            //var args = new AggregateArgs { Pipeline = pipeline };
-            //var res = dbETriks.GetCollection(mongoCollectionName).Aggregate(aggregateArgs);
-
-            //////
-            //AggregateArgs aggregateArgs = new AggregateArgs()
-            //{
-            //    Pipeline = new[]
-            //        {
-            //            new BsonDocument("$match", Query<Car>.LTE(c => c.DailyRentalFee, 10).ToBsonDocument())
-            //            , new BsonDocument("$match", Query<Car>.GTE(c => c.DailyRentalFee, 3).ToBsonDocument())
-            //            , new BsonDocument("$sort", new BsonDocument("DailyRentalFee", 1))
-            //        }
-            //};
-
-            //var res2 = dbETriks.GetCollection(mongoCollectionName).Aggregate(aggregateArgs);
-
             foreach (var rec in eTRIKSRecords)
             {
                 NoSQLRecord noSQLRec = new NoSQLRecord(); // the equivalent of a row
@@ -307,60 +262,33 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
             return recordSet;
         }
 
-        public NoSQLRecordSet getGroupedNoSQLrecords(string queryString, IDictionary<string, string> groupingFields)
+        public List<Observation> getGroupedNoSQLrecords(IDictionary<string, string> filterFields, IDictionary<string, string> groupingFields)
         {
-            NoSQLRecordSet recordSet = new NoSQLRecordSet();
-            List<NoSQLRecord> records = new List<NoSQLRecord>();
             MongoDatabase dbETriks = GetDatabase();
 
-            QueryDocument query;
-            string[] filteredColumnList;
-            exctractFromQueryString(queryString, out query, out filteredColumnList);
-
-            Dictionary<string, string> projectionFields = new Dictionary<string, string>();
-            
+            Dictionary<string, object> projectionFields = new Dictionary<string, object>();
+            projectionFields.Add("_id", 0);
             foreach(var item in groupingFields){
                 projectionFields.Add(item.Key, "$_id." + item.Key);
             }
-
-            var projection = new BsonDocument("$project", projectionFields.ToBsonDocument());
-            
 
             AggregateArgs aggregateArgs = new AggregateArgs()
             {
                 Pipeline = new[]
                     {
-                        new BsonDocument ("$match",   query.ToBsonDocument()),
+                        new BsonDocument ("$match",   filterFields.ToBsonDocument()),
                         new BsonDocument ("$group", new BsonDocument{
                                 {"_id", groupingFields.ToBsonDocument() } 
                             }),
-                        projection
+                        new BsonDocument("$project", projectionFields.ToBsonDocument())
                     }
             };
 
-            var eTRIKSRecords = dbETriks.GetCollection(mongoCollectionName).Aggregate(aggregateArgs);
+            var observationRecords = dbETriks.GetCollection(mongoCollectionName)
+                                    .Aggregate(aggregateArgs)
+                                    .Select(BsonSerializer.Deserialize<Observation>).ToList();;
 
-            foreach (var rec in eTRIKSRecords)
-            {
-                NoSQLRecord noSQLRec = new NoSQLRecord(); // the equivalent of a row
-                foreach (var ele in rec.Elements)
-                {
-                    if (ele.Name.Contains("_id"))
-                        continue;
-                    RecordItem ri = new RecordItem(); //the equivalent of a field / column and row value
-                    ri.fieldName = ele.Name.ToString();
-                    ri.value = ele.Value.ToString();
-                    noSQLRec.RecordItems.Add(ri);
-                }
-                // Check if mongo record didnt have a matching column vale
-                if (noSQLRec.RecordItems.Count != 0)
-                    records.Add(noSQLRec);
-            }
-            recordSet.RecordSet = records;
-
-
-
-            return recordSet;
+            return observationRecords;
         }
     }
 

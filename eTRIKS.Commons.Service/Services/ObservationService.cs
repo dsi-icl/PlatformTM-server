@@ -19,8 +19,8 @@ namespace eTRIKS.Commons.Service.Services
         }
         public void loadObservations(string studyId)
         {
-            
-            
+
+            MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
             List<Activity> activity_list = _activityRepository.Get(
                d => d.StudyId.Equals(studyId),
                  new List<Expression<Func<Activity, object>>>(){
@@ -42,27 +42,6 @@ namespace eTRIKS.Commons.Service.Services
                     if(ds.Domain.Class.ToLower().Equals("relationship"))
                        continue;
 
-                    if(ds.Domain.Class.ToLower().Equals("events"))
-                        controlledTerm = ds.Variables
-                        .Select(l => l.VariableDefinition)
-                        .Where(v => v.Name == ds.Domain.Code+"DECOD")
-                        .First();
-
-                     if(ds.Domain.Class.ToLower().Equals("exposure"))
-                        controlledTerm = ds.Variables
-                        .Select(l => l.VariableDefinition)
-                        .Where(v => v.Name == ds.Domain.Code+"DECOD")
-                        .FirstOrDefault();
-
-                    if(ds.Domain.Class.ToLower().Equals("findings"))
-                        controlledTerm = ds.Variables
-                        .Select(l => l.VariableDefinition)
-                        .Where(v => v.Name == ds.Domain.Code+"TEST")
-                        .FirstOrDefault();
-
-                        
-
-
                     qualifiers = ds.Variables
                         .Select(l => l.VariableDefinition)
                         .Where(v => v.RoleId == "CL-Role-T-3")
@@ -78,34 +57,46 @@ namespace eTRIKS.Commons.Service.Services
                         .Where(v => v.RoleId == "CL-Role-T-2")
                         .First();
 
-                    
-                    MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
-                    NoSQLRecordSet recordSet = null;
+                    controlledTerm = ds.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.Name == ds.Domain.Code+"DECOD")
+                        .FirstOrDefault();
 
-                    string queryString = "?DOMAIN=" + ds.Domain.Code + 
-                                        "&" + topic.Name + "=*&" +
-                                         ds.Domain.Code + "CAT=*&" +
-                                         ds.Domain.Code + "SCAT=*" +
-                                         (controlledTerm != null ? "&" + controlledTerm.Name + "=*" : "");
+                    if(ds.Domain.Class.ToLower().Equals("findings")){
 
-                   // string groupingVars = "Topic,$" + topic.Name;
-                    
-                    Dictionary<string, string> groupFields = new Dictionary<string, string>();
-                    groupFields.Add("Topic", "$"+topic.Name);
-                    groupFields.Add("Name", "$" + controlledTerm.Name);
-                    groupFields.Add("Category", "$" + ds.Domain.Code + "CAT");
-                    groupFields.Add("Subcategory", "$" + ds.Domain.Code + "SCAT");
-
-                    recordSet = mongoDataService.getGroupedNoSQLrecords(queryString, groupFields);
-
-                    if (recordSet.RecordSet.Any())
-                    {
-                        //foreach(var rec in recordSet.RecordSet)
-                        //{
-                            
-                        //}
-
+                        controlledTerm = ds.Variables
+                                            .Select(l => l.VariableDefinition)
+                                            .Where(v => v.Name == ds.Domain.Code+"TESTCD")
+                                            .FirstOrDefault();
+                        topic = ds.Variables
+                                            .Select(l => l.VariableDefinition)
+                                            .Where(v => v.Name == ds.Domain.Code + "TEST")
+                                            .FirstOrDefault();
                     }
+
+
+
+                    Dictionary<string, string> filterFields = new Dictionary<string, string>();
+                    filterFields.Add("DOMAIN", ds.Domain.Code);
+
+                    Dictionary<string, string> groupFields = new Dictionary<string, string>();
+                    groupFields.Add("Name", "$"+topic.Name);
+                    groupFields.Add("ControlledTermStr", "$" + controlledTerm.Name);
+                    groupFields.Add("Group", "$" + ds.Domain.Code + "CAT");
+                    groupFields.Add("Subgroup", "$" + ds.Domain.Code + "SCAT");
+
+                    List<Observation> observations = mongoDataService.getGroupedNoSQLrecords(filterFields, groupFields);
+
+                    foreach (Observation obs in observations)
+                    {
+                        obs.Class = ds.Domain.Class;
+                        obs.DomainCode = ds.Domain.Code;
+                        obs.TopicVariable = topic;
+                        obs.qualifiers = qualifiers;
+                        obs.timings = timings;
+                    }
+                    Console.Out.WriteLine(observations);
+
                                                                     
                 }
             }

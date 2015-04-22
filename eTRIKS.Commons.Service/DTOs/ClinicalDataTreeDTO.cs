@@ -30,7 +30,7 @@ namespace eTRIKS.Commons.Service.DTOs
         }
     }
 
-    [KnownType(typeof(Observation))]
+    [KnownType(typeof(ObservationDTO))]
     [KnownType(typeof(ObservationGroup))]
     public class ClinicalDataTreeObs
     {
@@ -38,7 +38,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Code { get; set; }
     }
 
-    public class Observation : ClinicalDataTreeObs
+    public class ObservationDTO : ClinicalDataTreeObs
     {
         public string DomainCode;
         public string KeyVariable;
@@ -48,11 +48,11 @@ namespace eTRIKS.Commons.Service.DTOs
     public class ObservationGroup : ClinicalDataTreeObs
     {
 
-        public ICollection<Observation> Observations;
+        public ICollection<ObservationDTO> Observations;
 
         public ObservationGroup()
         {
-            Observations = new List<Observation>();
+            Observations = new List<ObservationDTO>();
         }
     }
 

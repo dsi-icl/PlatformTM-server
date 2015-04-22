@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    class Observation : Identifiable<int>
+    public class Observation : Identifiable<int>
     {
         //Identifier variables
         
         public string Name { get; set; } //BMI
+        public string ControlledTermStr { get; set; }
         public CVterm ControlledTerm { get; set; }
         public string DomainCode { get; set; } //VS
         public VariableDefinition TopicVariable { get; set; } //VSTESTCD
@@ -21,9 +22,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Subgroup { get; set; } //null 
 
         public List<VariableDefinition> synonyms { get; set; }
-        
-
         public List<VariableDefinition> qualifiers { get; set; } //VSORES, VSLOC ...etc
-        public List<VariableDefinition> timing { get; set; } //VISIT VSDY VSSTD
+        public List<VariableDefinition> timings { get; set; } //VISIT VSDY VSSTD
     }
 }
