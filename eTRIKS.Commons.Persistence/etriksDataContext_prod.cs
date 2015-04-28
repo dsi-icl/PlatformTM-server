@@ -7,6 +7,7 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
 using System.Transactions;
+using MongoDB.Bson;
 
 namespace eTRIKS.Commons.Persistence {
     public class etriksDataContext_prod : DbContext, IServiceUoW {
@@ -39,8 +40,15 @@ namespace eTRIKS.Commons.Persistence {
             }
 
             // If the repository for that Model class doesn't exist, create it
-           var repository = new GenericRepository<TEntity,TPrimaryKey>(this);
-            //var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
+            if (typeof(TEntity).Name.Equals("SubjectObservation"))
+            {
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
+            
+
+            var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
 
             // Add it to the dictionary
             _repositories.Add(typeof(TEntity), repository);
@@ -84,7 +92,7 @@ namespace eTRIKS.Commons.Persistence {
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new DomainTemplateMap());
-            modelBuilder.Configurations.Add(new DomainVariableMap());
+            modelBuilder.Configurations.Add(new DomainVariableTemplateMap());
             modelBuilder.Configurations.Add(new DatasetMap());
             modelBuilder.Configurations.Add(new ActivityMap());
             modelBuilder.Configurations.Add(new CVtermMap());
@@ -95,6 +103,8 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new StudyMap());
             modelBuilder.Configurations.Add(new VariableDefMap());
             modelBuilder.Configurations.Add(new VariableRefMap());
+            modelBuilder.Configurations.Add(new ObservationMap());
+            modelBuilder.Configurations.Add(new ProjectMap());
         }
     }
 }

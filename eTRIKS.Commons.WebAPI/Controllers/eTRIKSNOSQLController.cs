@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
 using eTRIKS.Commons.DataAccess.MongoDB;
+using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -15,23 +16,23 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
 
-        [HttpGet]
-        public NoSQLRecordSet GetData()
-        {
-            string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
-            return _mongoDbService.getNoSQLRecords(queryString);
-        }
+        //[HttpGet]
+        //public MongoDataCollection GetData()
+        //{
+        //    string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
+        //    return _mongoDbService.getNoSQLRecords(queryString);
+        //}
 
         [HttpGet]
         [Route("Distinct")]
-        public NoSQLRecordSet GetDistinctData()
+        public MongoDataCollection GetDistinctData()
         {
             string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
             return _mongoDbService.getDistinctNoSQLRecords(queryString);
         }
 
         [HttpDelete]
-        public string deleteRecord(NoSQLRecord record)
+        public string deleteRecord(MongoDocument record)
         {
             return _mongoDbService.deleteDataGeneric(record);
         }

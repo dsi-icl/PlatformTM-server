@@ -32,20 +32,20 @@ namespace eTRIKS.Commons.Service.Services{
 
         public DomainTemplate GetDomainTemplateById(string oid)
         {
-            return _templateRepository.GetById(oid);
+            return _templateRepository.Get(oid);
         }
 
         public DomainTemplate GetDomainWithVariables(string oid)
         {
             //TODO:figure out the query for that in IRepository
-           return _templateRepository.GetById(oid);
+           return _templateRepository.Get(oid);
         }
 
         public string getOIDOfCVterm(string name)
         {
             if (name.Length < 1)
                 return null;
-            return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().OID;
+            return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().Id;
         }
 
         public string Gettestdomain(string something)
@@ -55,7 +55,7 @@ namespace eTRIKS.Commons.Service.Services{
 
         public string checkDictionaryItem(string OID)
         {
-            return _dictionaryRepository.GetRecords(o => o.OID.Equals(OID)).First().OID;
+            return _dictionaryRepository.GetRecords(o => o.Id.Equals(OID)).First().Id;
         }
 
         public void addDictionaryItem(Dictionary dictionaryItem)

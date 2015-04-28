@@ -23,6 +23,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string RoleId { get; set; }
         public Study Study { get; set; }
         public string StudyId { get; set; }
+        public List<VariableDefinition> VariableQualifiers { get; set; }
 
         //public DerivedMethod DerivedVariableProperties { get; set; }
         //public string DerivedVariablePropertiesId { get; set; }

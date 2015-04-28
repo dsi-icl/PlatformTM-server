@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using eTRIKS.Commons.Service.Services;
 using System.Collections;
+using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -29,9 +30,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/studies/{studyId}/data/subjects/characteristics")]
-        public List<Hashtable> getSubjectData(string studyId, [FromBody] List<string> characs)
+        public async Task<List<Hashtable>> getSubjectData(string studyId, [FromBody] List<string> characs)
         {
-            return _dataService.getSubjectData(studyId, characs);
+            return await _dataService.getSubjectData(studyId, characs);
         }
 
         /*[HttpGet]
@@ -49,9 +50,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/studies/{studyId}/data/clinical/observations")]
-        public List<Hashtable> getObservations(string studyId)
+        public void getObservations(string studyId)
         {
-            return _dataService.getObservationsDataTemp();
+             _dataService.getObservationsData(studyId,null);
         }
 
         

@@ -8,10 +8,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public DomainTemplateMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
             // Properties
-            this.Property(t => t.OID)
+            this.Property(t => t.Id)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -32,7 +32,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Templates.DomainDataset_TBL", "Templates");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.Id).HasColumnName("OID");
             //this.Property(t => t.Name).HasColumnName("domainName");
             //this.Property(t => t.Class).HasColumnName("class");
             //this.Property(t => t.Description).HasColumnName("description");

@@ -6,25 +6,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     public class DataVisulaiserController : ApiController
     {
-        private ActivityService _activityService;
+        private DataService _dataService;
 
-        public DataVisulaiserController(ActivityService activityService)
+        public DataVisulaiserController(DataService dataService)
         {
-            _activityService = activityService;
+            _dataService = dataService;
         }
         
 
         [HttpGet]
         [Route("api/DataVisulaiser/{studyId}")]
-        public IEnumerable<ClinicalDataTreeDTO> getActivityData(string studyId)
+        public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(string studyId)
         {
-            return _activityService.getActivityData(studyId);
+            return await _dataService.getClinicalObsTree(studyId);
         }
     }
 }

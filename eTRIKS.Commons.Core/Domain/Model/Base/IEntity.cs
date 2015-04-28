@@ -5,7 +5,7 @@
     public interface IEntity<TPrimaryKey>
     {
         /// Unique identifier for this entity.
-        TPrimaryKey OID { get; set; }
+        TPrimaryKey Id { get; set; }
 
     }
 }

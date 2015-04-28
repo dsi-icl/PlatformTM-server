@@ -29,6 +29,14 @@ namespace eTRIKS.Commons.DataAccess {
 
             // If the repository for that Model class doesn't exist, create it
            // var repository = new GenericRepository<TEntity,TPrimaryKey>(_dataContext);
+
+            if (typeof(TEntity).Equals("MongoDocument"))
+            {
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
+                  
             var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
 
             // Add it to the dictionary

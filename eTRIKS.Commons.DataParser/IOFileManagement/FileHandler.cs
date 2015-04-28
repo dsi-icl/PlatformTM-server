@@ -8,6 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.DataParser.IOFileManagement
 {
@@ -34,7 +35,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     DomainTemplate dt = new DomainTemplate();
-                    dt.OID = ds.Tables[0].Rows[i][0].ToString().Trim();
+                    dt.Id = ds.Tables[0].Rows[i][0].ToString().Trim();
                     dt.Name = ds.Tables[0].Rows[i][4].ToString().Trim();
                     dt.Class = ds.Tables[0].Rows[i][1].ToString().Trim();
                     dt.Description = ds.Tables[0].Rows[i][6].ToString().Trim();
@@ -55,7 +56,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     DomainVariableTemplate dvt = new DomainVariableTemplate();
-                    dvt.OID = ds.Tables[0].Rows[i][0].ToString().Trim();
+                    dvt.Id = ds.Tables[0].Rows[i][0].ToString().Trim();
                     dvt.Name = ds.Tables[0].Rows[i][1].ToString().Trim();
                     dvt.Label = ds.Tables[0].Rows[i][2].ToString().Trim();
                     dvt.Description = ds.Tables[0].Rows[i][3].ToString().Trim();
@@ -78,7 +79,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             {
                 // undo the remove first line
                 MongoDbDataRepository ms = new MongoDbDataRepository();
-                NoSQLRecord record = new NoSQLRecord();
+                MongoDocument record = new MongoDocument();
 
                 ////string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { ' ', ',', '.', ':', '\t' });
                 ////if text file (tab delimited)
@@ -90,7 +91,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
 
                 //    for (int j = 0; j < headers.Length; j++)
                 //    {
-                //        RecordItem recordItem = new RecordItem();
+                //        MongoField recordItem = new MongoField();
                 //        recordItem.fieldName = headers[j];
                 //        recordItem.value = rowElements[j];
                 //        record.RecordItems.Add(recordItem);
@@ -101,15 +102,15 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 //if CSV file
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
-                    record.RecordItems.Clear();
+                    record.fields.Clear();
                     for (int j = 0; j < ds.Tables[0].Columns.Count; j++)
                     {
-                        RecordItem recordItem = new RecordItem();
-                        recordItem.fieldName = ds.Tables[0].Columns[j].ToString();
+                        MongoField recordItem = new MongoField();
+                        recordItem.Name = ds.Tables[0].Columns[j].ToString();
                         recordItem.value = ds.Tables[0].Rows[i][j].ToString();
                         if (recordItem.value != "")
                         {
-                            record.RecordItems.Add(recordItem);
+                            record.fields.Add(recordItem);
                         }
                     }
                     ms.loadDataGeneric(record);

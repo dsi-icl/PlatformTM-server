@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using eTRIKS.Commons.Service.Services;
+using eTRIKS.Commons.Core.Domain.Model;
+using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -18,8 +20,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        public void LoadObservations(string studyId){
-            _observationService.loadObservations(studyId);
+        public Task<List<SubjectObservation>> LoadObservations(string studyId){
+           // _observationService.loadObservations(studyId);
+           return  _observationService.test();
+           // return _observationService.loadTest();
         }
     }
 }

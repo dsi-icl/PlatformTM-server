@@ -3,15 +3,15 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    public class DomainVariableMap : EntityTypeConfiguration<DomainVariableTemplate>
+    public class DomainVariableTemplateMap : EntityTypeConfiguration<DomainVariableTemplate>
     {
-        public DomainVariableMap()
+        public DomainVariableTemplateMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
             // Properties
-            this.Property(t => t.OID)
+            this.Property(t => t.Id)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -45,7 +45,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Templates.DomainVariable_TBL", "Templates");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.Id).HasColumnName("OID");
             //this.Property(t => t.Name).HasColumnName("Name");
             //this.Property(t => t.Description).HasColumnName("Description");
             //this.Property(t => t.DataType).HasColumnName("DataType");

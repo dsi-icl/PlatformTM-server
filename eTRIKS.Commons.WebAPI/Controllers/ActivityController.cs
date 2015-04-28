@@ -49,7 +49,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             if (addedActivity != null)
             {
                 var response = Request.CreateResponse<Activity>(HttpStatusCode.Created, addedActivity);
-                string uri = Url.Link("GetActivityById", new { activityId = addedActivity.OID });
+                string uri = Url.Link("GetActivityById", new { activityId = addedActivity.Id });
                 response.Headers.Location = new Uri(uri);
                 return response;
             }

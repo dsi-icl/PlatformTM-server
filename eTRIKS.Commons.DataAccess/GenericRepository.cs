@@ -38,15 +38,15 @@ namespace eTRIKS.Commons.DataAccess
             return Entities;
         }
 
-        public List<TEntity> GetAllList()
-        {
-            return Entities.ToList();
-        }
+        //public List<TEntity> GetAllList()
+        //{
+        //    return Entities.ToList();
+        //}
 
-        public List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate)
-        {
-            return GetAll().Where(predicate).ToList();
-        }
+        //public List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate)
+        //{
+        //    return GetAll().Where(predicate).ToList();
+        //}
 
         public IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter)
         {
@@ -55,7 +55,7 @@ namespace eTRIKS.Commons.DataAccess
         }
 
 
-        public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, 
+        public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, 
                                     List<Expression<Func<TEntity, object>>> includeProperties = null,
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,
@@ -84,13 +84,13 @@ namespace eTRIKS.Commons.DataAccess
 
 
 
-        public TEntity GetSingle(Expression<Func<TEntity, bool>> filter = null,
+        public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null,
                                     List<Expression<Func<TEntity, object>>> includeProperties = null)
         {
-            return Get(filter, includeProperties).SingleOrDefault();
+            return FindAll(filter, includeProperties).SingleOrDefault();
         }
 
-        public TEntity GetById(TPrimaryKey key)
+        public TEntity FindAll(TPrimaryKey key)
         {
             return Entities.Find(key);
         }
@@ -109,23 +109,61 @@ namespace eTRIKS.Commons.DataAccess
             return entity;
         }
 
-        public void Delete(TEntity entity)
+        public void Remove(TEntity entity)
         {
             Entities.Attach(entity);
             Entities.Remove(entity);
         }
 
-        public void Delete(TPrimaryKey id)
+        public void Remove(TPrimaryKey id)
         {
             throw new NotImplementedException();
         }
 
-        public int Count()
+
+
+
+        public System.Threading.Tasks.Task<List<TEntity>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public int Count(Expression<Func<TEntity, bool>> predicate)
+        public System.Threading.Tasks.Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Threading.Tasks.Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public TEntity Get(TPrimaryKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Threading.Tasks.Task<TEntity> GetAsync(TPrimaryKey key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Threading.Tasks.Task InsertAsync(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Threading.Tasks.Task<int> UpdateAsync(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Threading.Tasks.Task<int> RemoveAsync(TEntity entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public System.Threading.Tasks.Task<ICollection<TNewResult>> AggregateAsync<Tkey, TNewResult>(Expression<Func<TEntity, bool>> match, Expression<Func<TEntity, Tkey>> idProjector, Expression<Func<IGrouping<Tkey, TEntity>, TNewResult>> groupProjector)
         {
             throw new NotImplementedException();
         }

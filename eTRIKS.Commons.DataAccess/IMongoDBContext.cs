@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.DataAccess
 {
-    public interface IDataContext
+    public interface IMongoDBContext
     {
         IDbSet<T> Set<T>() where T : class;
         DbEntityEntry Entry(object o);
         int SaveChanges();
         void Dispose();
+       
     }
 }

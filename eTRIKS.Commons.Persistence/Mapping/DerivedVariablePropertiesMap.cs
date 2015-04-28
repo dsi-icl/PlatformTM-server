@@ -8,7 +8,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public DerivedVariablePropertiesMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
             // Properties
             this.Property(t => t.DerivedVariableId)
@@ -26,6 +26,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Derived_Method_TBL");
+            this.Property(t => t.Id).HasColumnName("OID");
             this.Property(t => t.DerivedVariableId).HasColumnName("derivedVariableId");
             this.Property(t => t.MethodDescription).HasColumnName("methodDescription");
             this.Property(t => t.DerivedValueTypeId).HasColumnName("type");

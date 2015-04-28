@@ -8,10 +8,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public StudyMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
             // Properties
-            this.Property(t => t.OID)
+            this.Property(t => t.Id)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -23,9 +23,23 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Study_TBL");
-            //this.Property(t => t.OID).HasColumnName("OID");
-            //this.Property(t => t.Name).HasColumnName("name");
-            //this.Property(t => t.Description).HasColumnName("description");
+            this.Property(t => t.Id).HasColumnName("OID");
+
+            // Relationships
+            this.HasRequired(t => t.Project)
+                .WithMany(s => s.Studies)
+                .HasForeignKey(t => t.ProjectId);
+
+
+            this.HasMany(t => t.Observations)
+                .WithMany(t => t.Studies)
+                .Map(mc =>
+                {
+                    mc.ToTable("Study_Observations");
+                    mc.MapLeftKey("StudyId");
+                    mc.MapRightKey("ObservationId");
+
+                });
         }
     }
 }

@@ -27,7 +27,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("DBxref_TBL");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.OID).HasColumnName("OID");
             //this.Property(t => t.Accession).HasColumnName("accession");
             //this.Property(t => t.Description).HasColumnName("description");
             //this.Property(t => t.DBId).HasColumnName("db_id");
