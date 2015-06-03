@@ -29,8 +29,8 @@ namespace eTRIKS.Commons.DataAccess
             mongoClient = new MongoClient(ConfigurationManager.ConnectionStrings["MongoDBConnectionString"]
                                             .ConnectionString);
             database = mongoClient.GetDatabase(ConfigurationManager.AppSettings["NoSQLDatabaseName"]);
-            collection = database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower() + "s");
-            //collection = database.GetCollection<TEntity>("BioSpeak_Data");
+            //collection = database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower() + "s");
+            collection = database.GetCollection<TEntity>("Biospeak_clinical");
         }
 
         public async Task<TEntity>  FindAsync(Expression<Func<TEntity, bool>> filter = null)
@@ -42,16 +42,32 @@ namespace eTRIKS.Commons.DataAccess
 
         public async Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter = null)
         {
-            //BsonDocument filter2;
-            //if (filter == null)
-            //    filter2 = new BsonDocument();
-            //filter.ToBsonDocument();
-            return await collection.Find(filter).ToListAsync();
+            return await collection
+                    .Find(filter)
+                    /*
+                    .Project(Builders<BsonDocument>.Projection
+                                                    .Include(filteredColumnList[0])
+                                                    .Include(filteredColumnList[1])
+                                                    .Include(filteredColumnList[2])
+                                                    .Include(filteredColumnList[3])
+                                                    .Exclude("_id")).ToListAsync();)*/
+                    .ToListAsync();
         }
 
-        public async Task InsertAsync(TEntity entity)
+        public async Task<string> InsertAsync(TEntity entity)
         {
-            await collection.InsertOneAsync(entity);
+            try
+            {
+                await collection.InsertOneAsync(entity);
+                return "RECORD(s) SUCCESSFULLY INSERTED";
+            }
+            catch (Exception e)
+            {
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                return e.Message;
+            }
+            
         }
 
         public async Task<ICollection<TNewResult>> AggregateAsync<Tkey, TNewResult>(Expression<Func<TEntity, bool>> match,
@@ -71,20 +87,20 @@ namespace eTRIKS.Commons.DataAccess
                 .ToListAsync();
         }
 
-        public List<TEntity> getGroupedNoSQLrecords(IDictionary<string, string> filterFields, IDictionary<string, string> groupingFields)
-        {
-            return new List<TEntity>();
-        }
+        //public List<TEntity> getGroupedNoSQLrecords(IDictionary<string, string> filterFields, IDictionary<string, string> groupingFields)
+        //{
+        //    return new List<TEntity>();
+        //}
 
-        public void getNoSQLRecords(string queryString)
-        {
+        //public void getNoSQLRecords(string queryString)
+        //{
 
-        }
+        //}
 
-        public void getDistinctNoSQLRecords(string queryString)
-        {
+        //public void getDistinctNoSQLRecords(string queryString)
+        //{
 
-        }
+        //}
 
         private IQueryable<TEntity> GetAll()
         {
@@ -99,7 +115,7 @@ namespace eTRIKS.Commons.DataAccess
 
         public Task<List<TEntity>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            return this.FindAllAsync();
         }
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)

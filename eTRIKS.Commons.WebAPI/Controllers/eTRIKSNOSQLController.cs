@@ -23,13 +23,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    return _mongoDbService.getNoSQLRecords(queryString);
         //}
 
-        [HttpGet]
-        [Route("Distinct")]
-        public MongoDataCollection GetDistinctData()
-        {
-            string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
-            return _mongoDbService.getDistinctNoSQLRecords(queryString);
-        }
+        //[HttpGet]
+        //[Route("Distinct")]
+        //public MongoDataCollection GetDistinctData()
+        //{
+        //    string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
+        //    return _mongoDbService.getDistinctNoSQLRecords(queryString);
+        //}
 
         [HttpDelete]
         public string deleteRecord(MongoDocument record)

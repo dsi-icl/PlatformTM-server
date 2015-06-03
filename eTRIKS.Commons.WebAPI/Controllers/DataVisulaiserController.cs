@@ -23,7 +23,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/DataVisulaiser/{studyId}")]
-        public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(string studyId)
+        public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(int studyId)
         {
             return await _dataService.getClinicalObsTree(studyId);
         }

@@ -28,6 +28,16 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .WithMany(s => s.Activities)
                 .HasForeignKey(t => t.StudyId);
 
+            //this.HasMany(t => t.Studies)
+            //    .WithMany(t => t.Activities)
+            //    .Map(mc =>
+            //    {
+            //        mc.ToTable("Study_Activities");
+            //        mc.MapLeftKey("StudyId");
+            //        mc.MapRightKey("ActivityId");
+
+            //    });
+
         }
     }
 }

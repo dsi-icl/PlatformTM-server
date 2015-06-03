@@ -37,16 +37,10 @@ namespace eTRIKS.Commons.DataAccess
         {
             return Entities;
         }
-
-        //public List<TEntity> GetAllList()
-        //{
-        //    return Entities.ToList();
-        //}
-
-        //public List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate)
-        //{
-        //    return GetAll().Where(predicate).ToList();
-        //}
+        public TEntity Get(TPrimaryKey key)
+        {
+            return Entities.Find(key);
+        }
 
         public IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter)
         {
@@ -138,17 +132,12 @@ namespace eTRIKS.Commons.DataAccess
             throw new NotImplementedException();
         }
 
-        public TEntity Get(TPrimaryKey key)
-        {
-            throw new NotImplementedException();
-        }
-
         public System.Threading.Tasks.Task<TEntity> GetAsync(TPrimaryKey key)
         {
             throw new NotImplementedException();
         }
 
-        public System.Threading.Tasks.Task InsertAsync(TEntity entity)
+        public System.Threading.Tasks.Task<string> InsertAsync(TEntity entity)
         {
             throw new NotImplementedException();
         }

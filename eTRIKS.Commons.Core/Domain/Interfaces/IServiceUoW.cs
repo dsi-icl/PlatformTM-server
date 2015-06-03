@@ -8,5 +8,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         string Save();
         IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>()
             where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>;
+
+        void AddClassMap(string fieldname, string propertyName);
     }
 }

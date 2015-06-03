@@ -15,6 +15,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Name { get; set; }
         public string Class { get; set; } //Findings
         public string DomainCode { get; set; }
+        public string DomainName { get; set; }
         public string Group { get; set; } //null //shuold be variable not string?
         public string Subgroup { get; set; } //null 
         public string Visit { get; set; }
@@ -26,6 +27,11 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public RelativeTimePoint ObsStudyTimePoint { get; set; } //--TPT
         public TimeInterval ObsInterval { get; set; }
 
+        public SubjectObservation()
+        {
+            qualifiers = new Dictionary<string, string>();
+            timings = new Dictionary<string, string>();
+        }
         public class ObsQualifier
         {
             enum type
@@ -36,6 +42,13 @@ namespace eTRIKS.Commons.Core.Domain.Model
             public string value { get; set; }
         }
 
+        public string getNameVariable()
+        {
+            return "VSTESTCD";
+        }
+        private string FindingTestName;
+        private string EventName;
+        private string TreatmentName;
 
 
         

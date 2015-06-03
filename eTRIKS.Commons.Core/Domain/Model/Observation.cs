@@ -17,6 +17,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public CVterm ControlledTerm { get; set; }
         public String ControlledTermId { get; set; }
         public string DomainCode { get; set; } //VS
+        public string DomainName { get; set; } //Vital Signs
         public VariableDefinition TopicVariable { get; set; } //VSTESTCD
         public int TopicVariableId { get; set; }
         public string Class { get; set; } //Findings
@@ -24,7 +25,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Subgroup { get; set; } //null 
         public VariableDefinition DefaultQualifier { get; set; }
         public int? DefaultQualifierId { get; set; }
-        public ICollection<Study> Studies { get; set; }
+        public List<Study> Studies { get; set; }
+        public bool? isSubjCharacteristic { get; set; }
 
         public List<VariableDefinition> Synonyms { get; set; }
         public List<VariableDefinition> Qualifiers { get; set; } //VSORES, VSLOC ...etc

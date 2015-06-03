@@ -155,8 +155,11 @@
     <Compile Include="Controllers\DataParserController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
     <Compile Include="Controllers\DataVisulaiserController.cs" />
+    <Compile Include="Controllers\FileUploadController.cs" />
     <Compile Include="Controllers\ObservationController.cs" />
+    <Compile Include="Controllers\StreamProvider.cs" />
     <Compile Include="Controllers\StudyController.cs" />
+    <Compile Include="Controllers\SubjCharacteristicsController.cs" />
     <Compile Include="DependencyResolution\ContainerBootstrapper.cs">
       <SubType>Code</SubType>
     </Compile>

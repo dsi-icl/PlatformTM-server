@@ -10,58 +10,83 @@ namespace eTRIKS.Commons.Service.DTOs
     public class ClinicalDataTreeDTO
     {
         public string Class;
-        public ICollection<ClinicalDataTreeActivityDTO> Activities { get; set; }
+        public ICollection<DomainNode> Activities { get; set; }
+        public ICollection<DomainNode> Domains { get; set; }
 
         public ClinicalDataTreeDTO()
         {
-            Activities = new List<ClinicalDataTreeActivityDTO>();
+            Activities = new List<DomainNode>();
+            Domains = new List<DomainNode>();
         }
     }
 
-    public class ClinicalDataTreeActivityDTO
+    public class DomainNode
     {
         public string Name;
         public string Domain;
         public string code;
-        public ICollection<ClinicalDataTreeObs> Observations;
-        public ClinicalDataTreeActivityDTO()
+        public List<GenericNode> Terms;
+        public DomainNode()
         {
-            Observations = new List<ClinicalDataTreeObs>();
+            Terms = new List<GenericNode>();
         }
     }
 
-    [KnownType(typeof(ObservationDTO))]
-    [KnownType(typeof(ObservationGroup))]
-    public class ClinicalDataTreeObs
+    [KnownType(typeof(ObservationNode))]
+    [KnownType(typeof(GroupNode))]
+    [KnownType(typeof(MedDRAGroupNode))]
+    [KnownType(typeof(MedDRATermNode))]
+    public class GenericNode
     {
         public string Name {get;set;}
+        public int Id { get; set; }
         public string Code { get; set; }
+
+        public override bool Equals(Object obj)
+        {
+            GenericNode nodeObj = obj as GenericNode;
+            if (nodeObj == null)
+                return false;
+            else
+                return Name.Equals(nodeObj.Name);
+        }
     }
 
-    public class ObservationDTO : ClinicalDataTreeObs
+    public class ObservationNode : GenericNode
     {
         public string DomainCode;
         public string KeyVariable;
         public string ValueVariable;
     }
 
-    public class ObservationGroup : ClinicalDataTreeObs
+    public class GroupNode : GenericNode
     {
 
-        public ICollection<ObservationDTO> Observations;
+        public IList<GenericNode> Terms;
 
-        public ObservationGroup()
+        public GroupNode()
         {
-            Observations = new List<ObservationDTO>();
+            Terms = new List<GenericNode>();
         }
     }
 
-    public class ClinicalDataTreeRecordSummary
+    public class MedDRAGroupNode : GenericNode
     {
-        public string Class;
-        public string Name;
-        public string Domain;
-        public string code;
-        public string variableDefinition;
+         public string Variable {get;set;}
+         public string GroupTerm {get;set;}
+         public int Count {get;set;}
+         public List<int> TermIds { get; set; }
+         public IList<GenericNode> Terms { get; set; }
+
+         public MedDRAGroupNode()
+         {
+             Terms = new List<GenericNode>();
+         }
     }
+
+    public class MedDRATermNode : GenericNode
+    {
+        public string Term { get; set; }
+    }
+
 }

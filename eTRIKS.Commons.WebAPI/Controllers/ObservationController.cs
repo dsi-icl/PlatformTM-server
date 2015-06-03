@@ -19,10 +19,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _observationService = observationService;
         }
 
+        //[HttpGet]
+        //[Route("api/ObservationTest")]
+        //public async Task testSerializer()
+        //{
+        //    await _observationService.testSerializer();
+        //}
+
         [HttpGet]
-        public Task<List<SubjectObservation>> LoadObservations(string studyId){
-           // _observationService.loadObservations(studyId);
-           return  _observationService.test();
+        public async Task LoadObservations(string studyId){
+            await _observationService.loadObservations(studyId);
+           //return  _observationService.test();
            // return _observationService.loadTest();
         }
     }

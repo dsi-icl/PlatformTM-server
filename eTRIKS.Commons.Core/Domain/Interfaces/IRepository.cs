@@ -64,7 +64,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         /// </summary>
         /// <param name="entity">Entity</param>
         TEntity Insert(TEntity entity);
-        Task InsertAsync(TEntity entity);
+        Task<string> InsertAsync(TEntity entity);
 
         #endregion
 

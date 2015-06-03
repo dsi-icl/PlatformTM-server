@@ -27,11 +27,11 @@ namespace eTRIKS.Commons.Core.Domain.Model
     public class SubjObservationTemp
     {
         public string subjId { get; set; }
-        public string test { get; set; }
-        public string value { get; set; }
-        public int visitNo { get; set; }
-        public string timepoint { get; set; }
-        public int day { get; set; }
+        public string[] test { get; set; }
+        public string[] value { get; set; }
+        public int[] visitNo { get; set; }
+        public string[] timepoint { get; set; }
+        public int[] day { get; set; }
     }
 
     public class NoSQLRecordForUpdate

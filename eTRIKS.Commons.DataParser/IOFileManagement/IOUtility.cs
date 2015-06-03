@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using System.Reflection;
+using System.Configuration;
 using System.Text.RegularExpressions;
 
 
@@ -110,10 +111,11 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
 
         public DataSet readCSVFileContents(string fileName, string mapping)
         {
-            string fileLocation = @"C:\temp\" + fileName;
+            //string fileLocation = @"C:\temp\" + fileName;
+            string filepath = ConfigurationManager.AppSettings["UploadDir"] + fileName;
 
             OleDbConnection connection = new OleDbConnection("Provider=Microsoft.Jet.OleDb.4.0; Data Source = " +
-                                           Path.GetDirectoryName(fileLocation) +
+                                           Path.GetDirectoryName(filepath) +
                                                "; Extended Properties = \"text;HDR=YES;IMEX=1;FMT=Delimited;\"");
             connection.Open();
             OleDbDataAdapter adapter = new OleDbDataAdapter("SELECT " + mapping + " FROM " + fileName, connection);

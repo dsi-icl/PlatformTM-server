@@ -95,5 +95,11 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new ObservationMap());
             modelBuilder.Configurations.Add(new ProjectMap());
         }
+
+
+        public void AddClassMap(string fieldname, string propertyName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

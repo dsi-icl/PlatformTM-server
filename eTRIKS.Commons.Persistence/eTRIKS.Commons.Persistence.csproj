@@ -124,7 +124,17 @@
     <Compile Include="Migrations_prod\201504241704191_addProject.Designer.cs">
       <DependentUpon>201504241704191_addProject.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_prod\201504291440304_addDomainNameToObs.cs" />
+    <Compile Include="Migrations_prod\201504291440304_addDomainNameToObs.Designer.cs">
+      <DependentUpon>201504291440304_addDomainNameToObs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201505310108239_AddFieldToObservation.cs" />
+    <Compile Include="Migrations_prod\201505310108239_AddFieldToObservation.Designer.cs">
+      <DependentUpon>201505310108239_AddFieldToObservation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_prod\Configuration.cs" />
+    <Compile Include="SubjectSerializer.cs" />
+    <Compile Include="SubjectObsSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="etriksDataContext_prod.cs" />
   </ItemGroup>
@@ -172,6 +182,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201504241704191_addProject.resx">
       <DependentUpon>201504241704191_addProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201504291440304_addDomainNameToObs.resx">
+      <DependentUpon>201504291440304_addDomainNameToObs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201505310108239_AddFieldToObservation.resx">
+      <DependentUpon>201505310108239_AddFieldToObservation.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
