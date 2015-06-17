@@ -49,10 +49,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 }
                 string ext = Path.GetExtension(fileName);
 
-                File.WriteAllBytes(@"C:\temp\" + fileName, File.ReadAllBytes(fileLocalName));
+                //File.WriteAllBytes(@"C:\temp\" + fileName, File.ReadAllBytes(fileLocalName));
 
                 // Clean up App__Data folder 
-                File.Delete(fileLocalName);
+                //File.Delete(fileLocalName);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -87,21 +87,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        public string loadData(string datSource, string fileName, string page, string mapping)
+        public  string loadData(string dataSource, string fileName, string page, string mapping)
         {
             IOUtility iOUtility = new IOUtility();
             string ext = Path.GetExtension(fileName);
             if (ext == ".csv")
             {
-                return _fileHandler.loadDataFromFile(datSource, iOUtility.readCSVFileContents(fileName, mapping));
+                return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readCSVFileContents(fileName, mapping));
             }
             else if (ext == ".xlsx")
             {
-                return _fileHandler.loadDataFromFile(datSource, iOUtility.readExcelFileContents(fileName, page, mapping));
+                return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readExcelFileContents(fileName, page, mapping));
             }
             else if (ext == ".txt")
             {
-                return _fileHandler.loadDataFromFile(datSource, iOUtility.readTabDelimitedFileContents(fileName, mapping));
+                return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readTabDelimitedFileContents(fileName, mapping));
             }
 
             return "ERROR: Cannot Parse File";

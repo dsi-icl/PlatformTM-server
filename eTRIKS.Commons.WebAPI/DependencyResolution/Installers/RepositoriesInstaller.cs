@@ -5,7 +5,7 @@ using Castle.Windsor;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Persistence;
 using eTRIKS.Commons.DataParser.IOFileManagement;
-using eTRIKS.Commons.DataParser.MongoDBAccess;
+using eTRIKS.Commons.DataAccess.MongoDB;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 {
@@ -18,11 +18,11 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 
                 //TODO: remove EF and Persistence dependencies
                 Component.For<DbContext, IServiceUoW>()
-                    .ImplementedBy<etriksDataContext_dev>(),
+                    .ImplementedBy<etriksDataContext_prod>(),
 
                 Component.For<FileHandler>(),
 
-                Component.For<MongoDbDataServices>(),
+                Component.For<MongoDbDataRepository>(),
 
                 Classes
                     .FromAssemblyNamed("eTRIKS.Commons.DataAccess")

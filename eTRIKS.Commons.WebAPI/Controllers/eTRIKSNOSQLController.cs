@@ -1,37 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Web.Http;
-using eTRIKS.Commons.DataParser.MongoDBAccess;
+using eTRIKS.Commons.DataAccess.MongoDB;
+using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [RoutePrefix("api/etriksNOSQL")]
     public class eTRIKSNOSQLController : ApiController
     {
-        private MongoDbDataServices _mongoDbService;
+        private MongoDbDataRepository _mongoDbService;
 
-        public eTRIKSNOSQLController(MongoDbDataServices mongoDbService)
+        public eTRIKSNOSQLController(MongoDbDataRepository mongoDbService)
         {
             _mongoDbService = mongoDbService;
         }
 
-        //[Route("")]
-        // GET api/values
-        //public IEnumerable<string> getRecordsOfStudy()
+
+        //[HttpGet]
+        //public MongoDataCollection GetData()
         //{
-        //    return new string[] { "value1", "value2" };
+        //    string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
+        //    return _mongoDbService.getNoSQLRecords(queryString);
         //}
 
-        //[Route("{id}")]
-        // GET api/values/5
-        [HttpGet]
-        public List<NoSQLRecord> GetData()
-        {
-            string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
-            return _mongoDbService.getNoSQLRecord(queryString);
-        }
+        //[HttpGet]
+        //[Route("Distinct")]
+        //public MongoDataCollection GetDistinctData()
+        //{
+        //    string queryString = System.Web.HttpContext.Current.Request.Url.Query.ToString();
+        //    return _mongoDbService.getDistinctNoSQLRecords(queryString);
+        //}
 
         [HttpDelete]
-        public string deleteRecord(NoSQLRecord record)
+        public string deleteRecord(MongoDocument record)
         {
             return _mongoDbService.deleteDataGeneric(record);
         }

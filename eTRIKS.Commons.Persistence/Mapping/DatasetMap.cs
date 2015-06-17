@@ -8,9 +8,9 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public DatasetMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
-            this.Property(t => t.OID)
+            this.Property(t => t.Id)
                .IsRequired();
                //.HasMaxLength(200);
 
@@ -32,15 +32,16 @@ namespace eTRIKS.Commons.Persistence.Mapping
             //this.Property(t => t.DomainId).HasColumnName("domainId");
             //this.Property(t => t.DataFile).HasColumnName("DataFile");
             //this.Property(t => t.ActivityId).HasColumnName("ActivityId");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.Id).HasColumnName("OID");
 
             // Relationships
             this.HasRequired(d => d.Activity)
                 .WithMany(a => a.Datasets)
                 .HasForeignKey(d => d.ActivityId);
 
-            //A hack to get EF to use DomainId as the FK for Domain and not to autogenerate another one
-            this.HasRequired(d => d.Domain).WithMany().HasForeignKey(t => t.DomainId);
+            this.HasRequired(d => d.Domain)
+                .WithMany()
+                .HasForeignKey(t => t.DomainId);
 
 
 

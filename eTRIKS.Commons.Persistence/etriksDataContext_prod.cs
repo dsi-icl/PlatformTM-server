@@ -7,6 +7,9 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
 using System.Transactions;
+using MongoDB.Bson.Serialization;
+using eTRIKS.Commons.Core.Domain.Model;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace eTRIKS.Commons.Persistence {
     public class etriksDataContext_prod : DbContext, IServiceUoW {
@@ -21,12 +24,21 @@ namespace eTRIKS.Commons.Persistence {
             //_dataContext = context;
             Configuration.ProxyCreationEnabled = false;
             Database.SetInitializer<etriksDataContext_prod>(null);
+
+            BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
+            BsonSerializer.RegisterSerializer(typeof(Subject), new SubjectSerializer());
             
             _repositories = new Dictionary<Type, object>();
             this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             _disposed = false;
         }
 
+        public void AddClassMap(string fieldname, string propertyName)
+        {
+            BsonSerializationInfo info = new BsonSerializationInfo(fieldname, new StringSerializer(), typeof(string));
+            SubjectObsSerializer.DynamicMappers.Remove(propertyName);
+            SubjectObsSerializer.DynamicMappers.Add(propertyName, info);
+        }
         
 
         public IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>() 
@@ -39,8 +51,29 @@ namespace eTRIKS.Commons.Persistence {
             }
 
             // If the repository for that Model class doesn't exist, create it
-           var repository = new GenericRepository<TEntity,TPrimaryKey>(this);
-            //var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
+            if (typeof(TEntity).Name.Equals("SubjectObservation"))
+            {
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
+
+            if (typeof(TEntity).Name.Equals("MongoDocument"))
+            {
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
+
+            if (typeof(TEntity).Name.Equals("Subject"))
+            {
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
+            
+
+            var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
 
             // Add it to the dictionary
             _repositories.Add(typeof(TEntity), repository);
@@ -50,26 +83,26 @@ namespace eTRIKS.Commons.Persistence {
           
         public string Save() {
 
-            using (var tran = new TransactionScope())
-            {
+            //using (var tran = new TransactionScope())
+            //{
                 try
                 {
                     base.SaveChanges();
-                    tran.Complete();
+                   // tran.Complete();
                     return "CREATED";
                 }
                 catch (Exception e)
                 {
-                    tran.Dispose();
+                    //tran.Dispose();
                     while (e.InnerException != null)
                         e = e.InnerException;
                     return e.Message;
                 }
-            }
+            //}
         }
 
 
-        public void Dispose() {
+        public void Dispose(){
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -84,7 +117,7 @@ namespace eTRIKS.Commons.Persistence {
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Configurations.Add(new DomainTemplateMap());
-            modelBuilder.Configurations.Add(new DomainVariableMap());
+            modelBuilder.Configurations.Add(new DomainVariableTemplateMap());
             modelBuilder.Configurations.Add(new DatasetMap());
             modelBuilder.Configurations.Add(new ActivityMap());
             modelBuilder.Configurations.Add(new CVtermMap());
@@ -95,6 +128,8 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new StudyMap());
             modelBuilder.Configurations.Add(new VariableDefMap());
             modelBuilder.Configurations.Add(new VariableRefMap());
+            modelBuilder.Configurations.Add(new ObservationMap());
+            modelBuilder.Configurations.Add(new ProjectMap());
         }
     }
 }

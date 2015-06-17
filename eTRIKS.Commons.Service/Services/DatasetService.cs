@@ -35,13 +35,11 @@ namespace eTRIKS.Commons.Service.Services
         /// <param name="domainId"></param>
         public DatasetDTO GetTemplateDataset(string domainId)
         {
-            DomainTemplate domainTemplate = _domainRepository.Get(
-                d => d.OID.Equals(domainId),
+            DomainTemplate domainTemplate = _domainRepository.FindAll(
+                d => d.Id.Equals(domainId),
                 new List<Expression<Func<DomainTemplate, object>>>(){
                     d => d.Variables.Select(c => c.controlledTerminology.Xref.DB)
-                },
-                null,
-                null
+                }
                 ).FirstOrDefault<DomainTemplate>();
 
 
@@ -52,16 +50,18 @@ namespace eTRIKS.Commons.Service.Services
             dto.Class = domainTemplate.Class;
             dto.Description = domainTemplate.Description;
             dto.Name = domainTemplate.Name;
-            dto.DomainId = domainTemplate.OID;
+            dto.DomainId = domainTemplate.Id;
             dto.Structure = domainTemplate.Structure;
-            List<DatasetVariableDTO> vars = new List<DatasetVariableDTO>();
-            foreach (DomainVariableTemplate vt in domainTemplate.Variables)
+
+            foreach (DomainVariableTemplate vt in domainTemplate.Variables.OrderBy(c => c.Order))
             {
                 DatasetVariableDTO dv = new DatasetVariableDTO();
                 dv.Name = vt.Name;
                 dv.Description = vt.Description;
                 dv.Label = vt.Label;
-                dv.Accession = vt.OID;
+                dv.Accession = vt.Id;
+                dv.RoleId = vt.RoleId;
+                dv.DataType = vt.DataType;
                 if (vt.controlledTerminology != null)
                 {
                     dv.DictionaryName = vt.controlledTerminology.Name;
@@ -71,10 +71,10 @@ namespace eTRIKS.Commons.Service.Services
                 dv.IsRequired = null;
                 dv.KeySequence = null;
                 dv.OrderNumber = null;
-                    
-                vars.Add(dv);
+                dv.IsCurated = true;
+                
+                dto.variables.Add(dv);
             }
-            dto.variables = vars;
 
             return dto;
         }
@@ -96,8 +96,8 @@ namespace eTRIKS.Commons.Service.Services
         /// <param name="datasetId"></param>
         private Dataset GetActivityDataset(int datasetId)
         {
-            Dataset ds = _datasetRepository.GetSingle(
-                d => d.OID.Equals(datasetId),
+            Dataset ds = _datasetRepository.FindSingle(
+                d => d.Id.Equals(datasetId),
                 new List<Expression<Func<Dataset, object>>>(){
                         d => d.Variables.Select(t => t.VariableDefinition),
                 });
@@ -115,29 +115,34 @@ namespace eTRIKS.Commons.Service.Services
         {
             
             DatasetDTO dto = new DatasetDTO();
-            Dataset ds = _datasetRepository.GetSingle(
-                d => d.OID.Equals(datasetId),
+            Dataset ds = _datasetRepository.FindSingle(
+                d => d.Id.Equals(datasetId),
                 new List<Expression<Func<Dataset, object>>>(){
                         d => d.Variables.Select(t => t.VariableDefinition),
-                        d => d.Domain.Variables.Select(t => t.controlledTerminology.Xref.DB)
+                        d => d.Domain.Variables.Select(t => t.controlledTerminology.Xref.DB),
+                        d => d.Activity
                 });
 
-            dto.Id = ds.OID;//Set DatasetDTO id to Dataset.Id (int)
+            dto.Id = ds.Id;//Set DatasetDTO id to Dataset.Id (int)
             dto.Class = ds.Domain.Class;
             dto.Description = ds.Domain.Description;
             dto.Name = ds.Domain.Name;
-            dto.DomainId = ds.Domain.OID;
+            dto.DomainId = ds.Domain.Id;
             dto.Structure = ds.Domain.Structure;
             dto.Code = ds.Domain.Code;
+            dto.StudyId = ds.Activity.StudyId;
 
-            foreach (DomainVariableTemplate vt in ds.Domain.Variables)
+            foreach (DomainVariableTemplate vt in ds.Domain.Variables.OrderBy(v => v.Order))
             //foreach (var vt in ds.Variables)
             {
                 DatasetVariableDTO dv = new DatasetVariableDTO();
                 dv.Name = vt.Name;
                 dv.Description = vt.Description;
                 dv.Label = vt.Label;
-                dv.Accession = vt.OID;
+                dv.Accession = vt.Id;
+                dv.DataType = vt.DataType;
+                dv.IsCurated = true;
+                dv.RoleId = vt.RoleId;
 
                 if (vt.controlledTerminology != null)
                 {
@@ -158,6 +163,8 @@ namespace eTRIKS.Commons.Service.Services
                     dv.OrderNumber = vr.OrderNumber;
                     dv.Id = vr.VariableDefinitionId;
                     dv.isSelected = true;
+
+                    
                 }
             }
             
@@ -179,11 +186,11 @@ namespace eTRIKS.Commons.Service.Services
             {
                 if (VariableDTO.isSelected)
                 {
-
-                   VariableDefinition varDef;
+                   ;
                     //Compare newly added Variable to previously added VarDefs using accession string 
                     //since no Id for Variable created yet
-                   varDef = variableDefsOfStudy.SingleOrDefault(d => d.Accession.Equals(VariableDTO.Accession));
+                   VariableDefinition varDef = variableDefsOfStudy.SingleOrDefault(
+                       d => d.Accession.Equals(VariableDTO.Accession));
                    if (varDef == null){
                        varDef = new VariableDefinition();
                        varDef.Accession = VariableDTO.Accession;
@@ -191,6 +198,8 @@ namespace eTRIKS.Commons.Service.Services
                        varDef.Label = VariableDTO.Label;
                        varDef.Description = VariableDTO.Description;
                        varDef.DataType = VariableDTO.DataType;
+                       varDef.IsCurated = VariableDTO.IsCurated;
+                       varDef.RoleId = VariableDTO.RoleId;
                        varDef.StudyId = datasetDTO.StudyId;
                    }
                    //3. Fields for varRefList
@@ -236,9 +245,11 @@ namespace eTRIKS.Commons.Service.Services
                             varDef.Label = VariableDTO.Label;
                             varDef.Description = VariableDTO.Description;
                             varDef.DataType = VariableDTO.DataType;
+                            varDef.IsCurated = VariableDTO.IsCurated;
+                            varDef.RoleId = VariableDTO.RoleId;
                             varDef.StudyId = datasetDTO.StudyId;
                         }
-
+                        
                         VariableReference varRef = new VariableReference();
                         varRef.OrderNumber = VariableDTO.OrderNumber;
                         varRef.IsRequired = VariableDTO.IsRequired;
@@ -262,7 +273,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public IEnumerable<VariableDefinition> getVariableDefinitionsOfStudy(string studyId)
         {
-           return _variableDefinitionRepository.Get(d => d.StudyId.Equals(studyId));
+           return _variableDefinitionRepository.FindAll(d => d.StudyId.Equals(studyId));
         }
 
         private static readonly Expression<Func<DomainTemplate, DatasetDTO>> AsDatasetDto =
@@ -271,7 +282,7 @@ namespace eTRIKS.Commons.Service.Services
                 Name = x.Name,
                 Class = x.Class,
                 Description = x.Description,
-                DomainId = x.OID,
+                DomainId = x.Id,
                 Structure = x.Structure,
                 Code = x.Code,
 

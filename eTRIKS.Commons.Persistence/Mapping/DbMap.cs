@@ -29,7 +29,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Db_TBL");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.OID).HasColumnName("OID");
             this.Property(t => t.Name).HasColumnName("Name");
             this.Property(t => t.UrlPrefix).HasColumnName("URLPrefix");
             this.Property(t => t.Url).HasColumnName("URL");

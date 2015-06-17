@@ -1,6 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.DataParser.DataUtility;
-using eTRIKS.Commons.DataParser.MongoDBAccess;
+using eTRIKS.Commons.DataAccess.MongoDB;
 using eTRIKS.Commons.Service.Services;
 using System;
 using System.Collections.Generic;
@@ -8,16 +8,23 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Interfaces;
+using System.Diagnostics;
 
 namespace eTRIKS.Commons.DataParser.IOFileManagement
 {
     public class FileHandler
     {
         private TemplateService _templateService;
+        //private IRepository<MongoDocument, Guid> _genericMongoRepository;
+        //private IServiceUoW _dataContext;
 
         public FileHandler(TemplateService templateService)
         {
             _templateService = templateService;
+            //_dataContext = uoW;
+            //_genericMongoRepository = uoW.GetRepository<MongoDocument, Guid>();
         }
         
 
@@ -34,7 +41,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     DomainTemplate dt = new DomainTemplate();
-                    dt.OID = ds.Tables[0].Rows[i][0].ToString().Trim();
+                    dt.Id = ds.Tables[0].Rows[i][0].ToString().Trim();
                     dt.Name = ds.Tables[0].Rows[i][4].ToString().Trim();
                     dt.Class = ds.Tables[0].Rows[i][1].ToString().Trim();
                     dt.Description = ds.Tables[0].Rows[i][6].ToString().Trim();
@@ -55,7 +62,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                 for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
                     DomainVariableTemplate dvt = new DomainVariableTemplate();
-                    dvt.OID = ds.Tables[0].Rows[i][0].ToString().Trim();
+                    dvt.Id = ds.Tables[0].Rows[i][0].ToString().Trim();
                     dvt.Name = ds.Tables[0].Rows[i][1].ToString().Trim();
                     dvt.Label = ds.Tables[0].Rows[i][2].ToString().Trim();
                     dvt.Description = ds.Tables[0].Rows[i][3].ToString().Trim();
@@ -77,25 +84,59 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             else if (dataSource == "NOSQL")
             {
                 // undo the remove first line
-                MongoDbDataServices ms = new MongoDbDataServices();
-                NoSQLRecord record = new NoSQLRecord();
+                MongoDbDataRepository ms = new MongoDbDataRepository();
+                
+                List<MongoDocument> records = new List<MongoDocument>();
 
-                //string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { ' ', ',', '.', ':', '\t' });
-                string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { '\t' });
-                for (int i = 1; i < ds.Tables[0].Rows.Count; i++)
+                ////string[] headers = ds.Tables[0].Rows[0][0].ToString().Split(new Char[] { ' ', ',', '.', ':', '\t' });
+                ////if text file (tab delimited)
+                //string[] headers = ds.Tables[0].Columns.ToString().Split(new Char[] { '\t' });
+                //for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
+                //{
+                //    record.RecordItems.Clear();
+                //    string[] rowElements = ds.Tables[0].Rows[i][0].ToString().Split(new Char[] { '\t' });
+
+                //    for (int j = 0; j < headers.Length; j++)
+                //    {
+                //        MongoField recordItem = new MongoField();
+                //        recordItem.fieldName = headers[j];
+                //        recordItem.value = rowElements[j];
+                //        record.RecordItems.Add(recordItem);
+                //    }
+                //    ms.loadDataGeneric(record);
+                //}
+
+                //if CSV file
+                int count = 0;
+                for (int i = 0; i < ds.Tables[0].Rows.Count; i++)
                 {
-                    record.RecordItems.Clear();
-                    string[] rowElements = ds.Tables[0].Rows[i][0].ToString().Split(new Char[] { '\t' });
-
-                    for (int j = 0; j < headers.Length; j++)
+                    MongoDocument record = new MongoDocument(); //record.fields.Clear();
+                    for (int j = 0; j < ds.Tables[0].Columns.Count; j++)
                     {
-                        RecordItem recordItem = new RecordItem();
-                        recordItem.fieldName = headers[j];
-                        recordItem.value = rowElements[j];
-                        record.RecordItems.Add(recordItem);
+                        MongoField recordItem = new MongoField();
+                        recordItem.Name = ds.Tables[0].Columns[j].ToString();
+                        recordItem.value = ds.Tables[0].Rows[i][j].ToString();
+                        if (recordItem.value != "")
+                        {
+                            record.fields.Add(recordItem);
+                        }
                     }
-                    ms.loadDataGeneric(record);
+                    records.Add(record);
+
+                    if (i % 500 == 0)
+                    {
+                        ms.loadDataGeneric(records);
+                        records.Clear();
+                        Debug.WriteLine(i + " RECORD(s) SUCCESSFULLY INSERTED");
+                    }
+
+                    count = i+1;
                 }
+                ms.loadDataGeneric(records);
+
+                Debug.WriteLine(count + " RECORD(s) SUCCESSFULLY INSERTED");
+
+                status = "CREATED";
             }
             return status;
         }

@@ -8,10 +8,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public CVtermMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
             // Properties
-            this.Property(t => t.OID)
+            this.Property(t => t.Id)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -37,7 +37,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("CVterm_TBL");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.Id).HasColumnName("OID");
             //this.Property(t => t.Code).HasColumnName("Code");
             //this.Property(t => t.Name).HasColumnName("Name");
             //this.Property(t => t.Definition).HasColumnName("Definition");

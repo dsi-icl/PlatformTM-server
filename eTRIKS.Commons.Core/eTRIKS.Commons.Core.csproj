@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application\Services\MapperHelper.cs" />
     <Compile Include="Domain\Model\Activity.cs" />
     <Compile Include="Domain\Model\ControlledTerminology\CVterm.cs" />
     <Compile Include="Domain\Model\ControlledTerminology\DB.cs" />
@@ -50,6 +51,10 @@
     <Compile Include="Domain\Model\Base\Identifiable.cs" />
     <Compile Include="Domain\Model\Base\IEntity.cs" />
     <Compile Include="Domain\Model\NoSQLData.cs" />
+    <Compile Include="Domain\Model\Project.cs" />
+    <Compile Include="Domain\Model\Subject.cs" />
+    <Compile Include="Domain\Model\SubjectCharacteristic.cs" />
+    <Compile Include="Domain\Model\SubjectObservation.cs" />
     <Compile Include="Domain\Model\Templates\DomainTemplate.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -58,14 +63,21 @@
     </Compile>
     <Compile Include="Domain\Interfaces\IRepository.cs" />
     <Compile Include="Domain\Interfaces\IServiceUoW.cs" />
-    <Compile Include="Domain\Interfaces\ITemplateRepository.cs" />
+    <Compile Include="Domain\Interfaces\IObservationRepository.cs" />
     <Compile Include="Application\Services\ITemplateService.cs" />
+    <Compile Include="Domain\Model\Observation.cs" />
+    <Compile Include="Domain\Model\Timing\AbsoluteTimePoint.cs" />
+    <Compile Include="Domain\Model\Timing\RelativeTimePoint.cs" />
+    <Compile Include="Domain\Model\Timing\TimeInterval.cs" />
+    <Compile Include="Domain\Model\Timing\TimePoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Model\Study.cs" />
     <Compile Include="Domain\Model\VariableDefinition.cs" />
     <Compile Include="Domain\Model\VariableReference.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

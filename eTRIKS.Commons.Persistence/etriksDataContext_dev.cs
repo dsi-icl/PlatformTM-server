@@ -81,7 +81,7 @@ namespace eTRIKS.Commons.Persistence {
            // modelBuilder.Entity<HistoryRow>().Property(h => h.ContextKey).HasMaxLength(200).IsRequired();
     
             modelBuilder.Configurations.Add(new DomainTemplateMap());
-            modelBuilder.Configurations.Add(new DomainVariableMap());
+            modelBuilder.Configurations.Add(new DomainVariableTemplateMap());
             modelBuilder.Configurations.Add(new DatasetMap());
             modelBuilder.Configurations.Add(new ActivityMap());
             modelBuilder.Configurations.Add(new CVtermMap());
@@ -92,6 +92,14 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new StudyMap());
             modelBuilder.Configurations.Add(new VariableDefMap());
             modelBuilder.Configurations.Add(new VariableRefMap());
+            modelBuilder.Configurations.Add(new ObservationMap());
+            modelBuilder.Configurations.Add(new ProjectMap());
+        }
+
+
+        public void AddClassMap(string fieldname, string propertyName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

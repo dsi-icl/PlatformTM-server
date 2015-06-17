@@ -8,10 +8,10 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public VariableDefMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
+            this.HasKey(t => t.Id);
 
             // Properties
-            this.Property(t => t.OID)
+            this.Property(t => t.Id)
                 .IsRequired();
                 //.HasMaxLength(200);
 
@@ -35,7 +35,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Variable_Definition_TBL");
-            //this.Property(t => t.OID).HasColumnName("OID");
+            this.Property(t => t.Id).HasColumnName("OID");
             //this.Property(t => t.Name).HasColumnName("name");
             //this.Property(t => t.Description).HasColumnName("description");
             //this.Property(t => t.DataType).HasColumnName("dataType");
@@ -55,6 +55,16 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.HasOptional(t => t.VariableType)
                .WithMany()
                .HasForeignKey(t => t.VariableTypeId);
+
+            this.HasMany(t => t.VariableQualifiers)
+                .WithMany()
+                .Map(mc =>
+                {
+                    mc.ToTable("Variable_Qualifiers");
+                    mc.MapLeftKey("VariableId");
+                    mc.MapRightKey("QualifierId");
+
+                });
 
             //this.HasOptional(t => t.DerivedVariableProperties)
             //   .WithMany()

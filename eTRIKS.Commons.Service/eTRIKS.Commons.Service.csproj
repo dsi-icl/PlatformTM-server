@@ -36,8 +36,13 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.3.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
+    <Reference Include="MongoDB.Bson, Version=2.0.0.828, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MongoDB.Bson.2.0.0\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -46,13 +51,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTOs\ActivityDTO.cs" />
+    <Compile Include="DTOs\ClinicalDataTreeDTO.cs" />
     <Compile Include="DTOs\DatasetDTO.cs" />
+    <Compile Include="DTOs\SubjCharDTO.cs" />
     <Compile Include="DTOs\VariableDefinitionDTO.cs" />
     <Compile Include="DTOs\VariableReferenceDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActivityService.cs" />
     <Compile Include="Services\DataManagementServices.cs" />
+    <Compile Include="Services\DataService.cs" />
     <Compile Include="Services\DatasetService.cs" />
+    <Compile Include="Services\ObservationService.cs" />
     <Compile Include="Services\StudyService.cs" />
     <Compile Include="Services\TemplateService.cs" />
   </ItemGroup>
@@ -64,6 +73,13 @@
       <Project>{2b9025cd-68cd-4e1d-8542-2a6acd8c6354}</Project>
       <Name>eTRIKS.Commons.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj">
+      <Project>{5c7f6a70-9395-4dcf-8223-f1ae65f77c0f}</Project>
+      <Name>eTRIKS.Commons.DataAccess</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

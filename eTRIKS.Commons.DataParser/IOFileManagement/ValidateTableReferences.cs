@@ -49,7 +49,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             if (ditionaryItem == null)
             {
                 Dictionary dictionaryItem = new Dictionary();
-                dictionaryItem.OID = "CL-" + FK;
+                dictionaryItem.Id = "CL-" + FK;
                 dictionaryItem.Name = FK;
                 dictionaryItem.Definition = FK;
                 dictionaryItem.XrefId = null;
@@ -66,7 +66,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             if (existInCvterm == null)
             {
                 CVterm cvTerm = new CVterm();
-                cvTerm.OID = dictionaryId + "-T-" + cvTermCounter;
+                cvTerm.Id = dictionaryId + "-T-" + cvTermCounter;
                 cvTerm.Synonyms = null;
                 cvTerm.Name = FK;
                 cvTerm.Definition = FK;

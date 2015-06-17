@@ -150,11 +150,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\Class1.cs" />
     <Compile Include="Controllers\ActivityController.cs" />
+    <Compile Include="Controllers\DataController.cs" />
     <Compile Include="Controllers\DataParserController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
+    <Compile Include="Controllers\DataVisulaiserController.cs" />
+    <Compile Include="Controllers\FileUploadController.cs" />
+    <Compile Include="Controllers\ObservationController.cs" />
+    <Compile Include="Controllers\StreamProvider.cs" />
     <Compile Include="Controllers\StudyController.cs" />
+    <Compile Include="Controllers\SubjCharacteristicsController.cs" />
     <Compile Include="DependencyResolution\ContainerBootstrapper.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -193,7 +198,6 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\eTRIKSNOSQLController.cs" />
-    <Compile Include="Controllers\eTRIKSSQLController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="Global.asax.cs">

@@ -8,12 +8,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
         public ActivityMap()
         {
             // Primary Key
-            this.HasKey(t => t.OID);
-
-            // Properties
-            //this.Property(t => t.OID)
-            //    .IsRequired()
-            //    .HasMaxLength(200);
+            this.HasKey(t => t.Id);
 
             this.Property(t => t.Name)
                 .HasMaxLength(2000);
@@ -24,7 +19,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Activity_TBL");
-            this.Property(t => t.OID).HasColumnName("ActivityId");
+            this.Property(t => t.Id).HasColumnName("ActivityId");
             this.Property(t => t.Name).HasColumnName("Name");
             this.Property(t => t.StudyId).HasColumnName("StudyId");
 
@@ -32,6 +27,16 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.HasRequired(t => t.Study)
                 .WithMany(s => s.Activities)
                 .HasForeignKey(t => t.StudyId);
+
+            //this.HasMany(t => t.Studies)
+            //    .WithMany(t => t.Activities)
+            //    .Map(mc =>
+            //    {
+            //        mc.ToTable("Study_Activities");
+            //        mc.MapLeftKey("StudyId");
+            //        mc.MapRightKey("ActivityId");
+
+            //    });
 
         }
     }

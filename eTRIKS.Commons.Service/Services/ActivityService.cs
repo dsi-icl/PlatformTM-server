@@ -12,6 +12,8 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
+using eTRIKS.Commons.DataAccess.MongoDB;
+
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -19,13 +21,16 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IRepository<Activity, int> _activityRepository;
         private IRepository<Dataset, int> _dataSetRepository;
+        private IRepository<VariableDefinition, int> _variableDefinition;
         private IServiceUoW _activityServiceUnit;
+
 
         public ActivityService(IServiceUoW uoW)
         {
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
             _dataSetRepository = uoW.GetRepository<Dataset, int>();
+            _variableDefinition =  uoW.GetRepository<VariableDefinition, int>();
         }
 
         private static readonly Expression<Func<Activity, ActivityDTO>> AsBookDto =
@@ -36,7 +41,7 @@ namespace eTRIKS.Commons.Service.Services
             datasets = x.Datasets.Select(m => new DatasetBriefDTO
             {
                 Name = m.Domain.Name,
-                Id = m.OID
+                Id = m.Id
             }).ToList()
         };
 
@@ -56,7 +61,7 @@ namespace eTRIKS.Commons.Service.Services
         public bool checkExist(int activityId)
         {
             Activity activity = new Activity();
-            activity =_activityRepository.GetById(activityId);
+            activity =_activityRepository.Get(activityId);
             if (activity == null)
             {
                 return false;
@@ -67,8 +72,8 @@ namespace eTRIKS.Commons.Service.Services
 
         public ActivityDTO getActivityDTOById(int activityId)
         {
-            Activity activity = _activityRepository.GetSingle(
-                d => d.OID.Equals(activityId),
+            Activity activity = _activityRepository.FindSingle(
+                d => d.Id.Equals(activityId),
                 new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain)
                 }
@@ -76,25 +81,23 @@ namespace eTRIKS.Commons.Service.Services
 
             ActivityDTO activityDTO = new ActivityDTO();
             activityDTO.Name = activity.Name;
-            activityDTO.Id = activity.OID;
+            activityDTO.Id = activity.Id;
             activityDTO.StudyID = activity.StudyId;
-            Dataset ds = activity.Datasets.FirstOrDefault();
-            if (ds != null){
+
+            foreach (var ds in activity.Datasets){
                 DatasetBriefDTO dst = new DatasetBriefDTO();
                 dst.Name = ds.Domain.Name;
-                dst.Id = ds.OID; 
-            activityDTO.datasets = new List<DatasetBriefDTO>{dst};
+                dst.Id = ds.Id;
+                activityDTO.datasets.Add(dst);
             }
-            
             return activityDTO;
         }
-
         public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
         {
             IEnumerable<Activity> activities;
 
             // Typed lambda expression for Select() method. 
-            activities = _activityRepository.Get(
+            activities = _activityRepository.FindAll(
                     d => d.StudyId.Equals(studyId),
                     new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain)
@@ -103,19 +106,19 @@ namespace eTRIKS.Commons.Service.Services
             return activities.Select(p => new ActivityDTO
             {
                 Name = p.Name,
-                Id = p.OID,
+                Id = p.Id,
                 StudyID = p.StudyId,
                 datasets = p.Datasets.Select(m => new DatasetBriefDTO
                 {
                     Name = m.Domain.Name,
-                    Id = m.OID
+                    Id = m.Id
                 }).ToList()
             }).ToList();
         }
 
         public string updateActivity(ActivityDTO activityDTO, int activityId)
         {
-            Activity activityToUpdate = _activityRepository.GetById(activityId);
+            Activity activityToUpdate = _activityRepository.Get(activityId);
 
             activityToUpdate.Name = activityDTO.Name;
             return _activityServiceUnit.Save();

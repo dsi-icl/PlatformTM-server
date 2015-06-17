@@ -54,11 +54,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public HttpResponseMessage addDataset([FromBody] DatasetDTO datasetDTO)
         {
             var addedDataset = _datasetService.addDataset(datasetDTO);
-            datasetDTO.Id = addedDataset.OID;
+            datasetDTO.Id = addedDataset.Id;
             if (addedDataset != null)
             {
                 var response = Request.CreateResponse<DatasetDTO>(HttpStatusCode.Created, datasetDTO);
-                string uri = Url.Link("GetDatasetById", new { datasetId = addedDataset.OID, activityId = datasetDTO.ActivityId });
+                string uri = Url.Link("GetDatasetById", new { datasetId = addedDataset.Id, activityId = datasetDTO.ActivityId });
                 response.Headers.Location = new Uri(uri);
                 return response;
             }
