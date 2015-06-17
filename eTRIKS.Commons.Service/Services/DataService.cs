@@ -74,6 +74,7 @@ namespace eTRIKS.Commons.Service.Services
                    domainNode.Name = domain.Name;
                    domainNode.Domain = domainGroup.Key;
                    domainNode.code = domainGroup.Key;
+                   domainNode.Count = domainGroup.Count();
                    classNode.Domains.Add(domainNode);
 
                    
@@ -113,18 +114,23 @@ namespace eTRIKS.Commons.Service.Services
         }
 
         //New method using observationIds, observations coming from UI shuold have observationIds in SQL database
-        public async Task<List<Hashtable>> getObservationsData(string studyId, List<int> observationsIDs)
+        public async Task<Hashtable> getObservationsData(string projectId, Hashtable reqObservations)
         {
             //studyId = "CRC305C";
             List<Hashtable> dataMatrix = new List<Hashtable>();
-            
-            //observationsIDs = new List<int>();
-            //observationsIDs.Add(942);
-            //observationsIDs.Add(948);
 
-            Dictionary<string, List<int>> requestObservations = new Dictionary<string, List<int>>();
-            //observationsIDs = requestObservations.Values.;
-            
+
+            Dictionary<string, List<int>> requestObservations = null;
+                requestObservations =
+                    reqObservations.Cast<DictionaryEntry>()
+                    .ToDictionary(
+                    kvp => (string)kvp.Key, 
+                    kvp => (List<int>)kvp.Value.ToString()
+                        .Trim(new char[]{'[',']'})
+                        .Split(',')
+                        .Select(n => Convert.ToInt32(n)).ToList<int>());
+
+            List<int> observationsIDs = requestObservations.Values.Cast<List<int>>().SelectMany(o => o).ToList();
             //Get observation info from SQL
             List<Observation> observations = _observationRepository.FindAll(
                            o => observationsIDs.Contains(o.Id),
@@ -136,33 +142,52 @@ namespace eTRIKS.Commons.Service.Services
                            }
              ).ToList();
 
+            //This will be replaced by call to SQL for studies of a particular project.
+            List<string> studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
 
-
-            //Query for observation data from Mongo
             List<SubjectObservation> subjObservations = new List<SubjectObservation>();
             List<SubjectObservation> subjAdverseEvents = new List<SubjectObservation>();
 
-            foreach(Observation observation in observations){
+            #region Query Mongo for Subject Observations data
+            foreach (Observation observation in observations){
                 string obsName = observation.Name ;
+                string obsGroupName = observation.Group;
                 string fieldName = observation.TopicVariable.Name;
-                _dataContext.AddClassMap(fieldName, "Name");
-                List<SubjectObservation> observationData =
-                    await _subObservationRepository.FindAllAsync(d => d.Name.Equals(obsName));
+                string groupFieldName = observation.DomainCode + "CAT";
+                List<SubjectObservation> observationData;
 
+                _dataContext.AddClassMap(fieldName, "Name");
+                //TODO: search for subject observations in Mongo by observation Id instead of names
+                if (obsGroupName != null)
+                {
+                    _dataContext.AddClassMap(groupFieldName, "Group");
+                    //add cateogry and add class ... to make the name of the observation unique
+                    observationData =
+                        await _subObservationRepository.FindAllAsync(
+                            d => d.Name.Equals(obsName) /*CRC305D-GENT001-1001*/);
+                }
+                else
+                {
+                    observationData =
+                        await _subObservationRepository.FindAllAsync(
+                            d => d.Name.Equals(obsName));
+                }
                 if (observation.DomainCode.Equals("AE"))
                     subjAdverseEvents.AddRange(observationData);
                 else
                     subjObservations.AddRange(observationData);
             }
+            #endregion
 
-            var adverseEventsBySubject = subjAdverseEvents
-                .GroupBy(ob => ob.SubjectId);
 
-            var adverseEventsByAE = subjAdverseEvents
-                .GroupBy(ob => ob.Name);
+            #region get Subject Data and organize all Observations by Subject        
+
+            List<Subject> subjectData =
+                   await _subjectRepository.FindAllAsync(
+                   s => studyIds.Contains(s.StudyId) && s.DomainCode.Equals("DM"));
 
             //Group data by subject, visit and timepoint
-            var groupedBySubject = subjObservations
+            var FindingsBySubject = subjObservations
                 .GroupBy(ob => new { 
                     subjId = ob.SubjectId,
                     Visit = ob.Visit,
@@ -170,83 +195,259 @@ namespace eTRIKS.Commons.Service.Services
                     Timepoint = ob.ObsStudyTimePoint == null ? "" : ob.ObsStudyTimePoint.Name
                     });
 
+            var adverseEventsBySubject = subjAdverseEvents
+                .GroupBy(ob => ob.SubjectId);
+            #endregion
+
             //Create a datamatrix to sendback to crossfilter
             //One row per subject per visit per timepoint
 
+            //when there are subject observations, they are grouped by subject id and used to reflect the subset
+            //of subjects that have these observations selected(usually it will be the whole set of subjects, since
+            //these lab tests of vital signs are collected for all subjects)
+
+            //I then need to add to the subjectObservaation rows, info from the subjects (site, study and arms)
+
+            //If there are no subjectobservations selected (i.e. only adverse events), I need to query all subjects and iterate 
+            //through these instead of the subjecobservations
+
+            //Will iterate through subjects as a top level, then for each subject get subject observation from subObsbySubj then
+            //aes from aesbysubject
+            Dictionary<string, List<Hashtable>> subjectToObservationsPerVisitAndTime = new Dictionary<string, List<Hashtable>>();
+            #region Create the data matrix
             try
             {
-                foreach (var group in groupedBySubject)
+                foreach (Subject subject in subjectData)
                 {
-                    string key = group.Key.ToString();
-                    string subjId = group.Key.subjId;
+                    List<Hashtable> rows = new List<Hashtable>();
+                    subjectToObservationsPerVisitAndTime.Add(subject.SubjId, rows);
 
-                    Hashtable ht = new Hashtable();
-                    //adding Findings
-                    foreach (var subjObs in group)
+                    #region Add Findings
+                    //ADD FINDINGS
+                    if (FindingsBySubject.Any(o => o.Key.subjId.Equals(subject.SubjId)))
                     {
-                        //check if default qualifier is avaialable
-                        //if( observations.Find(o => o.Name.Equals(subjObs.Name)).DefaultQualifierId != null)
-
-                        string defVariable = observations.Find(o => o.Name.Equals(subjObs.Name)).DefaultQualifier.Name;
-                        if (!ht.ContainsKey("SubjectId")) ht.Add("SubjectId", subjObs.SubjectId);
-                        ht.Add(subjObs.Name, subjObs.qualifiers.SingleOrDefault(q => q.Key.Equals(defVariable)).Value);
-                        if (!ht.ContainsKey("Visit")) ht.Add("Visit", subjObs.Visit);
-                        if (!ht.ContainsKey("Timepoint")) ht.Add("Timepoint", subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name);
+                        //Subject has findings
+                        var subjFindings = FindingsBySubject.Where(o => o.Key.subjId.Equals(subject.SubjId));
+                        
+                        foreach (var groupOfSubjFindings in subjFindings)//Visit,TimePoint
+                        {
+                            Hashtable ht = new Hashtable();
+                            //adding Findings
+                            foreach (var subjObs in groupOfSubjFindings)
+                            {
+                                if (!ht.ContainsKey("subjectId")) ht.Add("subjectId", subject.SubjId);
+                                string defVariable = observations.Find(o => o.Name.Equals(subjObs.Name)).DefaultQualifier.Name;
+                                ht.Add(subjObs.Name.ToLower(), subjObs.qualifiers.SingleOrDefault(q => q.Key.Equals(defVariable)).Value);
+                                if (!ht.ContainsKey("visit")) ht.Add("visit", subjObs.Visit);
+                                if (!ht.ContainsKey("timepoint")) ht.Add("timepoint", subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name);
+                                if (!ht.ContainsKey("study")) ht.Add("study", subjObs.StudyId);
+                                
+                            }
+                            rows.Add(ht);
+                        }
                     }
+                    #endregion
 
-                    //
+                    #region Add Adverse Events
+                    //ADD Adverse Events
                     if (subjAdverseEvents.Count != 0)
                     {
-                        var subjAE = adverseEventsBySubject.SingleOrDefault(a => a.Key.Equals(subjId)); //this will contain a list of AEs
-                        if(subjAE != null)
+                        var subjAEs = adverseEventsBySubject.SingleOrDefault(a => a.Key.Equals(subject.SubjId)); //this will contain a list of AEs
+                        if (subjAEs != null)
                             //The current subject has values for the adverse events queried
                             
-                            foreach (var ae in subjAE)
+                            foreach (var subjAE in subjAEs)
                             {
-                                if(requestObservations.Keys.Contains(ae.Name))
-                                    if (!ht.ContainsKey(ae.Name)) ht.Add(ae.Name, "Yes");
-                                    else {
-                                        foreach (var reqObs in requestObservations)
+                                //List<Hashtable> hts;
+                                string aeName = subjAE.Name.ToLower();
+                                if (requestObservations.Keys.Contains(aeName))
+                                {
+                                    #region An Adverse Event Observation
+                                    //This is an individual AE Term selected by the user
+                                    if (rows.Count>0){
+                                        //rows for this subject have been created before for a number of findings
+                                        foreach (var ht in rows)
                                         {
-                                            string obs = reqObs.Key;
-                                            List<int> obsIds = reqObs.Value;
-                                            int subjObsId = observations.SingleOrDefault(
-                                                o => o.Name.Equals(ae.Name)).Id;
-                                            if (obsIds.Contains(subjObsId))
-                                            {
-                                                if (!ht.ContainsKey(obs)) ht.Add(obs, "Yes");
-                                            }
+                                            if (!ht.ContainsKey(aeName)) ht.Add(aeName, "Yes");
+                                            if (!ht.ContainsKey(aeName+" sev")){
+                                                string defVariable = observations.Find(o => o.Name.Equals(subjAE.Name)).DefaultQualifier.Name;
+                                                ht.Add(aeName+ " sev", subjAE.qualifiers.SingleOrDefault(q => q.Key.Equals(defVariable)).Value);
+                                                
+                                            } 
+                                                
+                                        }
+                                    }
+                                    else
+                                    {
+                                       //no rows for this subject has been created before (in the case of no findings selected)
+   
+                                        Hashtable ht = new Hashtable();
+                                        ht.Add(aeName, "Yes");
+                                        if (!ht.ContainsKey(aeName + " sev"))
+                                        {
+                                            string defVariable = observations.Find(o => o.Name.Equals(subjAE.Name)).DefaultQualifier.Name;
+                                            ht.Add(aeName + " sev", subjAE.qualifiers.SingleOrDefault(q => q.Key.Equals(defVariable)).Value);
 
+                                        } 
+                                        ht.Add("subjectId", subject.SubjId);
+                                        rows.Add(ht);
+                                    }
+                                    
+                                    
+                                }
+                                #endregion
+                                else
+                                {
+                                    //Not selected by the user, but could be an AE belonging to a medDRA group selected by the user
+                                    foreach (var reqObs in requestObservations)
+                                    {
+                                        string reqObsName = reqObs.Key.ToLower();
+                                        List<int> reqObsIds = reqObs.Value;
+
+                                        //Get the Observation Id of the current ae
+                                        //If it is in the list of ids of this requestedObsName (i.e. MedDRA group)
+                                        //then add the group to ht
+                                        int subjObsId = observations.SingleOrDefault(
+                                            o => o.Name.ToLower().Equals(aeName)).Id;
+                                        if (reqObsIds.Contains(subjObsId))
+                                        {
+                                            if (rows.Count!=0){
+                                                foreach (var ht in rows)
+                                                {
+                                                    if (!ht.ContainsKey(reqObsName)) ht.Add(reqObsName, "Yes");
+                                                }
+                                            }
+                                            else{
+                                                Hashtable ht = new Hashtable();
+                                                ht.Add(reqObsName, "Yes");
+                                                rows.Add(ht);
+                                            }
+                                            
                                         }
 
                                     }
+
+                                }
+                            }
+                    }
+                    #endregion
+
+                    if (rows.Count == 0)
+                    {
+                        Hashtable ht = new Hashtable();
+                        rows.Add(ht);
+                    }
+                        
+                    #region Fill in nulls and Nos
+                    foreach (var ht in rows)
+                    {
+                        if (!ht.ContainsKey("subjectId")) ht.Add("subjectId", subject.SubjId);
+                        if (!ht.ContainsKey("arm")) ht.Add("arm", subject.ArmCode);
+                        if (!ht.ContainsKey("site")) ht.Add("site", subject.Site);
+                        foreach (string obsReq in requestObservations.Keys)
+                        {
+                            if (!ht.ContainsKey(obsReq.ToLower()))
+                            {
+                                //If obs was requested and was not added to the ht so far
+                                var obs = observations.SingleOrDefault(o => o.Name.ToLower().Equals(obsReq.ToLower()));
+                                
+                                if (obs != null)
+                                {
+                                    //This is an individual observation AE or Findings
+                                    var obsName = obs.Name.ToLower();
+                                    if (obs.DomainCode.Equals("AE"))
+                                        ht.Add(obsName, "NO");
+                                    else
+                                        ht.Add(obsName, null);
+                                }
+                                else
+                                    //This is a group and this subject has no occurence for all its descendent observations
+                                    ht.Add(obsReq.ToLower(), "NO");
+                            }
+                        }
+                    }
+                    
+                    #endregion
+
+                    
+                    //Think about not adding hts that have no values for any of the requested observations
+                    dataMatrix.AddRange(rows);
+
+                }
+                
+                //foreach (var group in FindingsBySubject)
+                //{
+                //    string key = group.Key.ToString();
+                //    string subjId = group.Key.subjId;
+
+                //    Hashtable ht = new Hashtable();
+                //    //adding Findings
+                //    foreach (var subjObs in group)
+                //    {
+                //        //check if default qualifier is avaialable
+                //        //if( observations.Find(o => o.Name.Equals(subjObs.Name)).DefaultQualifierId != null)
+
+                //        string defVariable = observations.Find(o => o.Name.Equals(subjObs.Name)).DefaultQualifier.Name;
+                //        if (!ht.ContainsKey("SubjectId")) ht.Add("SubjectId", subjObs.SubjectId);
+                //        ht.Add(subjObs.Name.ToLower(), subjObs.qualifiers.SingleOrDefault(q => q.Key.Equals(defVariable)).Value);
+                //        if (!ht.ContainsKey("Visit")) ht.Add("Visit", subjObs.Visit);
+                //        if (!ht.ContainsKey("Timepoint")) ht.Add("Timepoint", subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name);
+                //        if (!ht.ContainsKey("study")) ht.Add("study", subjObs.StudyId);
+                //        if (!ht.ContainsKey("arm")) ht.Add("arm", subjO);
+                //    }
+
+                //    //
+                //    if (subjAdverseEvents.Count != 0)
+                //    {
+                //        var subjAE = adverseEventsBySubject.SingleOrDefault(a => a.Key.Equals(subjId)); //this will contain a list of AEs
+                //        if(subjAE != null)
+                //            //The current subject has values for the adverse events queried
+                            
+                //            foreach (var ae in subjAE)
+                //            {
+                //                string obsName = ae.Name.ToLower();
+                //                if (requestObservations.Keys.Contains(obsName))
+                //                {
+                //                    if (!ht.ContainsKey(ae.Name)) ht.Add(obsName, "Yes");
+                //                }
+                //                else {
+                //                        foreach (var reqObs in requestObservations)
+                //                        {
+                //                            string obs = reqObs.Key;
+                //                            List<int> obsIds = reqObs.Value;
+
+                //                            int subjObsId = observations.SingleOrDefault(
+                //                                o => o.Name.ToLower().Equals(obsName)).Id;
+                //                            if (obsIds.Contains(subjObsId))
+                //                            {
+                //                                if (!ht.ContainsKey(obs)) ht.Add(obs, "Yes");
+                //                            }
+
+                //                        }
+
+                //                    }
                                 
                                
                                 
-                            }
-                    }
+                //            }
+                //    }
+
+
+
                     
-
-        
-                    foreach (var obs in observations)
-                    {
-                        if (!ht.ContainsKey(obs.Name))
-                            if(obs.DomainCode.Equals("AE"))
-                                 ht.Add(obs.Name, "NO");
-                            else
-                                ht.Add(obs.Name, null);
-                    }
-
-                    dataMatrix.Add(ht);
-                }
+                
             }
             catch (Exception e)
             {
                 Debug.WriteLine("Error while generating data matrix: "+ e.Message);
             }
-            
+#endregion
+            List<string> columns = dataMatrix.ElementAt(0).Keys.Cast<string>().ToList();
 
-            return dataMatrix;
+            Hashtable result = new Hashtable();
+            result.Add("data", dataMatrix);
+            result.Add("columns", columns);
+            return result;
         }
 
         private async Task<List<MedDRAGroupNode>> getEventsByMedDRA(int projectId, List<Observation> observations)
@@ -268,7 +469,7 @@ namespace eTRIKS.Commons.Service.Services
                     Variable = "AESOC",
                     Code = SOCs.FirstOrDefault().qualifiers.SingleOrDefault(q => q.Key.Equals("AESOCCD")).Value,
                     Name = "SO: "+SOCs.Key.ToLowerInvariant(),
-                    GroupTerm = SOCs.Key,
+                    GroupTerm = SOCs.Key.ToLower(),
                     TermIds = (from ae in SOCs
                                select observations.Find(o => o.Name.Equals(ae.Name)).Id).ToList<int>(),
                     Count = SOCs.Count(),
@@ -279,7 +480,7 @@ namespace eTRIKS.Commons.Service.Services
                         {
                             Variable = "AEHLGT",
                             Code = HLGTs.FirstOrDefault().qualifiers.SingleOrDefault(q => q.Key.Equals("AEHLGTCD")).Value,
-                            GroupTerm = HLGTs.Key,
+                            GroupTerm = HLGTs.Key.ToLower(),
                             Name = "HLG: "+HLGTs.Key.ToLower(),
                             Count = HLGTs.Count(),
                             TermIds = (from ae in HLGTs
@@ -291,7 +492,7 @@ namespace eTRIKS.Commons.Service.Services
                                 {
                                     Variable = "AEHLT",
                                     Code = HLTs.FirstOrDefault().qualifiers.SingleOrDefault(q => q.Key.Equals("AEHLTCD")).Value,
-                                    GroupTerm = HLTs.Key,
+                                    GroupTerm = HLTs.Key.ToLower(),
                                     Name = "HLT: "+HLTs.Key.ToLower(),
                                     Count = HLTs.Count(),
                                     TermIds = (from ae in HLTs
@@ -303,7 +504,7 @@ namespace eTRIKS.Commons.Service.Services
                                         {
                                             Variable = "AEDECOD",
                                             Code = PTs.FirstOrDefault().qualifiers.SingleOrDefault(q => q.Key.Equals("AEPTCD")).Value,
-                                            GroupTerm = PTs.Key,
+                                            GroupTerm = PTs.Key.ToLower(),
                                             Name = "PT: "+PTs.Key.ToLower(),
                                             Count = PTs.Count(),
                                             TermIds = (from ae in PTs
@@ -321,6 +522,7 @@ namespace eTRIKS.Commons.Service.Services
                                                     from ae in PTs //TERMs
                                                     select new MedDRATermNode { 
                                                         Name = ae.Name,
+                                                        Code = observations.FirstOrDefault(o => o.Name.Equals(ae.Name)).ControlledTermStr.ToLower(),
                                                         Id = observations.FirstOrDefault(o => o.Name.Equals(ae.Name)).Id }
                                             ).Distinct().ToList<GenericNode>()
                                                 //}
@@ -370,7 +572,7 @@ namespace eTRIKS.Commons.Service.Services
             {
                 ht = new Hashtable();
                 ht.Add("subjectId", subjData.SubjId);
-                ht.Add("arm", subjData.Arm);
+                ht.Add("arm", subjData.ArmCode);
                 ht.Add("study", subjData.StudyId);
                 ht.Add("site", subjData.Site);
                 

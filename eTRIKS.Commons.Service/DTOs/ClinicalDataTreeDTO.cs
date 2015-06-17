@@ -26,6 +26,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Domain;
         public string code;
         public List<GenericNode> Terms;
+        public int Count;
         public DomainNode()
         {
             Terms = new List<GenericNode>();

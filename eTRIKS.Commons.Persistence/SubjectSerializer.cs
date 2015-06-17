@@ -43,7 +43,7 @@ namespace eTRIKS.Commons.Persistence
                             subject.Site= reader.ReadString();
                             break;
                         case "ARMCD":
-                            subject.Arm = reader.ReadString();
+                            subject.ArmCode = reader.ReadString();
                             break;
                         case "RFSTDTC":
                             string dateStr_s = reader.ReadString();

@@ -32,5 +32,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
            //return  _observationService.test();
            // return _observationService.loadTest();
         }
+
+        [HttpGet]
+        [Route("api/projects/{projectId}/observations")]
+        public void getObsInventory(string projectId)
+        {
+            _observationService.getObservationInventory(projectId);
+        }
     }
 }

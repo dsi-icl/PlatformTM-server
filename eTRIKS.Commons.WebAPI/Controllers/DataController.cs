@@ -54,7 +54,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/studies/{studyId}/data/clinical/observations")]
-        public async Task<List<Hashtable>> getObservations(string studyId, [FromBody] List<int> observations)
+        public async Task<Hashtable> getObservations(string studyId, [FromBody] Hashtable observations)
         {
             return await _dataService.getObservationsData(studyId, observations);
         }

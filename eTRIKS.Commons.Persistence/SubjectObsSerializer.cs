@@ -199,6 +199,12 @@ namespace eTRIKS.Commons.Persistence
                 case "Name":
                     serializationInfo = DynamicMappers.First(d => d.Key.Equals(memberName)).Value;
                     return true;
+                case "Class":
+                    serializationInfo = DynamicMappers.First(d => d.Key.Equals(memberName)).Value;
+                    return true;
+                case "Group":
+                    serializationInfo = DynamicMappers.First(d => d.Key.Equals(memberName)).Value;
+                    return true;
                 default:
                     serializationInfo = null;
                     return false;

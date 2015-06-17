@@ -3,7 +3,9 @@ using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.DataAccess.MongoDB;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -107,7 +109,7 @@ namespace eTRIKS.Commons.Service.Services
 
                     qualifiers = ds.Variables
                         .Select(l => l.VariableDefinition)
-                        .Where(v => v.RoleId == "CL-Role-T-3")
+                        .Where(v => v.RoleId == "CL-Role-T-3" || v.RoleId == "CL-Role-T-8")
                         .ToList();
 
                     timings = ds.Variables
@@ -236,24 +238,39 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        //public async Task<List<SubjectObservation>> test()
-        //{
-        //    List<SubjectObservation> md;
-        //    return md = await _subjObsRepository.FindAllAsync(x => true);
-           
-        //}
+        public void getObservationInventory(string projectId)
+        {
+            List<Hashtable> table = new List<Hashtable>();
+            Hashtable ht;
+            string studyId = "STD-BVS-01";
+            List<Observation> studyObservations =
+                _ObservationRepository.FindAll(
+                    x => x.Studies.Select(s => s.Id).Contains(studyId),
+                    new List<Expression<Func<Observation, object>>>()
+                    {
+                        d=>d.TopicVariable,
+                        d => d.Timings,
+                        d => d.Qualifiers,
+                        d => d.DefaultQualifier
+                    }
+                    ).ToList();
 
-
- 
-
-        //public async Task loadTest()
-        //{
-        //    SubjectObservation subjOb = new SubjectObservation();
-        //    subjOb.DomainCode = "VS";
-        //    subjOb.Class = "Findings";
-        //    //subjOb.Id = Guid.NewGuid();
-        //    await _subjObsRepository.InsertAsync(subjOb);
-        //}
+            foreach (var obs in studyObservations)
+            {
+                //ht = new Hashtable();
+                //ht.Add("Name", obs.Name);
+                Debug.WriteLine("Name: "+obs.Name);
+                foreach (var qualifier in obs.Qualifiers)
+                {
+                    Debug.WriteLine("Qualifier: " + qualifier.Label);
+                }
+                foreach (var timingVar in obs.Timings)
+                {
+                    Debug.WriteLine("Timing Variable: " + timingVar.Label);
+                }
+                Debug.WriteLine("**********************");
+            }
+        }
         private VariableDefinition getVarDef(string name)
         {
             return _variableRepository.FindSingle(d => d.Name.Equals(name));
