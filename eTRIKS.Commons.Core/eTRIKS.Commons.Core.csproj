@@ -41,7 +41,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Application\Services\MapperHelper.cs" />
+    <Compile Include="Application\Services\UserAuthentication\IUserDbContext.cs" />
+    <Compile Include="Application\Services\UserAuthentication\UserModel.cs" />
+    <Compile Include="Domain\Interfaces\IUserRepository.cs" />
     <Compile Include="Domain\Model\Activity.cs" />
+    <Compile Include="Domain\Model\Assay.cs" />
+    <Compile Include="Domain\Model\Biospecimen.cs" />
     <Compile Include="Domain\Model\ControlledTerminology\CVterm.cs" />
     <Compile Include="Domain\Model\ControlledTerminology\DB.cs" />
     <Compile Include="Domain\Model\ControlledTerminology\Dbxref.cs" />
@@ -78,6 +83,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

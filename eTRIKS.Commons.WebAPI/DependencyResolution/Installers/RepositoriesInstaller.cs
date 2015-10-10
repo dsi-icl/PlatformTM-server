@@ -6,6 +6,9 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Persistence;
 using eTRIKS.Commons.DataParser.IOFileManagement;
 using eTRIKS.Commons.DataAccess.MongoDB;
+using Microsoft.AspNet.Identity.EntityFramework;
+using eTRIKS.Commons.DataAccess.UserManagement;
+using eTRIKS.Commons.DataAccess;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 {
@@ -17,7 +20,8 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
             container.Register(
 
                 //TODO: remove EF and Persistence dependencies
-                Component.For<DbContext, IServiceUoW>()
+                
+                Component.For<IdentityDbContext<ApplicationUser>, IServiceUoW>()
                     .ImplementedBy<etriksDataContext_prod>(),
 
                 Component.For<FileHandler>(),
@@ -29,9 +33,17 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                     .BasedOn(typeof(IRepository<,>))
                     .WithServiceDefaultInterfaces(),
 
+                    Component.For<IUserRepository<ApplicationUser>>().ImplementedBy<UserAuthRepository<ApplicationUser>>(),
+
                 Classes
                      .FromAssemblyNamed("eTRIKS.Commons.Service")
                      .InNamespace("eTRIKS.Commons.Service.Services")
+                     .WithServiceSelf()
+                     .WithServiceDefaultInterfaces(),
+
+                Classes
+                     .FromAssemblyNamed("eTRIKS.Commons.Service")
+                     .InNamespace("eTRIKS.Commons.Service.Services.UserServices")
                      .WithServiceSelf()
                      .WithServiceDefaultInterfaces());
 

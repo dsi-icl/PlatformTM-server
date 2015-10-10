@@ -11,6 +11,7 @@ using System.Web.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Authorize]
     public class DataVisulaiserController : ApiController
     {
         private DataService _dataService;

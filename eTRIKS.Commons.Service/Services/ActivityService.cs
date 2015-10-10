@@ -111,7 +111,8 @@ namespace eTRIKS.Commons.Service.Services
                 datasets = p.Datasets.Select(m => new DatasetBriefDTO
                 {
                     Name = m.Domain.Name,
-                    Id = m.Id
+                    Id = m.Id,
+                    DomainId = m.DomainId
                 }).ToList()
             }).ToList();
         }

@@ -27,7 +27,11 @@ namespace eTRIKS.Commons.Persistence {
             _disposed = false;
         }
 
-        
+
+        public IUserRepository<TEntity> GetUserRepository<TEntity>()
+        {
+            throw new NotImplementedException();
+        }
 
         public IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>() 
             where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey> {

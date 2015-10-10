@@ -14,11 +14,14 @@ namespace eTRIKS.Commons.Core.Domain.Model
         
         public string Name { get; set; } //BMI
         public string ControlledTermStr { get; set; }
-        public CVterm ControlledTerm { get; set; }
+        public CVterm ControlledTerm { get; set; } 
         public String ControlledTermId { get; set; }
         public string DomainCode { get; set; } //VS
         public string DomainName { get; set; } //Vital Signs
-        public VariableDefinition TopicVariable { get; set; } //VSTESTCD
+
+        //TODO: should be changed to a reference to the Observation 
+        //or replaced by an "Observation Identity" variable to represent the OBJECT of Observation
+        public VariableDefinition TopicVariable { get; set; } //VSTESTCD //
         public int TopicVariableId { get; set; }
         public string Class { get; set; } //Findings
         public string Group { get; set; } //null //shuold be variable not string?

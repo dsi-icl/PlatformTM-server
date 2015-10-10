@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper;
 using eTRIKS.Commons.Core.Domain.Model;
 using System.Reflection;
 using System.Configuration;
@@ -17,6 +18,16 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
 {
     public class IOUtility
     {
+        public string[] getFileHeader(string filePath)
+        {
+            StreamReader reader = File.OpenText(filePath);
+
+            var parser = new CsvParser(reader);
+            string[] header = parser.Read();
+            return header;
+
+        }
+
         public List<string> getDataSourceColumns(string dataSource)
         {
              //
@@ -119,7 +130,7 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                                                "; Extended Properties = \"text;HDR=YES;IMEX=1;FMT=Delimited;\"");
             connection.Open();
             OleDbDataAdapter adapter = new OleDbDataAdapter("SELECT " + mapping + " FROM " + fileName, connection);
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             adapter.Fill(ds);
             connection.Close();
             return ds;

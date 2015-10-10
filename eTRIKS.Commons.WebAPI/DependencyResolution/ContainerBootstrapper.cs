@@ -5,6 +5,8 @@ using System.Web.Mvc;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
 using eTRIKS.Commons.WebAPI.DependencyResolution.Plumbing;
+using System.Collections.Generic;
+using System.Web.Http.Dependencies;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution
 {
@@ -22,7 +24,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
             get { return _container; }
         }
 
-        public static ContainerBootstrapper Bootstrap()
+        public static ContainerBootstrapper Bootstrap(HttpConfiguration HttpConfiguration)
         {
             
             
@@ -31,7 +33,13 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
 
             ControllerBuilder.Current.SetControllerFactory(new WindsorControllerFactory(container));
 
-            GlobalConfiguration.Configuration.Services.Replace(typeof(IHttpControllerActivator),
+            //var httpDependencyResolver = new WindsorHttpDependencyResolver(container);
+
+           // GlobalConfiguration.Configuration.Services.Replace.ServiceResolver.SetResolver(
+            //        serviceType => container.Resolve(serviceType),
+            //        serviceType => container.ResolveAll(serviceType).Cast<object>());
+
+            HttpConfiguration.Services.Replace(typeof(IHttpControllerActivator),
                 new WindsorControllerFactory(container));
 
 
@@ -45,4 +53,40 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
             Container.Dispose();
         }
     }
+
+    //internal sealed class WindsorHttpDependencyResolver : IDependencyResolver
+    //{
+    //    private readonly IWindsorContainer _container;
+
+    //    public WindsorHttpDependencyResolver(IWindsorContainer container)
+    //    {
+    //        if (container == null)
+    //        {
+    //            throw new ArgumentNullException("container");
+    //        }
+
+    //        _container = container;
+    //    }
+
+    //    public object GetService(Type t)
+    //    {
+    //        return _container.Kernel.HasComponent(t)
+    //         ? _container.Resolve(t) : null;
+    //    }
+
+    //    public IEnumerable<object> GetServices(Type t)
+    //    {
+    //        return _container.ResolveAll(t)
+    //        .Cast<object>().ToArray();
+    //    }
+
+    //    public IDependencyScope BeginScope()
+    //    {
+    //        return new WindsorDependencyScope(_container);
+    //    }
+
+    //    public void Dispose()
+    //    {
+    //    }
+    //}
 }

@@ -26,5 +26,6 @@ namespace eTRIKS.Commons.Service.DTOs
     {
         public string Name { get; set; }
         public int Id { get; set; }
+        public string DomainId {get; set; }
     }
 }

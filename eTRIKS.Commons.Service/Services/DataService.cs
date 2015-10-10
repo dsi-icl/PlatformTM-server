@@ -51,6 +51,8 @@ namespace eTRIKS.Commons.Service.Services
             List<Observation> studyObservations =
                 _observationRepository.FindAll(x => x.Studies.Select(s => s.Id).Contains(studyId)).ToList();
             //_observationRepository.FindAll(x => x.Studies.Select(s => s.ProjectId).Equals(projectId)).ToList();
+
+           
             
 
             List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
@@ -231,8 +233,8 @@ namespace eTRIKS.Commons.Service.Services
                         
                         foreach (var groupOfSubjFindings in subjFindings)//Visit,TimePoint
                         {
-                            Hashtable ht = new Hashtable();
-                            //adding Findings
+                            Hashtable ht = new Hashtable(); //creating a new row for each visit/timepoint instance 
+                            //adding Findings in the same visit and timepoint to the same row 
                             foreach (var subjObs in groupOfSubjFindings)
                             {
                                 if (!ht.ContainsKey("subjectId")) ht.Add("subjectId", subject.SubjId);
@@ -446,7 +448,7 @@ namespace eTRIKS.Commons.Service.Services
 
             Hashtable result = new Hashtable();
             result.Add("data", dataMatrix);
-            result.Add("columns", columns);
+            result.Add("header", columns);
             return result;
         }
 
@@ -588,7 +590,7 @@ namespace eTRIKS.Commons.Service.Services
             }
 
             Hashtable returnObject = new Hashtable();
-            returnObject.Add("scs", SCs);
+            returnObject.Add("header", SCs);
             returnObject.Add("data", subject_table);
 
             return returnObject;

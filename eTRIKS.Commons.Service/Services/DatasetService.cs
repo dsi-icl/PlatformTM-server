@@ -276,6 +276,32 @@ namespace eTRIKS.Commons.Service.Services
            return _variableDefinitionRepository.FindAll(d => d.StudyId.Equals(studyId));
         }
 
+        public  IEnumerable<DataTemplateMap> GeTemplateMaps(int datasetId)
+        {
+            
+            DataTemplateMap map = new DataTemplateMap();
+
+            Dataset ds = _datasetRepository.FindSingle(
+                d => d.Id.Equals(datasetId),
+                new List<Expression<Func<Dataset, object>>>(){
+                        d => d.Variables.Select(t => t.VariableDefinition),
+                        d => d.Domain.Variables.Select(t => t.Role),
+                        d => d.Activity
+                });
+
+            map.Domain = ds.Domain.Name;
+            map.TopicColumns = new List<string>();
+            map.ObservationName = ds.Domain.Name.Substring(0, ds.Domain.Name.Length-1);
+
+            foreach (var vtg in ds.Domain.Variables.GroupBy(v => v.Role.Name))
+            {
+                Console.Out.WriteLine(vtg.Key);
+            }
+
+
+            return null;
+        }
+        
         private static readonly Expression<Func<DomainTemplate, DatasetDTO>> AsDatasetDto =
             x => new DatasetDTO
             {

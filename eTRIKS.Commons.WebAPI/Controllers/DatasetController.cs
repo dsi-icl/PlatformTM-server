@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Web.Http;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 
@@ -82,5 +83,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public void Delete(int id)
         {
         }
-    }
+
+        [HttpGet]
+        [Route("api/Dataset/{datasetId}/templateMap")]
+        public IEnumerable<DataTemplateMap> getDatasetTemplateMap(int datasetId)
+        {
+            return  _datasetService.GeTemplateMaps(datasetId);
+        }
+        }
 }

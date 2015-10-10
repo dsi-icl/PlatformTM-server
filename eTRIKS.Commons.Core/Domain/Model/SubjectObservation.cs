@@ -12,7 +12,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
     {
         public string SubjectId { get; set; }
         public string StudyId { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; }// should be the Object of Observation entity with and id ...etc
         public string Class { get; set; } //Findings
         public string DomainCode { get; set; }
         public string DomainName { get; set; }
@@ -20,7 +20,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Subgroup { get; set; } //null 
         public string Visit { get; set; }
         public int VisitNum { get; set; }
-        public Dictionary<string, string> qualifiers { get; set; }
+        public Dictionary<string, string> qualifiers { get; set; } //  That becomes an array of maps
         public Dictionary<string, string> timings { get; set; }
         public AbsoluteTimePoint ObDateTime { get; set; } //Date of Collection / --DTC
         public RelativeTimePoint ObsStudyDay { get; set; } //--DY

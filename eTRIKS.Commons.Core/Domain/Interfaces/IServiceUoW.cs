@@ -10,5 +10,9 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
             where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>;
 
         void AddClassMap(string fieldname, string propertyName);
+
+
+        IUserRepository<TEntity> GetUserRepository<TEntity>();
+
     }
 }

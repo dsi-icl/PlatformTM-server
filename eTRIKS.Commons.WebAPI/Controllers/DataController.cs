@@ -13,6 +13,7 @@ using eTRIKS.Commons.Service.DTOs;
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     //[RoutePrefix("api/studies")]
+    [Authorize]
     public class DataController : ApiController
     {
         private DataService _dataService;
