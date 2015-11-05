@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,20 @@ namespace eTRIKS.Commons.Service.DTOs
     {
         public string Domain { get; set; }
         public string ObservationName { get; set; }
-        public Dictionary<string,List<VariableMap>> VarTypes{ get; set; }
+        //public List<Dictionary<string,List<VariableMap>>> VarTypes{ get; set; }
+        public List<VariableType> VarTypes { get; set; } 
         public List<string> TopicColumns { get; set; }
 
+        public DataTemplateMap()
+        {
+            TopicColumns = new List<string>(){"1"};
+        }
+
+        public class VariableType
+        {
+            public string name { get; set; }
+            public List<VariableMap> vars { get; set; }
+        }
 
         public class VariableMap
         {

@@ -16,7 +16,7 @@ using eTRIKS.Commons.DataAccess.UserManagement;
 namespace eTRIKS.Commons.Persistence {
 
     [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
-    public class etriksDataContext_prod : DbContext, IServiceUoW
+    public class etriksUserContext_prod : IdentityDbContext<ApplicationUser>, IServiceUoW 
     {
         //private readonly IDataContext _dataContext;
 
@@ -24,16 +24,16 @@ namespace eTRIKS.Commons.Persistence {
         private IUserRepository<ApplicationUser> userAuthRepository;
         private bool _disposed;
 
-        public etriksDataContext_prod() : base("name=eTRIKScontext_MySQL")
+        public etriksUserContext_prod() : base("name=eTRIKScontext_MySQL")
         {
             //_dataContext = context;
             Configuration.ProxyCreationEnabled = false;
-            Database.SetInitializer<etriksDataContext_prod>(null);
+            Database.SetInitializer<etriksUserContext_prod>(null);
 
             DbConfiguration.SetConfiguration(new MySql.Data.Entity.MySqlEFConfiguration());
 
-            BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
-            BsonSerializer.RegisterSerializer(typeof(Subject), new SubjectSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(Subject), new SubjectSerializer());
 
             //INITIALIZE ApplicationUserManager and expose it via a method similar to other repositories 
             //ApplicationUserManager.Create();
@@ -51,19 +51,19 @@ namespace eTRIKS.Commons.Persistence {
 
         public void AddClassMap(string fieldname, string propertyName)
         {
-            BsonSerializationInfo info = new BsonSerializationInfo(fieldname, new StringSerializer(), typeof(string));
-            SubjectObsSerializer.DynamicMappers.Remove(propertyName);
-            SubjectObsSerializer.DynamicMappers.Add(propertyName, info);
+            throw new NotImplementedException();
+            //BsonSerializationInfo info = new BsonSerializationInfo(fieldname, new StringSerializer(), typeof(string));
+            //SubjectObsSerializer.DynamicMappers.Remove(propertyName);
+            //SubjectObsSerializer.DynamicMappers.Add(propertyName, info);
         }
 
-        public IUserRepository<TEntity> GetUserRepository<TEntity>()
+        public IUserRepository<TEntity> GetUserRepository<TEntity>() 
         {
-            throw new NotImplementedException();
-            //if (userAuthRepository == null)
-            //{
-            //    userAuthRepository = new UserAuthRepository<TEntity>(this);
-            //}
-            //return userAuthRepository as IUserRepository<TEntity>;
+            if (userAuthRepository == null)
+            {
+                userAuthRepository = new UserAuthRepository<TEntity>(this);
+            }
+            return userAuthRepository as IUserRepository<TEntity>;
         }
 
         public IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>() 
@@ -97,9 +97,8 @@ namespace eTRIKS.Commons.Persistence {
                 return MongoRepository;
             }
             
-
-            //var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
-            var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
+            TODO://UPDATE USER WILL FAIL
+            var repository = new GenericRepository<TEntity, TPrimaryKey>(base.Set<TEntity>());
 
             // Add it to the dictionary
             _repositories.Add(typeof(TEntity), repository);
@@ -145,11 +144,11 @@ namespace eTRIKS.Commons.Persistence {
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.Entity<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>()
-            //.Property(c => c.Name).HasMaxLength(128).IsRequired();
+            modelBuilder.Entity<Microsoft.AspNet.Identity.EntityFramework.IdentityRole>()
+            .Property(c => c.Name).HasMaxLength(128).IsRequired();
 
-            //modelBuilder.Entity<Microsoft.AspNet.Identity.EntityFramework.IdentityUser>().ToTable("AspNetUsers")
-            //    .Property(c => c.UserName).HasMaxLength(128).IsRequired();
+            modelBuilder.Entity<Microsoft.AspNet.Identity.EntityFramework.IdentityUser>().ToTable("AspNetUsers")
+                .Property(c => c.UserName).HasMaxLength(128).IsRequired();
 
             modelBuilder.Configurations.Add(new DomainTemplateMap());
             modelBuilder.Configurations.Add(new DomainVariableTemplateMap());

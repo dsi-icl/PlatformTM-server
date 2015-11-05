@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="etriksDataContext_dev.cs" />
     <Compile Include="AuthContext.cs" />
+    <Compile Include="etriksUserContext_prod.cs" />
     <Compile Include="Mapping\ProjectMap.cs" />
     <Compile Include="Mapping\ObservationMap.cs" />
     <Compile Include="Mapping\DatasetMap.cs" />
@@ -144,6 +145,10 @@
     <Compile Include="Migrations_prod\201509081818235_AddUserTables.Designer.cs">
       <DependentUpon>201509081818235_AddUserTables.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_prod\201510120741451_updateDatasetTBL.cs" />
+    <Compile Include="Migrations_prod\201510120741451_updateDatasetTBL.Designer.cs">
+      <DependentUpon>201510120741451_updateDatasetTBL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_prod\Configuration.cs" />
     <Compile Include="SubjectSerializer.cs" />
     <Compile Include="SubjectObsSerializer.cs" />
@@ -203,6 +208,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201509081818235_AddUserTables.resx">
       <DependentUpon>201509081818235_AddUserTables.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201510120741451_updateDatasetTBL.resx">
+      <DependentUpon>201510120741451_updateDatasetTBL.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

@@ -1,4 +1,7 @@
-﻿using eTRIKS.Commons.Service.DTOs;
+﻿using System.Collections;
+using System.Configuration;
+using System.Data;
+using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using System;
 using System.Collections.Generic;
@@ -25,15 +28,18 @@ namespace eTRIKS.Commons.WebAPI.Controllers
        
 
         [HttpPost]
-        [Route("upload")]
-        public async Task<List<string>> LoadFile()
+        [Route("study/{studyId}/upload")]
+        public async Task<List<string>> UploadFile(string studyId)
         {
             try
             {
-                string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
+                //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
+                string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+                string path = rawFilesDirectory + studyId;
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 if (Request.Content.IsMimeMultipartContent())
                 {
-                    var streamProvider = new StreamProvider(PATH);
+                    var streamProvider = new StreamProvider(path);
                     await Request.Content.ReadAsMultipartAsync(streamProvider);
                     List<string> messages = new List<string>();
                     foreach (var file in streamProvider.FileData)
@@ -57,33 +63,28 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("uploadedFiles")]
-        public async Task<List<FileDTO>> GetUploadedFiles()
+        [Route("study/{studyId}/uploadedFiles")]
+        public async Task<List<FileDTO>> GetUploadedFiles(string studyId)
         {
-            string path = HttpContext.Current.Server.MapPath("~/App_Data");
-            
-            //List<string> files = Directory.GetFiles(PATH).ToList<string>();
+            string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+            string path = rawFilesDirectory + studyId;
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 
             return _fileService.getUploadedFiles(path);
         }
 
-        [HttpGet]
-        [Route("{fileName}/fileHeader")]
-        public async Task<List<Dictionary<string, string>>> LinkFile(string fileName)
-        {
+        //[HttpGet]
+        //[Route("{fileName}/fileHeader")]
+        //public async Task<List<Dictionary<string, string>>> LinkFile(string fileName)
+        //{
 
-            string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-            string filePath = PATH + "\\" + fileName;
-            return _fileService.getFileColHeaders(filePath);
-        }
+        //    //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
+        //    var rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+        //    string path = rawFilesDirectory + studyId;
+        //    string filePath = rawFilesDirectory + "\\" + fileName;
+        //    return _fileService.getFileColHeaders(filePath);
+        //}
 
-        [HttpGet]
-        [Route("transform")]
-        public async Task<string> transform(string fileName, [FromBody] DataTemplateMap dataTemplateMap)
-        {
-            string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-            string filePath = PATH + "\\" + fileName;
-            return _fileService.transformFile(filePath,dataTemplateMap);
-        }
+        
     }
 }

@@ -24,6 +24,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Study Study { get; set; }
         public string StudyId { get; set; }
         public List<VariableDefinition> VariableQualifiers { get; set; }
+        //public List<VariableDefinition> Synonyms { get; set; } 
 
         //public DerivedMethod DerivedVariableProperties { get; set; }
         //public string DerivedVariablePropertiesId { get; set; }

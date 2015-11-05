@@ -20,7 +20,7 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class DataService
     {
-        private IRepository<Project, int> _projectRepository;
+        private IRepository<Study, string> _studyRepository;
         private IRepository<Observation, int> _observationRepository;
         private IRepository<Subject, Guid> _subjectRepository;
         //private IRepository<SubjectCharacteristic, int> _subjCharacterisitcRepository;
@@ -32,6 +32,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             _dataContext = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
+            _studyRepository = uoW.GetRepository<Study, string>();
             //_dataSetRepository = uoW.GetRepository<Dataset, int>();
             _observationRepository = uoW.GetRepository<Observation, int>();
             _subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
@@ -41,16 +42,21 @@ namespace eTRIKS.Commons.Service.Services
         }
 
 
-        public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalObsTree(int projectId)
+        public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalObsTree(string projectAccession)
         {
 
             //Should change to reflect multiple studies for project
             //Either change the observations in the database to be associated with project and not study 
             //or query here for 
-            string studyId = "STD-BVS-01";
+            //string studyId = "STD-BVS-01";
             List<Observation> studyObservations =
-                _observationRepository.FindAll(x => x.Studies.Select(s => s.Id).Contains(studyId)).ToList();
-            //_observationRepository.FindAll(x => x.Studies.Select(s => s.ProjectId).Equals(projectId)).ToList();
+            //    _observationRepository.FindAll(x => x.Studies.Select(s => s.Id).Contains(studyId)).ToList();
+            _observationRepository.FindAll(
+                x => x.Studies.Select(s => s.Project.Accession).Contains(projectAccession),
+                new List<Expression<Func<Observation, object>>>(){
+                        d => d.Studies.Select(s => s.Project)
+                    }
+                ).ToList();
 
            
             
@@ -82,7 +88,7 @@ namespace eTRIKS.Commons.Service.Services
                    
                    if (domainNode.code.Equals("AE"))
                    {
-                       List<MedDRAGroupNode> AEs = await getEventsByMedDRA(projectId, studyObservations);
+                       List<MedDRAGroupNode> AEs = await getEventsByMedDRA(1, studyObservations);
                        
                        domainNode.Terms.AddRange(AEs);
                        continue;
@@ -545,7 +551,7 @@ namespace eTRIKS.Commons.Service.Services
             List<Observation> subjCharacteristics = null;
             //Get Requested (If any) subject characteristics (Observations)
             if(subjCharacteristicIds!=null && subjCharacteristicIds.Count!=0)
-            subjCharacteristics = _observationRepository.FindAll(
+                subjCharacteristics = _observationRepository.FindAll(
                            o => subjCharacteristicIds.Contains(o.Id)//,
                 //new List<Expression<Func<SubjectCharacteristic, object>>>()
                 //{
@@ -555,9 +561,19 @@ namespace eTRIKS.Commons.Service.Services
                 //}
              ).ToList();
 
-
+            List<string> studyIds;
             //This will be replaced by call to SQL for studies of a particular project.
-            List<string> studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
+            if(projectId.Equals("P-BVS"))
+                studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
+            else
+            {
+                studyIds = _studyRepository.FindAll(
+                    s => s.Project.Accession.Equals(projectId),
+                    new List<Expression<Func<Study, object>>>()
+                    {
+                        d=>d.Project
+                    }).Select(s => s.Id).ToList();
+            }
 
 
             // A query to Mongo

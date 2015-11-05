@@ -130,7 +130,6 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                         records.Clear();
                         Debug.WriteLine(i + " RECORD(s) SUCCESSFULLY INSERTED");
                     }
-
                     count = i+1;
                 }
                 ms.loadDataGeneric(records);

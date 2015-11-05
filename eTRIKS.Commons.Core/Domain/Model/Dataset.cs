@@ -15,6 +15,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Activity Activity { get; private set; }
         public DomainTemplate Domain { get; set; }
         public ICollection<VariableReference> Variables { get;  set; }
+        public string StandardDataFile { get; set; }
+        public string State { get; set; }
 
         public Dataset()
         {
