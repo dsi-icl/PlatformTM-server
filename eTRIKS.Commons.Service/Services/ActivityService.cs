@@ -38,7 +38,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             Name = x.Name,
             StudyID = x.StudyId,
-            datasets = x.Datasets.Select(m => new DatasetBriefDTO
+            datasets = x.Datasets.Select(m => new DatasetDTO
             {
                 Name = m.Domain.Name,
                 Id = m.Id
@@ -85,7 +85,7 @@ namespace eTRIKS.Commons.Service.Services
             activityDTO.StudyID = activity.StudyId;
 
             foreach (var ds in activity.Datasets){
-                DatasetBriefDTO dst = new DatasetBriefDTO();
+                DatasetDTO dst = new DatasetDTO();
                 dst.Name = ds.Domain.Name;
                 dst.Id = ds.Id;
                 activityDTO.datasets.Add(dst);
@@ -108,10 +108,11 @@ namespace eTRIKS.Commons.Service.Services
                 Name = p.Name,
                 Id = p.Id,
                 StudyID = p.StudyId,
-                datasets = p.Datasets.Select(m => new DatasetBriefDTO
+                datasets = p.Datasets.Select(m => new DatasetDTO
                 {
                     Name = m.Domain.Name,
-                    Id = m.Id
+                    Id = m.Id,
+                    DomainId = m.DomainId
                 }).ToList()
             }).ToList();
         }

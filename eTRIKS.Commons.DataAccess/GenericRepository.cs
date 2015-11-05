@@ -31,6 +31,7 @@ namespace eTRIKS.Commons.DataAccess
         public GenericRepository(IDbSet<TEntity> entities)
         {
             Entities = (DbSet<TEntity>)entities;
+            //dataContext = entities
         }
 
         public IQueryable<TEntity> GetAll()

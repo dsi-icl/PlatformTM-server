@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
@@ -47,13 +48,27 @@ namespace eTRIKS.Commons.Persistence
                             break;
                         case "RFSTDTC":
                             string dateStr_s = reader.ReadString();
-                            DateTime dt; if (dateStr_s != null)
-                            subject.StudyStartDate = DateTime.Parse(dateStr_s);
+                            DateTime dt;
+                            if (dateStr_s != null)
+                            {
+                                if(Regex.IsMatch(dateStr_s, "(((0|1)[1-9]|2[1-9]|3[0-1])\\/(0[1-9]|1[0-2])\\/((19|20)\\d\\d))$"))
+                                    dt= DateTime.ParseExact(dateStr_s, "dd/MM/yyyy", null);
+                                else
+                                    dt =  DateTime.Parse(dateStr_s);
+                                subject.StudyStartDate = dt;
+                            }
                             break;
                         case "RFENDTC":
                             string dateStr_e = reader.ReadString();
+                            DateTime dte;
                             if (dateStr_e != null)
-                            subject.StudyStartDate = DateTime.Parse(dateStr_e);
+                            {
+                                if(Regex.IsMatch(dateStr_e, "(((0|1)[1-9]|2[1-9]|3[0-1])\\/(0[1-9]|1[0-2])\\/((19|20)\\d\\d))$"))
+                                    dt= DateTime.ParseExact(dateStr_e, "dd/MM/yyyy", null);
+                                else
+                                    dt =  DateTime.Parse(dateStr_e);
+                                subject.StudyEndDate = dt;
+                            }
                             break;
                         default:
                             subject.characteristicsValues.Add(fieldName, reader.ReadString());

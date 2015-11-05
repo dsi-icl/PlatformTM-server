@@ -23,6 +23,9 @@ namespace eTRIKS.Commons.Service.DTOs
         public string DomainId { get; set; }
         public string StudyId { get; set; }
         public int ActivityId { get; set; }
+        public string DataFile { get; set; }
+        public string StandardDataFile { get; set; }
+        public string State { get; set; }
         public List<DatasetVariableDTO> variables { get; set; }
 
         public DatasetDTO()
@@ -53,5 +56,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string DictionaryXrefURL { get; set; }
         //public DerivedMethod DerivedVariableProperties { get; set; }
         //public string DerivedVariablePropertiesId { get; set; }
+
+        public string UsageId { get; set; }
     }
 }

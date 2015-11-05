@@ -101,11 +101,11 @@ namespace eTRIKS.Commons.Service.Services
                         || ds.Domain.Code.Equals("LB") || ds.Domain.Code.Equals("DM"))
                        continue;
 
-                    if (ds.Domain.Code.Equals("DM"))
-                    {
-                        loadSubjectCharacteristics(studyId, ds, studies);
-                        continue;
-                    }
+                    //if (ds.Domain.Code.Equals("DM"))
+                    //{
+                    //    loadSubjectCharacteristics(studyId, ds, studies);
+                    //    continue;
+                    //}
 
                     qualifiers = ds.Variables
                         .Select(l => l.VariableDefinition)
@@ -118,21 +118,15 @@ namespace eTRIKS.Commons.Service.Services
                         .ToList();
 
                     topic = ds.Variables
-                        .Select(l => l.VariableDefinition)
-                        .Where(v => v.RoleId == "CL-Role-T-2")
-                        .First();
+                        .Select(l => l.VariableDefinition).First(v => v.RoleId == "CL-Role-T-2");
 
                     controlledTerm = ds.Variables
-                        .Select(l => l.VariableDefinition)
-                        .Where(v => v.Name == ds.Domain.Code+"DECOD")
-                        .FirstOrDefault();
+                        .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == ds.Domain.Code+"DECOD");
 
                     if(obsClass.Equals("findings")){
 
                         controlledTerm = ds.Variables
-                                            .Select(l => l.VariableDefinition)
-                                            .Where(v => v.Name == ds.Domain.Code+"TEST")
-                                            .FirstOrDefault();
+                            .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == ds.Domain.Code+"TEST");
                         //topic = ds.Variables
                         //                    .Select(l => l.VariableDefinition)
                         //                    .Where(v => v.Name == ds.Domain.Code + "TESTCD")
@@ -199,7 +193,7 @@ namespace eTRIKS.Commons.Service.Services
             
         }
 
-        public void loadSubjectCharacteristics(string projectId, Dataset ds, List<Study> studies)
+        public void loadSubjectCharacteristics(Dataset ds)
         {
             //If dataset is SC or SUPPDM ... then I need to read values from the Data file SC or SUPPDM from SQL to pivot them
             //Dictionary<string, string> filterFields = new Dictionary<string, string>();
@@ -230,7 +224,7 @@ namespace eTRIKS.Commons.Service.Services
                 sc.DomainCode = ds.Domain.Code;
                 sc.Class = ds.Domain.Class;
                 sc.DomainName = ds.Domain.Name;
-                sc.Studies.AddRange(studies);
+                sc.Studies.Add(ds.Activity.Study);
                 sc.isSubjCharacteristic = true;
                 _ObservationRepository.Insert(sc);
             }
@@ -274,6 +268,96 @@ namespace eTRIKS.Commons.Service.Services
         private VariableDefinition getVarDef(string name)
         {
             return _variableRepository.FindSingle(d => d.Name.Equals(name));
+        }
+
+        public async Task loadDatasetObservations(Dataset ds)
+        {
+            VariableDefinition controlledTerm = null;
+            VariableDefinition defaultQualifier = null;
+            string obsName;
+            string obsClass = ds.Domain.Class.ToLower();
+            if (obsClass.Equals("relationship"))
+                return;
+
+            //if (ds.Domain.Code.Equals("DM"))
+            //{
+            //    loadSubjectCharacteristics(studyId, ds, studies);
+            //    continue;
+            //}
+
+            List<VariableDefinition> qualifiers = ds.Variables
+                .Select(l => l.VariableDefinition)
+                .Where(v => v.RoleId == "CL-Role-T-3" || v.RoleId == "CL-Role-T-8")
+                .ToList();
+
+            List<VariableDefinition> timings = ds.Variables
+                .Select(l => l.VariableDefinition)
+                .Where(v => v.RoleId == "CL-Role-T-6")
+                .ToList();
+
+            VariableDefinition topic = ds.Variables
+                .Select(l => l.VariableDefinition).First(v => v.RoleId == "CL-Role-T-2");
+
+            controlledTerm = ds.Variables
+                .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == ds.Domain.Code + "DECOD");
+
+            if (obsClass.Equals("findings"))
+            {
+
+                controlledTerm = ds.Variables
+                    .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == ds.Domain.Code + "TEST");
+                //topic = ds.Variables
+                //                    .Select(l => l.VariableDefinition)
+                //                    .Where(v => v.Name == ds.Domain.Code + "TESTCD")
+                //                    .FirstOrDefault();
+                obsName = controlledTerm.Name;
+                defaultQualifier = getVarDef(ds.Domain.Code + "ORRES");
+            }
+
+            if (obsClass.Equals("events"))
+                defaultQualifier = getVarDef(ds.Domain.Code + "SEV");
+            
+            obsName = topic.Name;
+
+            //Formulate Query
+            var filterFields = new Dictionary<string, string>
+            {
+                {"DOMAIN", ds.Domain.Code},
+                {"STUDYID", ds.Activity.StudyId}
+            };
+
+            var groupFields = new Dictionary<string, string>
+            {
+                {"Name", "$" + obsName},
+                {"ControlledTermStr", "$" + controlledTerm.Name},
+                {"Group", "$" + ds.Domain.Code + "CAT"},
+                {"Subgroup", "$" + ds.Domain.Code + "SCAT"}
+            };
+            //End of formulate Query
+
+            MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
+            List<Observation> observations = await mongoDataService.getGroupedNoSQLrecords(filterFields, groupFields);
+            
+
+            foreach (Observation obs in observations)
+            {
+                obs.Class = ds.Domain.Class;
+                obs.DomainCode = ds.Domain.Code;
+                obs.DomainName = ds.Domain.Name;
+                obs.TopicVariable = topic;
+                obs.Qualifiers = qualifiers;
+                obs.Timings = timings;
+                //obs.ControlledTerm = controlledTerm;
+                if (obsClass.Equals("findings"))
+                    obs.DefaultQualifier = defaultQualifier;
+
+                if (obsClass.Equals("events"))
+                    obs.DefaultQualifier = defaultQualifier;
+                obs.Studies.Add(ds.Activity.Study);
+                //obs.Studies.AddRange(studies);
+                _ObservationRepository.Insert(obs);
+            }
+            _dataContext.Save();            
         }
     }
 }

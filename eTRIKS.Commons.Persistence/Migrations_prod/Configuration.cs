@@ -1,5 +1,6 @@
 namespace eTRIKS.Commons.Persistence.Migrations_prod
 {
+    using MySql.Data.Entity;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
@@ -12,6 +13,8 @@ namespace eTRIKS.Commons.Persistence.Migrations_prod
             AutomaticMigrationsEnabled = false;
             MigrationsDirectory = @"Migrations_prod";
             SetSqlGenerator("MySql.Data.MySqlClient", new MySql.Data.Entity.MySqlMigrationSqlGenerator());
+            SetHistoryContextFactory(
+                "MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));    
         }
 
         protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContext_prod context)

@@ -15,10 +15,10 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Name { get; set; }
         public int Id { get; set; }
         public string StudyID { get; set; }
-        public ICollection<DatasetBriefDTO> datasets { get; set; }
+        public ICollection<DatasetDTO> datasets { get; set; }
         public ActivityDTO()
         {
-            datasets = new List<DatasetBriefDTO>();
+            datasets = new List<DatasetDTO>();
         }
     }
 
@@ -26,5 +26,7 @@ namespace eTRIKS.Commons.Service.DTOs
     {
         public string Name { get; set; }
         public int Id { get; set; }
+        public string DomainId {get; set; }
+        
     }
 }

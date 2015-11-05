@@ -26,7 +26,8 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
             //_dataContext = uoW;
             //_genericMongoRepository = uoW.GetRepository<MongoDocument, Guid>();
         }
-        
+
+
 
         public string loadDataFromFile(string dataSource, DataSet ds)
         {
@@ -129,7 +130,6 @@ namespace eTRIKS.Commons.DataParser.IOFileManagement
                         records.Clear();
                         Debug.WriteLine(i + " RECORD(s) SUCCESSFULLY INSERTED");
                     }
-
                     count = i+1;
                 }
                 ms.loadDataGeneric(records);
