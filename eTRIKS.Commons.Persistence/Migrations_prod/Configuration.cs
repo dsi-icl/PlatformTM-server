@@ -6,7 +6,7 @@ namespace eTRIKS.Commons.Persistence.Migrations_prod
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContext_prod>
+    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.EtriksDataContextProd>
     {
         public Configuration()
         {
@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.Persistence.Migrations_prod
                 "MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));    
         }
 
-        protected override void Seed(eTRIKS.Commons.Persistence.etriksDataContext_prod context)
+        protected override void Seed(eTRIKS.Commons.Persistence.EtriksDataContextProd context)
         {
             //  This method will be called after migrating to the latest version.
 

@@ -7,6 +7,7 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
 using System.Transactions;
+using Microsoft.AspNet.Identity;
 using MongoDB.Bson.Serialization;
 using eTRIKS.Commons.Core.Domain.Model;
 using MongoDB.Bson.Serialization.Serializers;
@@ -16,19 +17,19 @@ using eTRIKS.Commons.DataAccess.UserManagement;
 namespace eTRIKS.Commons.Persistence {
 
     [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
-    public class etriksDataContext_prod : DbContext, IServiceUoW
+    public class EtriksDataContextProd : IdentityDbContext<ApplicationUser>, IServiceUoW
     {
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
-        private IUserRepository<ApplicationUser> userAuthRepository;
+        private IUserRepository<ApplicationUser,IdentityResult> userAuthRepository;
         private bool _disposed;
 
-        public etriksDataContext_prod() : base("name=eTRIKScontext_MySQL")
+        public EtriksDataContextProd() : base("name=eTRIKScontext_MySQL")
         {
             //_dataContext = context;
             Configuration.ProxyCreationEnabled = false;
-            Database.SetInitializer<etriksDataContext_prod>(null);
+            Database.SetInitializer<EtriksDataContextProd>(null);
 
             DbConfiguration.SetConfiguration(new MySql.Data.Entity.MySqlEFConfiguration());
 
@@ -56,14 +57,13 @@ namespace eTRIKS.Commons.Persistence {
             SubjectObsSerializer.DynamicMappers.Add(propertyName, info);
         }
 
-        public IUserRepository<TEntity> GetUserRepository<TEntity>()
+        public IUserRepository<TEntity,TResult> GetUserRepository<TEntity,TResult>()
         {
-            throw new NotImplementedException();
-            //if (userAuthRepository == null)
-            //{
-            //    userAuthRepository = new UserAuthRepository<TEntity>(this);
-            //}
-            //return userAuthRepository as IUserRepository<TEntity>;
+            if (userAuthRepository == null)
+            {
+                userAuthRepository = new UserAuthRepository(this);
+            }
+            return userAuthRepository as IUserRepository<TEntity, TResult>;
         }
 
         public IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>() 

@@ -1,5 +1,6 @@
 ﻿using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services.UserServices;
+using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     [RoutePrefix("api/accounts")]
     public class AccountController : ApiController
     {
-        private UserAccountService userAccountService;
+        private readonly UserAccountService userAccountService;
 
         public AccountController(UserAccountService userService)
         {
@@ -31,48 +32,48 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             //IdentityResult addUserResult = await this.AppUserManager.CreateAsync(user, createUserModel.Password);
 
-            bool succeeded = await userAccountService.RegisterUser(userDTO);
+            IdentityResult addUserResult = await userAccountService.RegisterUser(userDTO);
 
-            if (!succeeded)
+            if (!addUserResult.Succeeded)
             {
-                return BadRequest();//GetErrorResult(addUserResult);
+                return GetErrorResult(addUserResult);
             }
 
             //Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
 
             //return Created(locationHeader, TheModelFactory.Create(user));
             //ApplicationUser user = await userAccountService.FindUser(userModel.UserName, userModel.Password);
-            string psk = await userAccountService.GetUserPSK(userDTO);
+            string psk = await userAccountService.GetUserPsk(userDTO);
             return Ok(new { PSK = psk });
         }
 
-        //private IHttpActionResult GetErrorResult(IdentityResult result)
-        //{
-        //    if (result == null)
-        //    {
-        //        return InternalServerError();
-        //    }
+        private IHttpActionResult GetErrorResult(IdentityResult result)
+        {
+            if (result == null)
+            {
+                return InternalServerError();
+            }
 
-        //    if (!result.Succeeded)
-        //    {
-        //        if (result.Errors != null)
-        //        {
-        //            foreach (string error in result.Errors)
-        //            {
-        //                ModelState.AddModelError("", error);
-        //            }
-        //        }
+            if (!result.Succeeded)
+            {
+                if (result.Errors != null)
+                {
+                    foreach (string error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error);
+                    }
+                }
 
-        //        if (ModelState.IsValid)
-        //        {
-        //            // No ModelState errors are available to send, so just return an empty BadRequest.
-        //            return BadRequest();
-        //        }
+                if (ModelState.IsValid)
+                {
+                    // No ModelState errors are available to send, so just return an empty BadRequest.
+                    return BadRequest();
+                }
 
-        //        return BadRequest(ModelState);
-        //    }
+                return BadRequest(ModelState);
+            }
 
-        //    return null;
-        //}
+            return null;
+        }
     }
 }

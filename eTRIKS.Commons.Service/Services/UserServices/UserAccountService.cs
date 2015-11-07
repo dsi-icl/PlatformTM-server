@@ -7,24 +7,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace eTRIKS.Commons.Service.Services.UserServices
 {
     public class UserAccountService
     {
-        private IUserRepository<ApplicationUser> _userRepository;
+        private IUserRepository<ApplicationUser,IdentityResult> _userRepository;
         private IServiceUoW AppDBcontext;
         //private ApplicationUserManager userManager;
 
         public UserAccountService(IServiceUoW uoW)
         {
             AppDBcontext = uoW;
-            _userRepository = uoW.GetUserRepository<ApplicationUser>();
+            _userRepository = uoW.GetUserRepository<ApplicationUser,IdentityResult>();
         }
 
-        public async Task<bool> RegisterUser(UserDTO userDTO)
+        public async Task<IdentityResult> RegisterUser(UserDTO userDTO)
         {
-            ApplicationUser user = new ApplicationUser()
+            var user = new ApplicationUser()
             {
                 UserName = userDTO.Username,
                 Email = userDTO.Email,
@@ -35,23 +36,21 @@ namespace eTRIKS.Commons.Service.Services.UserServices
                 TwoFactorEnabled = true,
                 PSK = TimeSensitivePassCodeService.GeneratePresharedKey()
             };
-            
 
-            bool result = await _userRepository.RegisterUser(user,userDTO.Password);
+
+            var result = await _userRepository.RegisterUser(user, userDTO.Password);
             return result;
-
-            //IdentityResult addUserResult = userManager.CreateAsync(user, userDTO.Password);
         }
 
-        public async Task<string> GetUserPSK(UserDTO userDTO)
+        public async Task<string> GetUserPsk(UserDTO userDTO)
         {
-            string PSK = null;
-            ApplicationUser user = await _userRepository.FindUser(userDTO.Username, userDTO.Password);
+            string psk = null;
+            var user = await _userRepository.FindUser(userDTO.Username, userDTO.Password);
             if (user != null)
             {
-                PSK = user.PSK;
+                psk = user.PSK;
             }
-            return PSK;
+            return psk;
         }
     }
 }

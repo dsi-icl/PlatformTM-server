@@ -12,7 +12,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         void AddClassMap(string fieldname, string propertyName);
 
 
-        IUserRepository<TEntity> GetUserRepository<TEntity>();
+        IUserRepository<TEntity,TResult> GetUserRepository<TEntity,TResult>();
 
     }
 }

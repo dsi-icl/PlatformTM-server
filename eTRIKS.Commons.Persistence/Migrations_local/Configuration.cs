@@ -5,7 +5,7 @@ namespace eTRIKS.Commons.Persistence.Migrations_local
     using System.Data.Entity.Migrations;
     using System.Linq;
 
-    internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContext_dev>
+   /* internal sealed class Configuration : DbMigrationsConfiguration<eTRIKS.Commons.Persistence.etriksDataContext_dev>
     {
         public Configuration()
         {
@@ -29,5 +29,6 @@ namespace eTRIKS.Commons.Persistence.Migrations_local
             //    );
             //
         }
-    }
+    
+    */
 }

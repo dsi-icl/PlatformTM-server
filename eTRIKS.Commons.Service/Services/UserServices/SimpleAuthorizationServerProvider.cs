@@ -1,6 +1,7 @@
 ﻿using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.DataAccess.UserManagement;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.OAuth;
 using System;
@@ -14,8 +15,8 @@ namespace eTRIKS.Commons.Service.Services.UserServices
 {
     public class SimpleAuthorizationServerProvider : OAuthAuthorizationServerProvider
     {
-        private readonly IUserRepository<ApplicationUser> _userRepository;
-        public SimpleAuthorizationServerProvider(IUserRepository<ApplicationUser> userRepository)
+        private readonly IUserRepository<ApplicationUser,IdentityResult> _userRepository;
+        public SimpleAuthorizationServerProvider(IUserRepository<ApplicationUser, IdentityResult> userRepository)
         {
             _userRepository = userRepository;
         }
