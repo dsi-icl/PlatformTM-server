@@ -22,6 +22,7 @@ namespace eTRIKS.Commons.Service.Services
         private IRepository<Activity, int> _activityRepository;
         private IRepository<Dataset, int> _dataSetRepository;
         private IRepository<VariableDefinition, int> _variableDefinition;
+        private IRepository<Assay, int> _assayRepository;
         private IServiceUoW _activityServiceUnit;
 
 
@@ -83,6 +84,8 @@ namespace eTRIKS.Commons.Service.Services
             activityDTO.Name = activity.Name;
             activityDTO.Id = activity.Id;
             activityDTO.StudyID = activity.StudyId;
+            if (activity.GetType() == typeof (Assay))
+                activityDTO.isAssay = true;
 
             foreach (var ds in activity.Datasets){
                 DatasetDTO dst = new DatasetDTO();
@@ -92,13 +95,13 @@ namespace eTRIKS.Commons.Service.Services
             }
             return activityDTO;
         }
-        public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
+        public IEnumerable<ActivityDTO> getStudyActivities(string projectId)
         {
             IEnumerable<Activity> activities;
 
             // Typed lambda expression for Select() method. 
             activities = _activityRepository.FindAll(
-                    d => d.StudyId.Equals(studyId),
+                    d => d.Study.Project.Accession.Equals(projectId),
                     new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain)
                     }

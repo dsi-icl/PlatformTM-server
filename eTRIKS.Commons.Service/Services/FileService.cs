@@ -4,6 +4,7 @@ using System.Net;
 using AutoMapper;
 using AutoMapper.Internal;
 using CsvHelper;
+using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System;
@@ -19,40 +20,85 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class FileService
     {
+        private IServiceUoW _dataServiceUnit;
+        private IRepository<DataFile, int> _fileRepository;
         private string rawFilesDirectory;
         private string stdFilesDirecotry;
 
-        public FileService()
+        public FileService(IServiceUoW uoW)
         {
+            _dataServiceUnit = uoW;
+            _fileRepository = uoW.GetRepository<DataFile, int>();
             rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
             stdFilesDirecotry = rawFilesDirectory + "\\Mapped";
         }
-        public List<FileDTO> getUploadedFiles(string path)
+        public List<FileDTO> getUploadedFiles(string projectId,string path)
         {
             List<FileDTO> fileDTOs = new List<FileDTO>();
             //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
 
             //List<string> files = Directory.GetFiles(path).ToList<string>();
-            DirectoryInfo f = new DirectoryInfo(path);
-            foreach (var Finfo in f.GetFiles())
+            var files = _fileRepository.FindAll(f => f.Project.Accession.Equals(projectId) && f.Path.Equals(path));
+            //DirectoryInfo f = new DirectoryInfo(path);
+            foreach (var file in files)
             {
                 FileDTO fileDTO = new FileDTO();
-                fileDTO.FileName = Finfo.Name;
-                fileDTO.dateAdded = Finfo.LastWriteTime.ToLongDateString();
+                fileDTO.FileName = file.FileName;
+                fileDTO.dateAdded = file.DateAdded;//.LastWriteTime.ToLongDateString();
                 fileDTO.icon = "";
+                fileDTO.IsDirectory = file.IsDirectory;
                 fileDTO.selected = false;
                 fileDTOs.Add(fileDTO);
-                fileDTO.state = "NEW";
+                fileDTO.state = file.State;
+                fileDTO.DataFileId = file.Id;
             }
             return fileDTOs;
         }
 
-        //public FileDTO getDatasetFileInfo(int datasetId)
-        //{
-        //    FileDTO fileDTO = new FileDTO();
+        public bool addDirectory(string projectId, DirectoryInfo di, string dir)
+        {
+            //TODO: projectId
+            var file = new DataFile();
+            file.FileName = di.Name;
+            //file.Path = di.FullName.Substring(di.FullName.IndexOf(projectId));
+            file.Path = dir;//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
+            file.DateAdded = di.CreationTime.ToLongDateString();
+            file.IsDirectory = true;
+            file.ProjectId = 1;
 
-        //}
+            _fileRepository.Insert(file);
+            return _dataServiceUnit.Save().Equals("CREATED");
+        }
 
+        public bool addOrUpdateFile(string projectId, FileInfo fi)
+        {
+            //TODO: projectId
+            DataFile file;
+            file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Project.Accession.Equals(projectId));
+            //TODO: add property isLoadedToDB to the file and only change status to modified if not loadedToDB
+            if (file == null)
+            {
+                file = new DataFile();
+                file.FileName = fi.Name;
+                file.DateAdded = fi.CreationTime.ToLongDateString();
+                file.State = "New";
+                file.Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf(projectId));
+                file.IsDirectory = false;
+                _fileRepository.Insert(file);
+                file.ProjectId = 1;
+            }
+            else
+            {
+                file.LastModified = fi.LastWriteTime.ToLongDateString();
+                _fileRepository.Update(file);
+                if (file.LoadedToDB)
+                    file.State = "Modified";
+            }
+            return _dataServiceUnit.Save().Equals("CREATED");
+        }
+
+        #region IO methods
+       
         public DataTable readStandardFile(string studyId, string fileName)
         {
             string filePath = rawFilesDirectory + studyId + "\\Mapped\\" + fileName; 
@@ -60,10 +106,11 @@ namespace eTRIKS.Commons.Service.Services
             return readDataFile(filePath);
         }
 
-        public DataTable ReadOriginalFile(string studyId, string fileName)
+        public DataTable ReadOriginalFile(string filePath)
         {
-            string filePath = rawFilesDirectory + studyId + "\\" + fileName;
-            return readDataFile(filePath);
+            //string filePath = rawFilesDirectory + studyId + "\\" + fileName;
+            string PATH = rawFilesDirectory + filePath;
+            return readDataFile(PATH);
         }
 
         private DataTable readDataFile(string filePath)
@@ -107,11 +154,11 @@ namespace eTRIKS.Commons.Service.Services
             return dt;
         }
 
-        public List<Dictionary<string, string>> getFileColHeaders(string studyId, string fileName)
+        public List<Dictionary<string, string>> getFileColHeaders(string filePath)
         {
             //Parse header of the file
             string delim = ",";
-            string PATH = rawFilesDirectory + studyId + "\\" + fileName;
+            string PATH = rawFilesDirectory + filePath;// + studyId + "\\" + fileName;
             StreamReader reader = File.OpenText(PATH);
             string firstline = reader.ReadLine();
 
@@ -169,7 +216,13 @@ namespace eTRIKS.Commons.Service.Services
             value.Replace("\"", "\"\""), "\"");
         }
 
+        #endregion
 
-        
+        public List<string> getDirectories(string projectId)
+        {
+           var dirs =  _fileRepository.FindAll(f => f.IsDirectory.Equals(true) && f.Project.Accession.Equals(projectId));
+            if (dirs == null) return null;
+            return dirs.Select(d => d.FileName).ToList();
+        }
     }
 }

@@ -278,13 +278,7 @@ namespace eTRIKS.Commons.Service.Services
             string obsClass = ds.Domain.Class.ToLower();
             if (obsClass.Equals("relationship"))
                 return;
-
-            //if (ds.Domain.Code.Equals("DM"))
-            //{
-            //    loadSubjectCharacteristics(studyId, ds, studies);
-            //    continue;
-            //}
-
+            //Record qualifiers & Result qualifiers
             List<VariableDefinition> qualifiers = ds.Variables
                 .Select(l => l.VariableDefinition)
                 .Where(v => v.RoleId == "CL-Role-T-3" || v.RoleId == "CL-Role-T-8")

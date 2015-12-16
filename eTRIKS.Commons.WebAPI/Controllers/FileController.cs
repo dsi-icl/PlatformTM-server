@@ -25,29 +25,60 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _fileService = fileService;
         }
 
-       
 
         [HttpPost]
-        [Route("study/{studyId}/upload")]
-        public async Task<List<string>> UploadFile(string studyId)
+        [Route("project/{projectId}/createdir")]
+        public List<string> CreateDirectory(string projectId, [FromBody] DirectoryDTO dir)
+        {
+            string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            string projDir = fileDir + projectId;
+            string newDir = projDir  +"/"+dir.name;
+            if (!Directory.Exists(newDir))
+            {
+                Directory.CreateDirectory(newDir);
+                _fileService.addDirectory(projectId, new DirectoryInfo(newDir),projectId);
+            }
+
+            return new DirectoryInfo(projDir).GetDirectories().Select(d => d.Name).ToList();
+        }
+
+        [HttpGet]
+        [Route("project/{projectId}/directories")]
+        public List<string> getDirectories(string projectId)
+        {
+            return _fileService.getDirectories(projectId);
+            //string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            //string projDir = fileDir + projectId;
+            ////string newDir = projDir + "/" + dirName;
+            //if (!Directory.Exists(projDir)) Directory.CreateDirectory(projDir);
+            //return new DirectoryInfo(projDir).GetDirectories().Select(d => d.Name).ToList();
+        }
+
+        [HttpPost]
+        [Route("project/{projectId}/upload/{dir}")]
+        public async Task<List<string>> UploadFile(string projectId, string dir)
         {
             try
             {
                 //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
                 string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-                string path = rawFilesDirectory + studyId;
+                string path = rawFilesDirectory + projectId + "\\" + dir  ;
                 if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 if (Request.Content.IsMimeMultipartContent())
                 {
                     var streamProvider = new StreamProvider(path);
+                   
                     await Request.Content.ReadAsMultipartAsync(streamProvider);
                     List<string> messages = new List<string>();
                     foreach (var file in streamProvider.FileData)
                     {
                         FileInfo fi = new FileInfo(file.LocalFileName);
+
+                        if (!_fileService.addOrUpdateFile(projectId, fi))
+                            throw new Exception("Failed to updated database");
                         messages.Add("File uploaded as " + fi.FullName + " (" + fi.Length + " bytes)");
                     }
-
+                    
                     return messages;
                 }
                 else
@@ -63,14 +94,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("study/{studyId}/uploadedFiles")]
-        public async Task<List<FileDTO>> GetUploadedFiles(string studyId)
+        [Route("project/{projectId}/uploadedFiles/{subdir}")]
+        public async Task<List<FileDTO>> GetUploadedFiles(string projectId,string subdir)
         {
             string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-            string path = rawFilesDirectory + studyId;
-            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            //string path = rawFilesDirectory + projectId;
+            string relativePath = projectId; 
+            //if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            if(!subdir.Equals("top"))
+                relativePath = relativePath + "\\" + subdir;
 
-            return _fileService.getUploadedFiles(path);
+            return _fileService.getUploadedFiles(projectId, relativePath);
         }
 
         //[HttpGet]

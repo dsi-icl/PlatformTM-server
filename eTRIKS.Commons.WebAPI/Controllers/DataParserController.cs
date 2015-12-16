@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,13 +18,34 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     {
 
         private FileHandler _fileHandler;
+        private TemplateService templateService;
 
-        public DataParserController(FileHandler fileHandler)
+        public DataParserController(FileHandler fileHandler, TemplateService tmplService)
         {
             _fileHandler = fileHandler;
+            templateService = tmplService;
         }
 
 
+        [HttpGet]
+        [Route("api/temp/loadtemp")]
+        public void LoadTemplateFromFile()
+        {
+            string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            string tempFilepath = "temp/BStemplate.csv";
+            string tempVarFilepath = "temp/BStemplateVars.csv";
+            templateService.loadDatasetTemplate(tempFilepath, tempVarFilepath);
+        }
+
+        [HttpGet]
+        [Route("api/temp/loadTerms")]
+        public void LoadTerms()
+        {
+            string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            string tempFilepath = "temp/assaytermsDict.csv";
+            string tempVarFilepath = "temp/assaytermsCVs.csv";
+            templateService.loadCVterms(tempFilepath, tempVarFilepath);
+        }
 
         [HttpPost]
         public async Task<HttpResponseMessage> LoadFile()

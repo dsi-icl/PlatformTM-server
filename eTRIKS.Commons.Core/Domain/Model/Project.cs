@@ -14,6 +14,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string ShortName { get; set;}
         public string Accession { get; set;}
         public ICollection<Study> Studies { get; set;}
+        public ICollection<DataFile> DataFiles { get; set; } 
 
         public Project()
         {

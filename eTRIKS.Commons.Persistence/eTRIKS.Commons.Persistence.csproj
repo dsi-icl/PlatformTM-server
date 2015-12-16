@@ -82,6 +82,8 @@
     <Compile Include="etriksDataContext_dev.cs" />
     <Compile Include="AuthContext.cs" />
     <Compile Include="etriksUserContext_prod.cs" />
+    <Compile Include="Mapping\DataFileMap.cs" />
+    <Compile Include="Mapping\AssayMap.cs" />
     <Compile Include="Mapping\ProjectMap.cs" />
     <Compile Include="Mapping\ObservationMap.cs" />
     <Compile Include="Mapping\DatasetMap.cs" />
@@ -149,7 +151,36 @@
     <Compile Include="Migrations_prod\201510120741451_updateDatasetTBL.Designer.cs">
       <DependentUpon>201510120741451_updateDatasetTBL.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_prod\201512131347173_adddatafiles.cs" />
+    <Compile Include="Migrations_prod\201512131347173_adddatafiles.Designer.cs">
+      <DependentUpon>201512131347173_adddatafiles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512131939171_updateDataFileTable.cs" />
+    <Compile Include="Migrations_prod\201512131939171_updateDataFileTable.Designer.cs">
+      <DependentUpon>201512131939171_updateDataFileTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512141642145_addColToDAtafile.cs" />
+    <Compile Include="Migrations_prod\201512141642145_addColToDAtafile.Designer.cs">
+      <DependentUpon>201512141642145_addColToDAtafile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512141904421_updateDataFileTable1.cs" />
+    <Compile Include="Migrations_prod\201512141904421_updateDataFileTable1.Designer.cs">
+      <DependentUpon>201512141904421_updateDataFileTable1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512141908246_updateDataFileTable2.cs" />
+    <Compile Include="Migrations_prod\201512141908246_updateDataFileTable2.Designer.cs">
+      <DependentUpon>201512141908246_updateDataFileTable2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512151634252_addassay.cs" />
+    <Compile Include="Migrations_prod\201512151634252_addassay.Designer.cs">
+      <DependentUpon>201512151634252_addassay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512151852494_updateAssayTBL.cs" />
+    <Compile Include="Migrations_prod\201512151852494_updateAssayTBL.Designer.cs">
+      <DependentUpon>201512151852494_updateAssayTBL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_prod\Configuration.cs" />
+    <Compile Include="BiospecimenSerializer.cs" />
     <Compile Include="SubjectSerializer.cs" />
     <Compile Include="SubjectObsSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -211,6 +242,27 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201510120741451_updateDatasetTBL.resx">
       <DependentUpon>201510120741451_updateDatasetTBL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512131347173_adddatafiles.resx">
+      <DependentUpon>201512131347173_adddatafiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512131939171_updateDataFileTable.resx">
+      <DependentUpon>201512131939171_updateDataFileTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512141642145_addColToDAtafile.resx">
+      <DependentUpon>201512141642145_addColToDAtafile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512141904421_updateDataFileTable1.resx">
+      <DependentUpon>201512141904421_updateDataFileTable1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512141908246_updateDataFileTable2.resx">
+      <DependentUpon>201512141908246_updateDataFileTable2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512151634252_addassay.resx">
+      <DependentUpon>201512151634252_addassay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512151852494_updateAssayTBL.resx">
+      <DependentUpon>201512151852494_updateAssayTBL.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

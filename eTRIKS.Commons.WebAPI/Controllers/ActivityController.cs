@@ -20,10 +20,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class ActivityController : ApiController
     {
         private ActivityService _activityService;
+        private AssayService _assayService;
 
-        public ActivityController(ActivityService activityService)
+        public ActivityController(ActivityService activityService, AssayService assayService)
         {
             _activityService = activityService;
+            _assayService = assayService;
         }
 
         [HttpGet]
@@ -44,7 +46,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/activities")]
         public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
         {
-            var addedActivity = _activityService.addActivity(activityDTO);
+            Activity addedActivity =null;
+            if(!activityDTO.isAssay)
+                addedActivity = _activityService.addActivity(activityDTO);
+            if (activityDTO.isAssay)
+                addedActivity = _assayService.AddAssay(activityDTO);
 
             if (addedActivity != null)
             {

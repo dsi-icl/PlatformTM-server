@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -38,11 +39,14 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,
                                     int? pageSize = null);
-        Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter = null);
+        Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null);
+
+        Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null);
+
 
         TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null,
                            List<Expression<Func<TEntity, object>>> includeProperties = null);
-        Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> filter);
+        Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> filterExpression = null);
 
         /// <summary>
         /// Gets an entity with given primary key.

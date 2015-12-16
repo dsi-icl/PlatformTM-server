@@ -22,6 +22,8 @@ namespace eTRIKS.Commons.Service.Services
         private IRepository<DomainTemplate, string> _domainRepository;
         private IRepository<Activity, string> _activityRepository;
         private IRepository<VariableDefinition, int> _variableDefinitionRepository;
+        private IRepository<DataFile, int> _dataFileRepository;
+       // private FileService _fileService;
 
         public DatasetService(IServiceUoW uoW)
         {
@@ -31,6 +33,8 @@ namespace eTRIKS.Commons.Service.Services
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
+            _dataFileRepository = uoW.GetRepository<DataFile, int>();
+            //_fileService = new FileService(_dataServiceUnit);
         }
 
         /// <summary>
@@ -111,7 +115,8 @@ namespace eTRIKS.Commons.Service.Services
                 new List<Expression<Func<Dataset, object>>>()
                 {
                     d => d.Variables.Select(t => t.VariableDefinition),
-                    d => d.Activity
+                    d => d.Activity,
+                    d => d.DataFiles
                 });
             return ds;
         }
@@ -236,8 +241,21 @@ namespace eTRIKS.Commons.Service.Services
             Dataset datasetToUpdate = GetActivityDataset(datasetDTO.Id);
 
             //TODO: Do this using some DTOmapping library
-            datasetToUpdate.DataFile = datasetDTO.DataFile;
-            datasetToUpdate.StandardDataFile = datasetDTO.StandardDataFile;
+            // datasetDTO woll only have one DataFile unlike Class Dataset since the DTO reflect one assignment of a datafile to a dataset
+            //check the FileDTO sent back in this dataset
+            //
+
+
+            if (datasetToUpdate.DataFiles.Count!=0 && !datasetToUpdate.DataFiles.Any(d => d.Id.Equals(datasetDTO.DataFileDTO.DataFileId)))
+            {
+                //Adding a new datafile to this dataset
+                var datafile = _dataFileRepository.FindSingle(d=>d.Id.Equals(datasetDTO.DataFileDTO.DataFileId));
+                datasetToUpdate.DataFiles.Add(datafile);
+            }
+           
+                //update status of datafile
+
+           // datasetToUpdate.StandardDataFile = datasetDTO.StandardDataFile;
             datasetToUpdate.State = datasetDTO.State;
             
             List<VariableDefinition> variableDefsOfStudy = getVariableDefinitionsOfStudy(datasetDTO.StudyId).ToList();
@@ -295,7 +313,7 @@ namespace eTRIKS.Commons.Service.Services
             return _variableDefinitionRepository.FindAll(d => d.StudyId.Equals(studyId));
         }
 
-        public DataTemplateMap GeTemplateMaps(int datasetId)
+        public DataTemplateMap GetTemplateMaps(int datasetId)
         {
             var map = new DataTemplateMap();
 
@@ -387,131 +405,131 @@ namespace eTRIKS.Commons.Service.Services
             return map;
         }
 
-
-        public Hashtable getDatasetPreview(int datasetId)
+        public Hashtable getDatasetPreview(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
-            //This will change to retrieve FileObject
-            var fileName = dataset.StandardDataFile;
-            var studyId = dataset.Activity.StudyId;
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            //var studyId = dataset.Activity.StudyId;
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
-            var fileService = new FileService();
+            var fileService = new FileService(_dataServiceUnit);
             //TEMP usage of dataset.state
-            var dataTable = dataset.State.Equals("standard") ? fileService.ReadOriginalFile(studyId, fileName) : fileService.readStandardFile(studyId, fileName);
+            var dataTable = fileService.ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
             var ht = getHashtable(dataTable);
             return ht;
         }
 
-        public bool mapToTemplate(int datasetId, DataTemplateMap map)
+        public bool mapToTemplate(int datasetId, int fileId, DataTemplateMap map)
         {
-            var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.DataFile;
-            var studyId = dataset.Activity.StudyId;
+            //var dataset = GetActivityDataset(datasetId);
+            //var studyId = dataset.Activity.StudyId;
+            //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            //var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
-            FileService fileService = new FileService();
-            DataTable inputDataTable = fileService.ReadOriginalFile(studyId,fileName);
-            DataTable sdtmTable = new DataTable();
+            //FileService fileService = new FileService(_dataServiceUnit);
+            //DataTable inputDataTable = fileService.ReadOriginalFile(filePath);
+            //DataTable sdtmTable = new DataTable();
 
-            //var varMaps = new List<DataTemplateMap.VariableMap>();
-            foreach (
-                var varMap in
-                    map.VarTypes.SelectMany(variableType => variableType.vars.Where(varMap => varMap.DataType != null)))
-            {
-                sdtmTable.Columns.Add(varMap.ShortName); //,Type.GetType(varMap.DataType)
-               // varMaps.Add(varMap);
-            }
-
-
-            for (int i = 0; i < map.TopicColumns.Count; i++)
-                foreach (DataRow inputRow in inputDataTable.Rows) // Loop over the rows.
-                {
-                    DataRow sdtmRow = sdtmTable.NewRow();
-
-                    //Identifiers
-                    foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Identifiers")).vars)
-                    {
-                        if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
-                            continue;
-                        if (varMap.MapToStringValueList[0] != null && varMap.MapToStringValueList[0] != string.Empty)
-                        {
-                            sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[0];
-                        }
-
-                        else if (varMap.MapToColList[0] != null)
-                        {
-                            var colName = varMap.MapToColList[0].colName;
-                            sdtmRow[varMap.ShortName] = inputRow[colName];
-                        }
-                        //if (varMap.ShortName.Equals("STUDYID"))
-                        //    studyId = sdtmRow[varMap.ShortName].ToString();
-                    }
-
-                    //Observation Topic & Qualifiers
-                    foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Observation Descriptors")).vars)
-                    {
-                        if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
-                            continue;
-                        if (varMap.MapToStringValueList[i] != null && varMap.MapToStringValueList[i] != string.Empty)
-                        {
-                            sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[i];
-                        }
-                        else if (varMap.MapToColList[i] != null)
-                        {
-                            var colName = varMap.MapToColList[i].colName;
-                            sdtmRow[varMap.ShortName] = inputRow[colName];
-                        }
-                        else
-                        {
-                            sdtmRow[varMap.ShortName] = null;
-                        }
-                    }
-
-                    //Timings
-                    foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Timing Descriptors")).vars)
-                    {
-                        if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
-                            continue;
-                        if (varMap.MapToStringValueList[0] != null && varMap.MapToStringValueList[0] != string.Empty)
-                        {
-                            sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[0];
-                        }
-
-                        else if (varMap.MapToColList[0] != null)
-                        {
-                            var colName = varMap.MapToColList[0].colName;
-                            sdtmRow[varMap.ShortName] = inputRow[colName];
-                        }
-                    }
-                    sdtmTable.Rows.Add(sdtmRow);
-                }
-
-            if (sdtmTable.Rows.Count != 0)
-            {
-                string dsName = studyId + "_" + dataset.DomainId;
-                sdtmTable.TableName = dsName;
-                //Write new transformed to file 
-                string path = fileService.writeDataFile(studyId,sdtmTable);
-                
-                //Update dataset
-                dataset.StandardDataFile = dsName+".csv";
-                _datasetRepository.Update(dataset);
-                _dataServiceUnit.Save();
-            }
-            dataset.State = "mapped";
-            //var ht = new Hashtable();
-            //var headerList = new List<Dictionary<string, string>>();
-            //foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
+            ////var varMaps = new List<DataTemplateMap.VariableMap>();
+            //foreach (
+            //    var varMap in
+            //        map.VarTypes.SelectMany(variableType => variableType.vars.Where(varMap => varMap.DataType != null)))
             //{
-            //    var header = new Dictionary<string, string>
-            //    {
-            //        {"data", col.ColumnName.ToLower()},
-            //        {"title", col.ColumnName}
-            //    };
-            //    headerList.Add(header);
+            //    sdtmTable.Columns.Add(varMap.ShortName); //,Type.GetType(varMap.DataType)
+            //   // varMaps.Add(varMap);
             //}
-            //ht.Add("header", headerList);
-            //ht.Add("data", sdtmTable);
-            //return ht;
+
+
+            //for (int i = 0; i < map.TopicColumns.Count; i++)
+            //    foreach (DataRow inputRow in inputDataTable.Rows) // Loop over the rows.
+            //    {
+            //        DataRow sdtmRow = sdtmTable.NewRow();
+
+            //        //Identifiers
+            //        foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Identifiers")).vars)
+            //        {
+            //            if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
+            //                continue;
+            //            if (varMap.MapToStringValueList[0] != null && varMap.MapToStringValueList[0] != string.Empty)
+            //            {
+            //                sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[0];
+            //            }
+
+            //            else if (varMap.MapToColList[0] != null)
+            //            {
+            //                var colName = varMap.MapToColList[0].colName;
+            //                sdtmRow[varMap.ShortName] = inputRow[colName];
+            //            }
+            //            //if (varMap.ShortName.Equals("STUDYID"))
+            //            //    studyId = sdtmRow[varMap.ShortName].ToString();
+            //        }
+
+            //        //Observation Topic & Qualifiers
+            //        foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Observation Descriptors")).vars)
+            //        {
+            //            if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
+            //                continue;
+            //            if (varMap.MapToStringValueList[i] != null && varMap.MapToStringValueList[i] != string.Empty)
+            //            {
+            //                sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[i];
+            //            }
+            //            else if (varMap.MapToColList[i] != null)
+            //            {
+            //                var colName = varMap.MapToColList[i].colName;
+            //                sdtmRow[varMap.ShortName] = inputRow[colName];
+            //            }
+            //            else
+            //            {
+            //                sdtmRow[varMap.ShortName] = null;
+            //            }
+            //        }
+
+            //        //Timings
+            //        foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Timing Descriptors")).vars)
+            //        {
+            //            if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
+            //                continue;
+            //            if (varMap.MapToStringValueList[0] != null && varMap.MapToStringValueList[0] != string.Empty)
+            //            {
+            //                sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[0];
+            //            }
+
+            //            else if (varMap.MapToColList[0] != null)
+            //            {
+            //                var colName = varMap.MapToColList[0].colName;
+            //                sdtmRow[varMap.ShortName] = inputRow[colName];
+            //            }
+            //        }
+            //        sdtmTable.Rows.Add(sdtmRow);
+            //    }
+
+            //if (sdtmTable.Rows.Count != 0)
+            //{
+            //    string dsName = studyId + "_" + dataset.DomainId;
+            //    sdtmTable.TableName = dsName;
+            //    //Write new transformed to file 
+            //    string path = fileService.writeDataFile(studyId,sdtmTable);
+                
+            //    //Update dataset
+            //    dataset.StandardDataFile = dsName+".csv";
+            //    _datasetRepository.Update(dataset);
+            //    _dataServiceUnit.Save();
+            //}
+            //dataset.State = "mapped";
+            ////var ht = new Hashtable();
+            ////var headerList = new List<Dictionary<string, string>>();
+            ////foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
+            ////{
+            ////    var header = new Dictionary<string, string>
+            ////    {
+            ////        {"data", col.ColumnName.ToLower()},
+            ////        {"title", col.ColumnName}
+            ////    };
+            ////    headerList.Add(header);
+            ////}
+            ////ht.Add("header", headerList);
+            ////ht.Add("data", sdtmTable);
+            ////return ht;
             return true;
         }
 
@@ -533,36 +551,39 @@ namespace eTRIKS.Commons.Service.Services
             return ht;
         }
 
-        public string loadDataset(int datasetId)
+        public string loadDataset(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.StandardDataFile;
-            var studyId = dataset.Activity.StudyId;
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
+            
+            //var studyId = dataset.Activity.StudyId;
 
-            var fileService = new FileService();
-            var dataTable = dataset.State.Equals("standard") ? fileService.ReadOriginalFile(studyId, fileName) : fileService.readStandardFile(studyId, fileName);
+            var fileService = new FileService(_dataServiceUnit);
+            var dataTable = fileService.ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
 
             //var dataTable = fileService.readStandardFile(studyId,fileName);
 
             var ms = new MongoDbDataRepository();
 
-            int count=0,i = 0;
+            int count = 0, i = 0;
             var records = new List<MongoDocument>();
             //var columns = dataTable.Columns.Cast<String>();
-            foreach(DataRow row in dataTable.Rows)
+            foreach (DataRow row in dataTable.Rows)
             {
-               var record = new MongoDocument();
+                var record = new MongoDocument();
                 i++;
-                foreach(DataColumn column in dataTable.Columns)
+                foreach (DataColumn column in dataTable.Columns)
                 {
-                   var recordItem = new MongoField {Name = column.ColumnName, value = row[column].ToString()};
+                    var recordItem = new MongoField { Name = column.ColumnName, value = row[column].ToString() };
                     //TODO: consider putting this back
                     //if (recordItem.value != "")
-                        record.fields.Add(recordItem);
+                    record.fields.Add(recordItem);
                 }
                 records.Add(record);
 
-                if (i%500 == 0)
+                if (i % 500 == 0)
                 {
                     ms.loadDataGeneric(records);
                     records.Clear();
@@ -611,15 +632,15 @@ namespace eTRIKS.Commons.Service.Services
 
             };
 
-        public List<Dictionary<string, string>> getFileColHeaders(int datasetId)
-        {
-            var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.DataFile;
-            var studyId = dataset.Activity.StudyId;
+        //public List<Dictionary<string, string>> getFileColHeaders(int datasetId)
+        //{
+        //    var dataset = GetActivityDataset(datasetId);
+        //    var fileName = dataset.DataFile;
+        //    var studyId = dataset.Activity.StudyId;
 
-            var fileService = new FileService();
-            return fileService.getFileColHeaders(studyId, fileName);
-        }
+        //    var fileService = new FileService(_dataServiceUnit);
+        //    return fileService.getFileColHeaders(studyId, fileName);
+        //}
 
         //public bool checkTemplateMatch(int datasetId)
         //{
@@ -641,18 +662,19 @@ namespace eTRIKS.Commons.Service.Services
         //    //TODO: getColmn headers and get dataset if headers are not 
         //}
 
-        public FileDTO getDatasetFileInfo(int datasetId)
+        public FileDTO getDatasetFileInfo(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.DataFile;
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
             var studyId = dataset.Activity.StudyId;
-
-            var fileService = new FileService();
-            var colHeaders = fileService.getFileColHeaders(studyId, fileName);
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
+            var fileService = new FileService(_dataServiceUnit);
+            var colHeaders = fileService.getFileColHeaders(filePath);
             
             FileDTO fileDto = new FileDTO();
-            fileDto.FileName = dataset.DataFile;
+            fileDto.FileName = dataFile.FileName;
             fileDto.columnHeaders = colHeaders;
+            fileDto.DataFileId = dataFile.Id;
             
             var varNames = dataset.Variables.Select(v => v.VariableDefinition.Name).ToList();
             var headers = colHeaders.Select(d => d["colName"]).ToList<string>();
@@ -660,9 +682,13 @@ namespace eTRIKS.Commons.Service.Services
             fileDto.templateMatched = headers.All(header => varNames.Contains(header));
             if (fileDto.templateMatched)
             {
-               dataset.StandardDataFile = fileName;
+                //dataset.StandardDataFile = filePath;
                //TODO: TEMP usage of dataset state
-                dataset.State = "standard";
+                //dataset.State = "standard";
+                fileDto.IsStandard = true;
+                dataFile.IsStandard = true;
+                _dataFileRepository.Update(dataFile);
+                _dataServiceUnit.Save();
             }
                 
             return fileDto;

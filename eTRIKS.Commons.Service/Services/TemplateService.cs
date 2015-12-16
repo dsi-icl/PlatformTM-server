@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using eTRIKS.Commons.Core.Application.Services;
 using eTRIKS.Commons.Core.Domain.Interfaces;
@@ -6,7 +8,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Service.Services{
-    public class TemplateService : ITemplateService
+    public class TemplateService// : ITemplateService
     {
 
         private IServiceUoW _dataServiceUnit;
@@ -45,7 +47,8 @@ namespace eTRIKS.Commons.Service.Services{
         {
             if (name.Length < 1)
                 return null;
-            return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().Id;
+            //return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().Id;
+            return _cvTermRepository.FindSingle(o => o.Name.Equals(name)).Id;
         }
 
         public string Gettestdomain(string something)
@@ -105,5 +108,76 @@ namespace eTRIKS.Commons.Service.Services{
             }
             return _dataServiceUnit.Save();
         }
+
+        #region temp loader methods
+
+        public void loadDatasetTemplate(string templateDefFilename, string varDefFilename)
+        {
+            var fileservice = new FileService(_dataServiceUnit);
+            var tbl1 = fileservice.ReadOriginalFile(templateDefFilename);
+            //foreach (var row in tbl1.Rows)
+            //{
+                var dt = new DomainTemplate();
+            dt.Id = tbl1.Rows[0][0].ToString();
+                dt.Name = tbl1.Rows[0][4].ToString();//ds.Tables[0].Rows[i][4].ToString().Trim();
+                dt.Class = tbl1.Rows[0][1].ToString();
+                dt.Description = tbl1.Rows[0][6].ToString();
+                dt.Code = tbl1.Rows[0][5].ToString();
+                dt.Structure = tbl1.Rows[0][7].ToString();
+            //}
+
+            
+
+            var tbl2 = fileservice.ReadOriginalFile(varDefFilename);
+            foreach (DataRow row in tbl2.Rows)
+            {
+                var dvt = new DomainVariableTemplate();
+                dvt.Id = row[0].ToString();
+                dvt.Name = row[3].ToString();//ds.Tables[0].Rows[i][1].ToString().Trim();
+                dvt.Label = row[4].ToString(); //ds.Tables[0].Rows[i][2].ToString().Trim();
+                dvt.Description = row[5].ToString();//ds.Tables[0].Rows[i][3].ToString().Trim();
+                dvt.DataType = row[8].ToString(); //ds.Tables[0].Rows[i][4].ToString().Trim();
+                dvt.RoleId = getOIDOfCVterm(row[10].ToString());
+                dvt.UsageId = getOIDOfCVterm(row[9].ToString());
+                
+                //IOUtility iou = new IOUtility();
+                //dvt.controlledTerminologyId = iou.processDictionaryIdForTemplateVariable(ds.Tables[0].Rows[i][7].ToString().Trim());
+                //dvt.DomainId = ds.Tables[0].Rows[i][8].ToString().Trim();
+                dvt.Order = Convert.ToInt32(row[2].ToString());
+                dt.Variables.Add(dvt);
+            }
+            _templateRepository.Insert(dt);
+            _dataServiceUnit.Save();
+        }
+
+        public void loadCVterms(string DictFilename, string CVsfFilename)
+        {
+            var fileservice = new FileService(_dataServiceUnit);
+           // var tbl1 = fileservice.ReadOriginalFile(DictFilename);
+
+            var tbl1 = fileservice.ReadOriginalFile(CVsfFilename);
+            //foreach (DataRow row in tbl1.Rows)
+            //{
+            //  Dictionary dict  = new Dictionary();
+            //    dict.Id = row[0].ToString();
+            //    dict.Name = row[1].ToString();
+            //    dict.Definition = row[2].ToString();
+            //    _dictionaryRepository.Insert(dict);
+            //}
+
+            foreach (DataRow row in tbl1.Rows)
+            {
+                CVterm cv = new CVterm();
+                cv.Id = row[0].ToString();
+                cv.Name = row[1].ToString();
+                cv.DictionaryId = row[2].ToString();
+                _cvTermRepository.Insert(cv);
+            }
+            _dataServiceUnit.Save();
+        }
+
+        #endregion
+
+
     }
 }

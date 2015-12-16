@@ -79,6 +79,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -87,18 +88,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTOs\ActivityDTO.cs" />
+    <Compile Include="DTOs\AssayDTO.cs" />
     <Compile Include="DTOs\ClinicalDataTreeDTO.cs" />
     <Compile Include="DTOs\ColHeaderDTO.cs" />
     <Compile Include="DTOs\DatasetDTO.cs" />
     <Compile Include="DTOs\DatasetMapDTO.cs" />
     <Compile Include="DTOs\DataTemplateMap.cs" />
+    <Compile Include="DTOs\DirectoryDTO.cs" />
+    <Compile Include="DTOs\ExportRequestDTO.cs" />
     <Compile Include="DTOs\FileDTO.cs" />
+    <Compile Include="DTOs\ObservationRequestDTO.cs" />
     <Compile Include="DTOs\SubjCharDTO.cs" />
     <Compile Include="DTOs\UserDTO.cs" />
     <Compile Include="DTOs\VariableDefinitionDTO.cs" />
     <Compile Include="DTOs\VariableReferenceDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActivityService.cs" />
+    <Compile Include="Services\AssayService.cs" />
+    <Compile Include="Services\ExportService.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\UserServices\UserAccountService.cs" />
     <Compile Include="Services\DataManagementServices.cs" />

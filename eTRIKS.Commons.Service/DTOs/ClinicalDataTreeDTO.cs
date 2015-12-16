@@ -55,15 +55,19 @@ namespace eTRIKS.Commons.Service.DTOs
 
     public class ObservationNode : GenericNode
     {
-        public string DomainCode;
-        public string KeyVariable;
-        public string ValueVariable;
+        //public string DomainCode;
+        //public string KeyVariable;
+        //public string ValueVariable;
+        public ObservationRequestDTO DefaultObservation;
+        public List<ObservationRequestDTO> Qualifiers;
+
+        //public string DefaultQualifier { get; set; }
     }
 
     public class GroupNode : GenericNode
     {
 
-        public IList<GenericNode> Terms;
+        public List<GenericNode> Terms;
 
         public GroupNode()
         {
@@ -87,7 +91,9 @@ namespace eTRIKS.Commons.Service.DTOs
 
     public class MedDRATermNode : GenericNode
     {
-        public string Term { get; set; }
+        public ObservationRequestDTO DefaultObservation;
+        public List<ObservationRequestDTO> Qualifiers;
+        public string Variable { get; set; }
     }
 
 }

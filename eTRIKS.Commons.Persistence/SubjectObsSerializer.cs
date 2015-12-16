@@ -25,11 +25,21 @@ namespace eTRIKS.Commons.Persistence
             {
                 String fieldName = reader.ReadName();
 
+                //TODO:Name of Obs name for Events shuold be DECOD? 
+                //TODO: SubjObs SHOULD store SQL ObservationId
 
-                if (fieldName.EndsWith("TESTCD") || fieldName.EndsWith("TERM") || fieldName.EndsWith("TRT"))
+                if (fieldName.EndsWith("TESTCD") || fieldName.EndsWith("DECOD") || fieldName.EndsWith("TRT"))
+                {
                     subjObs.Name = reader.ReadString();
+                    subjObs.StandardName = subjObs.Name;
+                }
+                    
+                else if (fieldName.EndsWith("TEST") || fieldName.EndsWith("TERM"))
+                    subjObs.VerbatimName = reader.ReadString();
+                //if (fieldName.EndsWith("LOINC") || fieldName.EndsWith("DECOD"))
+                //    subjObs.StandardName = reader.ReadString();
 
-                if (fieldName.EndsWith("CAT"))
+                else if (fieldName.EndsWith("CAT"))
                     subjObs.Group = reader.ReadString();
 
                 else if (fieldName.EndsWith("SCAT"))
@@ -76,7 +86,7 @@ namespace eTRIKS.Commons.Persistence
                         }
                        
                     }
-                    
+                 
                 }
                 else if (fieldName.EndsWith("TPT"))
                 {

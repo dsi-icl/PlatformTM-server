@@ -35,9 +35,9 @@ namespace eTRIKS.Commons.Persistence {
 
             BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
             BsonSerializer.RegisterSerializer(typeof(Subject), new SubjectSerializer());
+            BsonSerializer.RegisterSerializer(typeof(Biospecimen), new BiospecimenSerializer());
 
-            //INITIALIZE ApplicationUserManager and expose it via a method similar to other repositories 
-            //ApplicationUserManager.Create();
+            
 
             
 
@@ -91,6 +91,12 @@ namespace eTRIKS.Commons.Persistence {
             }
 
             if (typeof(TEntity).Name.Equals("Subject"))
+            {
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
+            if (typeof(TEntity).Name.Equals("Biospecimen"))
             {
                 var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
                 _repositories.Add(typeof(TEntity), MongoRepository);
@@ -165,6 +171,7 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new VariableRefMap());
             modelBuilder.Configurations.Add(new ObservationMap());
             modelBuilder.Configurations.Add(new ProjectMap());
+            modelBuilder.Configurations.Add(new DataFileMap());
         }
 
 

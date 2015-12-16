@@ -13,6 +13,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string SubjectId { get; set; }
         public string StudyId { get; set; }
         public string Name { get; set; }// should be the Object of Observation entity with and id ...etc
+        public string VerbatimName { get; set; }
+        public string StandardName { get; set; }
         public string Class { get; set; } //Findings
         public string DomainCode { get; set; }
         public string DomainName { get; set; }

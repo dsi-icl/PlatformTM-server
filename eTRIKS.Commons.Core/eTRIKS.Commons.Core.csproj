@@ -56,6 +56,7 @@
     <Compile Include="Domain\Model\DerivedMethod.cs" />
     <Compile Include="Domain\Model\Base\Identifiable.cs" />
     <Compile Include="Domain\Model\Base\IEntity.cs" />
+    <Compile Include="Domain\Model\DataFile.cs" />
     <Compile Include="Domain\Model\NoSQLData.cs" />
     <Compile Include="Domain\Model\ObjectOfObservation.cs" />
     <Compile Include="Domain\Model\Project.cs" />

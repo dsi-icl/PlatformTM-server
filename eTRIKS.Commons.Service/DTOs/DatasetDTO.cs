@@ -23,7 +23,9 @@ namespace eTRIKS.Commons.Service.DTOs
         public string DomainId { get; set; }
         public string StudyId { get; set; }
         public int ActivityId { get; set; }
-        public string DataFile { get; set; }
+        public FileDTO DataFileDTO { get; set; }
+
+        //public List<FileDTO> DataFileDtos { get; set; } 
         public string StandardDataFile { get; set; }
         public string State { get; set; }
         public List<DatasetVariableDTO> variables { get; set; }

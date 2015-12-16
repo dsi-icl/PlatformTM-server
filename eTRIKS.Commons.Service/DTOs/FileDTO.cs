@@ -19,5 +19,9 @@ namespace eTRIKS.Commons.Service.DTOs
         public List<Dictionary<string, string>> columnHeaders { get; set; }
 
         public bool templateMatched { get; set; }
+
+        public bool IsDirectory { get; set; }
+        public int DataFileId { get; set; }
+        public bool IsStandard { get; set; }
     }
 }

@@ -1,6 +1,9 @@
-﻿using eTRIKS.Commons.Core.Domain.Interfaces;
+﻿using System.Collections;
+using eTRIKS.Commons.Core.Domain.Interfaces;
+using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq.Translators;
 using System;
@@ -40,18 +43,36 @@ namespace eTRIKS.Commons.DataAccess
            
         }
 
-        public async Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter = null)
+        public async Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null)
         {
-            return await collection
-                    .Find(filter)
-                    /*
-                    .Project(Builders<BsonDocument>.Projection
-                                                    .Include(filteredColumnList[0])
-                                                    .Include(filteredColumnList[1])
-                                                    .Include(filteredColumnList[2])
-                                                    .Include(filteredColumnList[3])
-                                                    .Exclude("_id")).ToListAsync();)*/
+            if (filterExpression != null)
+                return await collection
+                    .Find(filterExpression)
                     .ToListAsync();
+            return null;
+        }
+
+        public async Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null)
+        {
+            var filterDoc = new BsonDocument();
+            filterDoc.AllowDuplicateNames = true;
+            foreach (var filterField in filterFields)
+            {
+                var jsonDoc = Newtonsoft.Json.JsonConvert.SerializeObject(filterField);
+                var bsonDoc = BsonSerializer.Deserialize<BsonDocument>(jsonDoc);
+                filterDoc.AddRange(bsonDoc);
+            }
+
+
+            return await collection.Find(filterDoc).ToListAsync();
+        }
+
+        private void TEST()
+        {
+            var filterBuilder = Builders<Subject>.Filter;
+            var filter = filterBuilder.Eq("STUDYID", "CRC305C");
+
+            collection.Find(filter.ToBsonDocument()).ToListAsync();
         }
 
         public async Task<string> InsertAsync(TEntity entity)
@@ -115,13 +136,14 @@ namespace eTRIKS.Commons.DataAccess
 
         public Task<List<TEntity>> GetAllAsync()
         {
-            return this.FindAllAsync();
+            throw new NotImplementedException();
         }
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)
         {
             throw new NotImplementedException();
         }
+
 
 
 

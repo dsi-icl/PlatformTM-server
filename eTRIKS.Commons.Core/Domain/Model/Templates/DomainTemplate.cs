@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using System.Runtime.Serialization;
 
@@ -18,6 +19,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public Boolean IsRepeating { get; set; }
 
         public ICollection<DomainVariableTemplate> Variables { get; private set; }
+
+        public DomainTemplate()
+        {
+            Variables = new List<DomainVariableTemplate>();
+        }
     }
 
 }

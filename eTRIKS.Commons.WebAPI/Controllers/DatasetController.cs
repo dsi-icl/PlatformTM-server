@@ -98,33 +98,33 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/Dataset/{datasetId}/templateMap")]
+        [Route("api/datasets/{datasetId}/templateMap")]
         public DataTemplateMap getDatasetTemplateMap(int datasetId)
         {
-            return  _datasetService.GeTemplateMaps(datasetId);
+            return  _datasetService.GetTemplateMaps(datasetId);
         }
 
-        [HttpPost]
-        [Route("api/Datasets/{datasetId}/mapToTemplate")]
-        public async Task<bool> MapToTemplate(int datasetId, [FromBody] DataTemplateMap dataTemplateMap)
+        //[HttpPost]
+        //[Route("api/Datasets/{datasetId}/mapToTemplate")]
+        //public async Task<bool> MapToTemplate(int datasetId, [FromBody] DataTemplateMap dataTemplateMap)
+        //{
+        //    //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
+        //    //string filePath = PATH + "\\" + fileName;
+        //    return _datasetService.mapToTemplate(datasetId, dataTemplateMap);
+        //}
+
+        [HttpGet]
+        [Route("api/datasets/{datasetId}/preview/file/{fileId}")]
+        public async Task<Hashtable> getDatasetPreview(int datasetId, int fileId)
         {
-            //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-            //string filePath = PATH + "\\" + fileName;
-            return _datasetService.mapToTemplate(datasetId, dataTemplateMap);
+           return _datasetService.getDatasetPreview(datasetId,fileId);
         }
 
         [HttpGet]
-        [Route("api/datasets/{datasetId}/preview")]
-        public async Task<Hashtable> getDatasetPreview(int datasetId)
+        [Route("api/Datasets/{datasetId}/loadDataFile/file/{fileId}")]
+        public async Task<string> LoadDataSetFromFile(int datasetId, int fileId)
         {
-           return _datasetService.getDatasetPreview(datasetId);
-        }
-
-        [HttpGet]
-        [Route("api/Datasets/{datasetId}/loadDataFile")]
-        public async Task<string> LoadDataSetFromFile(int datasetId)
-        {
-            _datasetService.loadDataset(datasetId);
+            _datasetService.loadDataset(datasetId,fileId);
             return "";
         }
 
@@ -135,20 +135,20 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return await _datasetService.loadObservations(datasetId);
         }
 
-        [HttpGet]
-        [Route("api/Datasets/{datasetId}/dataFile/header")]
-        public async Task<List<Dictionary<string, string>>> LinkFile(int datasetId)
-        {
-            //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-            //string path = rawFilesDirectory + studyId;
-            return _datasetService.getFileColHeaders(datasetId);
-        }
+        //[HttpGet]
+        //[Route("api/Datasets/{datasetId}/dataFile/header")]
+        //public async Task<List<Dictionary<string, string>>> LinkFile(int datasetId)
+        //{
+        //    //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+        //    //string path = rawFilesDirectory + studyId;
+        //    return _datasetService.getFileColHeaders(datasetId);
+        //}
 
         [HttpGet]
-        [Route("api/datasets/{datasetId}/OriFileInfo")]
-        public async Task<FileDTO> checkTemplateMatch(int datasetId)
+        [Route("api/datasets/{datasetId}/OriFileInfo/{fileId}")]
+        public async Task<FileDTO> checkTemplateMatch(int datasetId, int fileId)
         {
-             return _datasetService.getDatasetFileInfo(datasetId);
+             return _datasetService.getDatasetFileInfo(datasetId,fileId);
         }
     }
 }
