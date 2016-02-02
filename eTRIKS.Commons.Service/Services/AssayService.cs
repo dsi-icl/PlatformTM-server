@@ -28,7 +28,7 @@ namespace eTRIKS.Commons.Service.Services
             //assay.AssayPlatform = assayDto.;
             //assay.AssayTechnology =;
             assay.Name = assayDto.Name;
-            assay.StudyId = assayDto.StudyID;
+            assay.ProjectId = assayDto.ProjectId;
             assay.TechnologyPlatformId = assayDto.AssayTechnologyPlatform;
             assay.TechnologyTypeId = assayDto.AssayTechnology;
             //assay.DesignType = getCVterm(assayDto.AssayDesignType);

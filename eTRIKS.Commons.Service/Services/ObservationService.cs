@@ -22,9 +22,9 @@ namespace eTRIKS.Commons.Service.Services
         //private IRepository<SubjectCharacteristic, int> subjCharacteristicsRepository;
 
         //MongoDB Repositories
-        private IRepository<Subject, Guid> subjectRepository;
+        private IRepository<Subject, string> subjectRepository;
 
-        private IRepository<Study, String> studyRepository; 
+        private IRepository<Study, int> studyRepository; 
         
         public ObservationService(IServiceUoW uoW)
         {
@@ -36,9 +36,9 @@ namespace eTRIKS.Commons.Service.Services
 
             _variableRepository = uoW.GetRepository<VariableDefinition, int>();
             //subjCharacteristicsRepository = uoW.GetRepository<SubjectCharacteristic, int>();
-            subjectRepository = uoW.GetRepository<Subject, Guid>();
+            subjectRepository = uoW.GetRepository<Subject, string>();
 
-            studyRepository = uoW.GetRepository<Study, string>();
+            studyRepository = uoW.GetRepository<Study, int>();
         }
 
         /***
@@ -60,12 +60,12 @@ namespace eTRIKS.Commons.Service.Services
 
             //TODO: Change Activity-Study relationship to many-to-many
             List<Activity> activity_list = _activityRepository.FindAll(
-               d => d.StudyId.Equals(studyId),
+               d => d.ProjectId.Equals(studyId),
                  new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain), 
                         d=> d.Datasets.Select(t=>t.Variables),
                         d => d.Datasets.Select(t => t.Domain),
-                        d => d.Study,
+                        d => d.Project,
                         d=>d.Datasets.Select(t=>t.Variables.Select(k=>k.VariableDefinition))
                 }).ToList();
 
@@ -193,13 +193,14 @@ namespace eTRIKS.Commons.Service.Services
             
         }
 
+        /*
         public void loadSubjectCharacteristics(Dataset ds)
         {
             //If dataset is SC or SUPPDM ... then I need to read values from the Data file SC or SUPPDM from SQL to pivot them
             //Dictionary<string, string> filterFields = new Dictionary<string, string>();
             //filterFields.Add("DOMAIN", ds.Domain.Code);
             ////filterFields.Add("STUDYID", studyId);
-
+   
             //Dictionary<string, string> groupFields = new Dictionary<string, string>();
             //groupFields.Add("Name", "$" + obsName);
             //groupFields.Add("ControlledTermStr", "$" + controlledTerm.Name);
@@ -230,7 +231,11 @@ namespace eTRIKS.Commons.Service.Services
             }
             _dataContext.Save();
 
+            //List<SdtmEntity> subjectData = await _sdtmRepository.FindAllAsync(
+             //       bs => bs.DatasetId.Equals(datasetId));
+
         }
+         */
 
         public void getObservationInventory(string projectId)
         {
@@ -239,7 +244,7 @@ namespace eTRIKS.Commons.Service.Services
             string studyId = "STD-BVS-01";
             List<Observation> studyObservations =
                 _ObservationRepository.FindAll(
-                    x => x.Studies.Select(s => s.Id).Contains(studyId),
+                    x => x.Studies.Select(s => s.Accession).Contains(studyId),
                     new List<Expression<Func<Observation, object>>>()
                     {
                         d=>d.TopicVariable,
@@ -317,7 +322,7 @@ namespace eTRIKS.Commons.Service.Services
             var filterFields = new Dictionary<string, string>
             {
                 {"DOMAIN", ds.Domain.Code},
-                {"STUDYID", ds.Activity.StudyId}
+                {"STUDYID", ds.Activity.Project.Accession}
             };
 
             var groupFields = new Dictionary<string, string>
@@ -347,7 +352,8 @@ namespace eTRIKS.Commons.Service.Services
 
                 if (obsClass.Equals("events"))
                     obs.DefaultQualifier = defaultQualifier;
-                obs.Studies.Add(ds.Activity.Study);
+                //TODO: CHECK THAT
+                //obs.Studies.AddRange(ds.Activity.Project.Studies);
                 //obs.Studies.AddRange(studies);
                 _ObservationRepository.Insert(obs);
             }

@@ -16,6 +16,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Activity Activity { get; private set; }
         public DomainTemplate Domain { get; set; }
         public ICollection<VariableReference> Variables { get;  set; }
+        public ICollection<Study> Studies { get; set; }
         public ICollection<DataFile> DataFiles { get; set; }
         //public ICollection<DataFile> StandardDataFiles { get; set; }
         public string State { get; set; }
@@ -23,7 +24,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Dataset()
         {
             Variables = new List<VariableReference>();
-            DataFiles = new List<DataFile>();
+            DataFiles = new HashSet<DataFile>();
         }
 
         public void AddDataFile(DataFile file)

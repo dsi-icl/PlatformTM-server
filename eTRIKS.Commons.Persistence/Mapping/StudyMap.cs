@@ -12,8 +12,8 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Properties
             this.Property(t => t.Id)
-                .IsRequired()
-                .HasMaxLength(200);
+                .IsRequired();
+                //.HasMaxLength(200);
 
             this.Property(t => t.Name)
                 .HasMaxLength(2000);
@@ -23,7 +23,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
 
             // Table & Column Mappings
             this.ToTable("Study_TBL");
-            this.Property(t => t.Id).HasColumnName("OID");
+            this.Property(t => t.Id).HasColumnName("StudyId");
 
             // Relationships
             this.HasRequired(t => t.Project)
@@ -38,6 +38,15 @@ namespace eTRIKS.Commons.Persistence.Mapping
                     mc.ToTable("Study_Observations");
                     mc.MapLeftKey("StudyId");
                     mc.MapRightKey("ObservationId");
+
+                });
+            this.HasMany(t => t.Datasets)
+                .WithMany(t => t.Studies)
+                .Map(mc =>
+                {
+                    mc.ToTable("Study_Datasets");
+                    mc.MapLeftKey("StudyId");
+                    mc.MapRightKey("DatasetId");
 
                 });
         }

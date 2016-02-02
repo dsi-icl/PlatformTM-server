@@ -21,12 +21,13 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class DataService
     {
-        private readonly IRepository<Study, string> _studyRepository;
+        private readonly IRepository<Study, int> _studyRepository;
         private readonly IRepository<Observation, int> _observationRepository;
-        private readonly IRepository<Subject, Guid> _subjectRepository;
+        private readonly IRepository<Subject, string> _subjectRepository;
+        private readonly IRepository<CharacteristicObject, int> _characObjRepository;
         private IRepository<Activity, int> _activityRepository;
         private readonly IRepository<SubjectObservation, Guid> _subObservationRepository;
-        private readonly IRepository<Biospecimen, Guid> _biospecimenRepository;
+        private readonly IRepository<Biosample, int> _biospecimenRepository;
         private readonly IRepository<DomainTemplate, string> _domainRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IServiceUoW _dataContext;
@@ -34,14 +35,15 @@ namespace eTRIKS.Commons.Service.Services
         {
             _dataContext = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
-            _studyRepository = uoW.GetRepository<Study, string>();
+            _studyRepository = uoW.GetRepository<Study, int>();
             //_dataSetRepository = uoW.GetRepository<Dataset, int>();
             _observationRepository = uoW.GetRepository<Observation, int>();
             _subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
-            _subjectRepository = uoW.GetRepository<Subject, Guid>();
+            _subjectRepository = uoW.GetRepository<Subject, string>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-            _biospecimenRepository = uoW.GetRepository<Biospecimen, Guid>();
+            _biospecimenRepository = uoW.GetRepository<Biosample, int>();
+            _characObjRepository = uoW.GetRepository<CharacteristicObject, int>();
             // _subjCharacterisitcRepository = uoW.GetRepository<SubjectCharacteristic, int>();
         }
 
@@ -49,29 +51,20 @@ namespace eTRIKS.Commons.Service.Services
         public List<ObservationRequestDTO> getSubjectCharacteristics(string projectId)
         {
             var subjChars = new List<ObservationRequestDTO>();
-            var SCs =
-             _observationRepository.FindAll(o => o.Studies.Any(s => s.Project.Accession.Equals(projectId)) && o.isSubjCharacteristic == true).ToList();
+            var SCs = _characObjRepository.FindAll(sco=>sco.Project.Accession.Equals(projectId)).ToList();
 
-            ObservationRequestDTO scdto;
-            foreach (var sc in SCs)
+            subjChars = SCs.Select(sc => new ObservationRequestDTO()
             {
-                if (sc.ControlledTermStr.Contains("RF") || sc.ControlledTermStr.Equals(""))
-                    continue;
-                scdto = new ObservationRequestDTO
-                {
-                    O3 = sc.Name,
-                    O3id = sc.Id,
-                    O3code = sc.ControlledTermStr //
-                };
-                subjChars.Add(scdto);
-            }
-            var studyVarRequest = new ObservationRequestDTO()
-            {
-                O3 = "STUDY",
-                O3id = 123545,
-                O3code = "study"
-            };
-            subjChars.Add(studyVarRequest);
+                O3 = sc.FullName,
+                O3id = sc.Id,
+                O3code = sc.ShortName
+            }).ToList();
+
+            var armSC = new ObservationRequestDTO() {O3 = "Arm", O3code = "ARM", O3id = 999};
+            var studySC = new ObservationRequestDTO() { O3 = "Study", O3code = "STUDY", O3id = 888 };
+            subjChars.Add(armSC);
+            subjChars.Add(studySC);
+
             return subjChars.OrderBy(o => o.O3).ToList();
         }
         public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalObsTree(string projectAccession)
@@ -245,9 +238,9 @@ namespace eTRIKS.Commons.Service.Services
 
                 //TODO: either add projectId to Mongo Records or query for project studies ids from SQL and include them in the query for mongo
                 List<SubjectObservation> observationData = await _subObservationRepository.FindAllAsync(
-                    d => d.Name.Equals(obsName),
+                    d => d.Name.Equals(obsName));
                     //TEMP
-                    d => studyIds.Contains(d.StudyId));
+                   // d => studyIds.Contains(d.StudyId));
                 //}
                 if (observation.DomainCode.Equals("AE"))
                 {
@@ -581,63 +574,82 @@ namespace eTRIKS.Commons.Service.Services
         {
 
             List<Observation> subjCharacteristics = null;
+            List<int> subjCharacteristicIds =null ;
 
             //Get Requested (If any) subject characteristics (Observations)
             if (reqObservations != null && reqObservations.Count != 0)
             {
-                var subjCharacteristicIds = reqObservations.Select(o => o.O3id).ToList();
-                subjCharacteristics = _observationRepository.FindAll(
-                           o => subjCharacteristicIds.Contains(o.Id)//,
-                    //new List<Expression<Func<SubjectCharacteristic, object>>>()
-                    //{
-                    //d=>d.TopicVariable,
-                    //d => d.Timings//,
-                    //d => d.DefaultQualifier
-                    //}
-             ).ToList();
+                 subjCharacteristicIds = reqObservations.Select(o => o.O3id).ToList();
+                //subjCharacteristics = _observationRepository.FindAll(
+                //           o => subjCharacteristicIds.Contains(o.Id)//,
+                //    //new List<Expression<Func<SubjectCharacteristic, object>>>()
+                //    //{
+                //    //d=>d.TopicVariable,
+                //    //d => d.Timings//,
+                //    //d => d.DefaultQualifier
+                //    //}).ToList();
             }
 
 
-            List<string> studyIds;
-            //This will be replaced by call to SQL for studies of a particular project.
-            if (projectId.Equals("P-BVS"))
-                studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
-            else
-            {
-                studyIds = _studyRepository.FindAll(
-                    s => s.Project.Accession.Equals(projectId),
-                    new List<Expression<Func<Study, object>>>()
-                    {
-                        d=>d.Project
-                    }).Select(s => s.Id).ToList();
-            }
+            //List<string> studyIds;
+            ////This will be replaced by call to SQL for studies of a particular project.
+            //if (projectId.Equals("P-BVS"))
+            //    studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
+            //else
+            //{
+            //    studyIds = _studyRepository.FindAll(
+            //        s => s.Project.Accession.Equals(projectId),
+            //        new List<Expression<Func<Study, object>>>()
+            //        {
+            //            d=>d.Project
+            //        }).Select(s => s.Accession).ToList();
+            //}
 
 
-            // A query to Mongo
-            List<Subject> subjectData =
-                    await _subjectRepository.FindAllAsync(
-                    s => studyIds.Contains(s.StudyId) && s.DomainCode.Equals("DM"));
+            //TODO: replace this with a query to SQL
+
+            List<Subject> subjects = _subjectRepository.FindAll(
+                s => s.Study.Project.Accession.Equals(projectId),
+                new List<Expression<Func<Subject, object>>>()
+                {   d=> d.SubjectCharacteristics,
+                    d=>d.Study
+                }).ToList();
+
+
+            //List<Subject> subjectData =
+            //        _subjectRepository.FindAll(
+            //        s => studyIds.Contains(s.Study.Accession)).ToList();
 
             List<Hashtable> subject_table = new List<Hashtable>();
-            HashSet<string> SCs = new HashSet<string>() { "armcd", "siteid", "study" };
+            HashSet<string> SCs = new HashSet<string>() { "arm", "siteid", "study" };
 
 
             Hashtable ht;
-            foreach (Subject subjData in subjectData)
+            foreach (Subject subject in subjects)
             {
                 ht = new Hashtable();
-                ht.Add("subjectId", subjData.SubjId);
-                ht.Add("armcd", subjData.ArmCode);
-                ht.Add("study", subjData.StudyId);
-                ht.Add("siteid", subjData.Site);
+                ht.Add("subjectId", subject.UniqueSubjectId);
+                ht.Add("arm", subject.ArmCode);
+                ht.Add("study", subject.Study.Name);
+                ht.Add("siteid", subject.Study.Site);
 
-                if (subjCharacteristics != null)
-                    foreach (Observation sc in subjCharacteristics)
+
+                if (reqObservations != null)
+                    foreach (var requestDto in reqObservations)
                     {
-                        string value = subjData.characteristicsValues.SingleOrDefault(q => q.Key.Equals(sc.ControlledTermStr)).Value;
-                        ht.Add(sc.ControlledTermStr, value);
-                        SCs.Add(sc.ControlledTermStr.ToLower());
+                        var charVal = subject.SubjectCharacteristics.Single(sc => sc.CharacteristicObjectId.Equals(requestDto.O3id));
+                        ht.Add(requestDto.O3code, charVal.VerbatimValue);
+                        SCs.Add(requestDto.O3code.ToLower());
                     }
+
+                //if (subjCharacteristicIds != null)
+
+                //    foreach (SubjectCharacteristic sc in subject.SubjectCharacteristics)
+                //    {
+                //        //string value = subjData.characteristicsValues.SingleOrDefault(q => q.Key.Equals(sc.ControlledTermStr)).Value;
+                //        //ht.Add(sc.ControlledTermStr, value);
+                //        SCs.Add(sc.ControlledTermStr.ToLower());
+                //    }
 
                 subject_table.Add(ht);
             }
@@ -905,10 +917,10 @@ namespace eTRIKS.Commons.Service.Services
         {
             var studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C" };
 
-            var samples = new List<Biospecimen>();
+            var samples = new List<Biosample>();
             #region Query Mongo for Subject Observations data
 
-            List<Assay> assays = _assayRepository.FindAll(a => a.Study.Project.Accession.Equals(projectId)).ToList();
+            List<Assay> assays = _assayRepository.FindAll(a => a.Project.Accession.Equals(projectId)).ToList();
             var result = new Hashtable();
 
             foreach (var assay in assays)
@@ -938,8 +950,8 @@ namespace eTRIKS.Commons.Service.Services
                 //{
 
                 //TODO: either add projectId to Mongo Records or query for project studies ids from SQL and include them in the query for mongo
-                List<Biospecimen> sampleData = await _biospecimenRepository.FindAllAsync(
-                    bs => bs.AssayId.Equals(assay.Id) && bs.DomainCode.Equals("BS") && studyIds.Contains(bs.StudyId));
+                List<Biosample> sampleData = await _biospecimenRepository.FindAllAsync(
+                    bs => bs.AssayId.Equals(assay.Id) /*&& bs.DomainCode.Equals("BS")*/ && studyIds.Contains(bs.Study.Accession));
 
                 #region Build Table columns
                 var datatable = new DataTable();
@@ -960,7 +972,7 @@ namespace eTRIKS.Commons.Service.Services
                     .GroupBy(ob => new
                     {
                         subjId = ob.SubjectId,
-                        sdy = ob.ObsStudyDay.Number,
+                        sdy = ob.Visit.StudyDay.Number,
                         //Day = ob.ObsStudyDay == null ? -999 : ob.ObsStudyDay.Number,
                         //Timepoint = ob.ObsStudyTimePoint == null ? "" : ob.ObsStudyTimePoint.Name
                     });
@@ -980,7 +992,7 @@ namespace eTRIKS.Commons.Service.Services
                         //    //TODO: assumption to be validated that visits/timepoints are study and dont differ between observations or studies of the same project
                         //    row[obsreq.Id] = subjObs.qualifiers.SingleOrDefault(q => q.Key.Equals(obsreq.QO2)).Value;
 
-                        row["studyDay"] = sample.ObsStudyDay.Number;
+                       // row["studyDay"] = sample.ObsStudyDay.Number;
                         
                     }
                     datatable.Rows.Add(row);

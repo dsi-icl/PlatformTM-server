@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Base;
@@ -67,6 +68,7 @@ namespace eTRIKS.Commons.DataAccess
             return await collection.Find(filterDoc).ToListAsync();
         }
 
+
         private void TEST()
         {
             var filterBuilder = Builders<Subject>.Filter;
@@ -89,6 +91,43 @@ namespace eTRIKS.Commons.DataAccess
                 return e.Message;
             }
             
+        }
+
+        public Task DeleteOneAsync(IList<object> filterFields = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<TEntity> InsertMany(IList<TEntity> entities = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task InsertManyAsync(IList<TEntity> entitites = null)
+        {
+            try
+            {
+                await collection.InsertManyAsync(entitites);
+            }
+            catch (Exception e)
+            {
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                Debug.WriteLine(e.Message);
+            }
+        }
+
+        public async Task DeleteManyAsync(IList<object> filterFields = null)
+        {
+            var filterDoc = new BsonDocument();
+            filterDoc.AllowDuplicateNames = true;
+            foreach (var filterField in filterFields)
+            {
+                var jsonDoc = Newtonsoft.Json.JsonConvert.SerializeObject(filterField);
+                var bsonDoc = BsonSerializer.Deserialize<BsonDocument>(jsonDoc);
+                filterDoc.AddRange(bsonDoc);
+            }
+            await collection.DeleteManyAsync(filterDoc);
         }
 
         public async Task<ICollection<TNewResult>> AggregateAsync<Tkey, TNewResult>(Expression<Func<TEntity, bool>> match,
@@ -198,5 +237,7 @@ namespace eTRIKS.Commons.DataAccess
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

@@ -21,8 +21,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string VariableTypeId { get; set; }
         public CVterm Role { get; set; }
         public string RoleId { get; set; }
-        public Study Study { get; set; }
-        public string StudyId { get; set; }
+        public Project Project { get; set; }
+        public int ProjectId { get; set; }
         public List<VariableDefinition> VariableQualifiers { get; set; }
         //public List<VariableDefinition> Synonyms { get; set; } 
 

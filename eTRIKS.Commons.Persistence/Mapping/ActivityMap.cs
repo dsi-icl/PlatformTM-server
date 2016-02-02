@@ -13,20 +13,20 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.Property(t => t.Name)
                 .HasMaxLength(2000);
 
-            this.Property(t => t.StudyId)
-                .IsRequired()
-                .HasMaxLength(200);
+            this.Property(t => t.ProjectId)
+                .IsRequired();
+                //.HasMaxLength(200);
 
             // Table & Column Mappings
             this.ToTable("Activity_TBL");
             this.Property(t => t.Id).HasColumnName("ActivityId");
             this.Property(t => t.Name).HasColumnName("Name");
-            this.Property(t => t.StudyId).HasColumnName("StudyId");
+            this.Property(t => t.ProjectId).HasColumnName("ProjectId");
 
             // Relationships
-            this.HasRequired(t => t.Study)
+            this.HasRequired(t => t.Project)
                 .WithMany(s => s.Activities)
-                .HasForeignKey(t => t.StudyId);
+                .HasForeignKey(t => t.ProjectId);
 
             //this.HasMany(t => t.Studies)
             //    .WithMany(t => t.Activities)

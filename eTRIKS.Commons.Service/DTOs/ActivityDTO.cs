@@ -14,7 +14,8 @@ namespace eTRIKS.Commons.Service.DTOs
     {
         public string Name { get; set; }
         public int Id { get; set; }
-        public string StudyID { get; set; }
+        public int ProjectId { get; set; }
+        public string ProjectAcc { get; set; }
         public ICollection<DatasetDTO> datasets { get; set; }
 
         //Assay properties

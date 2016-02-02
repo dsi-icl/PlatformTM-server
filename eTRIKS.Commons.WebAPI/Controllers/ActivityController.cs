@@ -46,15 +46,15 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/activities")]
         public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
         {
-            Activity addedActivity =null;
+            ActivityDTO addedActivity =null;
             if(!activityDTO.isAssay)
                 addedActivity = _activityService.addActivity(activityDTO);
-            if (activityDTO.isAssay)
-                addedActivity = _assayService.AddAssay(activityDTO);
+            //if (activityDTO.isAssay)
+                //addedActivity = _assayService.AddAssay(activityDTO);
 
             if (addedActivity != null)
             {
-                var response = Request.CreateResponse<Activity>(HttpStatusCode.Created, addedActivity);
+                var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Created, addedActivity);
                 string uri = Url.Link("GetActivityById", new { activityId = addedActivity.Id });
                 response.Headers.Location = new Uri(uri);
                 return response;

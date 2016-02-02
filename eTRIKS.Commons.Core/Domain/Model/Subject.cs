@@ -7,23 +7,24 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class Subject : Identifiable<Guid>
+    public class Subject : Identifiable<string>
     {
         public Study Study { get; set; }
-        public string StudyId { get; set; }
-        public string SubjId { get; set; }
-        public string Site { get; set; }
-        public DateTime StudyStartDate { get; set; }
-        public DateTime StudyEndDate { get; set; }
+        public int StudyId { get; set; }
+        public string SubjectStudyId { get; set; }
+        public string UniqueSubjectId { get; set; }
+        //public string Site { get; set; }
+        public DateTime SubjectStartDate { get; set; }
+        public DateTime SubjectEndDate { get; set; }
         public string Arm { get; set; } //Should be replace by ARM class reference
         public string ArmCode { get; set; } //Should be replace by ARM class reference
-        public string DomainCode { get; set; }
-        public List<Observation> characteristics {get;set;}
-        public Dictionary<string, string> characteristicsValues { get; set; }
+        public Dataset Dataset { get; set; }
+        public int DatasetId { get; set; }
+        public ICollection<SubjectCharacteristic> SubjectCharacteristics { get; set; }
 
         public Subject()
         {
-            characteristicsValues = new Dictionary<string, string>();
+            SubjectCharacteristics = new List<SubjectCharacteristic>();
         }
     }
 }

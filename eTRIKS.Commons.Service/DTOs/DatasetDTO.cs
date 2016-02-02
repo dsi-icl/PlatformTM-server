@@ -21,7 +21,8 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Code { get; set; }
         public string Structure { get; set; }
         public string DomainId { get; set; }
-        public string StudyId { get; set; }
+        public int ProjectId { get; set; }
+        public string ProjectStrAcc { get; set; }
         public int ActivityId { get; set; }
         public FileDTO DataFileDTO { get; set; }
 

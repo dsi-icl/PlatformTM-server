@@ -108,6 +108,16 @@ namespace eTRIKS.Commons.DataAccess
             return Entities.Add(entity);
         }
 
+        public IEnumerable<TEntity> InsertMany(IList<TEntity> entities = null)
+        {
+            return Entities.AddRange(entities);
+        }
+
+        public Task InsertManyAsync(IList<TEntity> entitites = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public TEntity Update(TEntity entity)
         {
             //Entities.Attach(entity);
@@ -122,6 +132,16 @@ namespace eTRIKS.Commons.DataAccess
         }
 
         public void Remove(TPrimaryKey id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteManyAsync(IList<object> filterFields = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteOneAsync(IList<object> filterFields = null)
         {
             throw new NotImplementedException();
         }

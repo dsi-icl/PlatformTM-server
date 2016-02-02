@@ -69,6 +69,8 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         /// <param name="entity">Entity</param>
         TEntity Insert(TEntity entity);
         Task<string> InsertAsync(TEntity entity);
+        IEnumerable<TEntity> InsertMany(IList<TEntity> entities = null);
+        Task InsertManyAsync(IList<TEntity> entitites = null);
 
         #endregion
 
@@ -97,8 +99,9 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         /// </summary>
         /// <param name="id">Primary key of the entity</param>
         void Remove(TPrimaryKey id);
-
-
+        Task DeleteManyAsync(IList<object> filterFields = null);
+        Task DeleteOneAsync(IList<object> filterFields = null);
+        
         #endregion
 
         #region Aggregates

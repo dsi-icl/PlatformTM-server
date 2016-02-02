@@ -25,7 +25,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
          **/
         //private List<string> Factors { get; set; }
         private string ObservationDomain { get; set; }
-        //public ICollection<Biospecimen> Biospecimens { get; set; }
+        public ICollection<Biosample> Biosamples { get; set; }
 
         public Assay()
         {

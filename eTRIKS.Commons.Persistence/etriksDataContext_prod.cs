@@ -34,8 +34,8 @@ namespace eTRIKS.Commons.Persistence {
             DbConfiguration.SetConfiguration(new MySql.Data.Entity.MySqlEFConfiguration());
 
             BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
-            BsonSerializer.RegisterSerializer(typeof(Subject), new SubjectSerializer());
-            BsonSerializer.RegisterSerializer(typeof(Biospecimen), new BiospecimenSerializer());
+            BsonSerializer.RegisterSerializer(typeof(SdtmEntity), new SdtmSerializer());
+            BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
 
             
 
@@ -48,6 +48,11 @@ namespace eTRIKS.Commons.Persistence {
 
             this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
             _disposed = false;
+        }
+
+        public void setSDTMentityDescriptor(SdtmEntityDefine descriptor)
+        {
+            SdtmSerializer.sdtmEntityDescriptor = descriptor;
         }
 
         public void AddClassMap(string fieldname, string propertyName)
@@ -90,13 +95,13 @@ namespace eTRIKS.Commons.Persistence {
                 return MongoRepository;
             }
 
-            if (typeof(TEntity).Name.Equals("Subject"))
-            {
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
-                _repositories.Add(typeof(TEntity), MongoRepository);
-                return MongoRepository;
-            }
-            if (typeof(TEntity).Name.Equals("Biospecimen"))
+            //if (typeof(TEntity).Name.Equals("Subject"))
+            //{
+            //    var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+            //    _repositories.Add(typeof(TEntity), MongoRepository);
+            //    return MongoRepository;
+            //}
+            if (typeof(TEntity).Name.Equals("SdtmEntity"))
             {
                 var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
                 _repositories.Add(typeof(TEntity), MongoRepository);
@@ -113,7 +118,37 @@ namespace eTRIKS.Commons.Persistence {
             return repository;
         }
 
-        
+        //public IRepository<TEntity, TPrimaryKey> GetDatasetRepository<TEntity, TPrimaryKey>()
+        //    where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
+        //{
+        //    if (typeof(TEntity).Name.Equals("SubjectObservation"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+
+        //    if (typeof(TEntity).Name.Equals("MongoDocument"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+
+        //    if (typeof(TEntity).Name.Equals("Subject"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+        //    if (typeof(TEntity).Name.Equals("Biospecimen"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+        //}
+
         public string Save() {
 
             //using (var tran = new TransactionScope())
@@ -172,6 +207,11 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new ObservationMap());
             modelBuilder.Configurations.Add(new ProjectMap());
             modelBuilder.Configurations.Add(new DataFileMap());
+            modelBuilder.Configurations.Add(new VisitMap());
+            modelBuilder.Configurations.Add(new SubjectMap());
+            modelBuilder.Configurations.Add(new BioSampleMap());
+            modelBuilder.Configurations.Add(new CharacterisitcMap());
+            modelBuilder.Configurations.Add(new CharacteristicObjectMap());
         }
 
 

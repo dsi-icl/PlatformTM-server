@@ -24,8 +24,8 @@ namespace eTRIKS.Commons.Persistence.Mapping
             this.Property(t => t.DataType)
                 .HasMaxLength(200);
 
-            this.Property(t => t.StudyId)
-                .HasMaxLength(200);
+            this.Property(t => t.ProjectId);
+                //.HasMaxLength(200);
 
             this.Property(t => t.VariableTypeId)
                 .HasMaxLength(200);
@@ -44,9 +44,9 @@ namespace eTRIKS.Commons.Persistence.Mapping
             //this.Property(t => t.VariableTypeId).HasColumnName("variableType");
             //this.Property(t => t.RoleId).HasColumnName("role");
 
-            this.HasOptional(t => t.Study)
+            this.HasRequired(t => t.Project)
                .WithMany()
-               .HasForeignKey(t => t.StudyId);
+               .HasForeignKey(t => t.ProjectId);
             
             this.HasOptional(t => t.Role)
                 .WithMany()

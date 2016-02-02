@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Configuration;
 using System.Net;
+using System.Security.Permissions;
 using AutoMapper;
 using AutoMapper.Internal;
 using CsvHelper;
@@ -45,6 +46,7 @@ namespace eTRIKS.Commons.Service.Services
                 FileDTO fileDTO = new FileDTO();
                 fileDTO.FileName = file.FileName;
                 fileDTO.dateAdded = file.DateAdded;//.LastWriteTime.ToLongDateString();
+                fileDTO.dateLastModified = file.LastModified;
                 fileDTO.icon = "";
                 fileDTO.IsDirectory = file.IsDirectory;
                 fileDTO.selected = false;
@@ -55,22 +57,29 @@ namespace eTRIKS.Commons.Service.Services
             return fileDTOs;
         }
 
-        public bool addDirectory(string projectId, DirectoryInfo di, string dir)
+        public DirectoryInfo addDirectory(string projectId, string newDir)
         {
+            if (Directory.Exists(newDir))
+                return new DirectoryInfo(newDir);
+
+            
+            var di = Directory.CreateDirectory(newDir);
+                //_fileService.addDirectory(projectId, new DirectoryInfo(newDir), projectId);
+            
             //TODO: projectId
             var file = new DataFile();
             file.FileName = di.Name;
             //file.Path = di.FullName.Substring(di.FullName.IndexOf(projectId));
-            file.Path = dir;//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
+            file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf(projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
             file.DateAdded = di.CreationTime.ToLongDateString();
             file.IsDirectory = true;
             file.ProjectId = 1;
 
             _fileRepository.Insert(file);
-            return _dataServiceUnit.Save().Equals("CREATED");
+            return _dataServiceUnit.Save().Equals("CREATED") ? di : null;
         }
 
-        public bool addOrUpdateFile(string projectId, FileInfo fi)
+        public DataFile addOrUpdateFile(string projectId, FileInfo fi)
         {
             //TODO: projectId
             DataFile file;
@@ -94,7 +103,7 @@ namespace eTRIKS.Commons.Service.Services
                 if (file.LoadedToDB)
                     file.State = "Modified";
             }
-            return _dataServiceUnit.Save().Equals("CREATED");
+            return _dataServiceUnit.Save().Equals("CREATED") ? file : null;
         }
 
         #region IO methods
@@ -182,16 +191,17 @@ namespace eTRIKS.Commons.Service.Services
             return res;
         }
 
-        public string writeDataFile(string studyId, DataTable dt)
+        public FileInfo writeDataFile(string filePath, DataTable dt)
         {
             //TODO: ADD STUDY ID as subfolder
             string path = ConfigurationManager.AppSettings["FileDirectory"];
-            path += studyId;
+            path +=filePath + "\\Mapped";
+            string projectId = "P-BVS";
+            var DirInfo = addDirectory(projectId, path);
 
-            if (!Directory.Exists(path + "\\Mapped"))
-                Directory.CreateDirectory(path + "\\Mapped");
+           
 
-            string strFilePath = path+"\\Mapped\\"+dt.TableName+".csv";
+            string strFilePath = DirInfo.FullName+"\\"+dt.TableName+".csv";
             
             StreamWriter writer = File.CreateText(strFilePath);
 
@@ -207,7 +217,9 @@ namespace eTRIKS.Commons.Service.Services
             }
             writer.Flush();
             writer.Close();
-            return strFilePath;
+
+            //addOrUpdateFile(studyId,new FileInfo(strFilePath));
+            return new FileInfo(strFilePath);
         }
 
         private static string QuoteValue(string value)
@@ -223,6 +235,29 @@ namespace eTRIKS.Commons.Service.Services
            var dirs =  _fileRepository.FindAll(f => f.IsDirectory.Equals(true) && f.Project.Accession.Equals(projectId));
             if (dirs == null) return null;
             return dirs.Select(d => d.FileName).ToList();
+        }
+
+        public void tempmethod()
+        {
+            DataTable usubjids = ReadOriginalFile("temp/CRC305ABCusubjids.csv");
+            DataTable cytofSamples = ReadOriginalFile("temp/CyTOFsamples.csv");
+            DataTable luminexSamples = ReadOriginalFile("temp/CRC305ABC_cytokine_samples.csv");
+            luminexSamples.TableName = "luminexSamples";
+
+            List<string> subjidlist = new List<string>();
+
+            foreach (DataRow row in usubjids.Rows)
+            {
+                subjidlist.Add(row[0].ToString());
+            }
+
+            foreach (DataRow row in luminexSamples.Rows)
+            {
+                string subjId = row["USUBJID"].ToString();
+                string newsubjid = subjidlist.Find(d => d.StartsWith(subjId));
+                row["USUBJID"] = newsubjid;
+            }
+           // writeDataFile("samples", luminexSamples);
         }
     }
 }

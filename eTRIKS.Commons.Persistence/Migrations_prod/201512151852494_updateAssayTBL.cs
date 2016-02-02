@@ -7,10 +7,10 @@ namespace eTRIKS.Commons.Persistence.Migrations_prod
     {
         public override void Up()
         {
-            RenameColumn(table: "Activity_TBL", name: "DesignType_Id", newName: "DesignTypeId");
-            RenameColumn(table: "Activity_TBL", name: "MeasurementType_Id", newName: "MeasurementTypeId");
-            RenameColumn(table: "Activity_TBL", name: "TechnologyPlatform_Id", newName: "TechnologyPlatformId");
-            RenameColumn(table: "Activity_TBL", name: "TechnologyType_Id", newName: "TechnologyTypeId");
+            //RenameColumn(table: "Activity_TBL", name: "DesignType_Id", newName: "DesignTypeId");
+            //RenameColumn(table: "Activity_TBL", name: "MeasurementType_Id", newName: "MeasurementTypeId");
+            //RenameColumn(table: "Activity_TBL", name: "TechnologyPlatform_Id", newName: "TechnologyPlatformId");
+            //RenameColumn(table: "Activity_TBL", name: "TechnologyType_Id", newName: "TechnologyTypeId");
             //RenameIndex(table: "Activity_TBL", name: "IX_DesignType_Id", newName: "IX_DesignTypeId");
             //RenameIndex(table: "Activity_TBL", name: "IX_TechnologyType_Id", newName: "IX_TechnologyTypeId");
             //RenameIndex(table: "Activity_TBL", name: "IX_TechnologyPlatform_Id", newName: "IX_TechnologyPlatformId");

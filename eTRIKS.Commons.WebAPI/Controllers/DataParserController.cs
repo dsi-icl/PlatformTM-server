@@ -19,11 +19,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         private FileHandler _fileHandler;
         private TemplateService templateService;
+        private FileService _fileService;
 
-        public DataParserController(FileHandler fileHandler, TemplateService tmplService)
+        public DataParserController(FileHandler fileHandler, TemplateService tmplService, FileService fileService)
         {
             _fileHandler = fileHandler;
             templateService = tmplService;
+            _fileService = fileService;
         }
 
 
@@ -35,6 +37,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string tempFilepath = "temp/BStemplate.csv";
             string tempVarFilepath = "temp/BStemplateVars.csv";
             templateService.loadDatasetTemplate(tempFilepath, tempVarFilepath);
+        }
+
+        [HttpGet]
+        [Route("api/temp/matchids")]
+        public void matchIds()
+        {
+            string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            //string tempFilepath = "temp/BStemplate.csv";
+            //string tempVarFilepath = "temp/BStemplateVars.csv";
+            _fileService.tempmethod();
         }
 
         [HttpGet]

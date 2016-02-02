@@ -104,14 +104,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return  _datasetService.GetTemplateMaps(datasetId);
         }
 
-        //[HttpPost]
-        //[Route("api/Datasets/{datasetId}/mapToTemplate")]
-        //public async Task<bool> MapToTemplate(int datasetId, [FromBody] DataTemplateMap dataTemplateMap)
-        //{
-        //    //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-        //    //string filePath = PATH + "\\" + fileName;
-        //    return _datasetService.mapToTemplate(datasetId, dataTemplateMap);
-        //}
+        [HttpPost]
+        [Route("api/Datasets/{datasetId}/mapToTemplate/file/{fileId}")]
+        public async Task<int?> MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
+        {
+            //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
+            //string filePath = PATH + "\\" + fileName;
+            return _datasetService.mapToTemplate(datasetId,fileId, dataTemplateMap);
+        }
 
         [HttpGet]
         [Route("api/datasets/{datasetId}/preview/file/{fileId}")]
@@ -121,18 +121,18 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/Datasets/{datasetId}/loadDataFile/file/{fileId}")]
-        public async Task<string> LoadDataSetFromFile(int datasetId, int fileId)
+        [Route("api/Datasets/{datasetId}/saveDataFile/file/{fileId}")]
+        public async Task<string> LoadDataFile(int datasetId, int fileId)
         {
-            _datasetService.loadDataset(datasetId,fileId);
+            _datasetService.SaveDataFile(datasetId,fileId);
             return "";
         }
 
         [HttpGet]
-        [Route("api/datasets/{datasetId}/loadObservations")]
-        public async Task<bool> loadObservations(int datasetId)
+        [Route("api/datasets/{datasetId}/loadData/file/{fileId}")]
+        public async Task<bool> LoadData(int datasetId, int fileId)
         {
-            return await _datasetService.loadObservations(datasetId);
+            return await _datasetService.LoadDataset(datasetId,fileId);
         }
 
         //[HttpGet]

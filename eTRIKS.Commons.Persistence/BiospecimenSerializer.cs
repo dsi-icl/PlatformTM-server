@@ -14,103 +14,116 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
 {
-    class BiospecimenSerializer : SerializerBase<Biospecimen>, IBsonDocumentSerializer, IBsonIdProvider
+    class BiospecimenSerializer : SerializerBase<Biosample>, IBsonDocumentSerializer, IBsonIdProvider
     {
         public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
-        public override Biospecimen Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override Biosample Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             context.Reader.ReadStartDocument();
             var reader = (BsonReader)context.Reader;
-            Biospecimen biospecimen = new Biospecimen();
-            
-            while (reader.ReadBsonType() != BsonType.EndOfDocument)
-            {
-                String fieldName = reader.ReadName();
+            var biospecimen = new Biosample();
 
-                if (fieldName.EndsWith("TPT"))
-                {
-                    if (biospecimen.ObsStudyTimePoint == null)
-                        biospecimen.ObsStudyTimePoint = new RelativeTimePoint();
-                    biospecimen.ObsStudyTimePoint.Name = reader.ReadString();
-                }
-                else if (fieldName.EndsWith("TPTNUM"))
-                {
-                    if (biospecimen.ObsStudyTimePoint == null)
-                        biospecimen.ObsStudyTimePoint = new RelativeTimePoint();
-                    biospecimen.ObsStudyTimePoint.Number = Int32.Parse(reader.ReadString());
-                }
-                else if (fieldName.EndsWith("TPTREF"))
-                {
-                    if (biospecimen.ObsStudyTimePoint == null)
-                        biospecimen.ObsStudyTimePoint = new RelativeTimePoint();
-                    if (biospecimen.ObsStudyTimePoint.ReferenceTimePoint == null)
-                        biospecimen.ObsStudyTimePoint.ReferenceTimePoint = new AbsoluteTimePoint();
-                    biospecimen.ObsStudyTimePoint.ReferenceTimePoint.Name = reader.ReadString();
-                }
-                else if (fieldName.EndsWith("RFTDTC"))
-                {
-                    if (biospecimen.ObsStudyTimePoint == null)
-                        biospecimen.ObsStudyTimePoint = new RelativeTimePoint();
-                    if (biospecimen.ObsStudyTimePoint.ReferenceTimePoint == null)
-                        biospecimen.ObsStudyTimePoint.ReferenceTimePoint = new AbsoluteTimePoint();
-                    ((AbsoluteTimePoint)biospecimen.ObsStudyTimePoint.ReferenceTimePoint).DateTime = DateTime.Parse(reader.ReadString());
-                }
-                else if (fieldName.EndsWith("DTC"))
-                {
-                    if (biospecimen.ObDateTime == null)
-                        biospecimen.ObDateTime = new AbsoluteTimePoint();
-                    string dt = reader.ReadString();
-                    DateTime DT;
-                    if (DateTime.TryParse(dt, out DT))
-                        biospecimen.ObDateTime.DateTime = DT;
-                }
-                
-                else if (fieldName.EndsWith("DY"))
-                {
-                    if (biospecimen.ObsStudyDay == null)
-                        biospecimen.ObsStudyDay = new RelativeTimePoint();
-                    biospecimen.ObsStudyDay.Number = Int32.Parse(reader.ReadString());
-                }
-                else
+            //while (reader.ReadBsonType() != BsonType.EndOfDocument)
+            //{
+            //    String fieldName = reader.ReadName();
 
-                switch (fieldName)
-                    {
-                        case "_id":
-                            biospecimen.Id = reader.ReadBinaryData().AsGuid;
-                            break;
-                        case "STUDYID":
-                            biospecimen.StudyId = reader.ReadString();
-                            break;
-                        case "DOMAIN":
-                            biospecimen.DomainCode = reader.ReadString();
-                            break;
-                        case "USUBJID":
-                            biospecimen.SubjectId = reader.ReadString();
-                            break;
-                        case "BSREFID":
-                            biospecimen.SampleId= reader.ReadString();
-                            break;
-                        case "BSGRPID":
-                            biospecimen.AssayId = Int32.Parse(reader.ReadString());
-                            break;
-                        case "VISIT":
-                            biospecimen.Visit = reader.ReadString();
-                            break;
-                        case "VISITNUM":
-                            biospecimen.VisitNum = Int32.Parse(reader.ReadString());
-                            break;
-                        default:
-                            biospecimen.Characteristics.Add(fieldName, reader.ReadString());
-                            break;
-                    }
-            }
+            //    if (fieldName.EndsWith("TPT"))
+            //    {
+            //        if (biospecimen.CollectionStudyTimePoint == null)
+            //            biospecimen.CollectionStudyTimePoint = new RelativeTimePoint();
+            //        biospecimen.CollectionStudyTimePoint.Name = reader.ReadString();
+            //    }
+            //    else if (fieldName.EndsWith("TPTNUM"))
+            //    {
+            //        if (biospecimen.CollectionStudyTimePoint == null)
+            //            biospecimen.CollectionStudyTimePoint = new RelativeTimePoint();
+            //        biospecimen.CollectionStudyTimePoint.Number = Int32.Parse(reader.ReadString());
+            //    }
+            //    else if (fieldName.EndsWith("TPTREF"))
+            //    {
+            //        if (biospecimen.CollectionStudyTimePoint == null)
+            //            biospecimen.CollectionStudyTimePoint = new RelativeTimePoint();
+            //        if (biospecimen.CollectionStudyTimePoint.ReferenceTimePoint == null)
+            //            biospecimen.CollectionStudyTimePoint.ReferenceTimePoint = new AbsoluteTimePoint();
+            //        biospecimen.CollectionStudyTimePoint.ReferenceTimePoint.Name = reader.ReadString();
+            //    }
+            //    else if (fieldName.EndsWith("RFTDTC"))
+            //    {
+            //        if (biospecimen.CollectionStudyTimePoint == null)
+            //            biospecimen.CollectionStudyTimePoint = new RelativeTimePoint();
+            //        if (biospecimen.CollectionStudyTimePoint.ReferenceTimePoint == null)
+            //            biospecimen.CollectionStudyTimePoint.ReferenceTimePoint = new AbsoluteTimePoint();
+            //        ((AbsoluteTimePoint)biospecimen.CollectionStudyTimePoint.ReferenceTimePoint).DateTime = DateTime.Parse(reader.ReadString());
+            //    }
+            //    else if (fieldName.EndsWith("DTC"))
+            //    {
+            //        if (biospecimen.CollectionDateTime == null)
+            //            biospecimen.CollectionDateTime = new AbsoluteTimePoint();
+            //        string dt = reader.ReadString();
+            //        DateTime DT;
+            //        if (DateTime.TryParse(dt, out DT))
+            //            biospecimen.CollectionDateTime.DateTime = DT;
+            //    }
+
+            //    else if (fieldName.EndsWith("DY"))
+            //    {
+            //        if (biospecimen.CollectionStudyDay == null)
+            //            biospecimen.CollectionStudyDay = new RelativeTimePoint();
+            //        biospecimen.CollectionStudyDay.Number = Int32.Parse(reader.ReadString());
+            //    }
+            //    else
+
+            //        switch (fieldName)
+            //        {
+            //            case "_id":
+            //                // biospecimen.Id = reader.ReadBinaryData().AsGuid;
+            //                break;
+            //            case "STUDYID":
+            //                biospecimen.StudyId = reader.ReadString();
+            //                break;
+            //            case "DOMAIN":
+            //                //biospecimen = reader.ReadString();
+            //                break;
+            //            case "USUBJID":
+            //                biospecimen.SubjectId = reader.ReadString();
+            //                break;
+            //            case "BSREFID":
+            //                biospecimen.SampleId = reader.ReadString();
+            //                break;
+            //            case "ACTIVITYID":
+            //                biospecimen.AssayId = Int32.Parse(reader.ReadString());
+            //                break;
+            //            case "DATASETID":
+            //                biospecimen.DatasetId = Int32.Parse(reader.ReadString());
+            //                break;
+            //            case "VISIT":
+            //                if(biospecimen.Visit==null)
+            //                    biospecimen.Visit = new Visit();
+            //                biospecimen.Visit.Name = reader.ReadString();
+            //                break;
+            //            case "VISITNUM":
+            //                if (biospecimen.Visit == null)
+            //                    biospecimen.Visit = new Visit();
+            //                 biospecimen.Visit.Number = Int32.Parse(reader.ReadString());
+            //                break;
+            //            default:
+            //                 biospecimen.SampleProperties.Add(new Property()
+            //                 {
+            //                     Name = fieldName,
+            //                     Value = reader.ReadString(),
+            //                     SubjectMatter = "BioSample",
+            //                     DatasetDomainCode = "BS"
+            //                 });
+            //                break;
+            //        }
+            //}
             context.Reader.ReadEndDocument();
 
 
             return biospecimen;
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Biospecimen value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Biosample value)
         {
             var subjObs = value;
         //    BsonDocument document = new

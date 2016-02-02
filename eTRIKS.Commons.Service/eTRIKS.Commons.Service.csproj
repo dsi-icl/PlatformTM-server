@@ -104,11 +104,12 @@
     <Compile Include="DTOs\VariableReferenceDTO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\ActivityService.cs" />
+    <Compile Include="Services\BioSampleService.cs" />
     <Compile Include="Services\AssayService.cs" />
     <Compile Include="Services\ExportService.cs" />
     <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\SubjectService.cs" />
     <Compile Include="Services\UserServices\UserAccountService.cs" />
-    <Compile Include="Services\DataManagementServices.cs" />
     <Compile Include="Services\DataService.cs" />
     <Compile Include="Services\DatasetService.cs" />
     <Compile Include="Services\ObservationService.cs" />

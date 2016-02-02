@@ -68,7 +68,10 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
 
                 foreach (var field in record.fields)
                 {
-                    doc.Add(field.Name, field.value);
+                   if(field.value is int)
+                    doc.Add(field.Name, Convert.ToInt16(field.value));
+                   else
+                       doc.Add(field.Name, Convert.ToString(field.value));
                 }
                 docs.Add(doc);
             }

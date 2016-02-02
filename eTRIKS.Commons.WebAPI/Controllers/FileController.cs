@@ -33,13 +33,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
             string projDir = fileDir + projectId;
             string newDir = projDir  +"/"+dir.name;
-            if (!Directory.Exists(newDir))
-            {
-                Directory.CreateDirectory(newDir);
-                _fileService.addDirectory(projectId, new DirectoryInfo(newDir),projectId);
-            }
+            
+             var diInfo =    _fileService.addDirectory(projectId, newDir);
+            
 
-            return new DirectoryInfo(projDir).GetDirectories().Select(d => d.Name).ToList();
+            return diInfo.GetDirectories().Select(d => d.Name).ToList();
         }
 
         [HttpGet]
@@ -74,7 +72,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                     {
                         FileInfo fi = new FileInfo(file.LocalFileName);
 
-                        if (!_fileService.addOrUpdateFile(projectId, fi))
+                        if (_fileService.addOrUpdateFile(projectId, fi)==null)
                             throw new Exception("Failed to updated database");
                         messages.Add("File uploaded as " + fi.FullName + " (" + fi.Length + " bytes)");
                     }

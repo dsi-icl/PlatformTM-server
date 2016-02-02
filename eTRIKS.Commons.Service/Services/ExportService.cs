@@ -12,7 +12,7 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class ExportService
     {
-        private IRepository<Subject, Guid> _subjectRepository;
+        private IRepository<Subject, string> _subjectRepository;
         private IRepository<SubjectObservation, Guid> _subObservationRepository;
         private IServiceUoW _dataContext;
 
@@ -20,7 +20,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             _dataContext = uoW;
             _subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
-            _subjectRepository = uoW.GetRepository<Subject, Guid>();
+            _subjectRepository = uoW.GetRepository<Subject, string>();
         }
         private async Task<List<Subject>> ExportDataset(string projectId, ExportRequestDTO.Criteria criteria)
         {

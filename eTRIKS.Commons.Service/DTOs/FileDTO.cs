@@ -23,5 +23,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public bool IsDirectory { get; set; }
         public int DataFileId { get; set; }
         public bool IsStandard { get; set; }
+
+        public string dateLastModified { get; set; }
     }
 }

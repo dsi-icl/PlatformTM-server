@@ -1,4 +1,5 @@
 ﻿using System;
+using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Domain.Interfaces
@@ -11,7 +12,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
         void AddClassMap(string fieldname, string propertyName);
 
-
+        void setSDTMentityDescriptor(SdtmEntityDefine descriptor);
         IUserRepository<TEntity,TResult> GetUserRepository<TEntity,TResult>();
 
     }
