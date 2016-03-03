@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Data;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
     public class Biosample : Identifiable<int>
     {
-        //public Subject Subject {get; set; }
+        public HumanSubject Subject {get; set; }
         public string SubjectId { get; set; }
         public string BiosampleStudyId { get; set; }
         public Study Study { get; set; }
@@ -23,7 +24,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
 
         public ICollection<SampleCharacteristic> SampleCharacteristics { get; set; }
         public Visit Visit { get; set; }
-        public int VisitId { get; set; }
+        public int? VisitId { get; set; }
         public AbsoluteTimePoint CollectionDateTime { get; set; } //Date of Collection / --DTC
         public RelativeTimePoint CollectionStudyDay { get; set; } //--DY
         public RelativeTimePoint CollectionStudyTimePoint { get; set; } //--TPT

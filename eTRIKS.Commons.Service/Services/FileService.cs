@@ -23,6 +23,7 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IServiceUoW _dataServiceUnit;
         private IRepository<DataFile, int> _fileRepository;
+        private IRepository<Project, int> _projectRepository;
         private string rawFilesDirectory;
         private string stdFilesDirecotry;
 
@@ -30,6 +31,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             _dataServiceUnit = uoW;
             _fileRepository = uoW.GetRepository<DataFile, int>();
+            _projectRepository = uoW.GetRepository<Project, int>();
             rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
             stdFilesDirecotry = rawFilesDirectory + "\\Mapped";
         }
@@ -46,13 +48,14 @@ namespace eTRIKS.Commons.Service.Services
                 FileDTO fileDTO = new FileDTO();
                 fileDTO.FileName = file.FileName;
                 fileDTO.dateAdded = file.DateAdded;//.LastWriteTime.ToLongDateString();
-                fileDTO.dateLastModified = file.LastModified;
+                fileDTO.dateLastModified = file.LastModified ?? file.DateAdded;
                 fileDTO.icon = "";
                 fileDTO.IsDirectory = file.IsDirectory;
                 fileDTO.selected = false;
                 fileDTOs.Add(fileDTO);
                 fileDTO.state = file.State;
                 fileDTO.DataFileId = file.Id;
+                fileDTO.path = file.Path;
             }
             return fileDTOs;
         }
@@ -66,14 +69,18 @@ namespace eTRIKS.Commons.Service.Services
             var di = Directory.CreateDirectory(newDir);
                 //_fileService.addDirectory(projectId, new DirectoryInfo(newDir), projectId);
             
-            //TODO: projectId
+           
+            var project = _projectRepository.FindSingle(p => p.Accession.Equals(projectId));
+            if(project ==null)
+                return null;
+
             var file = new DataFile();
             file.FileName = di.Name;
             //file.Path = di.FullName.Substring(di.FullName.IndexOf(projectId));
             file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf(projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
             file.DateAdded = di.CreationTime.ToLongDateString();
             file.IsDirectory = true;
-            file.ProjectId = 1;
+            file.ProjectId = project.Id;
 
             _fileRepository.Insert(file);
             return _dataServiceUnit.Save().Equals("CREATED") ? di : null;
@@ -87,18 +94,21 @@ namespace eTRIKS.Commons.Service.Services
             //TODO: add property isLoadedToDB to the file and only change status to modified if not loadedToDB
             if (file == null)
             {
+                var project = _projectRepository.FindSingle(p => p.Accession.Equals(projectId));
+                if (project == null)
+                    return null;
                 file = new DataFile();
                 file.FileName = fi.Name;
-                file.DateAdded = fi.CreationTime.ToLongDateString();
+                file.DateAdded = fi.CreationTime.ToShortDateString() + " " + fi.CreationTime.ToShortTimeString();
                 file.State = "New";
                 file.Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf(projectId));
                 file.IsDirectory = false;
                 _fileRepository.Insert(file);
-                file.ProjectId = 1;
+                file.ProjectId = project.Id;
             }
             else
             {
-                file.LastModified = fi.LastWriteTime.ToLongDateString();
+                file.LastModified = fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString();
                 _fileRepository.Update(file);
                 if (file.LoadedToDB)
                     file.State = "Modified";
@@ -141,7 +151,7 @@ namespace eTRIKS.Commons.Service.Services
             DataTable dt = new DataTable();
             foreach (string field in header)
             {
-                dt.Columns.Add(field.Replace("\"","") ,typeof(string));
+                dt.Columns.Add(field.Replace("\"","").ToUpper() ,typeof(string));
             }
 
             while (true)
@@ -258,6 +268,40 @@ namespace eTRIKS.Commons.Service.Services
                 row["USUBJID"] = newsubjid;
             }
            // writeDataFile("samples", luminexSamples);
+        }
+
+        public Hashtable getFilePreview(int fileId)
+        {
+            //var dataset = GetActivityDataset(datasetId);
+            //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            //var studyId = dataset.Activity.StudyId;
+            var file = _fileRepository.Get(fileId);
+            var filePath = file.Path + "\\" + file.FileName;
+
+            //var fileService = new FileService(_dataServiceUnit);
+            //TEMP usage of dataset.state
+            var dataTable = ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
+            var ht = getHashtable(dataTable);
+            ht.Add("fileInfo",file.FileName);
+            return ht;
+        }
+        private Hashtable getHashtable(DataTable sdtmTable)
+        {
+            var ht = new Hashtable();
+            var headerList = new List<Dictionary<string, string>>();
+            foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
+            {
+                var header = new Dictionary<string, string>
+                {
+                    {"data", col.ColumnName.ToLower()},
+                    {"title", col.ColumnName}
+                };
+                headerList.Add(header);
+            }
+            ht.Add("header", headerList);
+            ht.Add("data", sdtmTable);
+            
+            return ht;
         }
     }
 }

@@ -3,7 +3,7 @@ using eTRIKS.Commons.Core.Domain.Model;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    public class SubjectMap : EntityTypeConfiguration<Subject>
+    public class SubjectMap : EntityTypeConfiguration<HumanSubject>
     {
         public SubjectMap()
         {

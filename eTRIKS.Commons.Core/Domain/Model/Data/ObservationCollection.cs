@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Data
 {
-    public class SubjectOfObservation
+    class ObservationCollection
     {
     }
 }

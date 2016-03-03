@@ -56,6 +56,13 @@ namespace eTRIKS.Commons.Service.Services
             var project = _projectRepository.FindSingle(d=>d.Accession
                 .Equals(activityDTO.ProjectAcc));
             var activity = new Activity {Name = activityDTO.Name, ProjectId = project.Id};
+            foreach (var datasetDto in activityDTO.datasets)
+            {
+                datasetDto.ProjectId = project.Id;
+                var dataset = _datasetService.CreateDataset(datasetDto);
+                activity.Datasets.Add(dataset);
+            }
+            
 
             _activityRepository.Insert(activity);
             if (_activityServiceUnit.Save().Equals("CREATED"))
@@ -133,6 +140,11 @@ namespace eTRIKS.Commons.Service.Services
             Activity activityToUpdate = _activityRepository.Get(activityId);
 
             activityToUpdate.Name = activityDTO.Name;
+            foreach (var datasetDto in activityDTO.datasets)
+            {
+                //datasetDto.ProjectId = project.Id;
+                _datasetService.updateDataset(datasetDto);                
+            }
             return _activityServiceUnit.Save();
         }
     }

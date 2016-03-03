@@ -78,18 +78,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPut]
         [Route("api/Dataset/{datasetId}")]
-        public string updateDataset(string datasetId, [FromBody] DatasetDTO datasetDTO)
+        public string updateDataset(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
-
-            return _datasetService.updateDataset(datasetDTO, datasetId);
+            if (datasetDTO.Id == datasetId)
+                return _datasetService.updateDataset(datasetDTO);
+            return "FAILED to update datasetId";
         }
 
         [HttpPost]
         [Route("api/Datasets/{datasetId}/update")]
-        public string updateDatasetPost(string datasetId, [FromBody] DatasetDTO datasetDTO)
+        public string updateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
 
-            return _datasetService.updateDataset(datasetDTO, datasetId);
+            if (datasetDTO.Id == datasetId)
+                return _datasetService.updateDataset(datasetDTO);
+            return "FAILED to update datasetId";
         }
 
         // DELETE: api/Dataset/5

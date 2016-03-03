@@ -9,7 +9,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
 {
     public class SubjectCharacteristic : Characterisitc
     {
-        public Subject Subject { get; set; }
+        public HumanSubject Subject { get; set; }
         public string SubjectId { get; set; }
     }
 }

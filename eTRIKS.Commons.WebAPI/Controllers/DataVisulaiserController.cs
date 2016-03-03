@@ -26,7 +26,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/visualise/clinicalTree/{projectAccession}")]
         public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(string projectAccession)
         {
-            return await _dataService.getClinicalObsTree(projectAccession);
+            return await _dataService.GetClinicalObsTree(projectAccession);
         }
     }
 }

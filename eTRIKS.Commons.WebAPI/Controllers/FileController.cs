@@ -35,9 +35,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string newDir = projDir  +"/"+dir.name;
             
              var diInfo =    _fileService.addDirectory(projectId, newDir);
-            
 
-            return diInfo.GetDirectories().Select(d => d.Name).ToList();
+            return diInfo == null ? null : diInfo.GetDirectories().Select(d => d.Name).ToList();
         }
 
         [HttpGet]
@@ -103,6 +102,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 relativePath = relativePath + "\\" + subdir;
 
             return _fileService.getUploadedFiles(projectId, relativePath);
+        }
+
+        [HttpGet]
+        [Route("project/{projectId}/preview/{fileId}")]
+        public async Task<Hashtable> getDatasetPreview(int fileId)
+        {
+            return _fileService.getFilePreview(fileId);
         }
 
         //[HttpGet]

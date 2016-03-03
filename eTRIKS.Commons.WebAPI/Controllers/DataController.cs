@@ -43,7 +43,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/projects/{projectId}/subjects/characteristics")]
         public List<ObservationRequestDTO> getSubjectCharacteristics(string projectId)
         {
-            return _dataService.getSubjectCharacteristics(projectId);
+            return _dataService.GetSubjectCharacteristics(projectId);
         }
 
         [HttpPost]
@@ -61,10 +61,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/projects/{projectId}/data/samples")]
-        public Task<Hashtable> getSamplesData(string projectId)
+        [Route("api/projects/{projectId}/assays/{assayId}/samples")]
+        public Task<Hashtable> getSamplesData(string projectId, int assayId)
         {
-            return _dataService.getSamplesDataPerAssay(projectId);
+            return _dataService.getSamplesDataPerAssay(projectId,assayId);
         }
         
     }

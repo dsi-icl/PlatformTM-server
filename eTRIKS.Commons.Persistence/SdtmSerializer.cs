@@ -18,7 +18,7 @@ namespace eTRIKS.Commons.Persistence
     {
         public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
 
-        public static SdtmEntityDefine sdtmEntityDescriptor;
+        public static SdtmEntityDescriptor sdtmEntityDescriptor;
         public override SdtmEntity Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             context.Reader.ReadStartDocument();
@@ -62,7 +62,7 @@ namespace eTRIKS.Commons.Persistence
                                 if (DateTime.TryParse(rfedt, out rfeDT))
                                     sdtmEntity.RFENDTC = rfeDT;
                             break;
-                        case "BSREFID":
+                        case "BSREFID ":
                             sdtmEntity.SampleId = reader.ReadString();
                             break;
                         case "DBACTIVITYID":
@@ -92,14 +92,39 @@ namespace eTRIKS.Commons.Persistence
                             break;
                         default:
                         {
-                            if (sdtmEntityDescriptor.QualifierVariables.Select(v => v.Name).Contains(fieldName))
+                            if (sdtmEntityDescriptor.O3Variable!=null && sdtmEntityDescriptor.O3Variable.Name.Equals(fieldName))
+                            {
+                                sdtmEntity.TopicVariable = reader.ReadString();
+
+                            }
+                            else if (sdtmEntityDescriptor.GroupVariable!=null && sdtmEntityDescriptor.GroupVariable.Name.Equals(fieldName))
+                            {
+                                sdtmEntity.Group = reader.ReadString();
+                            }
+                            else if (sdtmEntityDescriptor.SubgroupVariable != null && sdtmEntityDescriptor.SubgroupVariable.Name.Equals(fieldName))
+                            {
+                                sdtmEntity.Subgroup = reader.ReadString();
+                            }
+                            else if (sdtmEntityDescriptor.O3SynoymVariable != null && sdtmEntityDescriptor.O3SynoymVariable.Name.Equals(fieldName))
+                            {
+                                sdtmEntity.TopicVariableSynonym = reader.ReadString();
+                            }
+                            else if (sdtmEntityDescriptor.O3CVterm != null && sdtmEntityDescriptor.O3CVterm.Name.Equals(fieldName))
+                            {
+                                sdtmEntity.TopicVariableControlledTerm = reader.ReadString();
+                            }
+                            else if (sdtmEntityDescriptor.QualifierVariables.Select(v => v.Name).Contains(fieldName))
                             {
                                 sdtmEntity.Qualifiers.Add(fieldName, reader.ReadString());
                             }
-                            else if (sdtmEntityDescriptor.GroupDescriptors.Select(v => v.Name).Contains(fieldName))
+                            else if (sdtmEntityDescriptor.ResultVariables.Select(v => v.Name).Contains(fieldName))
                             {
-                                sdtmEntity.Groups.Add(fieldName, reader.ReadString());
+                                sdtmEntity.ResultQualifiers.Add(fieldName, reader.ReadString());
                             }
+                            //else if (sdtmEntityDescriptor.GroupDescriptors.Select(v => v.Name).Contains(fieldName))
+                            //{
+                            //    sdtmEntity.Groups.Add(fieldName, reader.ReadString());
+                            //}
                             else if (sdtmEntityDescriptor.SynonymVariables.Select(v => v.Name).Contains(fieldName))
                             {
                                 sdtmEntity.QualifierSynonyms.Add(fieldName, reader.ReadString());

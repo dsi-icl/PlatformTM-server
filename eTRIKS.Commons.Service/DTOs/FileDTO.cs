@@ -25,5 +25,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public bool IsStandard { get; set; }
 
         public string dateLastModified { get; set; }
+
+        public string path { get; set; }
     }
 }

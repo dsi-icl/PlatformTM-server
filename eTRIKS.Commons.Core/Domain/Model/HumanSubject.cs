@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Data;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class Subject : Identifiable<string>
+    public class HumanSubject : Identifiable<string>
     {
         public Study Study { get; set; }
         public int StudyId { get; set; }
@@ -22,7 +23,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int DatasetId { get; set; }
         public ICollection<SubjectCharacteristic> SubjectCharacteristics { get; set; }
 
-        public Subject()
+        public HumanSubject()
         {
             SubjectCharacteristics = new List<SubjectCharacteristic>();
         }

@@ -64,6 +64,12 @@ namespace eTRIKS.Commons.DataAccess
                 filterDoc.AddRange(bsonDoc);
             }
 
+            //Dictionary<string, object> projections = new Dictionary<string, object>();
+            //projections.Add("_id", 0);
+            //foreach (var item in projectionFields)
+            //{
+            //    projections.Add(item.Key, "$_id." + item.Key);
+            //}
 
             return await collection.Find(filterDoc).ToListAsync();
         }
@@ -71,7 +77,7 @@ namespace eTRIKS.Commons.DataAccess
 
         private void TEST()
         {
-            var filterBuilder = Builders<Subject>.Filter;
+            var filterBuilder = Builders<HumanSubject>.Filter;
             var filter = filterBuilder.Eq("STUDYID", "CRC305C");
 
             collection.Find(filter.ToBsonDocument()).ToListAsync();

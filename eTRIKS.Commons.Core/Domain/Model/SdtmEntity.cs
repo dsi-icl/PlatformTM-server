@@ -27,9 +27,11 @@ namespace eTRIKS.Commons.Core.Domain.Model
         //public Dictionary<string, string> Characteristics { get; set; }
         public int ActivityId { get; set; }
         public int DatasetId { get; set; }
-        //public string Visit { get; set; }
-        //public int VisitNum { get; set; }
+        public string TopicVariableSynonym { get; set; }
+        public string TopicVariable { get; set; }
+        public string TopicVariableControlledTerm { get; set; }
         public Dictionary<string, string> Qualifiers { get; set; }
+        public Dictionary<string, string> ResultQualifiers { get; set; }
         public Dictionary<string, string> QualifierQualifiers { get; set; }
         public Dictionary<string, string> QualifierSynonyms { get; set; }
         //public ICollection<Characterisitc> Characteristics { get; set; }
@@ -42,16 +44,19 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Arm { get; set; }
         public string ArmCode { get; set; }
         public string SiteId { get; set; }
-        public Dictionary<string, string> Groups { get; set; }
+        public string Group { get; set; }
+        public string Subgroup { get; set; }
+        //public Dictionary<string, string> Groups { get; set; }
         public Dictionary<string, string> Leftovers { get; set; }
 
         public SdtmEntity()
         {
             Qualifiers = new Dictionary<string, string>();
+            ResultQualifiers = new Dictionary<string, string>();
             QualifierSynonyms = new Dictionary<string, string>();
             QualifierQualifiers = new Dictionary<string, string>();
             Leftovers = new Dictionary<string, string>();
-            Groups = new Dictionary<string, string>();
+            //Groups = new Dictionary<string, string>();
             Visit = new Visit();
         }
 
@@ -63,5 +68,6 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string VerbatimStudyId { get; set; }
 
         public int DatafileId { get; set; }
+        
     }
 }

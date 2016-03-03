@@ -16,6 +16,7 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
+        private readonly IRepository<Study, int> _studyRepository;
 
         private readonly IServiceUoW _dataContext;
 
@@ -24,6 +25,7 @@ namespace eTRIKS.Commons.Service.Services
             _dataContext = uoW;
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
+            _studyRepository = uoW.GetRepository<Study, int>();
         }
 
         public async Task<bool> LoadBioSamples(List<SdtmEntity> sampleData, int datasetId)
@@ -33,15 +35,25 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     d => d.Variables.Select(v=>v.VariableDefinition)
                 });
+            var studyMap = new Dictionary<string, int>();
             foreach (SdtmEntity sdtmEntity in sampleData)
             {
+                Study study;
+                int studyid;
+                if(!studyMap.TryGetValue(sdtmEntity.VerbatimStudyId, out studyid)){
+                    study = _studyRepository.FindSingle(s => s.Name.Equals(sdtmEntity.VerbatimStudyId));
+                    studyMap.Add(sdtmEntity.VerbatimStudyId,study.Id);
+                    studyid = study.Id;
+                }
                 var bioSample = new Biosample()
                 {
                     BiosampleStudyId = sdtmEntity.SampleId,
                     AssayId = sdtmEntity.ActivityId,
-                    SubjectId = sdtmEntity.SubjectId,
-                    StudyId = sdtmEntity.DBstudyId,
-                    Visit = sdtmEntity.Visit
+                    SubjectId = sdtmEntity.USubjId,
+                    StudyId = studyid,//study.Id,//sdtmEntity.DBstudyId,
+                    //Visit = sdtmEntity.Visit,
+                    CollectionStudyDay = sdtmEntity.CollectionStudyDay,
+                    DatasetId = sdtmEntity.DatasetId
                 };
                 foreach (var qualifier in sdtmEntity.Qualifiers)
                 {

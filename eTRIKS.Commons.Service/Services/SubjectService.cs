@@ -11,7 +11,7 @@ namespace eTRIKS.Commons.Service.Services
 {
     class SubjectService
     {
-        private readonly IRepository<Subject, string> _subjectRepository;
+        private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
         private readonly IRepository<Study, int> _studtRepository;
         private readonly IRepository<CharacteristicObject, int> _characteristicObjRepository;
@@ -21,7 +21,7 @@ namespace eTRIKS.Commons.Service.Services
         public SubjectService(IServiceUoW uoW)
         {
             _dataContext = uoW;
-            _subjectRepository = uoW.GetRepository<Subject, string>();
+            _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _studtRepository = uoW.GetRepository<Study, int>();
             _characteristicObjRepository = uoW.GetRepository<CharacteristicObject, int>();
@@ -65,7 +65,7 @@ namespace eTRIKS.Commons.Service.Services
                  /**
                   * ADDING SUBJECTS
                   */
-                 var subject = new Subject
+                 var subject = new HumanSubject
                  {
                      Id = sdtmEntity.USubjId,
                      UniqueSubjectId = sdtmEntity.USubjId,

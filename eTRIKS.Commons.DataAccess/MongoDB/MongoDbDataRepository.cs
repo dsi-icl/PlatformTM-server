@@ -342,7 +342,7 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
             return recordSet;
         }
 
-        public async Task<List<Observation>> getGroupedNoSQLrecords(IDictionary<string, string> filterFields, IDictionary<string, string> groupingFields)
+        public async Task<List<Observation>> getGroupedNoSQLrecords(Dictionary<string, object> filterFields, IDictionary<string, string> groupingFields)
         {
             IMongoDatabase dbETriks = GetDatabase();
 
@@ -354,12 +354,13 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
             }
 
 
-            var group = new BsonDocument{
-                                {"_id", groupingFields.ToBsonDocument() }};
-            var projection = projectionFields.ToBsonDocument();
+            var group = new BsonDocument{ {"_id", groupingFields.ToBsonDocument() }};
+            var jsonDoc = Newtonsoft.Json.JsonConvert.SerializeObject(filterFields);
+            var filterDoc = BsonSerializer.Deserialize<BsonDocument>(jsonDoc);
+            
             IEnumerable<BsonDocument> docs = await dbETriks.GetCollection<BsonDocument>(mongoCollectionName)
                 .Aggregate()
-                .Match(filterFields.ToBsonDocument())
+                .Match(filterDoc)
                 .Group(group)
                 .Project(projectionFields.ToBsonDocument())
                 

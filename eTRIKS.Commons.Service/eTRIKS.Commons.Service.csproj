@@ -99,6 +99,7 @@
     <Compile Include="DTOs\FileDTO.cs" />
     <Compile Include="DTOs\ObservationRequestDTO.cs" />
     <Compile Include="DTOs\SubjCharDTO.cs" />
+    <Compile Include="DTOs\TreeNodeDTO.cs" />
     <Compile Include="DTOs\UserDTO.cs" />
     <Compile Include="DTOs\VariableDefinitionDTO.cs" />
     <Compile Include="DTOs\VariableReferenceDTO.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Services\AssayService.cs" />
     <Compile Include="Services\ExportService.cs" />
     <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\HelperService\PropertyDescriptorFactory.cs" />
     <Compile Include="Services\SubjectService.cs" />
     <Compile Include="Services\UserServices\UserAccountService.cs" />
     <Compile Include="Services\DataService.cs" />

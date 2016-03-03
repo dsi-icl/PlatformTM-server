@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
 {
-    class SubjectSerializer : SerializerBase<Subject>, IBsonDocumentSerializer, IBsonIdProvider
+    class SubjectSerializer : SerializerBase<HumanSubject>, IBsonDocumentSerializer, IBsonIdProvider
     {
         public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
-        public override Subject Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override HumanSubject Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             context.Reader.ReadStartDocument();
             var reader = (BsonReader)context.Reader;
-            Subject subject = new Subject();
+            HumanSubject subject = new HumanSubject();
             
             while (reader.ReadBsonType() != BsonType.EndOfDocument)
             {
@@ -81,7 +81,7 @@ namespace eTRIKS.Commons.Persistence
             return subject;
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Subject value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, HumanSubject value)
         {
             var subjObs = value;
         //    BsonDocument document = new

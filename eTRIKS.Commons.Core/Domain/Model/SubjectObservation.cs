@@ -53,6 +53,16 @@ namespace eTRIKS.Commons.Core.Domain.Model
         private string TreatmentName;
 
 
-        
+
+
+        public int ActivityId { get; set; }
+
+        public int DBstudyId { get; set; }
+
+        public int DatafileId { get; set; }
+
+        public int ProjectId { get; set; }
+
+        public int DatasetId { get; set; }
     }
 }

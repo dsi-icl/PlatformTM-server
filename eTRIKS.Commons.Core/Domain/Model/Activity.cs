@@ -17,7 +17,10 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public ICollection<Dataset> Datasets { get; set; }
         //public List<Study> Studies { get; set; }
         public Project Project { get; set; }
-       
 
+        public Activity()
+        {
+            Datasets = new List<Dataset>();
+        }
     }
 }

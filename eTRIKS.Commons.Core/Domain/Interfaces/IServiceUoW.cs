@@ -12,7 +12,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
         void AddClassMap(string fieldname, string propertyName);
 
-        void setSDTMentityDescriptor(SdtmEntityDefine descriptor);
+        void setSDTMentityDescriptor(SdtmEntityDescriptor descriptor);
         IUserRepository<TEntity,TResult> GetUserRepository<TEntity,TResult>();
 
     }

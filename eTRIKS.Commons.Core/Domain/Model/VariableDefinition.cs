@@ -29,6 +29,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         //public DerivedMethod DerivedVariableProperties { get; set; }
         //public string DerivedVariablePropertiesId { get; set; }
 
-        
+
+
+        //public Data.DescriptorType DescriptorType { get; set; }
     }
 }

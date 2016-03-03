@@ -50,7 +50,7 @@ namespace eTRIKS.Commons.Persistence {
             _disposed = false;
         }
 
-        public void setSDTMentityDescriptor(SdtmEntityDefine descriptor)
+        public void setSDTMentityDescriptor(SdtmEntityDescriptor descriptor)
         {
             SdtmSerializer.sdtmEntityDescriptor = descriptor;
         }
