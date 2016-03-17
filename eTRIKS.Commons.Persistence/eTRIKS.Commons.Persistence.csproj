@@ -121,9 +121,13 @@
     <Compile Include="Migrations_prod\201601291228562_addCharacteristicsTBL1.Designer.cs">
       <DependentUpon>201601291228562_addCharacteristicsTBL1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations_prod\201601291235211_remCharacteristicsobjTBL.cs" />
-    <Compile Include="Migrations_prod\201601291235211_remCharacteristicsobjTBL.Designer.cs">
-      <DependentUpon>201601291235211_remCharacteristicsobjTBL.cs</DependentUpon>
+    <Compile Include="Migrations_prod\201603100036145_addBSbaseline.cs" />
+    <Compile Include="Migrations_prod\201603100036145_addBSbaseline.Designer.cs">
+      <DependentUpon>201603100036145_addBSbaseline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201603100040396_addBSbaseline2.cs" />
+    <Compile Include="Migrations_prod\201603100040396_addBSbaseline2.Designer.cs">
+      <DependentUpon>201603100040396_addBSbaseline2.cs</DependentUpon>
     </Compile>
     <Compile Include="MongoDocumentSerializer.cs" />
     <Compile Include="SdtmSerializer.cs" />
@@ -339,8 +343,11 @@
     <EmbeddedResource Include="Migrations_prod\201601291228562_addCharacteristicsTBL1.resx">
       <DependentUpon>201601291228562_addCharacteristicsTBL1.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations_prod\201601291235211_remCharacteristicsobjTBL.resx">
-      <DependentUpon>201601291235211_remCharacteristicsobjTBL.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations_prod\201603100036145_addBSbaseline.resx">
+      <DependentUpon>201603100036145_addBSbaseline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201603100040396_addBSbaseline2.resx">
+      <DependentUpon>201603100040396_addBSbaseline2.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

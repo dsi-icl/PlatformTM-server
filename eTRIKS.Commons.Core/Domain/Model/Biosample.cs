@@ -21,7 +21,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int AssayId { get; set; }
         public Dataset Dataset { get; set; }
         public int DatasetId { get; set; }
-
+        public bool? IsBaseline { get; set; }
         public ICollection<SampleCharacteristic> SampleCharacteristics { get; set; }
         public Visit Visit { get; set; }
         public int? VisitId { get; set; }

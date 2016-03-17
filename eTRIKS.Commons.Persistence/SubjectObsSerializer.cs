@@ -171,6 +171,9 @@ namespace eTRIKS.Commons.Persistence
                         case "DBPROJECTID":
                             subjObs.ProjectId = reader.ReadInt32();
                             break;
+                        case "DBPROJECTACC":
+                            subjObs.ProjectAcc = reader.ReadString();
+                            break;
                         case "DBDATASETID":
                             subjObs.DatasetId = reader.ReadInt32();
                             break;
@@ -216,9 +219,12 @@ namespace eTRIKS.Commons.Persistence
                 case "DomainCode":
                     serializationInfo = new BsonSerializationInfo("DOMAIN", new StringSerializer(), typeof(string));
                     return true;
-                //case "ProjectId":
-                //    serializationInfo = new BsonSerializationInfo("DBPROJECTID", new Int32Serializer(), typeof(int));
-                //    return true;
+                case "ProjectId":
+                    serializationInfo = new BsonSerializationInfo("DBPROJECTID", new Int32Serializer(), typeof(int));
+                    return true;
+                case "ProjectAcc":
+                    serializationInfo = new BsonSerializationInfo("DBPROJECTACC", new StringSerializer(), typeof(string));
+                    return true;
                 case "Name":
                     serializationInfo = DynamicMappers.First(d => d.Key.Equals(memberName)).Value;
                     return true;

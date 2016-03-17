@@ -64,5 +64,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int ProjectId { get; set; }
 
         public int DatasetId { get; set; }
+
+        public string ProjectAcc { get; set; }
     }
 }

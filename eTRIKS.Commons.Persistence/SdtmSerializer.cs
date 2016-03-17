@@ -62,7 +62,7 @@ namespace eTRIKS.Commons.Persistence
                                 if (DateTime.TryParse(rfedt, out rfeDT))
                                     sdtmEntity.RFENDTC = rfeDT;
                             break;
-                        case "BSREFID ":
+                        case "BSREFID":
                             sdtmEntity.SampleId = reader.ReadString();
                             break;
                         case "DBACTIVITYID":
@@ -76,6 +76,9 @@ namespace eTRIKS.Commons.Persistence
                             break;
                         case "DBPROJECTID":
                             sdtmEntity.ProjectId = reader.ReadInt32();
+                            break;
+                        case "DBPROJECTACC":
+                            sdtmEntity.ProjectAccession = reader.ReadString();
                             break;
                         case "DBDATASETID":
                             sdtmEntity.DatasetId = reader.ReadInt32();
@@ -92,6 +95,9 @@ namespace eTRIKS.Commons.Persistence
                             break;
                         default:
                         {
+                            if (fieldName.EndsWith("BLFL"))
+                                sdtmEntity.BaseLineFlag = reader.ReadString().ToUpper().Equals("Y");
+                            else
                             if (sdtmEntityDescriptor.O3Variable!=null && sdtmEntityDescriptor.O3Variable.Name.Equals(fieldName))
                             {
                                 sdtmEntity.TopicVariable = reader.ReadString();
@@ -175,6 +181,7 @@ namespace eTRIKS.Commons.Persistence
                                 if (sdtmEntity.CollectionStudyDay == null)
                                     sdtmEntity.CollectionStudyDay = new RelativeTimePoint();
                                 sdtmEntity.CollectionStudyDay.Number = Int32.Parse(reader.ReadString());
+                                sdtmEntity.CollectionStudyDay.Name = null;
                             }
                             else
                                 sdtmEntity.Leftovers.Add(fieldName, reader.ReadString());

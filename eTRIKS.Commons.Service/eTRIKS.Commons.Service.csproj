@@ -109,6 +109,7 @@
     <Compile Include="Services\AssayService.cs" />
     <Compile Include="Services\ExportService.cs" />
     <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\HDdataService.cs" />
     <Compile Include="Services\HelperService\PropertyDescriptorFactory.cs" />
     <Compile Include="Services\SubjectService.cs" />
     <Compile Include="Services\UserServices\UserAccountService.cs" />

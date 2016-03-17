@@ -732,6 +732,11 @@ namespace eTRIKS.Commons.Service.Services
                 var sampleService = new BioSampleService(_dataServiceUnit);
                 await sampleService.LoadBioSamples(sdtmData, datasetId);
             }
+            else if (dataset.Domain.Code.Equals("CY") || dataset.Domain.Code.Equals("HD"))
+            {
+                var hdDataService = new HDdataService(_dataServiceUnit);
+                await hdDataService.LoadHDdata(sdtmData, datasetId);
+            }
                 //else if (dataset.Domain.Code.Equals("SC"))
                 //{
                 

@@ -99,7 +99,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string relativePath = projectId; 
             //if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             if(!subdir.Equals("top"))
-                relativePath = relativePath + "\\" + subdir;
+                relativePath = relativePath + "\\" + subdir.Replace('_','\\');
 
             return _fileService.getUploadedFiles(projectId, relativePath);
         }

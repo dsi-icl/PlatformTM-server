@@ -30,6 +30,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string StandardDataFile { get; set; }
         public string State { get; set; }
         public List<DatasetVariableDTO> variables { get; set; }
+        public bool isNew { get; set; }
 
         public DatasetDTO()
         {

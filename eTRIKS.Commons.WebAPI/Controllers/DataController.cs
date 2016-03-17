@@ -54,18 +54,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/studies/{studyId}/data/clinical/observations")]
-        public async Task<Hashtable> getObservations(string studyId, [FromBody] List<ObservationRequestDTO> observations)
+        [Route("api/projects/{projectAcc}/data/clinical/observations")]
+        public async Task<Hashtable> getObservations(string projectAcc, [FromBody] List<ObservationRequestDTO> observations)
         {
-            return await _dataService.getObservationsData(studyId, observations);
+            return await _dataService.getObservationsData(projectAcc, observations);
         }
 
-        [HttpGet]
-        [Route("api/projects/{projectId}/assays/{assayId}/samples")]
-        public Task<Hashtable> getSamplesData(string projectId, int assayId)
-        {
-            return _dataService.getSamplesDataPerAssay(projectId,assayId);
-        }
+
         
     }
 }

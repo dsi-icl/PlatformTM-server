@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
@@ -14,13 +16,70 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<Dictionary, string> _dictionaryRepository;
+        private readonly IRepository<Biosample, int> _bioSampleRepository;
+
         private readonly IServiceUoW _dataContext;
 
         public AssayService(IServiceUoW uoW)
         {
             _dataContext = uoW;
             _assayRepository = uoW.GetRepository<Assay, int>();
+            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
         }
+
+        public List<AssayDTO> GetProjectAssays(string projectAcc)
+        {
+            List<Assay> assays = _assayRepository.FindAll(a => a.Project.Accession.Equals(projectAcc),
+                new List<Expression<Func<Assay, object>>>()
+                {
+                    a => a.MeasurementType,
+                    a => a.TechnologyPlatform,
+                    a => a.TechnologyType
+                }).ToList();
+
+            if (assays.Count == 0)
+                return null;
+            return assays.Select(p => new AssayDTO()
+            {
+                AssayId = p.Id,
+                Measurement = p.MeasurementType!=null?p.MeasurementType.Name:"",
+                Platform = p.TechnologyPlatform!=null?p.TechnologyPlatform.Name:"",
+                Technology = p.TechnologyType!=null?p.TechnologyType.Name:"",
+                Name = p.Name
+            }).ToList();
+        }
+
+        public async Task<Hashtable> GetSamplesDataPerAssay(string projectId, int assayId)
+        {
+            var samples = new List<Biosample>();
+            samples = _bioSampleRepository.FindAll
+                (bs => bs.AssayId.Equals(assayId), new List<Expression<Func<Biosample, object>>>()
+                {
+                    d => d.Study,
+                    d =>d.Subject,
+                    d => d.CollectionStudyDay
+                }).ToList();
+
+            List<Hashtable> sample_table = new List<Hashtable>();
+            HashSet<string> SCs = new HashSet<string>() { "subjectId", "studyId", "sampleId", "studyDay#" };
+
+            foreach (Biosample sample in samples)
+            {
+                Hashtable ht = new Hashtable();
+                ht.Add("subjectId", sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing");
+                ht.Add("studyId", sample.Study.Name);
+                ht.Add("sampleId", sample.BiosampleStudyId);
+                ht.Add("studyDay#", sample.CollectionStudyDay.Number);
+                sample_table.Add(ht);
+            }
+            Hashtable returnObject = new Hashtable();
+            returnObject.Add("header", SCs);
+            returnObject.Add("data", sample_table);
+
+            return returnObject;
+
+        }
+
 
         public Assay AddAssay(ActivityDTO assayDto)
         {

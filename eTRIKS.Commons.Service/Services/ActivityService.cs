@@ -143,7 +143,13 @@ namespace eTRIKS.Commons.Service.Services
             foreach (var datasetDto in activityDTO.datasets)
             {
                 //datasetDto.ProjectId = project.Id;
-                _datasetService.updateDataset(datasetDto);                
+                if (datasetDto.isNew)
+                {
+                    var dataset = _datasetService.CreateDataset(datasetDto);
+                    activityToUpdate.Datasets.Add(dataset);
+                }
+                else
+                    _datasetService.updateDataset(datasetDto);                
             }
             return _activityServiceUnit.Save();
         }

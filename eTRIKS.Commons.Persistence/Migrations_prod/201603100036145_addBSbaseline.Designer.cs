@@ -7,13 +7,13 @@ namespace eTRIKS.Commons.Persistence.Migrations_prod
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.1.1-30610")]
-    public sealed partial class remCharacteristicsobjTBL : IMigrationMetadata
+    public sealed partial class addBSbaseline : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(remCharacteristicsobjTBL));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addBSbaseline));
         
         string IMigrationMetadata.Id
         {
-            get { return "201601291235211_remCharacteristicsobjTBL"; }
+            get { return "201603100036145_addBSbaseline"; }
         }
         
         string IMigrationMetadata.Source

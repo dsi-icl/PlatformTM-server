@@ -50,10 +50,11 @@ namespace eTRIKS.Commons.Service.Services
                     BiosampleStudyId = sdtmEntity.SampleId,
                     AssayId = sdtmEntity.ActivityId,
                     SubjectId = sdtmEntity.USubjId,
-                    StudyId = studyid,//study.Id,//sdtmEntity.DBstudyId,
+                    StudyId = studyid,
                     //Visit = sdtmEntity.Visit,
                     CollectionStudyDay = sdtmEntity.CollectionStudyDay,
-                    DatasetId = sdtmEntity.DatasetId
+                    DatasetId = sdtmEntity.DatasetId,
+                    IsBaseline = sdtmEntity.BaseLineFlag
                 };
                 foreach (var qualifier in sdtmEntity.Qualifiers)
                 {

@@ -247,28 +247,7 @@ namespace eTRIKS.Commons.Service.Services
             return dirs.Select(d => d.FileName).ToList();
         }
 
-        public void tempmethod()
-        {
-            DataTable usubjids = ReadOriginalFile("temp/CRC305ABCusubjids.csv");
-            DataTable cytofSamples = ReadOriginalFile("temp/CyTOFsamples.csv");
-            DataTable luminexSamples = ReadOriginalFile("temp/CRC305ABC_cytokine_samples.csv");
-            luminexSamples.TableName = "luminexSamples";
-
-            List<string> subjidlist = new List<string>();
-
-            foreach (DataRow row in usubjids.Rows)
-            {
-                subjidlist.Add(row[0].ToString());
-            }
-
-            foreach (DataRow row in luminexSamples.Rows)
-            {
-                string subjId = row["USUBJID"].ToString();
-                string newsubjid = subjidlist.Find(d => d.StartsWith(subjId));
-                row["USUBJID"] = newsubjid;
-            }
-           // writeDataFile("samples", luminexSamples);
-        }
+        
 
         public Hashtable getFilePreview(int fileId)
         {
@@ -302,6 +281,210 @@ namespace eTRIKS.Commons.Service.Services
             ht.Add("data", sdtmTable);
             
             return ht;
+        }
+
+        public void tempmethod()
+        {
+            DataTable usubjids = ReadOriginalFile("temp/CRC305Dusubjids.csv");
+            //DataTable cytofSamples = ReadOriginalFile("temp/CyTOFsamples.csv");
+            DataTable luminexSamples = ReadOriginalFile("temp/GhentLuminexSamples_v1.csv");
+            //DataTable FACSSamples = ReadOriginalFile("temp/FACSsamples_v1.csv");
+            //luminexSamples.TableName = "luminexSamples";
+
+            luminexSamples.Columns.Add("USUBJID");
+            List<string> subjidlist = new List<string>();
+
+            foreach (DataRow row in usubjids.Rows)
+            {
+                subjidlist.Add(row[0].ToString());
+            }
+
+            foreach (DataRow row in luminexSamples.Rows)
+            {
+                string subjId = row["SubjId"].ToString();
+                string newsubjid = subjidlist.Find(d => d.EndsWith(subjId));
+                row["USUBJID"] = newsubjid;
+            }
+            string path = ConfigurationManager.AppSettings["FileDirectory"];
+            StreamWriter writer = File.CreateText(path + "temp\\GhentLuminexSamples_v2.csv");
+
+            IEnumerable<String> headerValues = luminexSamples.Columns.Cast<DataColumn>()
+                .Select(column => QuoteValue(column.ColumnName));
+
+            writer.WriteLine(String.Join(",", headerValues));
+            IEnumerable<String> items;
+
+            foreach (DataRow row in luminexSamples.Rows)
+            {
+                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
+                writer.WriteLine(String.Join(",", items));
+            }
+            writer.Flush();
+            writer.Close();
+        }
+
+        /**
+         *To gather one column we need the following params
+         *- identifier columns (columns that will remain as is
+         *- gather columns (those that will be pivoted to long format
+         *- name of the key column
+         *- name of the value column
+         */
+        public void getLongFormat()
+        {
+            DataTable wideDataTable = ReadOriginalFile("temp/CyTOFdata_v2.csv");
+            DataTable longDataTable = new DataTable();
+
+            List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
+            List<string> gatherColumns = new List<string>();
+            int gatherColumnsFrom = 7;
+            int gatherColumnsTo = 111;
+
+            List<int> countColumns = new List<int>(){1,10,19,28};
+
+            //Retrieve dataset template for the long format file
+            //identify key column and value Column
+            string keyColumn = "OBSMEA", valueColumn = "OBSVALUE",
+                featureColumn = "FEAT", domainColumn = "DOMAIN";
+
+            //1- Create new table from the identifier columns + the new columns
+            longDataTable.Columns.Add(domainColumn);
+            foreach (var idCol in ids )
+            {
+                longDataTable.Columns.Add(idCol);
+            }
+            //longDataTable.Columns.Add(popColumn);
+            //longDataTable.Columns.Add(countColumn);
+            longDataTable.Columns.Add(featureColumn);
+            longDataTable.Columns.Add(keyColumn);
+            longDataTable.Columns.Add(valueColumn);
+
+            foreach (DataRow inRow in wideDataTable.Rows)
+            {
+                
+
+                for (int i = gatherColumnsFrom; i <= gatherColumnsTo; i++)
+                {
+                    DataRow longDataRow = longDataTable.NewRow();
+                    foreach (var idCol in ids)
+                    {
+                        longDataRow[idCol] = inRow[idCol];
+                    }
+                    string[] keyValue = wideDataTable.Columns[i].ToString().Split('.');
+                    longDataRow[keyColumn] = keyValue[0];
+                    longDataRow[valueColumn] = inRow[i];
+                    longDataRow[featureColumn] = keyValue[1];
+                    longDataRow[domainColumn] = "CY";
+
+                    longDataTable.Rows.Add(longDataRow);
+                }
+                //foreach (DataColumn col in inputDataTable.Columns)
+                //{
+                    
+                //}
+            }
+           // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
+            string path = ConfigurationManager.AppSettings["FileDirectory"];
+            StreamWriter writer = File.CreateText(path+"temp\\CyTOFdata_long.csv");
+
+            IEnumerable<String> headerValues = longDataTable.Columns.Cast<DataColumn>()
+                .Select(column => QuoteValue(column.ColumnName));
+
+            writer.WriteLine(String.Join(",", headerValues));
+            IEnumerable<String> items;
+
+            foreach (DataRow row in longDataTable.Rows)
+            {
+                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
+                writer.WriteLine(String.Join(",", items));
+            }
+            writer.Flush();
+            writer.Close();
+        }
+
+        public void getLongFormat2()
+        {
+            DataTable wideDataTable = ReadOriginalFile("temp/FACSdata_v2.csv");
+            DataTable longDataTable = new DataTable();
+
+            //List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
+            List<string> ids = new List<string>() { "SAMPLEID" };
+            List<string> gatherColumns = new List<string>();
+            int gatherColumnsFrom = 7;
+            int gatherColumnsTo = 111;
+
+
+
+            List<int> countColumns = new List<int>() { 1, 10, 19, 28 };
+
+            //Retrieve dataset template for the long format file
+            //identify key column and value Column
+            string countColumn = "COUNT", keyColumn = "OBSMEA", valueColumn = "OBSVALUE",
+                featureColumn = "FEAT", domainColumn = "DOMAIN", popColumn = "POPULATION";
+
+
+
+            //1- Create new table from the identifier columns + the new columns
+            longDataTable.Columns.Add(domainColumn);
+            foreach (var idCol in ids)
+            {
+                longDataTable.Columns.Add(idCol);
+            }
+            longDataTable.Columns.Add(popColumn);
+            longDataTable.Columns.Add(countColumn);
+            longDataTable.Columns.Add(featureColumn);
+            longDataTable.Columns.Add(keyColumn);
+            longDataTable.Columns.Add(valueColumn);
+
+            foreach (DataRow inRow in wideDataTable.Rows)
+            {
+                for(int k=0; k<countColumns.Count;k++)
+                {
+                    for (int i = countColumns[k] + 1; k+1==countColumns.Count?i<inRow.ItemArray.Length:i < countColumns[k+1]; i++)
+                    {
+                        DataRow longDataRow = longDataTable.NewRow();
+                        foreach (var idCol in ids)
+                        {
+                            longDataRow[idCol] = inRow[idCol];
+                        }
+                        string[] popCountKeyValue = wideDataTable.Columns[countColumns[k]].ToString().Split('.');
+
+                        longDataRow[popColumn] = popCountKeyValue[0];
+                        longDataRow[countColumn] = inRow[countColumns[k]];
+
+                        string[] keyValue = wideDataTable.Columns[i].ToString().Split('.');
+                        longDataRow[keyColumn] = keyValue[1];
+                        longDataRow[valueColumn] = inRow[i];
+                        longDataRow[featureColumn] = keyValue[2];
+                        longDataRow[domainColumn] = "CY";
+
+                        longDataTable.Rows.Add(longDataRow);
+                    }
+                }
+
+                
+                //foreach (DataColumn col in inputDataTable.Columns)
+                //{
+
+                //}
+            }
+            // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
+            string path = ConfigurationManager.AppSettings["FileDirectory"];
+            StreamWriter writer = File.CreateText(path + "temp\\FACSdata_long.csv");
+
+            IEnumerable<String> headerValues = longDataTable.Columns.Cast<DataColumn>()
+                .Select(column => QuoteValue(column.ColumnName));
+
+            writer.WriteLine(String.Join(",", headerValues));
+            IEnumerable<String> items;
+
+            foreach (DataRow row in longDataTable.Rows)
+            {
+                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
+                writer.WriteLine(String.Join(",", items));
+            }
+            writer.Flush();
+            writer.Close();
         }
     }
 }

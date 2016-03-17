@@ -167,7 +167,7 @@ namespace eTRIKS.Commons.Service.Services
 
         #region Crossfilter data methods
         //New method using observationIds, observations coming from UI shuold have observationIds in SQL database
-        public async Task<Hashtable> getObservationsData(string projectId, List<ObservationRequestDTO> reqObservations)
+        public async Task<Hashtable> getObservationsData(string projectAcc, List<ObservationRequestDTO> reqObservations)
         {
             //studyId = "CRC305C";
             List<Hashtable> dataMatrix = new List<Hashtable>();
@@ -188,7 +188,8 @@ namespace eTRIKS.Commons.Service.Services
             List<int> observationsIDs = reqObservations.Select(o => o.O3id).ToList();
             //Get observation info from SQL
             List<Observation> observations = _observationRepository.FindAll(
-                           o => observationsIDs.Contains(o.Id),
+                           o => observationsIDs.Contains(o.Id) && o.Studies.Select(g=>g.Project.Accession).ToList().Contains(projectAcc),
+
                            new List<Expression<Func<Observation, object>>>()
                            {
                                d=>d.TopicVariable,
@@ -234,7 +235,7 @@ namespace eTRIKS.Commons.Service.Services
 
                 //TODO: either add projectId to Mongo Records or query for project studies ids from SQL and include them in the query for mongo
                 List<SubjectObservation> observationData = await _subObservationRepository.FindAllAsync(
-                    d => d.Name.Equals(obsName));
+                    d => d.Name.Equals(obsName) && d.ProjectAcc.Equals(projectAcc));
                     //TEMP
                    // d => studyIds.Contains(d.StudyId));
                 //}
@@ -589,15 +590,25 @@ namespace eTRIKS.Commons.Service.Services
                     SCs.Add("arm"); ht.Add("arm", subject.ArmCode);
                 }
 
-                if (subject.Study.Name != null)
-                {
-                    SCs.Add("study"); ht.Add("study", subject.Study.Name);
-                }
+                //if (subject.Study.Name != null)
+                //{
+                //    SCs.Add("study"); ht.Add("study", subject.Study.Name);
+                //}
 
                 if (subject.Study.Site != null)
                 {
                     SCs.Add("siteid"); ht.Add("siteid", subject.Study.Site);
                 }
+
+                if (subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SEX")) != null)
+                {
+                    SCs.Add("sex"); ht.Add("sex", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SEX")).VerbatimValue);
+                }
+                if (subject.SubjectCharacteristics.SingleOrDefault(sc=> sc.CharacteristicObject.ShortName.ToUpper().Equals("AGE")) != null)
+                {
+                    SCs.Add("age"); ht.Add("age", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("AGE")).VerbatimValue);
+                }
+
                     
                 if (reqObservations != null)
                     foreach (var requestDto in reqObservations)
@@ -874,37 +885,6 @@ namespace eTRIKS.Commons.Service.Services
 
 
 
-        public async Task<Hashtable> getSamplesDataPerAssay(string projectId, int assayId)
-        {
-            var studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C" };
-
-            var samples = new List<Biosample>();
-            samples = _bioSampleRepository.FindAll
-                (bs => bs.AssayId.Equals(assayId), new List<Expression<Func<Biosample, object>>>()
-                {
-                    d => d.Study,
-                    d =>d.Subject,
-                    d => d.CollectionStudyDay
-                }).ToList();
-
-            List<Hashtable> sample_table = new List<Hashtable>();
-            HashSet<string> SCs = new HashSet<string>(){ "subjectId", "studyId", "sampleId","studyDay#" };
-
-            foreach (Biosample sample in samples)
-            {
-                Hashtable ht = new Hashtable();
-                ht.Add("subjectId", sample.Subject!=null?sample.Subject.UniqueSubjectId:"missing");
-                ht.Add("studyId", sample.Study.Name);
-                ht.Add("sampleId",sample.BiosampleStudyId);
-                ht.Add("studyDay#",sample.CollectionStudyDay.Number);
-                sample_table.Add(ht);
-            }
-            Hashtable returnObject = new Hashtable();
-            returnObject.Add("header", SCs);
-            returnObject.Add("data", sample_table);
-
-            return returnObject;
-
-        }
+        
     }
 }

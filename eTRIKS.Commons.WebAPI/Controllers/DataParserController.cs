@@ -34,8 +34,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public void LoadTemplateFromFile()
         {
             string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
-            string tempFilepath = "temp/BStemplate.csv";
-            string tempVarFilepath = "temp/BStemplateVars.csv";
+            string tempFilepath = "temp/dataTemplates/REtemplate.csv";
+            string tempVarFilepath = "temp/dataTemplates/REtemplateVars.csv";
             templateService.loadDatasetTemplate(tempFilepath, tempVarFilepath);
         }
 
@@ -58,6 +58,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string tempVarFilepath = "temp/assaytermsCVs.csv";
             templateService.loadCVterms(tempFilepath, tempVarFilepath);
         }
+
+        [HttpGet]
+        [Route("api/temp/widetolong")]
+        public void widetolong()
+        {
+            string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            //string tempFilepath = "temp/BStemplate.csv";
+            //string tempVarFilepath = "temp/BStemplateVars.csv";
+            _fileService.getLongFormat2();
+        }
+
 
         [HttpPost]
         public async Task<HttpResponseMessage> LoadFile()

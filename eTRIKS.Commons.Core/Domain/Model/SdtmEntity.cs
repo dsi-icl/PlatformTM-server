@@ -38,6 +38,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Visit Visit { get; set; }
         public AbsoluteTimePoint CollectionDateTime { get; set; } //Date of Collection / --DTC
         public RelativeTimePoint CollectionStudyDay { get; set; } //--DY
+        public bool BaseLineFlag { get; set; } //--BLFL
         public RelativeTimePoint CollectionStudyTimePoint { get; set; } //--TPT
         //public TimeInterval ObsInterval { get; set; }
         public string DomainCode { get; set; }
@@ -68,6 +69,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string VerbatimStudyId { get; set; }
 
         public int DatafileId { get; set; }
-        
+
+
+        public string ProjectAccession { get; set; }
     }
 }
