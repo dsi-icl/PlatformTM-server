@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Configuration;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Permissions;
 using AutoMapper;
@@ -90,7 +91,10 @@ namespace eTRIKS.Commons.Service.Services
         {
             //TODO: projectId
             DataFile file;
-            file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Project.Accession.Equals(projectId));
+            if (fi == null)
+                return null;
+            string filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf(projectId));
+            file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.Project.Accession.Equals(projectId));
             //TODO: add property isLoadedToDB to the file and only change status to modified if not loadedToDB
             if (file == null)
             {
@@ -134,41 +138,55 @@ namespace eTRIKS.Commons.Service.Services
 
         private DataTable readDataFile(string filePath)
         {
-            StreamReader reader = File.OpenText(filePath);
-            //var csv = new CsvReader(reader);
-            var parser = new CsvParser(reader);
-            string[] header = parser.Read();
-            if (!(header.Count() > 1))
-            {
-                if (header[0].Contains("\t"))
-                {
-                    parser.Configuration.Delimiter = "\t";
-                    header = header[0].Split('\t');
-                }
-                   
-            }
-
             DataTable dt = new DataTable();
-            foreach (string field in header)
-            {
-                dt.Columns.Add(field.Replace("\"","").ToUpper() ,typeof(string));
-            }
-
-            while (true)
-            {
-                var row = parser.Read();
-                if (row == null)
-                    break;
-
-                DataRow dr = dt.NewRow();
-                if (row.Length == 0 || row.Length != dt.Columns.Count) return null;
-
-                for (int i = 0; i < row.Length; i++)
+       
+                StreamReader reader = File.OpenText(filePath);
+                //var csv = new CsvReader(reader);
+                var parser = new CsvParser(reader);
+                string[] header = parser.Read();
+                if (!(header.Count() > 1))
                 {
-                    dr[i] = row[i];
+                    if (header[0].Contains("\t"))
+                    {
+                        parser.Configuration.Delimiter = "\t";
+                        header = header[0].Split('\t');
+                    }
+
                 }
-                dt.Rows.Add(dr);
-            }
+
+
+                foreach (string field in header)
+                {
+                    dt.Columns.Add(field.Replace("\"", "").ToUpper(), typeof (string));
+                }
+
+                while (true)
+                {
+                    try
+                    {
+                        var row = parser.Read();
+                        if (row == null)
+                            break;
+
+                        DataRow dr = dt.NewRow();
+                        if (row.Length == 0 || row.Length != dt.Columns.Count){
+                            Debug.WriteLine(row.Length+" "+dt.Columns.Count);
+                            return null;
+                        }
+
+                        for (int i = 0; i < row.Length; i++)
+                        {
+                            if (row[i] == null)
+                                Debug.WriteLine(row);
+                            dr[i] = row[i];
+                        }
+                        dt.Rows.Add(dr);
+                    }
+                    catch (System.NullReferenceException e)
+                    {
+                        Debug.WriteLine(e.Message);
+                    }
+                }
 
             return dt;
         }
