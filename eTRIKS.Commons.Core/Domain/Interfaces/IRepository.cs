@@ -101,6 +101,8 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         void Remove(TPrimaryKey id);
         Task DeleteManyAsync(IList<object> filterFields = null);
         Task DeleteOneAsync(IList<object> filterFields = null);
+        void DeleteMany(IList<object> filterFields = null);
+        void DeleteMany(Expression<Func<TEntity, bool>> filter);
         
         #endregion
 

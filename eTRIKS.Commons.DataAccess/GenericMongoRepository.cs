@@ -29,8 +29,8 @@ namespace eTRIKS.Commons.DataAccess
             //DataContext = dataContext;
             //DataContext.Configuration.ProxyCreationEnabled = false;
             //Entities = DataContext.Set<TEntity>();
-           
-            mongoClient = new MongoClient(ConfigurationManager.ConnectionStrings["MongoDBConnectionString"]
+
+            mongoClient = new MongoClient(ConfigurationManager.ConnectionStrings["MongoDBprod"]
                                             .ConnectionString);
             database = mongoClient.GetDatabase(ConfigurationManager.AppSettings["NoSQLDatabaseName"]);
             //collection = database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower() + "s");
@@ -134,6 +134,24 @@ namespace eTRIKS.Commons.DataAccess
                 filterDoc.AddRange(bsonDoc);
             }
             await collection.DeleteManyAsync(filterDoc);
+        }
+
+        public void DeleteMany(IList<object> filterFields = null)
+        {
+            var filterDoc = new BsonDocument();
+            filterDoc.AllowDuplicateNames = true;
+            foreach (var filterField in filterFields)
+            {
+                var jsonDoc = Newtonsoft.Json.JsonConvert.SerializeObject(filterField);
+                var bsonDoc = BsonSerializer.Deserialize<BsonDocument>(jsonDoc);
+                filterDoc.AddRange(bsonDoc);
+            }
+             collection.DeleteMany(filterDoc);
+        }
+
+        public void DeleteMany(Expression<Func<TEntity, bool>> filter)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<ICollection<TNewResult>> AggregateAsync<Tkey, TNewResult>(Expression<Func<TEntity, bool>> match,

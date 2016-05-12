@@ -744,13 +744,28 @@ namespace eTRIKS.Commons.Service.Services
             else
             {
                 //observationService.LoadObsDescriptors(dataset, );
-                await observationService.loadDatasetObservations(dataset);
+                await observationService.loadDatasetObservations(dataset, fileId);
             }
                 
             const string status = "LOADED";
             return true;
         }
 
+        public void UnloadDataset(int datasetId, int fileId)
+        {
+            var filterFields = new List<object>();
+            var filterField1 = new Dictionary<string, object>();
+            filterField1.Add("DBDATASETID", datasetId);
+            filterFields.Add(filterField1);
+            var filterField2 = new Dictionary<string, object>();
+            filterField2.Add("DBDATAFILEID", fileId);
+            filterFields.Add(filterField2);
+            _mongoDocRepository.DeleteMany(filterFields);
+            Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+
+
+        }
+        
         //public async Task<bool> loadSubjects(int datasetId)
         //{
         //    List<SdtmEntity> subjectData = await _sdtmRepository.FindAllAsync(

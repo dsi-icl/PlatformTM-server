@@ -293,7 +293,7 @@ namespace eTRIKS.Commons.Service.Services
             return _variableRepository.FindSingle(d => d.Name.Equals(name) && d.ProjectId.Equals(projectId));
         }
         
-        public async Task loadDatasetObservations(Dataset ds)
+        public async Task loadDatasetObservations(Dataset ds,int dataFileId)
         {
             VariableDefinition controlledTerm = null;
             VariableDefinition defaultQualifier = null;
@@ -332,16 +332,25 @@ namespace eTRIKS.Commons.Service.Services
             }
 
             if (obsClass.Equals("events"))
-                defaultQualifier = getVarDef(ds.Domain.Code + "SEV", ds.Activity.ProjectId);
-			
+            {
+                if(ds.Domain.Code.Equals("AE"))
+                    defaultQualifier = getVarDef(ds.Domain.Code + "SEV", ds.Activity.ProjectId);
+                else
+                {
+                    defaultQualifier = getVarDef(ds.Domain.Code + "OCCUR", ds.Activity.ProjectId);
+                }
+            }
+                
+            
             obsName = topic.Name;
 
             //Formulate Query
             var filterFields = new Dictionary<string, object>
             {
                 {"DOMAIN", ds.Domain.Code},
-                {"DBPROJECTACC", ds.Activity.Project.Accession}//,
-                //{"DBDATASETID",ds.Id}
+                {"DBPROJECTACC", ds.Activity.Project.Accession},
+                {"DBDATASETID",ds.Id},
+                {"DBDATAFILEID",dataFileId}
             };
 
             var groupFields = new Dictionary<string, string>
@@ -352,19 +361,34 @@ namespace eTRIKS.Commons.Service.Services
                 // {"Name", "$" + controlledTerm.Name}, ///FOR AEs only skip AETERM and only use DECOD
                                                       ///
                                                       /// 
-                {"ControlledTermStr", "$" + controlledTerm.Name},
+               
                 {"Group", "$" + ds.Domain.Code + "CAT"},
                 {"Subgroup", "$" + ds.Domain.Code + "SCAT"}
             };
+            if(controlledTerm!=null)
+                groupFields.Add("ControlledTermStr", "$" + controlledTerm.Name);
             //End of formulate Query
 
             MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
             List<Observation> observations = await mongoDataService.getGroupedNoSQLrecords(filterFields, groupFields);
 
-            observations = observations.Where(o => o.Group != "").ToList();
+            List<Observation> curr_observations =
+                _ObservationRepository.FindAll(o => o.ProjectId == ds.Activity.ProjectId && o.DomainCode.Equals(ds.Domain.Code)).ToList();
+
+            List<string> obsKeys = new List<string>();
+            foreach (var currObservation in curr_observations)
+            {
+                obsKeys.Add(currObservation.Name+currObservation.Group+currObservation.Class);
+            }
+                
+                observations = observations.Where(o => o.Group != "").ToList();
 
             foreach (Observation obs in observations)
             {
+
+                string key = obs.Name + obs.Group + ds.Domain.Class;
+                if(obsKeys.Contains(key))
+                    continue;
                 obs.Class = ds.Domain.Class;
                 obs.DomainCode = ds.Domain.Code;
                 obs.DomainName = ds.Domain.Name;
@@ -374,17 +398,22 @@ namespace eTRIKS.Commons.Service.Services
 
                 
                // obs.ControlledTermStr = controlledTerm;
-                if (obsClass.Equals("findings"))
-                    obs.DefaultQualifier = defaultQualifier;
-
-                if (obsClass.Equals("events"))
-                    obs.DefaultQualifier = defaultQualifier;
+ 
+                obs.DefaultQualifier = defaultQualifier;
                 //TODO: CHECK THAT
-                obs.Studies.AddRange(ds.Activity.Project.Studies);
+                //obs.Studies.AddRange(ds.Activity.Project.Studies);
+                obs.ProjectId = ds.Activity.ProjectId;
+                //obs.DatafileId = dataFileId;
+                //obs.DatasetId = ds.Id;
                 _ObservationRepository.Insert(obs);
             }
             
             _dataContext.Save();            
+        }
+
+        public void DeleteDatasetObservations(int DatasetId, int DatafileId)
+        {
+            _ObservationRepository.DeleteMany(o => o.DatasetId == DatasetId && o.DatafileId == DatafileId );
         }
         /*
         public void LoadObservations(Dataset dataset, SdtmEntityDescriptor sdtmEntityDescriptor, List<SdtmEntity> sdtmRowList)

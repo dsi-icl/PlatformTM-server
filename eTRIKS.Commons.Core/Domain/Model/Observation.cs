@@ -31,6 +31,12 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int? DefaultQualifierId { get; set; }
         public List<Study> Studies { get; set; }
         public bool? isSubjCharacteristic { get; set; }
+        public int? DatasetId { get; set; }
+        public Dataset Dataset { get; set; }
+        public DataFile Datafile { get; set; }
+        public int? DatafileId { get; set; }
+        public Project Project { get; set; }
+        public int? ProjectId { get; set; }
 
         public List<VariableDefinition> Synonyms { get; set; }
         public List<VariableDefinition> Qualifiers { get; set; } //VSORES, VSLOC ...etc

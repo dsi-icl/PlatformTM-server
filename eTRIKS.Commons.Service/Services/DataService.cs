@@ -73,15 +73,25 @@ namespace eTRIKS.Commons.Service.Services
         {
 
             //TODO: will replace Observation here with ObservationDescriptor
-            List<Observation> studyObservations =
-            _observationRepository.FindAll(
-                x => x.Studies.Select(s => s.Project.Accession).Contains(projectAccession),
+            List<Observation> studyObservations;// =
+            //_observationRepository.FindAll(
+            //    x => x.Studies.Select(s => s.Project.Accession).Contains(projectAccession),
+            //    new List<Expression<Func<Observation, object>>>(){
+            //            d => d.Studies.Select(s => s.Project),
+            //            d => d.DefaultQualifier,
+            //            d => d.Qualifiers
+            //        }
+            //    ).ToList();
+
+           // if (studyObservations.Count == 0)
+           // {
+                studyObservations =_observationRepository.FindAll(o => o.Project.Accession.Equals(projectAccession),
                 new List<Expression<Func<Observation, object>>>(){
                         d => d.Studies.Select(s => s.Project),
                         d => d.DefaultQualifier,
                         d => d.Qualifiers
-                    }
-                ).ToList();
+                    }).ToList();
+            //}
 
             List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
 
@@ -188,7 +198,7 @@ namespace eTRIKS.Commons.Service.Services
             List<int> observationsIDs = reqObservations.Select(o => o.O3id).ToList();
             //Get observation info from SQL
             List<Observation> observations = _observationRepository.FindAll(
-                           o => observationsIDs.Contains(o.Id) && o.Studies.Select(g=>g.Project.Accession).ToList().Contains(projectAcc),
+                           o => observationsIDs.Contains(o.Id) && o.Project.Accession.Equals(projectAcc),
 
                            new List<Expression<Func<Observation, object>>>()
                            {
@@ -201,16 +211,18 @@ namespace eTRIKS.Commons.Service.Services
              ).ToList();
 
             //This will be replaced by call to SQL for studies of a particular project.
-            var studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
+            //var studyIds = new List<string> { "CRC305A", "CRC305B", "CRC305C", "CRC305D" };
 
             var subjFindings = new List<SubjectObservation>();
-            var subjAdverseEvents = new List<SubjectObservation>();
+            var subjEvents = new List<SubjectObservation>();
 
             #region Query Mongo for Subject Observations data
             foreach (var observation in observations)
             {
                 string obsName = observation.Name;
                 string fieldName = observation.TopicVariable.Name;
+                if (observation.ControlledTermStr == null)
+                    observation.ControlledTermStr = observation.Name;
                 if (observation.DomainCode.Equals("AE") && observation.ControlledTermStr != null)
                 {
                     obsName = observation.ControlledTermStr;
@@ -239,9 +251,9 @@ namespace eTRIKS.Commons.Service.Services
                     //TEMP
                    // d => studyIds.Contains(d.StudyId));
                 //}
-                if (observation.DomainCode.Equals("AE"))
+                if (observation.Class.ToUpper().Equals("EVENTS"))
                 {
-                    subjAdverseEvents.AddRange(observationData);
+                    subjEvents.AddRange(observationData);
                 }
 
                 else
@@ -296,7 +308,7 @@ namespace eTRIKS.Commons.Service.Services
             //aes from aesbysubject
             //Dictionary<string, List<Hashtable>> subjectToObservationsPerVisitAndTime = new Dictionary<string, List<Hashtable>>();
             var findingsTable = getFindingsDataTable(subjFindings, observations, reqObservations);
-            var eventsTable = getEventsDataTable(subjAdverseEvents, observations, reqObservations);
+            var eventsTable = getEventsDataTable(subjEvents, observations, reqObservations);
             //            #region Create the data matrix
             //            try
             //            {
@@ -590,10 +602,10 @@ namespace eTRIKS.Commons.Service.Services
                     SCs.Add("arm"); ht.Add("arm", subject.ArmCode);
                 }
 
-                //if (subject.Study.Name != null)
-                //{
-                //    SCs.Add("study"); ht.Add("study", subject.Study.Name);
-                //}
+                if (subject.Study.Name != null)
+                {
+                    SCs.Add("study"); ht.Add("study", subject.Study.Name);
+                }
 
                 if (subject.Study.Site != null)
                 {
@@ -722,7 +734,9 @@ namespace eTRIKS.Commons.Service.Services
                     row["subjectId"] = subjObs.SubjectId;
                     row["study"] = subjObs.StudyId;
 
-                    foreach (var obsreq in reqObservations.Where(r => r.O3code.ToLower().Equals(subjObs.Name.ToLower())))
+                    var obsName = subjObs.Name != null ? subjObs.Name.ToLower() : subjObs.VerbatimName.ToLower();
+
+                    foreach (var obsreq in reqObservations.Where(r => r.O3code.ToLower().Equals(obsName)))
                         row[obsreq.Id] = subjObs.qualifiers.SingleOrDefault(q => q.Key.Equals(obsreq.QO2)).Value;
 
                     //if (subjObs.ObsInterval!=null && subjObs.ObsInterval.Start!=null)
@@ -737,7 +751,7 @@ namespace eTRIKS.Commons.Service.Services
         }
         private ObservationNode createObsNode(Observation obsObject)
         {
-            return new ObservationNode()
+            var node = new ObservationNode
             {
                 Name = obsObject.ControlledTermStr,
                 Id = obsObject.Id,
@@ -755,6 +769,12 @@ namespace eTRIKS.Commons.Service.Services
                     //Id = obsObject.Name.ToLower() + "_" + obsObject.DefaultQualifier.Name
                 }
             };
+            if (obsObject.ControlledTermStr == null)
+            {
+                node.Name = obsObject.Name;
+                node.DefaultObservation.O3 = obsObject.Name;
+            }
+            return node;
 
         }
         private async Task<List<MedDRAGroupNode>> getEventsByMedDRA(int projectId, List<Observation> observations, string gname)

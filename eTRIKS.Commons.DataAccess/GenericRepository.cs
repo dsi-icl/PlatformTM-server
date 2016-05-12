@@ -146,7 +146,15 @@ namespace eTRIKS.Commons.DataAccess
             throw new NotImplementedException();
         }
 
+        public void DeleteMany(IList<object> filterFields = null)
+        {
+            throw new NotImplementedException();
+        }
 
+        public void DeleteMany(Expression<Func<TEntity, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
 
 
         public System.Threading.Tasks.Task<List<TEntity>> GetAllAsync()

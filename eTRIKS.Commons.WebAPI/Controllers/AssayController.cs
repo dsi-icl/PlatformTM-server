@@ -11,7 +11,7 @@ using eTRIKS.Commons.Service.Services;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-  //  [Authorize]
+    //[Authorize]
     public class AssayController : ApiController
     {
          private readonly AssayService _assayService;
