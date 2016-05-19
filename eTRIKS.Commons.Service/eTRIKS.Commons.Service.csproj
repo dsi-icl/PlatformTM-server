@@ -107,6 +107,7 @@
     <Compile Include="Services\ActivityService.cs" />
     <Compile Include="Services\BioSampleService.cs" />
     <Compile Include="Services\AssayService.cs" />
+    <Compile Include="Services\CVtermService.cs" />
     <Compile Include="Services\ExportService.cs" />
     <Compile Include="Services\FileService.cs" />
     <Compile Include="Services\HDdataService.cs" />
