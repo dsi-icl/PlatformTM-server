@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
 {
-    class SdtmSerializer : SerializerBase<SdtmEntity>, IBsonDocumentSerializer, IBsonIdProvider
+    public class SdtmSerializer : SerializerBase<SdtmEntity>, IBsonDocumentSerializer, IBsonIdProvider
     {
         public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
 

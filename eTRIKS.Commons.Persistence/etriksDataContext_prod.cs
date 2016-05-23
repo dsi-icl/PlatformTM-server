@@ -33,9 +33,9 @@ namespace eTRIKS.Commons.Persistence {
 
             DbConfiguration.SetConfiguration(new MySql.Data.Entity.MySqlEFConfiguration());
 
-            BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
-            BsonSerializer.RegisterSerializer(typeof(SdtmEntity), new SdtmSerializer());
-            BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(SdtmEntity), new SdtmSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
 
             
 

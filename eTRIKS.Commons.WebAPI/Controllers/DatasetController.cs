@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Linq;
 using System.Net;
@@ -46,6 +47,29 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _datasetService.GetTemplateDataset(domainId);
         }
+
+        [HttpGet]
+        [Route("api/templates/assay/features")]
+        public List<DatasetDTO> GetAssayFeatureTemplates()
+        {
+            return _datasetService.GetAssayFeatureTemplates();
+        }
+
+        [HttpGet]
+        [Route("api/templates/assay/samples")]
+        public List<DatasetDTO> GetAssaySampleTemplates()
+        {
+            return _datasetService.GetAssaySampleTemplates();
+        }
+
+        [HttpGet]
+        [Route("api/templates/assay/data")]
+        public List<DatasetDTO> GetAssayDataTemplates()
+        {
+            return _datasetService.GetAssayDataTemplates();
+        }
+
+
 
         [HttpGet]
         [Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]

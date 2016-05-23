@@ -25,7 +25,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                 //Component.For<DbContext, IServiceUoW>()
                 //    .ImplementedBy<etriksDataContext_prod>(),
 
-                Component.For<IdentityDbContext<ApplicationUser>, IServiceUoW>()
+                Component.For<IdentityDbContext<ApplicationUser>, IServiceUoW>().LifestylePerWebRequest()
                     .ImplementedBy<EtriksDataContextProd>(),
 
                 Component.For<IUserRepository<ApplicationUser, IdentityResult>>()
@@ -37,14 +37,14 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 
                 Classes
                     .FromAssemblyNamed("eTRIKS.Commons.DataAccess")
-                    .BasedOn(typeof(IRepository<,>))
+                    .BasedOn(typeof(IRepository<,>)).LifestylePerWebRequest()
                     .WithServiceDefaultInterfaces(),
 
                 
 
                 Classes
                      .FromAssemblyNamed("eTRIKS.Commons.Service")
-                     .InNamespace("eTRIKS.Commons.Service.Services")
+                     .InNamespace("eTRIKS.Commons.Service.Services").LifestylePerWebRequest()
                      .WithServiceSelf()
                      .WithServiceDefaultInterfaces(),
 

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Service.DTOs;
+using eTRIKS.Commons.Service.Services;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -22,10 +23,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("assay/measurementTypes")]
-        public List<CVterm> GetAssayMeasurementTypes()
+        public List<AssayDefTermsDTO> GetAssayMeasurementTypes()
         {
-            
-            return _cvtermService.GetAssayDefTerms(); 
+
+            return _cvtermService.GetAssayDefTerms();
         }
     }
 }

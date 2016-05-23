@@ -251,6 +251,7 @@ namespace eTRIKS.Commons.Service.Services
             }
             return dataset;
         }
+        
         public string updateDataset(DatasetDTO datasetDTO)
         {
             Dataset datasetToUpdate = GetActivityDataset(datasetDTO.Id);
@@ -949,6 +950,24 @@ namespace eTRIKS.Commons.Service.Services
             }
                 
             return fileDto;
+        }
+
+        public List<DatasetDTO> GetAssayFeatureTemplates()
+        {
+            var ds = GetTemplateDataset("D-ASSAY-FEAT");
+            return new List<DatasetDTO>(){ds};
+        }
+
+        public List<DatasetDTO> GetAssaySampleTemplates()
+        {
+            var ds =  GetTemplateDataset("D-SDTM-BS");
+            return new List<DatasetDTO> {ds};
+        }
+
+        public List<DatasetDTO> GetAssayDataTemplates()
+        {
+            var ds =  GetTemplateDataset("D-CUST-HD");
+            return new List<DatasetDTO>(){ds};
         }
     }
 

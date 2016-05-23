@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
 {
-    class MongoDocumentSerializer : SerializerBase<MongoDocument>, IBsonDocumentSerializer
+    public class MongoDocumentSerializer : SerializerBase<MongoDocument>, IBsonDocumentSerializer
     {
         //public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
 

@@ -19,22 +19,26 @@ namespace eTRIKS.Commons.Service.Services
             _CVrepository = uoW.GetRepository<CVterm, string>();
         }
 
-        public List<CVterm> GetAssayDefTerms()
+        public List<AssayDefTermsDTO> GetAssayDefTerms()
         {
+           List<AssayDefTermsDTO> terms = new List<AssayDefTermsDTO>();
+            //TODO: TEMP ... SHOULD BE REPLACED BY A CALL TO THE ONTOLOGY LOOKUP SERVICE
            var assayMeasurementTypes = _CVrepository.FindAll(cv => cv.DictionaryId.Equals("CL-ASYMT")).ToList();
-            var assayPlatformTypes = _CVrepository.FindAll(cv => cv.DictionaryId.Equals("CL-ASYPT")).ToList();
+            var assayPlatformTypes = _CVrepository.FindAll(cv => cv.DictionaryId.Equals("CL-ASYTP")).ToList();
             var assayPlatTechTypes = _CVrepository.FindAll(cv => cv.DictionaryId.Equals("CL-ASYTT")).ToList();
 
-           
+            int i = 0;
             foreach(var term in assayMeasurementTypes)
             {
-                var assayCVterms = new AssayCVtermsDTO();
-                assayCVterms.AssayMeasurementType = term;
-
-
+                var assayCVterms = new AssayDefTermsDTO();
+                assayCVterms.AssayTypeTerm = term;
+                assayCVterms.AssayPlatTerms.Add(assayPlatformTypes[i]);
+                assayCVterms.AssayTechTerms.Add(assayPlatTechTypes[i]);
+                terms.Add(assayCVterms);
+                i++;
             }
 
-            return assayMeasurementTypes;
+            return terms;
         }
     }
 }
