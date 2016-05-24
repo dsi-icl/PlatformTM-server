@@ -80,6 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\ArmMap.cs" />
     <Compile Include="Mapping\CharacterisitcMap.cs" />
     <Compile Include="Mapping\CharacteristicObjectMap.cs" />
     <Compile Include="Mapping\SubjectMap.cs" />
@@ -137,6 +138,10 @@
     <Compile Include="Migrations_prod\201605111607238_addProejctIdToObs.cs" />
     <Compile Include="Migrations_prod\201605111607238_addProejctIdToObs.Designer.cs">
       <DependentUpon>201605111607238_addProejctIdToObs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201605241508354_AddStudyArms.cs" />
+    <Compile Include="Migrations_prod\201605241508354_AddStudyArms.Designer.cs">
+      <DependentUpon>201605241508354_AddStudyArms.cs</DependentUpon>
     </Compile>
     <Compile Include="MongoDocumentSerializer.cs" />
     <Compile Include="SdtmSerializer.cs" />
@@ -363,6 +368,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201605111607238_addProejctIdToObs.resx">
       <DependentUpon>201605111607238_addProejctIdToObs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201605241508354_AddStudyArms.resx">
+      <DependentUpon>201605241508354_AddStudyArms.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

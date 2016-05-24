@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Data;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {

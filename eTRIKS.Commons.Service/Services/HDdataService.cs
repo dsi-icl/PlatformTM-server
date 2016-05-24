@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -19,7 +20,7 @@ namespace eTRIKS.Commons.Service.Services
             _projectRepository = uoW.GetRepository<Project, int>();
         }
 
-        internal Task LoadHDdata(List<SdtmEntity> sdtmData, int datasetId)
+        internal Task LoadHDdata(List<SdtmRow> sdtmData, int datasetId)
         {
             throw new NotImplementedException();
         }

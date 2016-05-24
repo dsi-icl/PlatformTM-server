@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -27,7 +28,7 @@ namespace eTRIKS.Commons.Service.Services
             _characteristicObjRepository = uoW.GetRepository<CharacteristicObject, int>();
         }
 
-        public async Task<bool> LoadSubjects(List<SdtmEntity> subjectData, int datasetId)
+        public async Task<bool> LoadSubjects(List<SdtmRow> subjectData, int datasetId)
         {
             var dataset = _datasetRepository.FindSingle(d => d.Id.Equals(datasetId),
                 new List<Expression<Func<Dataset, object>>>()

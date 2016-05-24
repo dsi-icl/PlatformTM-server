@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using eTRIKS.Commons.Core.Domain.Model.Base;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -19,5 +20,6 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public ICollection<Observation> Observations { get; set; }
         public ICollection<Dataset> Datasets { get; set; }
         public ICollection<Visit> Visits { get; set; }
+        public ICollection<Arm> Arms { get; set; }
     }
 }

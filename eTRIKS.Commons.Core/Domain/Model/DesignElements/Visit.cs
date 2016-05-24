@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.DesignElements
 {
     public class Visit : Identifiable<int>
     {

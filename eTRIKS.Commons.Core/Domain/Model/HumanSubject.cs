@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Data;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -19,6 +20,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public DateTime SubjectEndDate { get; set; }
         public string Arm { get; set; } //Should be replace by ARM class reference
         public string ArmCode { get; set; } //Should be replace by ARM class reference
+        public Arm StudyArm { get; set; }
         public Dataset Dataset { get; set; }
         public int DatasetId { get; set; }
         public ICollection<SubjectCharacteristic> SubjectCharacteristics { get; set; }

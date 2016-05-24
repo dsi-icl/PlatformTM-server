@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
 {
     /*****
      * SDTMENTITY is the generic subject matter than a particular SDTM is collecting observations about
@@ -15,7 +16,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
      * In case of Events the event TERM is the subject matter
      * In case of Intervatntions the TRT is the subject matter
      */
-    public class SdtmEntity : Identifiable<Guid>
+    public class SdtmRow : Identifiable<Guid>
     {
         public DateTime RFENDTC;
         public DateTime RFSTDTC;
@@ -50,7 +51,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         //public Dictionary<string, string> Groups { get; set; }
         public Dictionary<string, string> Leftovers { get; set; }
 
-        public SdtmEntity()
+        public SdtmRow()
         {
             Qualifiers = new Dictionary<string, string>();
             ResultQualifiers = new Dictionary<string, string>();

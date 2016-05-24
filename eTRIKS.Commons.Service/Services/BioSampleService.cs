@@ -9,6 +9,7 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -28,7 +29,7 @@ namespace eTRIKS.Commons.Service.Services
             _studyRepository = uoW.GetRepository<Study, int>();
         }
 
-        public async Task<bool> LoadBioSamples(List<SdtmEntity> sampleData, int datasetId)
+        public async Task<bool> LoadBioSamples(List<SdtmRow> sampleData, int datasetId)
         {
             var dataset = _datasetRepository.FindSingle(d => d.Id.Equals(datasetId),
                 new List<Expression<Func<Dataset, object>>>()
@@ -36,7 +37,7 @@ namespace eTRIKS.Commons.Service.Services
                     d => d.Variables.Select(v=>v.VariableDefinition)
                 });
             var studyMap = new Dictionary<string, int>();
-            foreach (SdtmEntity sdtmEntity in sampleData)
+            foreach (SdtmRow sdtmEntity in sampleData)
             {
                 Study study;
                 int studyid;

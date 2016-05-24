@@ -14,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.Services.HelperService;
 using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -669,7 +670,7 @@ namespace eTRIKS.Commons.Service.Services
             }
         }
         */
-        internal List<PropertyDescriptor> LoadObsDescriptors(SdtmEntityDescriptor sdtmEntityDescriptor, int projectId)
+        internal List<PropertyDescriptor> LoadObsDescriptors(SdtmRowDescriptor sdtmEntityDescriptor, int projectId)
         {
 
             var descriptorList = new List<PropertyDescriptor>();

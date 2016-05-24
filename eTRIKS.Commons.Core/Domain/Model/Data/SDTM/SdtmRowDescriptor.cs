@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
 {
-    public class SdtmEntityDescriptor
+    public class SdtmRowDescriptor
     {
         public string DomainName { get; set; }
         public string DomainCode { get; set; }

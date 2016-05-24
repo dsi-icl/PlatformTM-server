@@ -1,4 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -14,16 +16,16 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
 {
-    public class SdtmSerializer : SerializerBase<SdtmEntity>, IBsonDocumentSerializer, IBsonIdProvider
+    public class SdtmSerializer : SerializerBase<SdtmRow>, IBsonDocumentSerializer, IBsonIdProvider
     {
         public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
 
-        public static SdtmEntityDescriptor sdtmEntityDescriptor;
-        public override SdtmEntity Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public static SdtmRowDescriptor sdtmEntityDescriptor;
+        public override SdtmRow Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             context.Reader.ReadStartDocument();
             var reader = (BsonReader)context.Reader;
-            var sdtmEntity = new SdtmEntity();
+            var sdtmEntity = new SdtmRow();
 
             while (reader.ReadBsonType() != BsonType.EndOfDocument)
             {
@@ -199,7 +201,7 @@ namespace eTRIKS.Commons.Persistence
             return sdtmEntity;
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, SdtmEntity value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, SdtmRow value)
         {
             var subjObs = value;
         //    BsonDocument document = new

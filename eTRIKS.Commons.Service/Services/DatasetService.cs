@@ -13,6 +13,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.DataAccess.MongoDB;
 using eTRIKS.Commons.Service.DTOs;
 using System.Data;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -26,7 +27,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<DataFile, int> _dataFileRepository;
         private readonly IRepository<HumanSubject, string> _humanSubjectRepository;
         private readonly IRepository<Biosample, int> _bioSampleRepository;
-        private readonly IRepository<SdtmEntity, Guid> _sdtmRepository;
+        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<MongoDocument, Guid> _mongoDocRepository;
        // private FileService _fileService;
 
@@ -41,7 +42,7 @@ namespace eTRIKS.Commons.Service.Services
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
             _activityRepository = uoW.GetRepository<Activity, int>();
-            _sdtmRepository = uoW.GetRepository<SdtmEntity, Guid>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _mongoDocRepository = uoW.GetRepository<MongoDocument, Guid>();
             _humanSubjectRepository = uoW.GetRepository<HumanSubject, string>();
 
@@ -718,7 +719,7 @@ namespace eTRIKS.Commons.Service.Services
             _dataServiceUnit.setSDTMentityDescriptor(sdtmEntityDescriptor);
 
 
-            List<SdtmEntity> sdtmData = await _sdtmRepository.FindAllAsync(
+            List<SdtmRow> sdtmData = await _sdtmRepository.FindAllAsync(
                     dm => dm.DatasetId.Equals(datasetId) && dm.DatafileId.Equals(fileId));
 
             var observationService = new ObservationService(this._dataServiceUnit);
@@ -804,9 +805,9 @@ namespace eTRIKS.Commons.Service.Services
          * SDTMEntityDescriptor uses the SDTM standard convention to identify the different types of variables 
          * available for this dataset
          */
-        private SdtmEntityDescriptor GetSdtmEntityDescriptor(Dataset dataset)
+        private SdtmRowDescriptor GetSdtmEntityDescriptor(Dataset dataset)
         {
-            var sdtmEntityDescriptor = new SdtmEntityDescriptor();
+            var sdtmEntityDescriptor = new SdtmRowDescriptor();
 
             //TODO: change all these strings to ENUMS
 

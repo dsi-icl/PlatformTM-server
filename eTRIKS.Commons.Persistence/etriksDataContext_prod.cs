@@ -13,6 +13,7 @@ using eTRIKS.Commons.Core.Domain.Model;
 using MongoDB.Bson.Serialization.Serializers;
 using Microsoft.AspNet.Identity.EntityFramework;
 using eTRIKS.Commons.DataAccess.UserManagement;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Persistence {
 
@@ -50,7 +51,7 @@ namespace eTRIKS.Commons.Persistence {
             _disposed = false;
         }
 
-        public void setSDTMentityDescriptor(SdtmEntityDescriptor descriptor)
+        public void setSDTMentityDescriptor(SdtmRowDescriptor descriptor)
         {
             SdtmSerializer.sdtmEntityDescriptor = descriptor;
         }
@@ -212,6 +213,7 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new BioSampleMap());
             modelBuilder.Configurations.Add(new CharacterisitcMap());
             modelBuilder.Configurations.Add(new CharacteristicObjectMap());
+            modelBuilder.Configurations.Add(new ArmMap());
         }
 
 

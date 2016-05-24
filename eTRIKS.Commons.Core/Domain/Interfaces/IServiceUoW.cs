@@ -1,6 +1,7 @@
 ﻿using System;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Base;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
@@ -12,7 +13,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
         void AddClassMap(string fieldname, string propertyName);
 
-        void setSDTMentityDescriptor(SdtmEntityDescriptor descriptor);
+        void setSDTMentityDescriptor(SdtmRowDescriptor descriptor);
         IUserRepository<TEntity,TResult> GetUserRepository<TEntity,TResult>();
 
     }

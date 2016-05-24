@@ -1,5 +1,6 @@
 using System.Data.Entity.ModelConfiguration;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {

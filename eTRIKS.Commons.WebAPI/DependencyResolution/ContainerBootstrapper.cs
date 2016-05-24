@@ -10,6 +10,7 @@ using eTRIKS.Commons.WebAPI.DependencyResolution.Plumbing;
 using System.Collections.Generic;
 using System.Web.Http.Dependencies;
 using MongoDB.Bson.Serialization;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution
 {
@@ -37,7 +38,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
                 new WindsorControllerFactory(container));
 
             BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
-            BsonSerializer.RegisterSerializer(typeof(SdtmEntity), new SdtmSerializer());
+            BsonSerializer.RegisterSerializer(typeof(SdtmRow), new SdtmSerializer());
             BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
 
 

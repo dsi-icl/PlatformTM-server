@@ -43,6 +43,7 @@
     <Compile Include="Application\Services\MapperHelper.cs" />
     <Compile Include="Application\Services\UserAuthentication\IUserDbContext.cs" />
     <Compile Include="Application\Services\UserAuthentication\UserModel.cs" />
+    <Compile Include="Domain\Model\DesignElements\Arm.cs" />
     <Compile Include="Domain\Interfaces\IUserRepository.cs" />
     <Compile Include="Domain\Model\Activity.cs" />
     <Compile Include="Domain\Model\AnimalSubject.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="Domain\Model\Project.cs" />
     <Compile Include="Domain\Model\Characterisitc.cs" />
     <Compile Include="Domain\Model\SampleCharacteristic.cs" />
-    <Compile Include="Domain\Model\SdtmEntity.cs" />
+    <Compile Include="Domain\Model\Data\SDTM\SdtmRow.cs" />
     <Compile Include="Domain\Model\HumanSubject.cs" />
     <Compile Include="Domain\Model\SubjectCharacteristic.cs" />
     <Compile Include="Domain\Model\SubjectObservation.cs" />
@@ -87,10 +88,10 @@
     <Compile Include="Domain\Model\Timing\RelativeTimePoint.cs" />
     <Compile Include="Domain\Model\Timing\TimeInterval.cs" />
     <Compile Include="Domain\Model\Timing\TimePoint.cs" />
-    <Compile Include="Domain\Model\SdtmEntityDescriptor.cs" />
+    <Compile Include="Domain\Model\Data\SDTM\SdtmRowDescriptor.cs" />
     <Compile Include="Domain\Model\Data\Observation_SQL.cs" />
     <Compile Include="Domain\Model\Users\Datasets\UserDataset.cs" />
-    <Compile Include="Domain\Model\Visit.cs" />
+    <Compile Include="Domain\Model\DesignElements\Visit.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Domain\Model\Study.cs" />
     <Compile Include="Domain\Model\VariableDefinition.cs" />
