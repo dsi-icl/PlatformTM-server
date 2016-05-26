@@ -19,13 +19,13 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class ActivityService
     {
-        private IRepository<Activity, int> _activityRepository;
-        private IRepository<Dataset, int> _dataSetRepository;
-        private IRepository<VariableDefinition, int> _variableDefinition;
-        private IRepository<Assay, int> _assayRepository;
-        private IRepository<Project, int> _projectRepository;
-        private IServiceUoW _activityServiceUnit;
-        private DatasetService _datasetService;
+        private readonly IRepository<Activity, int> _activityRepository;
+        private readonly IRepository<Dataset, int> _dataSetRepository;
+        private readonly IRepository<VariableDefinition, int> _variableDefinition;
+        private readonly IRepository<Assay, int> _assayRepository;
+        private readonly IRepository<Project, int> _projectRepository;
+        private readonly IServiceUoW _activityServiceUnit;
+        private readonly DatasetService _datasetService;
 
 
         public ActivityService(IServiceUoW uoW, DatasetService datasetService)
