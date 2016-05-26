@@ -219,6 +219,8 @@ namespace eTRIKS.Commons.Service.Services
 
         public Dataset CreateDataset(DatasetDTO datasetDTO)
         {
+            if (datasetDTO == null)
+                return null;
             var dataset = new Dataset {ActivityId = datasetDTO.ActivityId, DomainId = datasetDTO.DomainId};
 
             //var activity = _activityRepository.Get(dataset.ActivityId);

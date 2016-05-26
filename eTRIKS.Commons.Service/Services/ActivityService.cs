@@ -32,6 +32,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
+            _assayRepository = uoW.GetRepository<Assay, int>();
             _dataSetRepository = uoW.GetRepository<Dataset, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
             _variableDefinition =  uoW.GetRepository<VariableDefinition, int>();
@@ -90,7 +91,7 @@ namespace eTRIKS.Commons.Service.Services
             }
 
 
-            _activityRepository.Insert(activity);
+            activity = _activityRepository.Insert(activity);
             if (_activityServiceUnit.Save().Equals("CREATED"))
             {
                 activityDTO.Id = activity.Id;
@@ -176,11 +177,11 @@ namespace eTRIKS.Commons.Service.Services
             foreach (var dst in assay.Datasets.Select(ds => _datasetService.GetActivityDatasetDTO(ds.Id)))
             {
                 //TODO: convert to enums or CVterms
-                if (dst.Class == "Sample Annotation")
+                if (dst.Class == "Sample Annotations")
                     assayDTO.SamplesDataset = dst;
                 if (dst.Class == "Assay Observations")
                     assayDTO.ObservationsDataset = dst;
-                if (dst.Class == "Feature Annotation")
+                if (dst.Class == "Feature Annotations")
                     assayDTO.FeaturesDataset = dst;
             }
             return assayDTO;
@@ -199,20 +200,31 @@ namespace eTRIKS.Commons.Service.Services
             //assay.DesignType = getCVterm(assayDto.AssayDesignType);
             assay.MeasurementTypeId = assayDto.Type;
 
-            assayDto.SamplesDataset.ProjectId = project.Id;
-            
+            if(assayDto.SamplesDataset !=null) assayDto.SamplesDataset.ProjectId = project.Id;
+            if (assayDto.FeaturesDataset != null) assayDto.FeaturesDataset.ProjectId = project.Id;
+            if (assayDto.ObservationsDataset != null)  assayDto.ObservationsDataset.ProjectId = project.Id;
+
             var BSdataset = _datasetService.CreateDataset(assayDto.SamplesDataset);
-            assay.Datasets.Add(BSdataset);
+            if(BSdataset != null)
+                assay.Datasets.Add(BSdataset);
 
             var FEdataset = _datasetService.CreateDataset(assayDto.FeaturesDataset);
-            assay.Datasets.Add(FEdataset);
+            if (FEdataset != null)
+                assay.Datasets.Add(FEdataset);
 
             var OBdataset = _datasetService.CreateDataset(assayDto.ObservationsDataset);
-            assay.Datasets.Add(OBdataset);
+            if (OBdataset != null)
+                assay.Datasets.Add(OBdataset);
 
-            _assayRepository.Insert(assay);
-            _activityServiceUnit.Save();
-            return assayDto;
+            assay = _assayRepository.Insert(assay);
+           
+
+            if (_activityServiceUnit.Save().Equals("CREATED"))
+            {
+                assayDto.Id = assay.Id;
+                return assayDto;
+            }
+            return null;
         }
 
         public string UpdateAssay(AssayDTO assayDTO, int activityId)

@@ -105,7 +105,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             if (addedAssay != null)
             {
                 var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Created, addedAssay);
-                string uri = Url.Link("GetAssayById", new { activityId = addedAssay.Id });
+                string uri = Url.Link("GetAssayById", new { assayId = addedAssay.Id });
                 response.Headers.Location = new Uri(uri);
                 return response;
             }
