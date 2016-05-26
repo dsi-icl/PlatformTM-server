@@ -32,14 +32,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/activities/{activityId}", Name="GetActivityById")]
         public ActivityDTO getActivity(int activityId)
         {
-            return _activityService.getActivityDTOById(activityId);
-        }
-
-        [HttpGet]
-        [Route("api/studies/{studyId}/activities")]
-        public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
-        {
-            return _activityService.getStudyActivities(studyId);
+            return _activityService.GetActivity(activityId);
         }
 
         [HttpPost]
@@ -48,7 +41,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             ActivityDTO addedActivity =null;
             if(!activityDTO.isAssay)
-                addedActivity = _activityService.addActivity(activityDTO);
+                addedActivity = _activityService.AddActivity(activityDTO);
             //if (activityDTO.isAssay)
                 //addedActivity = _assayService.AddAssay(activityDTO);
 
@@ -71,7 +64,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public HttpResponseMessage updateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
         {
             try{
-                _activityService.updateActivity(activityDTO, activityId);
+                _activityService.UpdateActivity(activityDTO, activityId);
                 var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Accepted, activityDTO);
                 string uri = Url.Link("GetActivityById", new { activityId = activityDTO.Id });
                 response.Headers.Location = new Uri(uri);
@@ -80,6 +73,46 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/studies/{studyId}/activities")]
+        public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
+        {
+            return _activityService.GetStudyActivities(studyId);
+        }
+        /**
+         * Assay Methods
+         * 
+         * */
+
+        [HttpGet]
+        [Route("api/assays/{assayId}", Name = "GetAssayById")]
+        public AssayDTO getAssay(int assayId)
+        {
+            return _activityService.GetAssay(assayId);
+        }
+
+        [HttpPost]
+        [Route("api/assays")]
+        public HttpResponseMessage addAssay([FromBody] AssayDTO assayDTO)
+        {
+            AssayDTO addedAssay = null;
+
+            addedAssay = _activityService.AddAssay(assayDTO);
+
+            if (addedAssay != null)
+            {
+                var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Created, addedAssay);
+                string uri = Url.Link("GetAssayById", new { activityId = addedAssay.Id });
+                response.Headers.Location = new Uri(uri);
+                return response;
+            }
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                return response;
             }
         }
     }

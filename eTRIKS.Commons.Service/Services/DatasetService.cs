@@ -66,6 +66,9 @@ namespace eTRIKS.Commons.Service.Services
 
             //TODO: USE AutoMapper instead of this manual mapping
 
+            if (domainTemplate == null)
+                return null;
+
             DatasetDTO dto = new DatasetDTO();
 
             dto.Class = domainTemplate.Class;

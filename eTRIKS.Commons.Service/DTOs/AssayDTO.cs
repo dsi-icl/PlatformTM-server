@@ -20,6 +20,8 @@ namespace eTRIKS.Commons.Service.DTOs
         public DatasetDTO FeaturesDataset { get; set; }
         public DatasetDTO ObservationsDataset { get; set; }
         public int ProjectId { get; set; }
+        public string ProjectAcc { get; set; }
+
 
         public AssayDTO()
         {

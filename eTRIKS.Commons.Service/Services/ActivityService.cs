@@ -38,54 +38,22 @@ namespace eTRIKS.Commons.Service.Services
             _datasetService = datasetService;
         }
 
-        private static readonly Expression<Func<Activity, ActivityDTO>> AsBookDto =
-        x => new ActivityDTO
-        {
-            Id = x.Id,
-            Name = x.Name,
-            ProjectId = x.ProjectId,
-            datasets = x.Datasets.Select(m => new DatasetDTO
-            {
-                Name = m.Domain.Name,
-                Id = m.Id
-            }).ToList()
-        };
-
-        public ActivityDTO addActivity(ActivityDTO activityDTO)
-        {
-            var project = _projectRepository.FindSingle(d=>d.Accession
-                .Equals(activityDTO.ProjectAcc));
-            var activity = new Activity {Name = activityDTO.Name, ProjectId = project.Id};
-            foreach (var datasetDto in activityDTO.datasets)
-            {
-                datasetDto.ProjectId = project.Id;
-                var dataset = _datasetService.CreateDataset(datasetDto);
-                activity.Datasets.Add(dataset);
-            }
-            
-
-            _activityRepository.Insert(activity);
-            if (_activityServiceUnit.Save().Equals("CREATED"))
-            {
-                activityDTO.Id = activity.Id;
-                return activityDTO;
-            }
-            return null;
-        }
-
-        public bool checkExist(int activityId)
-        {
-            Activity activity = new Activity();
-            activity =_activityRepository.Get(activityId);
-            if (activity == null)
-            {
-                return false;
-            }
-            return true;
-        }
 
 
-        public ActivityDTO getActivityDTOById(int activityId)
+        
+
+        //public bool checkExist(int activityId)
+        //{
+        //    Activity activity = new Activity();
+        //    activity =_activityRepository.Get(activityId);
+        //    if (activity == null)
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
+
+        public ActivityDTO GetActivity(int activityId)
         {
             Activity activity = _activityRepository.FindSingle(
                 d => d.Id.Equals(activityId),
@@ -108,7 +76,49 @@ namespace eTRIKS.Commons.Service.Services
             }
             return activityDTO;
         }
-        public IEnumerable<ActivityDTO> getStudyActivities(string projectAccession)
+
+        public ActivityDTO AddActivity(ActivityDTO activityDTO)
+        {
+            var project = _projectRepository.FindSingle(d => d.Accession
+                .Equals(activityDTO.ProjectAcc));
+            var activity = new Activity { Name = activityDTO.Name, ProjectId = project.Id };
+            foreach (var datasetDto in activityDTO.datasets)
+            {
+                datasetDto.ProjectId = project.Id;
+                var dataset = _datasetService.CreateDataset(datasetDto);
+                activity.Datasets.Add(dataset);
+            }
+
+
+            _activityRepository.Insert(activity);
+            if (_activityServiceUnit.Save().Equals("CREATED"))
+            {
+                activityDTO.Id = activity.Id;
+                return activityDTO;
+            }
+            return null;
+        }
+     
+        public string UpdateActivity(ActivityDTO activityDTO, int activityId)
+        {
+            Activity activityToUpdate = _activityRepository.Get(activityId);
+
+            activityToUpdate.Name = activityDTO.Name;
+            foreach (var datasetDto in activityDTO.datasets)
+            {
+                //datasetDto.ProjectId = project.Id;
+                if (datasetDto.isNew)
+                {
+                    var dataset = _datasetService.CreateDataset(datasetDto);
+                    activityToUpdate.Datasets.Add(dataset);
+                }
+                else
+                    _datasetService.updateDataset(datasetDto);                
+            }
+            return _activityServiceUnit.Save();
+        }
+
+        public IEnumerable<ActivityDTO> GetStudyActivities(string projectAccession)
         {
             IEnumerable<Activity> activities;
 
@@ -135,22 +145,94 @@ namespace eTRIKS.Commons.Service.Services
             }).ToList();
         }
 
-        public string updateActivity(ActivityDTO activityDTO, int activityId)
+        /**
+         * Assay Methods
+         * */
+
+        public AssayDTO GetAssay(int assayId)
+        {
+            var assay = _assayRepository.FindSingle(
+                d => d.Id.Equals(assayId),
+                new List<Expression<Func<Assay, object>>>(){
+                        d => d.Datasets.Select(t => t.Domain),
+                        d => d.TechnologyType,
+                        d => d.TechnologyPlatform,
+                        d => d.MeasurementType,
+                        d => d.DesignType
+                }
+            );
+
+            var assayDTO = new AssayDTO();
+            assayDTO.Name = assay.Name;
+            assayDTO.Id = assay.Id;
+            assayDTO.ProjectId = assay.ProjectId;
+
+            assayDTO.Type = assay.MeasurementType.Id;
+            assayDTO.Technology = assay.TechnologyType.Id;
+            assayDTO.Platform = assay.TechnologyPlatform.Id;
+            assayDTO.Design = assay.DesignType.Id;
+
+
+            foreach (var dst in assay.Datasets.Select(ds => _datasetService.GetActivityDatasetDTO(ds.Id)))
+            {
+                //TODO: convert to enums or CVterms
+                if (dst.Class == "Sample Annotation")
+                    assayDTO.SamplesDataset = dst;
+                if (dst.Class == "Assay Observations")
+                    assayDTO.ObservationsDataset = dst;
+                if (dst.Class == "Feature Annotation")
+                    assayDTO.FeaturesDataset = dst;
+            }
+            return assayDTO;
+        }
+
+        public AssayDTO AddAssay(AssayDTO assayDto)
+        {
+            var assay = new Assay();
+            var project = _projectRepository.FindSingle(d => d.Accession
+                .Equals(assayDto.ProjectAcc));
+
+            assay.Name = assayDto.Name;
+            assay.ProjectId = project.Id;
+            assay.TechnologyPlatformId = assayDto.Platform;
+            assay.TechnologyTypeId = assayDto.Technology;
+            //assay.DesignType = getCVterm(assayDto.AssayDesignType);
+            assay.MeasurementTypeId = assayDto.Type;
+
+            assayDto.SamplesDataset.ProjectId = project.Id;
+            
+            var BSdataset = _datasetService.CreateDataset(assayDto.SamplesDataset);
+            assay.Datasets.Add(BSdataset);
+
+            var FEdataset = _datasetService.CreateDataset(assayDto.FeaturesDataset);
+            assay.Datasets.Add(FEdataset);
+
+            var OBdataset = _datasetService.CreateDataset(assayDto.ObservationsDataset);
+            assay.Datasets.Add(OBdataset);
+
+            _assayRepository.Insert(assay);
+            _activityServiceUnit.Save();
+            return assayDto;
+        }
+
+        public string UpdateAssay(AssayDTO assayDTO, int activityId)
         {
             Activity activityToUpdate = _activityRepository.Get(activityId);
 
-            activityToUpdate.Name = activityDTO.Name;
-            foreach (var datasetDto in activityDTO.datasets)
-            {
+            activityToUpdate.Name = assayDTO.Name;
+
+            //foreach (var datasetDto in assayDTO.datasets)
+            //{
                 //datasetDto.ProjectId = project.Id;
-                if (datasetDto.isNew)
-                {
-                    var dataset = _datasetService.CreateDataset(datasetDto);
-                    activityToUpdate.Datasets.Add(dataset);
-                }
-                else
-                    _datasetService.updateDataset(datasetDto);                
-            }
+
+                //if (datasetDto.isNew)
+                //{
+                //    var dataset = _datasetService.CreateDataset(datasetDto);
+                //    activityToUpdate.Datasets.Add(dataset);
+                //}
+                //else
+                //    _datasetService.updateDataset(datasetDto);
+            //}
             return _activityServiceUnit.Save();
         }
     }

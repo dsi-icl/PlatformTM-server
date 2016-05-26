@@ -34,5 +34,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _assayService.GetSamplesDataPerAssay(projectId, assayId);
         }
+
+       
     }
 }

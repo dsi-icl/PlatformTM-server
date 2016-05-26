@@ -18,6 +18,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Dictionary, string> _dictionaryRepository;
         private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly DatasetService _datasetService;
+        private readonly IRepository<Project, int> _projectRepository;
 
 
         private readonly IServiceUoW _dataContext;
@@ -27,6 +28,7 @@ namespace eTRIKS.Commons.Service.Services
             _dataContext = uoW;
             _assayRepository = uoW.GetRepository<Assay, int>();
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
+            _projectRepository = uoW.GetRepository<Project, int>();
             _datasetService = datasetService;
         }
 
@@ -84,64 +86,9 @@ namespace eTRIKS.Commons.Service.Services
         }
 
 
-        public Assay AddAssay(ActivityDTO assayDto)
-        {
-            var assay = new Assay();
-            //assay.AssayPlatform = assayDto.;
-            //assay.AssayTechnology =;
-            assay.Name = assayDto.Name;
-            assay.ProjectId = assayDto.ProjectId;
-            assay.TechnologyPlatformId = assayDto.AssayTechnologyPlatform;
-            assay.TechnologyTypeId = assayDto.AssayTechnology;
-            //assay.DesignType = getCVterm(assayDto.AssayDesignType);
-            assay.MeasurementTypeId = assayDto.AssayMeasurementType;
+       
 
-            //var biospecimens = new Dataset();
-            //var bioentities = new Dataset();
-
-            //assay.Datasets.Add(bioentities);
-            //assay.Datasets.Add(biospecimens);
-            _assayRepository.Insert(assay);
-            _dataContext.Save();
-            return assay;
-        }
-
-        public AssayDTO GetAssay(int assayId)
-        {
-            var assay = _assayRepository.FindSingle(
-                d => d.Id.Equals(assayId),
-                new List<Expression<Func<Assay, object>>>(){
-                        d => d.Datasets.Select(t => t.Domain),
-                        d => d.TechnologyType,
-                        d => d.TechnologyPlatform,
-                        d => d.MeasurementType,
-                        d => d.DesignType
-                }
-            );
-
-            var assayDTO = new AssayDTO();
-            assayDTO.Name = assay.Name;
-            assayDTO.Id = assay.Id;
-            assayDTO.ProjectId = assay.ProjectId;
-
-            assayDTO.Type = assay.MeasurementType.Id;
-            assayDTO.Technology = assay.TechnologyType.Id;
-            assayDTO.Platform = assay.TechnologyPlatform.Id;
-            assayDTO.Design = assay.DesignType.Id;
-
-           
-            foreach (var dst in assay.Datasets.Select(ds => _datasetService.GetActivityDatasetDTO(ds.Id)))
-            {
-                //TODO: convert to enums or CVterms
-                if (dst.Class == "Sample Annotation")
-                    assayDTO.SamplesDataset = dst;
-                if (dst.Class == "Assay Observations")
-                    assayDTO.ObservationsDataset = dst;
-                if (dst.Class == "Feature Annotation")
-                    assayDTO.FeaturesDataset = dst;
-            }
-            return assayDTO;
-        }
+        
 
 
         //TEMP
