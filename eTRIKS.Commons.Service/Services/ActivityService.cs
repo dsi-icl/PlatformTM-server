@@ -137,6 +137,7 @@ namespace eTRIKS.Commons.Service.Services
                 Id = p.Id,
                 ProjectId = p.ProjectId,
                 ProjectAcc = p.Project.Accession,
+                isAssay = typeof (Assay) == p.GetType(),
                 datasets = p.Datasets.Select(m => new DatasetDTO
                 {
                     Name = m.Domain.Name,
