@@ -119,6 +119,11 @@ namespace eTRIKS.Commons.Service.Services
             return _activityServiceUnit.Save();
         }
 
+        public void DeleteActivity(int activity)
+        {
+
+        }
+
         public IEnumerable<ActivityDTO> GetStudyActivities(string projectAccession)
         {
             IEnumerable<Activity> activities;
@@ -169,10 +174,10 @@ namespace eTRIKS.Commons.Service.Services
             assayDTO.Id = assay.Id;
             assayDTO.ProjectId = assay.ProjectId;
 
-            assayDTO.Type = assay.MeasurementType.Id;
-            assayDTO.Technology = assay.TechnologyType.Id;
-            assayDTO.Platform = assay.TechnologyPlatform.Id;
-            assayDTO.Design = assay.DesignType.Id;
+            assayDTO.Type = assay.MeasurementType?.Id;
+            assayDTO.Technology = assay.TechnologyType?.Id;
+            assayDTO.Platform = assay.TechnologyPlatform?.Id;
+            assayDTO.Design = assay.DesignType?.Id;
 
 
             foreach (var dst in assay.Datasets.Select(ds => _datasetService.GetActivityDatasetDTO(ds.Id)))
@@ -228,24 +233,28 @@ namespace eTRIKS.Commons.Service.Services
             return null;
         }
 
-        public string UpdateAssay(AssayDTO assayDTO, int activityId)
+        public string UpdateAssay(AssayDTO assayDTO, int assayId)
         {
-            Activity activityToUpdate = _activityRepository.Get(activityId);
+            Assay assayToUpdate = _assayRepository.Get(assayId);
 
-            activityToUpdate.Name = assayDTO.Name;
+            assayToUpdate.Name = assayDTO.Name;
+            assayToUpdate.TechnologyPlatformId = assayDTO.Platform;
+            assayToUpdate.TechnologyTypeId = assayDTO.Technology;
+            //assay.DesignType = getCVterm(assayDto.AssayDesignType);
+            assayToUpdate.MeasurementTypeId = assayDTO.Type;
 
-            //foreach (var datasetDto in assayDTO.datasets)
-            //{
+            foreach (var datasetDto in assayDTO.Datasets)
+            {
                 //datasetDto.ProjectId = project.Id;
-
-                //if (datasetDto.isNew)
-                //{
-                //    var dataset = _datasetService.CreateDataset(datasetDto);
-                //    activityToUpdate.Datasets.Add(dataset);
-                //}
-                //else
-                //    _datasetService.updateDataset(datasetDto);
-            //}
+                if (datasetDto == null) continue;
+                if (datasetDto.isNew)
+                {
+                    var dataset = _datasetService.CreateDataset(datasetDto);
+                    assayToUpdate.Datasets.Add(dataset);
+                }
+                else
+                    _datasetService.updateDataset(datasetDto);
+            }
             return _activityServiceUnit.Save();
         }
     }

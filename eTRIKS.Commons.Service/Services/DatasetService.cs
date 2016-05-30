@@ -94,7 +94,7 @@ namespace eTRIKS.Commons.Service.Services
                     dv.DictionaryXrefURL = vt.controlledTerminology.Xref.DB.UrlPrefix +
                                            vt.controlledTerminology.Xref.Accession;
                 }
-                dv.IsRequired = null;
+                dv.IsRequired = false;
                 dv.KeySequence = null;
                 dv.OrderNumber = null;
                 dv.IsCurated = true;
@@ -102,7 +102,9 @@ namespace eTRIKS.Commons.Service.Services
                 if (dv.UsageId.Equals("CL-Compliance-T-1") || dv.UsageId.Equals("CL-Compliance-T-2"))
                 {
                     dv.isSelected = true;
-                    dv.IsRequired = true;
+
+                    if(dv.UsageId.Equals("CL-Compliance-T-1"))
+                        dv.IsRequired = true;
                 }
 
                 dto.variables.Add(dv);

@@ -15,7 +15,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Type { get; set; }
         public string Design { get; set; }
         public string Name { get; set; }
-        public Dictionary<string,DatasetDTO> Datasets { get; set; }
+        public List<DatasetDTO> Datasets { get; set; }
         public DatasetDTO SamplesDataset { get; set; }
         public DatasetDTO FeaturesDataset { get; set; }
         public DatasetDTO ObservationsDataset { get; set; }
@@ -25,7 +25,7 @@ namespace eTRIKS.Commons.Service.DTOs
 
         public AssayDTO()
         {
-            Datasets = new Dictionary<string,DatasetDTO>();
+            Datasets = new List<DatasetDTO>();
         }
     }
 }

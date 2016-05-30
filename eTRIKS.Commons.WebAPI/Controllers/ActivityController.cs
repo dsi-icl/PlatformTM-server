@@ -115,5 +115,23 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 return response;
             }
         }
+
+        [HttpPut]
+        [Route("api/assays/{assayId}")]
+        public HttpResponseMessage updateAssay(int assayId, [FromBody] AssayDTO assayDTO)
+        {
+            try
+            {
+                _activityService.UpdateAssay(assayDTO, assayId);
+                var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Accepted, assayDTO);
+                string uri = Url.Link("GetAssayById", new { assayId = assayDTO.Id });
+                response.Headers.Location = new Uri(uri);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict);
+            }
+        }
     }
 }
