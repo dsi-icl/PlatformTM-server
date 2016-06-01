@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class SubjectCharacteristic : Identifiable<int>
+    public class SubjectCharacteristic : Characterisitc
     {
-        public string Name { get; set; }
-        public string DomainCode { get; set; }
-        public VariableDefinition TopicVariable { get; set; }
-        public List<VariableDefinition> qualifiers { get; set; }
+        public HumanSubject Subject { get; set; }
+        public string SubjectId { get; set; }
     }
 }

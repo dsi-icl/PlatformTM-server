@@ -7,36 +7,38 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Persistence.Mapping;
 using System.Transactions;
+using Microsoft.AspNet.Identity;
 using MongoDB.Bson.Serialization;
 using eTRIKS.Commons.Core.Domain.Model;
 using MongoDB.Bson.Serialization.Serializers;
 using Microsoft.AspNet.Identity.EntityFramework;
 using eTRIKS.Commons.DataAccess.UserManagement;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Persistence {
 
     [DbConfigurationType(typeof(MySql.Data.Entity.MySqlEFConfiguration))]
-    public class etriksDataContext_prod : DbContext, IServiceUoW
+    public class EtriksDataContextProd : IdentityDbContext<ApplicationUser>, IServiceUoW
     {
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
-        private IUserRepository<ApplicationUser> userAuthRepository;
+        private IUserRepository<ApplicationUser,IdentityResult> userAuthRepository;
         private bool _disposed;
 
-        public etriksDataContext_prod() : base("name=eTRIKScontext_MySQL")
+        public EtriksDataContextProd() : base("name=eTRIKScontext_MySQL")
         {
             //_dataContext = context;
             Configuration.ProxyCreationEnabled = false;
-            Database.SetInitializer<etriksDataContext_prod>(null);
+            Database.SetInitializer<EtriksDataContextProd>(null);
 
             DbConfiguration.SetConfiguration(new MySql.Data.Entity.MySqlEFConfiguration());
 
-            BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
-            BsonSerializer.RegisterSerializer(typeof(Subject), new SubjectSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(SdtmEntity), new SdtmSerializer());
+            //BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
 
-            //INITIALIZE ApplicationUserManager and expose it via a method similar to other repositories 
-            //ApplicationUserManager.Create();
+            
 
             
 
@@ -49,6 +51,11 @@ namespace eTRIKS.Commons.Persistence {
             _disposed = false;
         }
 
+        public void setSDTMentityDescriptor(SdtmRowDescriptor descriptor)
+        {
+            SdtmSerializer.sdtmEntityDescriptor = descriptor;
+        }
+
         public void AddClassMap(string fieldname, string propertyName)
         {
             BsonSerializationInfo info = new BsonSerializationInfo(fieldname, new StringSerializer(), typeof(string));
@@ -56,14 +63,13 @@ namespace eTRIKS.Commons.Persistence {
             SubjectObsSerializer.DynamicMappers.Add(propertyName, info);
         }
 
-        public IUserRepository<TEntity> GetUserRepository<TEntity>()
+        public IUserRepository<TEntity,TResult> GetUserRepository<TEntity,TResult>()
         {
-            throw new NotImplementedException();
-            //if (userAuthRepository == null)
-            //{
-            //    userAuthRepository = new UserAuthRepository<TEntity>(this);
-            //}
-            //return userAuthRepository as IUserRepository<TEntity>;
+            if (userAuthRepository == null)
+            {
+                userAuthRepository = new UserAuthRepository(this);
+            }
+            return userAuthRepository as IUserRepository<TEntity, TResult>;
         }
 
         public IRepository<TEntity, TPrimaryKey> GetRepository<TEntity, TPrimaryKey>() 
@@ -90,7 +96,13 @@ namespace eTRIKS.Commons.Persistence {
                 return MongoRepository;
             }
 
-            if (typeof(TEntity).Name.Equals("Subject"))
+            //if (typeof(TEntity).Name.Equals("Subject"))
+            //{
+            //    var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+            //    _repositories.Add(typeof(TEntity), MongoRepository);
+            //    return MongoRepository;
+            //}
+            if (typeof(TEntity).Name.Equals("SdtmEntity"))
             {
                 var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
                 _repositories.Add(typeof(TEntity), MongoRepository);
@@ -107,7 +119,37 @@ namespace eTRIKS.Commons.Persistence {
             return repository;
         }
 
-        
+        //public IRepository<TEntity, TPrimaryKey> GetDatasetRepository<TEntity, TPrimaryKey>()
+        //    where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
+        //{
+        //    if (typeof(TEntity).Name.Equals("SubjectObservation"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+
+        //    if (typeof(TEntity).Name.Equals("MongoDocument"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+
+        //    if (typeof(TEntity).Name.Equals("Subject"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+        //    if (typeof(TEntity).Name.Equals("Biospecimen"))
+        //    {
+        //        var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>();
+        //        _repositories.Add(typeof(TEntity), MongoRepository);
+        //        return MongoRepository;
+        //    }
+        //}
+
         public string Save() {
 
             //using (var tran = new TransactionScope())
@@ -165,6 +207,13 @@ namespace eTRIKS.Commons.Persistence {
             modelBuilder.Configurations.Add(new VariableRefMap());
             modelBuilder.Configurations.Add(new ObservationMap());
             modelBuilder.Configurations.Add(new ProjectMap());
+            modelBuilder.Configurations.Add(new DataFileMap());
+            modelBuilder.Configurations.Add(new VisitMap());
+            modelBuilder.Configurations.Add(new SubjectMap());
+            modelBuilder.Configurations.Add(new BioSampleMap());
+            modelBuilder.Configurations.Add(new CharacterisitcMap());
+            modelBuilder.Configurations.Add(new CharacteristicObjectMap());
+            modelBuilder.Configurations.Add(new ArmMap());
         }
 
 

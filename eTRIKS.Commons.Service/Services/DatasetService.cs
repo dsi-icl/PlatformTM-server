@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
@@ -12,16 +13,23 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.DataAccess.MongoDB;
 using eTRIKS.Commons.Service.DTOs;
 using System.Data;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
     public class DatasetService
     {
-        private IServiceUoW _dataServiceUnit;
-        private IRepository<Dataset, int> _datasetRepository;
-        private IRepository<DomainTemplate, string> _domainRepository;
-        private IRepository<Activity, string> _activityRepository;
-        private IRepository<VariableDefinition, int> _variableDefinitionRepository;
+        private readonly IServiceUoW _dataServiceUnit;
+        private readonly IRepository<Dataset, int> _datasetRepository;
+        private readonly IRepository<DomainTemplate, string> _domainRepository;
+        private readonly IRepository<Activity, int> _activityRepository;
+        private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
+        private readonly IRepository<DataFile, int> _dataFileRepository;
+        private readonly IRepository<HumanSubject, string> _humanSubjectRepository;
+        private readonly IRepository<Biosample, int> _bioSampleRepository;
+        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
+        private readonly IRepository<MongoDocument, Guid> _mongoDocRepository;
+       // private FileService _fileService;
 
         public DatasetService(IServiceUoW uoW)
         {
@@ -31,6 +39,14 @@ namespace eTRIKS.Commons.Service.Services
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _domainRepository = uoW.GetRepository<DomainTemplate, string>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
+            _dataFileRepository = uoW.GetRepository<DataFile, int>();
+            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
+            _activityRepository = uoW.GetRepository<Activity, int>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _mongoDocRepository = uoW.GetRepository<MongoDocument, Guid>();
+            _humanSubjectRepository = uoW.GetRepository<HumanSubject, string>();
+
+            //_fileService = new FileService(_dataServiceUnit);
         }
 
         /// <summary>
@@ -49,6 +65,9 @@ namespace eTRIKS.Commons.Service.Services
 
 
             //TODO: USE AutoMapper instead of this manual mapping
+
+            if (domainTemplate == null)
+                return null;
 
             DatasetDTO dto = new DatasetDTO();
 
@@ -75,7 +94,7 @@ namespace eTRIKS.Commons.Service.Services
                     dv.DictionaryXrefURL = vt.controlledTerminology.Xref.DB.UrlPrefix +
                                            vt.controlledTerminology.Xref.Accession;
                 }
-                dv.IsRequired = null;
+                dv.IsRequired = false;
                 dv.KeySequence = null;
                 dv.OrderNumber = null;
                 dv.IsCurated = true;
@@ -83,7 +102,9 @@ namespace eTRIKS.Commons.Service.Services
                 if (dv.UsageId.Equals("CL-Compliance-T-1") || dv.UsageId.Equals("CL-Compliance-T-2"))
                 {
                     dv.isSelected = true;
-                    dv.IsRequired = true;
+
+                    if(dv.UsageId.Equals("CL-Compliance-T-1"))
+                        dv.IsRequired = true;
                 }
 
                 dto.variables.Add(dv);
@@ -111,7 +132,10 @@ namespace eTRIKS.Commons.Service.Services
                 new List<Expression<Func<Dataset, object>>>()
                 {
                     d => d.Variables.Select(t => t.VariableDefinition),
-                    d => d.Activity
+                    d => d.Activity,
+                    d => d.DataFiles,
+                    d => d.Activity.Project,
+                    d => d.Domain
                 });
             return ds;
         }
@@ -142,7 +166,7 @@ namespace eTRIKS.Commons.Service.Services
             dto.DomainId = ds.Domain.Id;
             dto.Structure = ds.Domain.Structure;
             dto.Code = ds.Domain.Code;
-            dto.StudyId = ds.Activity.StudyId;
+            dto.ProjectId = ds.Activity.ProjectId;
 
             foreach (DomainVariableTemplate vt in ds.Domain.Variables.OrderBy(v => v.Order))
                 //foreach (var vt in ds.Variables)
@@ -185,43 +209,7 @@ namespace eTRIKS.Commons.Service.Services
         public Dataset addDataset(DatasetDTO datasetDTO)
         {
             //1. Fields for Dataset
-            Dataset dataset = new Dataset();
-            dataset.ActivityId = datasetDTO.ActivityId;
-            dataset.DomainId = datasetDTO.DomainId;
-
-            // Get any exisiting variable definitions for that study
-            List<VariableDefinition> variableDefsOfStudy = getVariableDefinitionsOfStudy(datasetDTO.StudyId).ToList();
-
-            foreach (var VariableDTO in datasetDTO.variables)
-            {
-                if (VariableDTO.isSelected)
-                {
-                    ;
-                    //Compare newly added Variable to previously added VarDefs using accession string 
-                    //since no Id for Variable created yet
-                    VariableDefinition varDef = variableDefsOfStudy.SingleOrDefault(
-                        d => d.Accession.Equals(VariableDTO.Accession));
-                    if (varDef == null)
-                    {
-                        varDef = new VariableDefinition();
-                        varDef.Accession = VariableDTO.Accession;
-                        varDef.Name = VariableDTO.Name;
-                        varDef.Label = VariableDTO.Label;
-                        varDef.Description = VariableDTO.Description;
-                        varDef.DataType = VariableDTO.DataType;
-                        varDef.IsCurated = VariableDTO.IsCurated;
-                        varDef.RoleId = VariableDTO.RoleId;
-                        varDef.StudyId = datasetDTO.StudyId;
-                    }
-                    //3. Fields for varRefList
-                    VariableReference varRef = new VariableReference();
-                    varRef.OrderNumber = VariableDTO.OrderNumber;
-                    varRef.IsRequired = VariableDTO.IsRequired;
-                    varRef.KeySequence = VariableDTO.KeySequence;
-                    varRef.VariableDefinition = varDef;
-                    dataset.Variables.Add(varRef);
-                }
-            }
+            var dataset = CreateDataset(datasetDTO);
 
             _datasetRepository.Insert(dataset);
             if (_dataServiceUnit.Save().Equals("CREATED"))
@@ -231,16 +219,70 @@ namespace eTRIKS.Commons.Service.Services
             return null;
         }
 
-        public string updateDataset(DatasetDTO datasetDTO, string datasetId)
+        public Dataset CreateDataset(DatasetDTO datasetDTO)
+        {
+            if (datasetDTO == null)
+                return null;
+            var dataset = new Dataset {ActivityId = datasetDTO.ActivityId, DomainId = datasetDTO.DomainId};
+
+            //var activity = _activityRepository.Get(dataset.ActivityId);
+
+            // Get any exisiting variable definitions for that study
+            List<VariableDefinition> variableDefsOfStudy = getVariableDefinitionsOfStudy(datasetDTO.ProjectId).ToList();
+
+            foreach (var variableDto in datasetDTO.variables.Where(variableDto => variableDto.isSelected))
+            {
+                ;
+                //Compare newly added Variable to previously added VarDefs using accession string 
+                //since no Id for Variable created yet
+                var varDef = variableDefsOfStudy.SingleOrDefault(
+                    d => d.Accession.Equals(variableDto.Accession));
+                if (varDef == null)
+                {
+                    varDef = new VariableDefinition();
+                    varDef.Accession = variableDto.Accession;
+                    varDef.Name = variableDto.Name;
+                    varDef.Label = variableDto.Label;
+                    varDef.Description = variableDto.Description;
+                    varDef.DataType = variableDto.DataType;
+                    varDef.IsCurated = variableDto.IsCurated;
+                    varDef.RoleId = variableDto.RoleId;
+                    varDef.ProjectId = datasetDTO.ProjectId;
+                }
+                //3. Fields for varRefList
+                VariableReference varRef = new VariableReference();
+                varRef.OrderNumber = variableDto.OrderNumber;
+                varRef.IsRequired = variableDto.IsRequired;
+                varRef.KeySequence = variableDto.KeySequence;
+                varRef.VariableDefinition = varDef;
+                dataset.Variables.Add(varRef);
+            }
+            return dataset;
+        }
+        
+        public string updateDataset(DatasetDTO datasetDTO)
         {
             Dataset datasetToUpdate = GetActivityDataset(datasetDTO.Id);
 
             //TODO: Do this using some DTOmapping library
-            datasetToUpdate.DataFile = datasetDTO.DataFile;
-            datasetToUpdate.StandardDataFile = datasetDTO.StandardDataFile;
+            // datasetDTO woll only have one DataFile unlike Class Dataset since the DTO reflect one assignment of a datafile to a dataset
+            //check the FileDTO sent back in this dataset
+            //
+
+
+            if (datasetDTO.DataFileDTO != null && !datasetToUpdate.DataFiles.Any(d => d.Id.Equals(datasetDTO.DataFileDTO.DataFileId)))
+            {
+                //Adding a new datafile to this dataset
+                var datafile = _dataFileRepository.FindSingle(d=>d.Id.Equals(datasetDTO.DataFileDTO.DataFileId));
+                datasetToUpdate.DataFiles.Add(datafile);
+            }
+           
+                //update status of datafile
+
+           // datasetToUpdate.StandardDataFile = datasetDTO.StandardDataFile;
             datasetToUpdate.State = datasetDTO.State;
             
-            List<VariableDefinition> variableDefsOfStudy = getVariableDefinitionsOfStudy(datasetDTO.StudyId).ToList();
+            List<VariableDefinition> variableDefsOfStudy = getVariableDefinitionsOfStudy(datasetDTO.ProjectId).ToList();
 
             var datasetVarsToUpdate = new HashSet<string>(
                 datasetToUpdate.Variables.Select(c => c.VariableDefinition.Accession));
@@ -265,7 +307,7 @@ namespace eTRIKS.Commons.Service.Services
                             varDef.DataType = VariableDTO.DataType;
                             varDef.IsCurated = VariableDTO.IsCurated;
                             varDef.RoleId = VariableDTO.RoleId;
-                            varDef.StudyId = datasetDTO.StudyId;
+                            varDef.ProjectId = datasetDTO.ProjectId;
                         }
 
                         VariableReference varRef = new VariableReference();
@@ -290,12 +332,12 @@ namespace eTRIKS.Commons.Service.Services
             return _dataServiceUnit.Save();
         }
 
-        public IEnumerable<VariableDefinition> getVariableDefinitionsOfStudy(string studyId)
+        public IEnumerable<VariableDefinition> getVariableDefinitionsOfStudy(int studyId)
         {
-            return _variableDefinitionRepository.FindAll(d => d.StudyId.Equals(studyId));
+            return _variableDefinitionRepository.FindAll(d => d.ProjectId.Equals(studyId));
         }
 
-        public DataTemplateMap GeTemplateMaps(int datasetId)
+        public DataTemplateMap GetTemplateMaps(int datasetId)
         {
             var map = new DataTemplateMap();
 
@@ -387,29 +429,30 @@ namespace eTRIKS.Commons.Service.Services
             return map;
         }
 
-
-        public Hashtable getDatasetPreview(int datasetId)
+        public Hashtable getDatasetPreview(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
-            //This will change to retrieve FileObject
-            var fileName = dataset.StandardDataFile;
-            var studyId = dataset.Activity.StudyId;
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            //var studyId = dataset.Activity.StudyId;
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
-            var fileService = new FileService();
+            var fileService = new FileService(_dataServiceUnit);
             //TEMP usage of dataset.state
-            var dataTable = dataset.State.Equals("standard") ? fileService.ReadOriginalFile(studyId, fileName) : fileService.readStandardFile(studyId, fileName);
+            var dataTable = fileService.ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
             var ht = getHashtable(dataTable);
             return ht;
         }
 
-        public bool mapToTemplate(int datasetId, DataTemplateMap map)
+        public int? mapToTemplate(int datasetId, int fileId, DataTemplateMap map)
         {
             var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.DataFile;
-            var studyId = dataset.Activity.StudyId;
+            var studyId = dataset.Activity.ProjectId;
+            var projectAcc = dataset.Activity.Project.Accession;
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
-            FileService fileService = new FileService();
-            DataTable inputDataTable = fileService.ReadOriginalFile(studyId,fileName);
+            FileService fileService = new FileService(_dataServiceUnit);
+            DataTable inputDataTable = fileService.ReadOriginalFile(filePath);
             DataTable sdtmTable = new DataTable();
 
             //var varMaps = new List<DataTemplateMap.VariableMap>();
@@ -418,7 +461,7 @@ namespace eTRIKS.Commons.Service.Services
                     map.VarTypes.SelectMany(variableType => variableType.vars.Where(varMap => varMap.DataType != null)))
             {
                 sdtmTable.Columns.Add(varMap.ShortName); //,Type.GetType(varMap.DataType)
-               // varMaps.Add(varMap);
+                // varMaps.Add(varMap);
             }
 
 
@@ -447,6 +490,7 @@ namespace eTRIKS.Commons.Service.Services
                     }
 
                     //Observation Topic & Qualifiers
+                    if (map.VarTypes.Exists(vt => vt.name.Equals("Observation Descriptors")))
                     foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Observation Descriptors")).vars)
                     {
                         if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
@@ -467,6 +511,7 @@ namespace eTRIKS.Commons.Service.Services
                     }
 
                     //Timings
+                    if (map.VarTypes.Exists(vt => vt.name.Equals("Timing Descriptors")))
                     foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Timing Descriptors")).vars)
                     {
                         if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
@@ -485,15 +530,17 @@ namespace eTRIKS.Commons.Service.Services
                     sdtmTable.Rows.Add(sdtmRow);
                 }
 
+            DataFile standardFile = null;
             if (sdtmTable.Rows.Count != 0)
             {
-                string dsName = studyId + "_" + dataset.DomainId;
+                string dsName = dataset.Activity.Name+"_" +dataset.DomainId;
                 sdtmTable.TableName = dsName;
                 //Write new transformed to file 
-                string path = fileService.writeDataFile(studyId,sdtmTable);
-                
+                var fileInfo = fileService.writeDataFile(dataFile.Path, sdtmTable);
+                standardFile = fileService.addOrUpdateFile(projectAcc, fileInfo);
+                //var file = _dataFileRepository.Get(4);
                 //Update dataset
-                dataset.StandardDataFile = dsName+".csv";
+                dataset.DataFiles.Add(standardFile);//.StandardDataFile = dsName + ".csv";
                 _datasetRepository.Update(dataset);
                 _dataServiceUnit.Save();
             }
@@ -512,7 +559,9 @@ namespace eTRIKS.Commons.Service.Services
             //ht.Add("header", headerList);
             //ht.Add("data", sdtmTable);
             //return ht;
-            return true;
+            if (standardFile != null)
+                return standardFile.Id;
+            else return null;
         }
 
         private Hashtable getHashtable(DataTable sdtmTable)
@@ -533,71 +582,309 @@ namespace eTRIKS.Commons.Service.Services
             return ht;
         }
 
-        public string loadDataset(int datasetId)
+        public string SaveDataFile(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.StandardDataFile;
-            var studyId = dataset.Activity.StudyId;
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
-            var fileService = new FileService();
-            var dataTable = dataset.State.Equals("standard") ? fileService.ReadOriginalFile(studyId, fileName) : fileService.readStandardFile(studyId, fileName);
+            //if (!dataFile.State.ToLower().Equals("new"))
+            //{
+            //    /**
+            //     * Replacing previously loaded file
+            //     * Remove file from collection before reloading it
+            //     */
+            //    var filterFields = new List<object>();
+            //    var filterField1 = new Dictionary<string, object>();
+            //    filterField1.Add("DBDATASETID", datasetId);
+            //    filterFields.Add(filterField1);
+            //    var filterField2 = new Dictionary<string, object>();
+            //    filterField2.Add("DBDATAFILEID", fileId);
+            //    filterFields.Add(filterField2);
+            //    _mongoDocRepository.DeleteManyAsync(filterFields);
+            //    Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+            //}
+            
+            //var studyId = dataset.Activity.StudyId;
 
+            var fileService = new FileService(_dataServiceUnit);
+            var dataTable = fileService.ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
+
+            if (dataset.Domain.Code.Equals("AE"))
+            {
+                //dataTable.Columns.Add("AEOCCUR");
+                var newColumn = new DataColumn("AEOCCUR", typeof(String));
+                newColumn.DefaultValue = "Y";
+                dataTable.Columns.Add(newColumn);
+
+                //ADD all remaining subjects in  project
+                var tableStudyIds = dataTable.AsEnumerable().Select(s => s.Field<string>("STUDYID")).Distinct().ToList();
+                var subjects = _humanSubjectRepository
+                    .FindAll(s => tableStudyIds.Contains(s.Study.Name),
+                    new List<Expression<Func<HumanSubject, object>>>()
+                    {
+                        s=>s.Study
+                    }).ToList();
+                
+                var tableSubjectIds = dataTable.AsEnumerable().Select(s => s.Field<string>("USUBJID")).Distinct().ToList();
+
+                var O3s = dataTable.AsEnumerable().Select(s => s.Field<string>("AEDECOD")).Distinct().ToList();
+                var remainingSubjects = subjects.FindAll(s => !tableSubjectIds.Contains(s.UniqueSubjectId));
+                
+                //Foreach subject add occur = N for each adverse event
+                foreach (var subject in remainingSubjects)
+                {
+                    foreach (var o3 in O3s)
+                    {
+                        DataRow dr = dataTable.NewRow();
+                        dr["USUBJID"] = subject.UniqueSubjectId;
+                        dr["AEOCCUR"] = "N";
+                        dr["AEDECOD"] = o3;
+                        dr["STUDYID"] = subject.Study.Name;
+                        dr["DOMAIN"] = "AE";
+                        dataTable.Rows.Add(dr);
+                    }
+                    
+                }
+            }
+            //return "";
             //var dataTable = fileService.readStandardFile(studyId,fileName);
 
             var ms = new MongoDbDataRepository();
 
-            int count=0,i = 0;
+            int count = 0, i = 0;
             var records = new List<MongoDocument>();
             //var columns = dataTable.Columns.Cast<String>();
-            foreach(DataRow row in dataTable.Rows)
+            foreach (DataRow row in dataTable.Rows)
             {
-               var record = new MongoDocument();
+                var record = new MongoDocument();
                 i++;
-                foreach(DataColumn column in dataTable.Columns)
+                foreach (DataColumn column in dataTable.Columns)
                 {
-                   var recordItem = new MongoField {Name = column.ColumnName, value = row[column].ToString()};
+                    var recordItem = new MongoField { Name = column.ColumnName, value = row[column].ToString() };
                     //TODO: consider putting this back
                     //if (recordItem.value != "")
-                        record.fields.Add(recordItem);
+                    record.fields.Add(recordItem);
                 }
+
+                //ADD internal fields to link SQL recordss with mongo datasets
+                var recorditem = new MongoField { Name = "DBPROJECTACC", value = dataset.Activity.Project.Accession };
+                record.fields.Add(recorditem);
+                recorditem = new MongoField { Name = "DBPROJECTID", value = dataset.Activity.ProjectId };
+                record.fields.Add(recorditem);
+                //recorditem = new MongoField { Name = "DBSTUDYID", value = dataset.Activity.Project };
+                //record.fields.Add(recorditem);
+                recorditem = new MongoField { Name = "DBDATASETID", value = dataset.Id };
+                record.fields.Add(recorditem);
+                recorditem = new MongoField { Name = "DBACTIVITYID", value = dataset.ActivityId };
+                record.fields.Add(recorditem);
+                recorditem = new MongoField { Name = "DBDATAFILEID", value = fileId };
+                record.fields.Add(recorditem);
+
+                
+                
+
                 records.Add(record);
 
-                if (i%500 == 0)
+                if (i % 500 == 0)
                 {
                     ms.loadDataGeneric(records);
+                    //_mongoDocRepository.InsertManyAsync(records);
                     records.Clear();
                     Debug.WriteLine(i + " RECORD(s) SUCCESSFULLY INSERTED");
                 }
                 count = i + 1;
             }
+
+
             ms.loadDataGeneric(records);
+            //_mongoDocRepository.InsertManyAsync(records);
 
             Debug.WriteLine(count + " RECORD(s) SUCCESSFULLY INSERTED");
+            dataFile.State = "LOADED";
+            _dataFileRepository.Update(dataFile);
+            _dataServiceUnit.Save();
 
             const string status = "CREATED";
             return status;
         }
 
-        public async Task<bool> loadObservations(int datasetId)
+        public async Task<bool> LoadDataset(int datasetId, int fileId)
         {
             Dataset dataset = _datasetRepository
                 .FindSingle(ds => ds.Id.Equals(datasetId),
                  new List<Expression<Func<Dataset, object>>>(){
                         d => d.Domain, 
-                        d=> d.Variables,
+                        d => d.Variables,
                         d => d.Activity,
-                        d => d.Activity.Study,
+                        d => d.Activity.Project.Studies,
                         d=>d.Variables.Select(k=>k.VariableDefinition)
                 });
 
-            ObservationService observationService = new ObservationService(this._dataServiceUnit);
-            if(dataset.Domain.Code.Equals("DM"))
-                observationService.loadSubjectCharacteristics(dataset);
+            var sdtmEntityDescriptor = GetSdtmEntityDescriptor(dataset);
+            _dataServiceUnit.setSDTMentityDescriptor(sdtmEntityDescriptor);
+
+
+            List<SdtmRow> sdtmData = await _sdtmRepository.FindAllAsync(
+                    dm => dm.DatasetId.Equals(datasetId) && dm.DatafileId.Equals(fileId));
+
+            var observationService = new ObservationService(this._dataServiceUnit);
+            
+            if (dataset.Domain.Code.Equals("DM"))
+            {
+                var subjectService = new SubjectService(_dataServiceUnit);
+                await subjectService.LoadSubjects(sdtmData,datasetId);
+            }
+            else if (dataset.Domain.Code.Equals("BS"))
+            {
+                var sampleService = new BioSampleService(_dataServiceUnit);
+                await sampleService.LoadBioSamples(sdtmData, datasetId);
+            }
+            else if (dataset.Domain.Code.Equals("CY") || dataset.Domain.Code.Equals("HD"))
+            {
+                var hdDataService = new HDdataService(_dataServiceUnit);
+                await hdDataService.LoadHDdata(sdtmData, datasetId);
+            }
+                //else if (dataset.Domain.Code.Equals("SC"))
+                //{
+                
+                //}
             else
-                await observationService.loadDatasetObservations(dataset);
+            {
+                //observationService.LoadObsDescriptors(dataset, );
+                await observationService.loadDatasetObservations(dataset, fileId);
+            }
+                
             const string status = "LOADED";
             return true;
         }
+
+        public void UnloadDataset(int datasetId, int fileId)
+        {
+            var filterFields = new List<object>();
+            var filterField1 = new Dictionary<string, object>();
+            filterField1.Add("DBDATASETID", datasetId);
+            filterFields.Add(filterField1);
+            var filterField2 = new Dictionary<string, object>();
+            filterField2.Add("DBDATAFILEID", fileId);
+            filterFields.Add(filterField2);
+            _mongoDocRepository.DeleteMany(filterFields);
+            Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+
+
+        }
+        
+        //public async Task<bool> loadSubjects(int datasetId)
+        //{
+        //    List<SdtmEntity> subjectData = await _sdtmRepository.FindAllAsync(
+        //            dm => dm.DatasetId.Equals(datasetId));
+
+        //    var subjectService = new SubjectService(_dataServiceUnit);
+        //    return subjectService.LoadSubjects(subjectData);
+        //}
+
+        //public async Task<bool> loadBioSamples(int datasetId)
+        //{
+        //    //var dataset = _datasetRepository
+        //    //    .FindSingle(ds => ds.Id.Equals(datasetId),
+        //    //     new List<Expression<Func<Dataset, object>>>(){
+        //    //            d => d.Domain, 
+        //    //            d=> d.Variables,
+        //    //            d => d.Activity,
+        //    //            d => d.Activity.Study,
+        //    //            d=>d.Variables.Select(k=>k.VariableDefinition)
+        //    //    });
+
+        //    List<SdtmEntity> sampleData = await _sdtmRepository.FindAllAsync(
+        //            bs => bs.DatasetId.Equals(datasetId));
+
+        //    var sampleService = new BioSampleService(_dataServiceUnit);
+        //    return sampleService.LoadBioSamples(sampleData);
+
+            
+
+        //}
+
+
+        /**
+         * Each dataset will have a set of different variables describing its observations
+         * SDTMEntityDescriptor uses the SDTM standard convention to identify the different types of variables 
+         * available for this dataset
+         */
+        private SdtmRowDescriptor GetSdtmEntityDescriptor(Dataset dataset)
+        {
+            var sdtmEntityDescriptor = new SdtmRowDescriptor();
+
+            //TODO: change all these strings to ENUMS
+
+            sdtmEntityDescriptor.QualifierVariables = dataset.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.RoleId == "CL-Role-T-3")
+                        .ToList();
+            //sdtmEntityDescriptor.GroupDescriptors = dataset.Variables
+            //            .Select(l => l.VariableDefinition)
+            //            .Where(v => v.RoleId == "CL-Role-T-7")
+            //            .ToList();
+            sdtmEntityDescriptor.SynonymVariables = dataset.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.RoleId == "CL-Role-T-4")
+                        .ToList();
+            sdtmEntityDescriptor.VariableQualifierVariables = dataset.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.RoleId == "CL-Role-T-5")
+                        .ToList();
+            sdtmEntityDescriptor.ResultVariables = dataset.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.RoleId == "CL-Role-T-8")
+                        .ToList();
+
+            //Domain Class
+            sdtmEntityDescriptor.Class = dataset.Domain.Class;
+
+
+            //O3Descriptor
+            sdtmEntityDescriptor.O3Variable = dataset.Variables
+                        .Select(l => l.VariableDefinition).FirstOrDefault(v => v.RoleId == "CL-Role-T-2");
+
+            //O3 CVTerm
+            sdtmEntityDescriptor.O3CVterm = dataset.Variables
+                        .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "DECOD");
+
+            if (dataset.Domain.Class.ToLower().Equals("findings"))
+                sdtmEntityDescriptor.O3CVterm = dataset.Variables
+                    .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "LOINC");
+
+            //O3 Synonym (VSTEST)
+            sdtmEntityDescriptor.O3SynoymVariable = dataset.Variables
+                    .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "MODIFY");
+
+            if (dataset.Domain.Class.ToLower().Equals("findings"))
+                sdtmEntityDescriptor.O3SynoymVariable = dataset.Variables
+                    .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "TEST");
+
+            //O3 Category
+            sdtmEntityDescriptor.GroupVariable = dataset.Variables
+                        .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "CAT");
+
+            //O3 Subcategory
+            sdtmEntityDescriptor.SubgroupVariable = dataset.Variables
+                       .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "SCAT");
+
+            //O3 DefaultQualifier
+            //if (dataset.Domain.Class.ToLower().Equals("findings"))
+            //    sdtmEntityDescriptor.DefaultQualifier = dataset.Variables
+            //        .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "ORRES");
+
+            //if (dataset.Domain.Class.ToLower().Equals("events"))
+            //    sdtmEntityDescriptor.DefaultQualifier = dataset.Variables
+            //        .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == dataset.Domain.Code + "OCCUR");
+
+
+
+            return sdtmEntityDescriptor;
+        }
+        
 
         private static readonly Expression<Func<DomainTemplate, DatasetDTO>> AsDatasetDto =
             x => new DatasetDTO
@@ -611,15 +898,15 @@ namespace eTRIKS.Commons.Service.Services
 
             };
 
-        public List<Dictionary<string, string>> getFileColHeaders(int datasetId)
-        {
-            var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.DataFile;
-            var studyId = dataset.Activity.StudyId;
+        //public List<Dictionary<string, string>> getFileColHeaders(int datasetId)
+        //{
+        //    var dataset = GetActivityDataset(datasetId);
+        //    var fileName = dataset.DataFile;
+        //    var studyId = dataset.Activity.StudyId;
 
-            var fileService = new FileService();
-            return fileService.getFileColHeaders(studyId, fileName);
-        }
+        //    var fileService = new FileService(_dataServiceUnit);
+        //    return fileService.getFileColHeaders(studyId, fileName);
+        //}
 
         //public bool checkTemplateMatch(int datasetId)
         //{
@@ -641,18 +928,19 @@ namespace eTRIKS.Commons.Service.Services
         //    //TODO: getColmn headers and get dataset if headers are not 
         //}
 
-        public FileDTO getDatasetFileInfo(int datasetId)
+        public FileDTO getDatasetFileInfo(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
-            var fileName = dataset.DataFile;
-            var studyId = dataset.Activity.StudyId;
-
-            var fileService = new FileService();
-            var colHeaders = fileService.getFileColHeaders(studyId, fileName);
+            var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
+            var studyId = dataset.Activity.ProjectId;
+            var filePath = dataFile.Path + "\\" + dataFile.FileName;
+            var fileService = new FileService(_dataServiceUnit);
+            var colHeaders = fileService.getFileColHeaders(filePath);
             
             FileDTO fileDto = new FileDTO();
-            fileDto.FileName = dataset.DataFile;
+            fileDto.FileName = dataFile.FileName;
             fileDto.columnHeaders = colHeaders;
+            fileDto.DataFileId = dataFile.Id;
             
             var varNames = dataset.Variables.Select(v => v.VariableDefinition.Name).ToList();
             var headers = colHeaders.Select(d => d["colName"]).ToList<string>();
@@ -660,12 +948,34 @@ namespace eTRIKS.Commons.Service.Services
             fileDto.templateMatched = headers.All(header => varNames.Contains(header));
             if (fileDto.templateMatched)
             {
-               dataset.StandardDataFile = fileName;
+                //dataset.StandardDataFile = filePath;
                //TODO: TEMP usage of dataset state
-                dataset.State = "standard";
+                //dataset.State = "standard";
+                fileDto.IsStandard = true;
+                dataFile.IsStandard = true;
+                _dataFileRepository.Update(dataFile);
+                _dataServiceUnit.Save();
             }
                 
             return fileDto;
+        }
+
+        public List<DatasetDTO> GetAssayFeatureTemplates()
+        {
+            var ds = GetTemplateDataset("D-ASSAY-FEAT");
+            return new List<DatasetDTO>(){ds};
+        }
+
+        public List<DatasetDTO> GetAssaySampleTemplates()
+        {
+            var ds =  GetTemplateDataset("D-SDTM-BS");
+            return new List<DatasetDTO> {ds};
+        }
+
+        public List<DatasetDTO> GetAssayDataTemplates()
+        {
+            var ds =  GetTemplateDataset("D-CUST-HD");
+            return new List<DatasetDTO>(){ds};
         }
     }
 

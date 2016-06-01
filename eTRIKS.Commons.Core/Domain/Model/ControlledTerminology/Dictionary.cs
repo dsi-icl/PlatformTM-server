@@ -17,5 +17,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
 
         public virtual ICollection<CVterm> Terms { get; set; }
 
+        public Dictionary()
+        {
+            Terms = new List<CVterm>();
+        }
+
     }
 }

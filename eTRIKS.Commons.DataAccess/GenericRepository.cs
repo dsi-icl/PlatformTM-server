@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 
@@ -77,6 +79,15 @@ namespace eTRIKS.Commons.DataAccess
             return query.ToList<TEntity>();
         }
 
+        public Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null)
+        {
+            throw new NotImplementedException();
+        }
 
 
         public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null,
@@ -97,6 +108,16 @@ namespace eTRIKS.Commons.DataAccess
             return Entities.Add(entity);
         }
 
+        public IEnumerable<TEntity> InsertMany(IList<TEntity> entities = null)
+        {
+            return Entities.AddRange(entities);
+        }
+
+        public Task InsertManyAsync(IList<TEntity> entitites = null)
+        {
+            throw new NotImplementedException();
+        }
+
         public TEntity Update(TEntity entity)
         {
             //Entities.Attach(entity);
@@ -115,7 +136,25 @@ namespace eTRIKS.Commons.DataAccess
             throw new NotImplementedException();
         }
 
+        public Task DeleteManyAsync(IList<object> filterFields = null)
+        {
+            throw new NotImplementedException();
+        }
 
+        public Task DeleteOneAsync(IList<object> filterFields = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteMany(IList<object> filterFields = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteMany(Expression<Func<TEntity, bool>> filter)
+        {
+            throw new NotImplementedException();
+        }
 
 
         public System.Threading.Tasks.Task<List<TEntity>> GetAllAsync()
@@ -123,10 +162,6 @@ namespace eTRIKS.Commons.DataAccess
             throw new NotImplementedException();
         }
 
-        public System.Threading.Tasks.Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter)
-        {
-            throw new NotImplementedException();
-        }
 
         public System.Threading.Tasks.Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> filter)
         {

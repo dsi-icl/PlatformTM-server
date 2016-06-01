@@ -19,7 +19,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
     public class MongoField
     {
         public string Name { get; set; }
-        public string value { get; set; }
+        public Object value { get; set; }
     }
 
 

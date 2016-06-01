@@ -13,7 +13,7 @@ using eTRIKS.Commons.Service.DTOs;
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     //[RoutePrefix("api/studies")]
-    [Authorize]
+    //[Authorize]
     public class DataController : ApiController
     {
         private DataService _dataService;
@@ -41,24 +41,25 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //}
         [HttpGet]
         [Route("api/projects/{projectId}/subjects/characteristics")]
-        public List<SubjCharDTO> getSubjectCharacteristics(string projectId)
+        public List<ObservationRequestDTO> getSubjectCharacteristics(string projectId)
         {
-            return _dataService.getSubjectCharacteristics(projectId);
+            return _dataService.GetSubjectCharacteristics(projectId);
         }
 
         [HttpPost]
         [Route("api/studies/{studyId}/data/subjects/characteristics")]
-        public async Task<Hashtable> getSubjectData(string studyId, [FromBody] List<int> SCids)
+        public async Task<Hashtable> getSubjectData(string studyId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {
-            return await _dataService.getSubjectData(studyId, SCids);
+            return await _dataService.getSubjectData(studyId, requestedSCs);
         }
 
         [HttpPost]
-        [Route("api/studies/{studyId}/data/clinical/observations")]
-        public async Task<Hashtable> getObservations(string studyId, [FromBody] Hashtable observations)
+        [Route("api/projects/{projectAcc}/data/clinical/observations")]
+        public async Task<Hashtable> getObservations(string projectAcc, [FromBody] List<ObservationRequestDTO> observations)
         {
-            return await _dataService.getObservationsData(studyId, observations);
+            return await _dataService.getObservationsData(projectAcc, observations);
         }
+
 
         
     }

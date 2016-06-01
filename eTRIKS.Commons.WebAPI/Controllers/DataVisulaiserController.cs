@@ -11,7 +11,7 @@ using System.Web.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Authorize]
+   // [Authorize]
     public class DataVisulaiserController : ApiController
     {
         private DataService _dataService;
@@ -26,7 +26,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/visualise/clinicalTree/{projectAccession}")]
         public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(string projectAccession)
         {
-            return await _dataService.getClinicalObsTree(projectAccession);
+            return await _dataService.GetClinicalObsTree(projectAccession);
         }
     }
 }

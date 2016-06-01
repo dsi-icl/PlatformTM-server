@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Linq;
 using System.Net;
@@ -48,6 +49,29 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
+        [Route("api/templates/assay/features")]
+        public List<DatasetDTO> GetAssayFeatureTemplates()
+        {
+            return _datasetService.GetAssayFeatureTemplates();
+        }
+
+        [HttpGet]
+        [Route("api/templates/assay/samples")]
+        public List<DatasetDTO> GetAssaySampleTemplates()
+        {
+            return _datasetService.GetAssaySampleTemplates();
+        }
+
+        [HttpGet]
+        [Route("api/templates/assay/data")]
+        public List<DatasetDTO> GetAssayDataTemplates()
+        {
+            return _datasetService.GetAssayDataTemplates();
+        }
+
+
+
+        [HttpGet]
         [Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]
         public DatasetDTO GetActivityDataset(int datasetId)
         {
@@ -78,18 +102,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPut]
         [Route("api/Dataset/{datasetId}")]
-        public string updateDataset(string datasetId, [FromBody] DatasetDTO datasetDTO)
+        public string updateDataset(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
-
-            return _datasetService.updateDataset(datasetDTO, datasetId);
+            if (datasetDTO.Id == datasetId)
+                return _datasetService.updateDataset(datasetDTO);
+            return "FAILED to update datasetId";
         }
 
         [HttpPost]
         [Route("api/Datasets/{datasetId}/update")]
-        public string updateDatasetPost(string datasetId, [FromBody] DatasetDTO datasetDTO)
+        public string updateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
 
-            return _datasetService.updateDataset(datasetDTO, datasetId);
+            if (datasetDTO.Id == datasetId)
+                return _datasetService.updateDataset(datasetDTO);
+            return "FAILED to update datasetId";
         }
 
         // DELETE: api/Dataset/5
@@ -98,57 +125,57 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/Dataset/{datasetId}/templateMap")]
+        [Route("api/datasets/{datasetId}/templateMap")]
         public DataTemplateMap getDatasetTemplateMap(int datasetId)
         {
-            return  _datasetService.GeTemplateMaps(datasetId);
+            return  _datasetService.GetTemplateMaps(datasetId);
         }
 
         [HttpPost]
-        [Route("api/Datasets/{datasetId}/mapToTemplate")]
-        public async Task<bool> MapToTemplate(int datasetId, [FromBody] DataTemplateMap dataTemplateMap)
+        [Route("api/Datasets/{datasetId}/mapToTemplate/file/{fileId}")]
+        public async Task<int?> MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
         {
             //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
             //string filePath = PATH + "\\" + fileName;
-            return _datasetService.mapToTemplate(datasetId, dataTemplateMap);
+            return _datasetService.mapToTemplate(datasetId,fileId, dataTemplateMap);
         }
 
         [HttpGet]
-        [Route("api/datasets/{datasetId}/preview")]
-        public async Task<Hashtable> getDatasetPreview(int datasetId)
+        [Route("api/datasets/{datasetId}/preview/file/{fileId}")]
+        public async Task<Hashtable> getDatasetPreview(int datasetId, int fileId)
         {
-           return _datasetService.getDatasetPreview(datasetId);
+           return _datasetService.getDatasetPreview(datasetId,fileId);
         }
 
         [HttpGet]
-        [Route("api/Datasets/{datasetId}/loadDataFile")]
-        public async Task<string> LoadDataSetFromFile(int datasetId)
+        [Route("api/Datasets/{datasetId}/saveDataFile/file/{fileId}")]
+        public async Task<string> LoadDataFile(int datasetId, int fileId)
         {
-            _datasetService.loadDataset(datasetId);
+            _datasetService.SaveDataFile(datasetId,fileId);
             return "";
         }
 
         [HttpGet]
-        [Route("api/datasets/{datasetId}/loadObservations")]
-        public async Task<bool> loadObservations(int datasetId)
+        [Route("api/datasets/{datasetId}/loadData/file/{fileId}")]
+        public async Task<bool> LoadData(int datasetId, int fileId)
         {
-            return await _datasetService.loadObservations(datasetId);
+            return await _datasetService.LoadDataset(datasetId,fileId);
         }
 
-        [HttpGet]
-        [Route("api/Datasets/{datasetId}/dataFile/header")]
-        public async Task<List<Dictionary<string, string>>> LinkFile(int datasetId)
-        {
-            //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-            //string path = rawFilesDirectory + studyId;
-            return _datasetService.getFileColHeaders(datasetId);
-        }
+        //[HttpGet]
+        //[Route("api/Datasets/{datasetId}/dataFile/header")]
+        //public async Task<List<Dictionary<string, string>>> LinkFile(int datasetId)
+        //{
+        //    //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+        //    //string path = rawFilesDirectory + studyId;
+        //    return _datasetService.getFileColHeaders(datasetId);
+        //}
 
         [HttpGet]
-        [Route("api/datasets/{datasetId}/OriFileInfo")]
-        public async Task<FileDTO> checkTemplateMatch(int datasetId)
+        [Route("api/datasets/{datasetId}/OriFileInfo/{fileId}")]
+        public async Task<FileDTO> checkTemplateMatch(int datasetId, int fileId)
         {
-             return _datasetService.getDatasetFileInfo(datasetId);
+             return _datasetService.getDatasetFileInfo(datasetId,fileId);
         }
     }
 }

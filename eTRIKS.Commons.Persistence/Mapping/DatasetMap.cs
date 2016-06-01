@@ -19,8 +19,8 @@ namespace eTRIKS.Commons.Persistence.Mapping
                 .IsRequired()
                 .HasMaxLength(200);
 
-            this.Property(t => t.DataFile)
-                .HasMaxLength(2000);
+            //this.Property(t => t.DataFile)
+            //    .HasMaxLength(2000);
 
             //this.Property(t => t.ActivityId)
             //    .IsRequired()

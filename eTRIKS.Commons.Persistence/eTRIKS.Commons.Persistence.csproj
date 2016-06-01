@@ -44,24 +44,25 @@
     <Reference Include="Microsoft.AspNet.Identity.EntityFramework">
       <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
     </Reference>
-    <Reference Include="MongoDB.Bson, Version=2.0.0.828, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MongoDB.Bson, Version=2.2.3.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MongoDB.Bson.2.0.0\lib\net45\MongoDB.Bson.dll</HintPath>
+      <HintPath>..\packages\MongoDB.Bson.2.2.3\lib\net45\MongoDB.Bson.dll</HintPath>
     </Reference>
-    <Reference Include="MongoDB.Driver, Version=2.0.0.828, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MongoDB.Driver, Version=2.2.3.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MongoDB.Driver.2.0.0\lib\net45\MongoDB.Driver.dll</HintPath>
+      <HintPath>..\packages\MongoDB.Driver.2.2.3\lib\net45\MongoDB.Driver.dll</HintPath>
     </Reference>
-    <Reference Include="MongoDB.Driver.Core">
-      <HintPath>..\packages\MongoDB.Driver.Core.2.0.0\lib\net45\MongoDB.Driver.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Data, Version=6.9.7.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="MongoDB.Driver.Core, Version=2.2.3.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MySql.Data.6.9.7\lib\net45\MySql.Data.dll</HintPath>
+      <HintPath>..\packages\MongoDB.Driver.Core.2.2.3\lib\net45\MongoDB.Driver.Core.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.7.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\MySql.Data.Entity.6.9.7\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
+      <HintPath>..\packages\MySql.Data.6.9.8\lib\net45\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data.Entity.EF6, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySql.Data.Entity.6.9.8\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -79,9 +80,76 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mapping\ArmMap.cs" />
+    <Compile Include="Mapping\CharacterisitcMap.cs" />
+    <Compile Include="Mapping\CharacteristicObjectMap.cs" />
+    <Compile Include="Mapping\SubjectMap.cs" />
+    <Compile Include="Mapping\TimePointMap.cs" />
+    <Compile Include="Mapping\VisitMap.cs" />
+    <Compile Include="Mapping\BioSampleMap.cs" />
+    <Compile Include="Migrations_prod\201601121127483_addSampleSubjectVisit.cs" />
+    <Compile Include="Migrations_prod\201601121127483_addSampleSubjectVisit.Designer.cs">
+      <DependentUpon>201601121127483_addSampleSubjectVisit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601131956529_changeStudyPKint.cs" />
+    <Compile Include="Migrations_prod\201601131956529_changeStudyPKint.Designer.cs">
+      <DependentUpon>201601131956529_changeStudyPKint.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601181844066_AddAct2ProjInsteadOfStudy.cs" />
+    <Compile Include="Migrations_prod\201601181844066_AddAct2ProjInsteadOfStudy.Designer.cs">
+      <DependentUpon>201601181844066_AddAct2ProjInsteadOfStudy.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601201934497_ChangeVarDEFFKtoProj.cs" />
+    <Compile Include="Migrations_prod\201601201934497_ChangeVarDEFFKtoProj.Designer.cs">
+      <DependentUpon>201601201934497_ChangeVarDEFFKtoProj.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601201958519_AddStudy2DatasetFK.cs" />
+    <Compile Include="Migrations_prod\201601201958519_AddStudy2DatasetFK.Designer.cs">
+      <DependentUpon>201601201958519_AddStudy2DatasetFK.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601202049420_changeFKToOptionalVarRefCharacteristic.cs" />
+    <Compile Include="Migrations_prod\201601202049420_changeFKToOptionalVarRefCharacteristic.Designer.cs">
+      <DependentUpon>201601202049420_changeFKToOptionalVarRefCharacteristic.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601280128331_delCharacteristicsTBL.cs" />
+    <Compile Include="Migrations_prod\201601280128331_delCharacteristicsTBL.Designer.cs">
+      <DependentUpon>201601280128331_delCharacteristicsTBL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601280148552_addCharacteristicsTBL.cs" />
+    <Compile Include="Migrations_prod\201601280148552_addCharacteristicsTBL.Designer.cs">
+      <DependentUpon>201601280148552_addCharacteristicsTBL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201601291228562_addCharacteristicsTBL1.cs" />
+    <Compile Include="Migrations_prod\201601291228562_addCharacteristicsTBL1.Designer.cs">
+      <DependentUpon>201601291228562_addCharacteristicsTBL1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201603100036145_addBSbaseline.cs" />
+    <Compile Include="Migrations_prod\201603100036145_addBSbaseline.Designer.cs">
+      <DependentUpon>201603100036145_addBSbaseline.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201603100040396_addBSbaseline2.cs" />
+    <Compile Include="Migrations_prod\201603100040396_addBSbaseline2.Designer.cs">
+      <DependentUpon>201603100040396_addBSbaseline2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201605111515071_addDatasetIdDatafileToObs.cs" />
+    <Compile Include="Migrations_prod\201605111515071_addDatasetIdDatafileToObs.Designer.cs">
+      <DependentUpon>201605111515071_addDatasetIdDatafileToObs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201605111607238_addProejctIdToObs.cs" />
+    <Compile Include="Migrations_prod\201605111607238_addProejctIdToObs.Designer.cs">
+      <DependentUpon>201605111607238_addProejctIdToObs.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201605241508354_AddStudyArms.cs" />
+    <Compile Include="Migrations_prod\201605241508354_AddStudyArms.Designer.cs">
+      <DependentUpon>201605241508354_AddStudyArms.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MongoDocumentSerializer.cs" />
+    <Compile Include="SdtmSerializer.cs" />
     <Compile Include="etriksDataContext_dev.cs" />
     <Compile Include="AuthContext.cs" />
     <Compile Include="etriksUserContext_prod.cs" />
+    <Compile Include="Mapping\DataFileMap.cs" />
+    <Compile Include="Mapping\AssayMap.cs" />
     <Compile Include="Mapping\ProjectMap.cs" />
     <Compile Include="Mapping\ObservationMap.cs" />
     <Compile Include="Mapping\DatasetMap.cs" />
@@ -149,7 +217,36 @@
     <Compile Include="Migrations_prod\201510120741451_updateDatasetTBL.Designer.cs">
       <DependentUpon>201510120741451_updateDatasetTBL.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations_prod\201512131347173_adddatafiles.cs" />
+    <Compile Include="Migrations_prod\201512131347173_adddatafiles.Designer.cs">
+      <DependentUpon>201512131347173_adddatafiles.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512131939171_updateDataFileTable.cs" />
+    <Compile Include="Migrations_prod\201512131939171_updateDataFileTable.Designer.cs">
+      <DependentUpon>201512131939171_updateDataFileTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512141642145_addColToDAtafile.cs" />
+    <Compile Include="Migrations_prod\201512141642145_addColToDAtafile.Designer.cs">
+      <DependentUpon>201512141642145_addColToDAtafile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512141904421_updateDataFileTable1.cs" />
+    <Compile Include="Migrations_prod\201512141904421_updateDataFileTable1.Designer.cs">
+      <DependentUpon>201512141904421_updateDataFileTable1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512141908246_updateDataFileTable2.cs" />
+    <Compile Include="Migrations_prod\201512141908246_updateDataFileTable2.Designer.cs">
+      <DependentUpon>201512141908246_updateDataFileTable2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512151634252_addassay.cs" />
+    <Compile Include="Migrations_prod\201512151634252_addassay.Designer.cs">
+      <DependentUpon>201512151634252_addassay.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations_prod\201512151852494_updateAssayTBL.cs" />
+    <Compile Include="Migrations_prod\201512151852494_updateAssayTBL.Designer.cs">
+      <DependentUpon>201512151852494_updateAssayTBL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations_prod\Configuration.cs" />
+    <Compile Include="BiospecimenSerializer.cs" />
     <Compile Include="SubjectSerializer.cs" />
     <Compile Include="SubjectObsSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -211,6 +308,69 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations_prod\201510120741451_updateDatasetTBL.resx">
       <DependentUpon>201510120741451_updateDatasetTBL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512131347173_adddatafiles.resx">
+      <DependentUpon>201512131347173_adddatafiles.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512131939171_updateDataFileTable.resx">
+      <DependentUpon>201512131939171_updateDataFileTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512141642145_addColToDAtafile.resx">
+      <DependentUpon>201512141642145_addColToDAtafile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512141904421_updateDataFileTable1.resx">
+      <DependentUpon>201512141904421_updateDataFileTable1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512141908246_updateDataFileTable2.resx">
+      <DependentUpon>201512141908246_updateDataFileTable2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512151634252_addassay.resx">
+      <DependentUpon>201512151634252_addassay.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201512151852494_updateAssayTBL.resx">
+      <DependentUpon>201512151852494_updateAssayTBL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601121127483_addSampleSubjectVisit.resx">
+      <DependentUpon>201601121127483_addSampleSubjectVisit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601131956529_changeStudyPKint.resx">
+      <DependentUpon>201601131956529_changeStudyPKint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601181844066_AddAct2ProjInsteadOfStudy.resx">
+      <DependentUpon>201601181844066_AddAct2ProjInsteadOfStudy.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601201934497_ChangeVarDEFFKtoProj.resx">
+      <DependentUpon>201601201934497_ChangeVarDEFFKtoProj.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601201958519_AddStudy2DatasetFK.resx">
+      <DependentUpon>201601201958519_AddStudy2DatasetFK.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601202049420_changeFKToOptionalVarRefCharacteristic.resx">
+      <DependentUpon>201601202049420_changeFKToOptionalVarRefCharacteristic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601280128331_delCharacteristicsTBL.resx">
+      <DependentUpon>201601280128331_delCharacteristicsTBL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601280148552_addCharacteristicsTBL.resx">
+      <DependentUpon>201601280148552_addCharacteristicsTBL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201601291228562_addCharacteristicsTBL1.resx">
+      <DependentUpon>201601291228562_addCharacteristicsTBL1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201603100036145_addBSbaseline.resx">
+      <DependentUpon>201603100036145_addBSbaseline.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201603100040396_addBSbaseline2.resx">
+      <DependentUpon>201603100040396_addBSbaseline2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201605111515071_addDatasetIdDatafileToObs.resx">
+      <DependentUpon>201605111515071_addDatasetIdDatafileToObs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201605111607238_addProejctIdToObs.resx">
+      <DependentUpon>201605111607238_addProejctIdToObs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations_prod\201605241508354_AddStudyArms.resx">
+      <DependentUpon>201605241508354_AddStudyArms.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />

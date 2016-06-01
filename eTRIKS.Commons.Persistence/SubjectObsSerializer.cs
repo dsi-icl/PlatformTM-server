@@ -25,11 +25,21 @@ namespace eTRIKS.Commons.Persistence
             {
                 String fieldName = reader.ReadName();
 
+                //TODO:Name of Obs name for Events shuold be DECOD? 
+                //TODO: SubjObs SHOULD store SQL ObservationId
 
-                if (fieldName.EndsWith("TESTCD") || fieldName.EndsWith("TERM") || fieldName.EndsWith("TRT"))
+                if (fieldName.EndsWith("TESTCD") || fieldName.EndsWith("DECOD") || fieldName.EndsWith("TRT"))
+                {
                     subjObs.Name = reader.ReadString();
+                    subjObs.StandardName = subjObs.Name;
+                }
+                    
+                else if (fieldName.EndsWith("TEST") || fieldName.EndsWith("TERM"))
+                    subjObs.VerbatimName = reader.ReadString();
+                //if (fieldName.EndsWith("LOINC") || fieldName.EndsWith("DECOD"))
+                //    subjObs.StandardName = reader.ReadString();
 
-                if (fieldName.EndsWith("CAT"))
+                else if (fieldName.EndsWith("CAT"))
                     subjObs.Group = reader.ReadString();
 
                 else if (fieldName.EndsWith("SCAT"))
@@ -39,44 +49,35 @@ namespace eTRIKS.Commons.Persistence
                 {
                     string dateStr = reader.ReadString();
                     DateTime dt;
-                    if (dateStr != null)
+                    if (dateStr == "") continue;
+                    try
                     {
-                        try
-                        {
-                            dt = DateTime.Parse(dateStr);
-                            if (subjObs.ObsInterval == null)
-                                subjObs.ObsInterval = new TimeInterval();
-                            subjObs.ObsInterval.Start = new AbsoluteTimePoint();
-                            ((AbsoluteTimePoint)subjObs.ObsInterval.Start).DateTime = dt;
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.Write("Failed to parse date for " + dateStr);
-                        }
-                        
-                       
+                        dt = DateTime.Parse(dateStr);
+                        if (subjObs.ObsInterval == null)
+                            subjObs.ObsInterval = new TimeInterval();
+                        subjObs.ObsInterval.Start = new AbsoluteTimePoint();
+                        ((AbsoluteTimePoint)subjObs.ObsInterval.Start).DateTime = dt;
                     }
-                    
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.Write("Failed to parse date for " + dateStr);
+                    }
                 }
                 else if (fieldName.EndsWith("ENDTC"))
                 {
                     string dateStr = reader.ReadString();
-                    if (dateStr != null)
+                    if (dateStr == "" ) continue;
+                    try
                     {
-                        try
-                        {
-                            if (subjObs.ObsInterval == null)
-                                subjObs.ObsInterval = new TimeInterval();
-                            subjObs.ObsInterval.End = new AbsoluteTimePoint();
-                            ((AbsoluteTimePoint)subjObs.ObsInterval.End).DateTime = DateTime.Parse(dateStr);
-                        }
-                        catch (Exception e)
-                        {
-                            System.Diagnostics.Debug.Write("Failed to parse date for " + dateStr);
-                        }
-                       
+                        if (subjObs.ObsInterval == null)
+                            subjObs.ObsInterval = new TimeInterval();
+                        subjObs.ObsInterval.End = new AbsoluteTimePoint();
+                        ((AbsoluteTimePoint)subjObs.ObsInterval.End).DateTime = DateTime.Parse(dateStr);
                     }
-                    
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.Write("Failed to parse date for " + dateStr);
+                    }
                 }
                 else if (fieldName.EndsWith("TPT"))
                 {
@@ -88,7 +89,9 @@ namespace eTRIKS.Commons.Persistence
                 {
                     if (subjObs.ObsStudyTimePoint == null)
                         subjObs.ObsStudyTimePoint = new RelativeTimePoint();
-                    subjObs.ObsStudyTimePoint.Number = Int32.Parse(reader.ReadString());
+                    int num;
+                    if(Int32.TryParse(reader.ReadString(),out num))
+                    subjObs.ObsStudyTimePoint.Number = num;
                 }
                 else if (fieldName.EndsWith("TPTREF"))
                 {
@@ -137,7 +140,9 @@ namespace eTRIKS.Commons.Persistence
                 {
                     if (subjObs.ObsStudyDay == null)
                         subjObs.ObsStudyDay = new RelativeTimePoint();
-                    subjObs.ObsStudyDay.Number = Int32.Parse(reader.ReadString());
+                    int num;
+                    if (Int32.TryParse(reader.ReadString(),out num))
+                    subjObs.ObsStudyDay.Number = num;
                 }
                 else
                     switch (fieldName)
@@ -153,6 +158,24 @@ namespace eTRIKS.Commons.Persistence
                             break;
                         case "USUBJID":
                             subjObs.SubjectId = reader.ReadString();
+                            break;
+                        case "DBACTIVITYID":
+                            subjObs.ActivityId = reader.ReadInt32();
+                            break;
+                        case "DBSTUDYID":
+                            subjObs.DBstudyId = reader.ReadInt32();
+                            break;
+                        case "DBDATAFILEID":
+                            subjObs.DatafileId = reader.ReadInt32();
+                            break;
+                        case "DBPROJECTID":
+                            subjObs.ProjectId = reader.ReadInt32();
+                            break;
+                        case "DBPROJECTACC":
+                            subjObs.ProjectAcc = reader.ReadString();
+                            break;
+                        case "DBDATASETID":
+                            subjObs.DatasetId = reader.ReadInt32();
                             break;
                         case "VISIT":
                             subjObs.Visit = reader.ReadString();
@@ -195,6 +218,12 @@ namespace eTRIKS.Commons.Persistence
                     return true;
                 case "DomainCode":
                     serializationInfo = new BsonSerializationInfo("DOMAIN", new StringSerializer(), typeof(string));
+                    return true;
+                case "ProjectId":
+                    serializationInfo = new BsonSerializationInfo("DBPROJECTID", new Int32Serializer(), typeof(int));
+                    return true;
+                case "ProjectAcc":
+                    serializationInfo = new BsonSerializationInfo("DBPROJECTACC", new StringSerializer(), typeof(string));
                     return true;
                 case "Name":
                     serializationInfo = DynamicMappers.First(d => d.Key.Equals(memberName)).Value;

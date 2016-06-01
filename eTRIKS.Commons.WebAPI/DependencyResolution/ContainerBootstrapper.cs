@@ -4,9 +4,13 @@ using System.Web.Http.Dispatcher;
 using System.Web.Mvc;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
+using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Persistence;
 using eTRIKS.Commons.WebAPI.DependencyResolution.Plumbing;
 using System.Collections.Generic;
 using System.Web.Http.Dependencies;
+using MongoDB.Bson.Serialization;
+using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution
 {
@@ -26,26 +30,19 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
 
         public static ContainerBootstrapper Bootstrap(HttpConfiguration HttpConfiguration)
         {
-            
-            
-            var container = new WindsorContainer()
-                .Install(FromAssembly.This());
+            var container = new WindsorContainer().Install(FromAssembly.This());
 
             ControllerBuilder.Current.SetControllerFactory(new WindsorControllerFactory(container));
-
-            //var httpDependencyResolver = new WindsorHttpDependencyResolver(container);
-
-           // GlobalConfiguration.Configuration.Services.Replace.ServiceResolver.SetResolver(
-            //        serviceType => container.Resolve(serviceType),
-            //        serviceType => container.ResolveAll(serviceType).Cast<object>());
 
             HttpConfiguration.Services.Replace(typeof(IHttpControllerActivator),
                 new WindsorControllerFactory(container));
 
+            BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
+            BsonSerializer.RegisterSerializer(typeof(SdtmRow), new SdtmSerializer());
+            BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
+
 
             return new ContainerBootstrapper(container);
-
-            
         }
 
         public void Dispose()

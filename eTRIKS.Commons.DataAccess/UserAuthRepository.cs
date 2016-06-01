@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.DataAccess
 {
-    public class UserAuthRepository<TEntity> : IUserRepository<ApplicationUser>
+    public class UserAuthRepository : IUserRepository<ApplicationUser,IdentityResult>
     {
         //private UserManager<IdentityUser> _userManager;
         private ApplicationUserManager userManager;
@@ -23,17 +23,18 @@ namespace eTRIKS.Commons.DataAccess
             userManager = new ApplicationUserManager(new UserStore<ApplicationUser>(_ctx));
         }
 
-        public UserAuthRepository()
+        //public UserAuthRepository()
+        //{
+        //    //IdentityDbContext _ctx = new AuthContext();
+        //   // _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
+        //}
+        public async Task<IdentityResult> RegisterUser(ApplicationUser user, string password)
         {
-            //IdentityDbContext _ctx = new AuthContext();
-           // _userManager = new UserManager<IdentityUser>(new UserStore<IdentityUser>(_ctx));
-        }
-        public async Task<bool> RegisterUser(ApplicationUser user, string password)
-        {
+            IdentityResult addUserResult=null;
             try
             {
-                IdentityResult addUserResult = await userManager.CreateAsync(user, password);
-                return addUserResult.Succeeded;
+                addUserResult = await userManager.CreateAsync(user, password);
+                
             }
             catch (System.Data.Entity.Validation.DbEntityValidationException ex)
             {
@@ -41,7 +42,7 @@ namespace eTRIKS.Commons.DataAccess
             }
 
 
-            return false;
+            return addUserResult;
         }
 
         public async Task<ApplicationUser> FindUser(string userName, string password)

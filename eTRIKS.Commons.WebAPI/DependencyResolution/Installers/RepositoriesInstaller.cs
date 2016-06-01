@@ -4,8 +4,8 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Persistence;
-using eTRIKS.Commons.DataParser.IOFileManagement;
 using eTRIKS.Commons.DataAccess.MongoDB;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using eTRIKS.Commons.DataAccess.UserManagement;
 using eTRIKS.Commons.DataAccess;
@@ -21,26 +21,29 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 
                 //TODO: remove EF and Persistence dependencies
 
-                Component.For<DbContext, IServiceUoW>()
-                    .ImplementedBy<etriksDataContext_prod>(),
+                //Component.For<DbContext, IServiceUoW>()
+                //    .ImplementedBy<etriksDataContext_prod>(),
 
-                Component.For<IdentityDbContext<ApplicationUser>, IServiceUoW>()
-                    .ImplementedBy<etriksUserContext_prod>(),
+                Component.For<IdentityDbContext<ApplicationUser>, IServiceUoW>().LifestylePerWebRequest()
+                    .ImplementedBy<EtriksDataContextProd>(),
 
-                Component.For<FileHandler>(),
+                Component.For<IUserRepository<ApplicationUser, IdentityResult>>()
+                    .ImplementedBy<UserAuthRepository>(),
+
+               
 
                 Component.For<MongoDbDataRepository>(),
 
                 Classes
                     .FromAssemblyNamed("eTRIKS.Commons.DataAccess")
-                    .BasedOn(typeof(IRepository<,>))
+                    .BasedOn(typeof(IRepository<,>)).LifestylePerWebRequest()
                     .WithServiceDefaultInterfaces(),
 
-                    Component.For<IUserRepository<ApplicationUser>>().ImplementedBy<UserAuthRepository<ApplicationUser>>(),
+                
 
                 Classes
                      .FromAssemblyNamed("eTRIKS.Commons.Service")
-                     .InNamespace("eTRIKS.Commons.Service.Services")
+                     .InNamespace("eTRIKS.Commons.Service.Services").LifestylePerWebRequest()
                      .WithServiceSelf()
                      .WithServiceDefaultInterfaces(),
 

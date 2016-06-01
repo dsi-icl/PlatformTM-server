@@ -9,7 +9,8 @@ using eTRIKS.Commons.Persistence.Mapping;
 using System.Data.Entity.Migrations.History;
 
 namespace eTRIKS.Commons.Persistence {
-    public class etriksDataContext_dev : DbContext, IServiceUoW {
+
+    /*public class etriksDataContext_dev : DbContext, IServiceUoW {
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
@@ -105,5 +106,6 @@ namespace eTRIKS.Commons.Persistence {
         {
             throw new NotImplementedException();
         }
-    }
+    }*/
 }
+

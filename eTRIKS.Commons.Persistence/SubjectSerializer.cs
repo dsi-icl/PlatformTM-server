@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Persistence
 {
-    class SubjectSerializer : SerializerBase<Subject>, IBsonDocumentSerializer, IBsonIdProvider
+    class SubjectSerializer : SerializerBase<HumanSubject>, IBsonDocumentSerializer, IBsonIdProvider
     {
         public static Dictionary<string, BsonSerializationInfo> DynamicMappers = new Dictionary<string, BsonSerializationInfo>();
-        public override Subject Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        public override HumanSubject Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
         {
             context.Reader.ReadStartDocument();
             var reader = (BsonReader)context.Reader;
-            Subject subject = new Subject();
+            HumanSubject subject = new HumanSubject();
             
             while (reader.ReadBsonType() != BsonType.EndOfDocument)
             {
@@ -29,19 +29,19 @@ namespace eTRIKS.Commons.Persistence
                 switch (fieldName)
                     {
                         case "_id":
-                            subject.Id = reader.ReadBinaryData().AsGuid;
+                            //subject.Id = reader.ReadBinaryData().AsGuid;
                             break;
                         case "STUDYID":
-                            subject.StudyId = reader.ReadString();
+                            //subject.StudyId = reader.ReadString();
                             break;
                         case "DOMAIN":
                             reader.ReadString();
                             break;
                         case "USUBJID":
-                            subject.SubjId = reader.ReadString();
+                            subject.UniqueSubjectId = reader.ReadString();
                             break;
                         case "SITEID":
-                            subject.Site= reader.ReadString();
+                            //subject.Site= reader.ReadString();
                             break;
                         case "ARMCD":
                             subject.ArmCode = reader.ReadString();
@@ -55,7 +55,7 @@ namespace eTRIKS.Commons.Persistence
                                     dt= DateTime.ParseExact(dateStr_s, "dd/MM/yyyy", null);
                                 else
                                     dt =  DateTime.Parse(dateStr_s);
-                                subject.StudyStartDate = dt;
+                                //subject.StudyStartDate = dt;
                             }
                             break;
                         case "RFENDTC":
@@ -67,11 +67,11 @@ namespace eTRIKS.Commons.Persistence
                                     dt= DateTime.ParseExact(dateStr_e, "dd/MM/yyyy", null);
                                 else
                                     dt =  DateTime.Parse(dateStr_e);
-                                subject.StudyEndDate = dt;
+                                //subject.StudyEndDate = dt;
                             }
                             break;
                         default:
-                            subject.characteristicsValues.Add(fieldName, reader.ReadString());
+                            //subject.characteristicsValues.Add(fieldName, reader.ReadString());
                             break;
                     }
             }
@@ -81,7 +81,7 @@ namespace eTRIKS.Commons.Persistence
             return subject;
         }
 
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, Subject value)
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, HumanSubject value)
         {
             var subjObs = value;
         //    BsonDocument document = new

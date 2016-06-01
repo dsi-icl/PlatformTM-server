@@ -2,6 +2,7 @@
 using eTRIKS.Commons.DataAccess.UserManagement;
 using eTRIKS.Commons.Service.Services.UserServices;
 using eTRIKS.Commons.WebAPI.DependencyResolution;
+using Microsoft.AspNet.Identity;
 using Microsoft.Owin;
 using Microsoft.Owin.Security.OAuth;
 using Owin;
@@ -85,7 +86,7 @@ namespace eTRIKS.Commons.WebAPI
                 AllowInsecureHttp = true,
                 TokenEndpointPath = new PathString("/token"),
                 AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new SimpleAuthorizationServerProvider(_bootstrapper.Container.Resolve<IUserRepository<ApplicationUser>>())
+                Provider = new SimpleAuthorizationServerProvider(_bootstrapper.Container.Resolve<IUserRepository<ApplicationUser,IdentityResult>>())
             };
  
             // Token Generation
