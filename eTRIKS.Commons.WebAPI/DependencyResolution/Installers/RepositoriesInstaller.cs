@@ -4,7 +4,6 @@ using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Persistence;
-using eTRIKS.Commons.DataParser.IOFileManagement;
 using eTRIKS.Commons.DataAccess.MongoDB;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
@@ -31,7 +30,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
                 Component.For<IUserRepository<ApplicationUser, IdentityResult>>()
                     .ImplementedBy<UserAuthRepository>(),
 
-                Component.For<FileHandler>(),
+               
 
                 Component.For<MongoDbDataRepository>(),
 

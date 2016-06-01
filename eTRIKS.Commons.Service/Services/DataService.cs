@@ -584,7 +584,7 @@ namespace eTRIKS.Commons.Service.Services
             List<HumanSubject> subjects = _subjectRepository.FindAll(
                 s => s.Study.Project.Accession.Equals(projectId),
                 new List<Expression<Func<HumanSubject, object>>>()
-                {   d=> d.SubjectCharacteristics,
+                {   d=> d.SubjectCharacteristics.Select(s=>s.CharacteristicObject),
                     d=>d.Study
                 }).ToList();
 

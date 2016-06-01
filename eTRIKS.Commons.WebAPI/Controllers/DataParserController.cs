@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
-using eTRIKS.Commons.DataParser.IOFileManagement;
+//using eTRIKS.Commons.DataParser.IOFileManagement;
 using eTRIKS.Commons.Service.Services;
 
 
@@ -17,13 +17,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class DataParserController : ApiController
     {
 
-        private FileHandler _fileHandler;
+        //private FileHandler _fileHandler;
         private TemplateService templateService;
         private FileService _fileService;
 
-        public DataParserController(FileHandler fileHandler, TemplateService tmplService, FileService fileService)
+        public DataParserController(TemplateService tmplService, FileService fileService)
         {
-            _fileHandler = fileHandler;
+            //_fileHandler = fileHandler;
             templateService = tmplService;
             _fileService = fileService;
         }
@@ -108,48 +108,48 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
 
-        [HttpGet]
-        public List<string> GetSourceFields(string dataSource)
-        {
-            IOUtility iOUtility = new IOUtility();
-            return iOUtility.getDataSourceColumns(dataSource);
-        }
+        //[HttpGet]
+        //public List<string> GetSourceFields(string dataSource)
+        //{
+        //    IOUtility iOUtility = new IOUtility();
+        //    return iOUtility.getDataSourceColumns(dataSource);
+        //}
 
-        [HttpGet]
-        public List<string> getWorkbooks(string fileName)
-        {
-            string fileLocation = @"C:\temp\" + fileName;
-            IOUtility iOUtility = new IOUtility();
-            return iOUtility.getExcelWorkbookNames(fileLocation);
-        }
+        //[HttpGet]
+        //public List<string> getWorkbooks(string fileName)
+        //{
+        //    string fileLocation = @"C:\temp\" + fileName;
+        //    IOUtility iOUtility = new IOUtility();
+        //    return iOUtility.getExcelWorkbookNames(fileLocation);
+        //}
 
-        [HttpGet]
-        public List<string> getColumnHeadersInWorkbooks(string fileName, string workbook)
-        {
-            string fileLocation = @"C:\temp\" + fileName;
-            IOUtility iOUtility = new IOUtility();
-            return iOUtility.getExcelFiledsInWorkbook(fileLocation, workbook);
-        }
+        //[HttpGet]
+        //public List<string> getColumnHeadersInWorkbooks(string fileName, string workbook)
+        //{
+        //    string fileLocation = @"C:\temp\" + fileName;
+        //    IOUtility iOUtility = new IOUtility();
+        //    return iOUtility.getExcelFiledsInWorkbook(fileLocation, workbook);
+        //}
 
-        [HttpGet]
-        public  string loadData(string dataSource, string fileName, string page, string mapping)
-        {
-            IOUtility iOUtility = new IOUtility();
-            string ext = Path.GetExtension(fileName);
-            if (ext == ".csv")
-            {
-                return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readCSVFileContents(fileName, mapping));
-            }
-            else if (ext == ".xlsx")
-            {
-                return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readExcelFileContents(fileName, page, mapping));
-            }
-            else if (ext == ".txt")
-            {
-                return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readTabDelimitedFileContents(fileName, mapping));
-            }
+        //[HttpGet]
+        //public  string loadData(string dataSource, string fileName, string page, string mapping)
+        //{
+        //    IOUtility iOUtility = new IOUtility();
+        //    string ext = Path.GetExtension(fileName);
+        //    if (ext == ".csv")
+        //    {
+        //        return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readCSVFileContents(fileName, mapping));
+        //    }
+        //    else if (ext == ".xlsx")
+        //    {
+        //        return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readExcelFileContents(fileName, page, mapping));
+        //    }
+        //    else if (ext == ".txt")
+        //    {
+        //        return  _fileHandler.loadDataFromFile(dataSource, iOUtility.readTabDelimitedFileContents(fileName, mapping));
+        //    }
 
-            return "ERROR: Cannot Parse File";
-        }
+        //    return "ERROR: Cannot Parse File";
+        //}
     }
 }
