@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    public class ExportController : ApiController
+    public class ExportController : Controller
     {
          private ExportService _exportService;
 
@@ -22,39 +15,34 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _exportService = exportService;
         }
 
-         [HttpPost]
-         [Route("api/export/{projectId}")]
-         public async Task<List<HumanSubject>>  getSubjectData(string projectId, [FromBody] ExportRequestDTO dto)
-         {
-              return await _exportService.ExportDatasets(projectId,dto);
-         }
 
         [HttpGet]
         [Route("api/projects/{projectAcc}/export/datafields")]
         public List<TreeNodeDTO> GetFields(string projectAcc)
         {
-            return _exportService.getAvailableFields(projectAcc);
+            var name = User.Identity.Name;
+            return _exportService.GetAvailableFields(projectAcc);
         }
         [HttpPost]
         [Route("api/projects/{projectAcc}/export/datafields/valueset")]
-        public async Task<Field> GetValueSet(string projectAcc, [FromBody] Field field)
+        public async Task<DataFilterDTO> GetValueSet(string projectAcc, [FromBody] DataFieldDTO fieldDto)
         {
-            return await _exportService.getFieldValueSet(projectAcc,field);
+            return await _exportService.GetFieldValueSet(projectAcc, fieldDto);
         }
 
         [HttpPost]
         [Route("api/projects/{projectAcc}/export/table")]
-        public async Task<Hashtable> GetDataPreview(string projectAcc, [FromBody] List<Criterion> criteria)
+        public async Task<Hashtable> GetDataPreview(string projectAcc, [FromBody] UserDatasetDTO userDatasetDto)
         {
-            return await _exportService.ExportDataTable(projectAcc, criteria);
+            return await _exportService.ExportDataTable(projectAcc, userDatasetDto);
         }
 
-        [HttpPost]
-        [Route("api/projects/{projectAcc}/export/tree/")]
-        public async Task<List<TreeNodeDTO>> GetDataTree(string projectAcc, [FromBody] List<Criterion> criteria)
-        {
-            return await _exportService.ExportDataTree(projectAcc, criteria);
-        }
+        //[HttpPost]
+        //[Route("api/projects/{projectAcc}/export/tree/")]
+        //public async Task<List<TreeNodeDTO>> GetDataTree(string projectAcc, [FromBody] UserDatasetDTO userDatasetDto)
+        //{
+        //    return await _exportService.ExportDataTree(projectAcc, userDatasetDto);
+        //}
 
 
         //[HttpGet]

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
-namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
+﻿namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
 {
     public class Dbxref
     {

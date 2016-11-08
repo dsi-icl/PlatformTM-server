@@ -1,9 +1,4 @@
-﻿
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Domain.Model

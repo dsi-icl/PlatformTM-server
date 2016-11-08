@@ -3,21 +3,17 @@
 /******** Services to handle functions on Activity **********/
 /************************************************************/
 
-using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using eTRIKS.Commons.Service.DTOs;
-using System.Web.Http.Cors;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     //[RoutePrefix("api/activities")]
-    public class ActivityController : ApiController
+    public class ActivityController : Controller
     {
         private ActivityService _activityService;
         private AssayService _assayService;
@@ -70,18 +66,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 response.Headers.Location = new Uri(uri);
                 return response;
             }
-            catch (Exception e)
+            catch
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
 
-        [HttpGet]
-        [Route("api/studies/{studyId}/activities")]
-        public IEnumerable<ActivityDTO> getStudyActivities(string studyId)
-        {
-            return _activityService.GetStudyActivities(studyId);
-        }
+        
         /**
          * Assay Methods
          * 
@@ -128,10 +119,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 response.Headers.Location = new Uri(uri);
                 return response;
             }
-            catch (Exception e)
+            catch
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
             }
         }
+
+ 
     }
 }

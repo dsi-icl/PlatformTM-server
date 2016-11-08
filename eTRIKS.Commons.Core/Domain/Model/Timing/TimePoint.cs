@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Base;
+﻿using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Timing
 {

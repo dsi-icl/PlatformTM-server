@@ -1,9 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using System;
+﻿using System;
+using eTRIKS.Commons.Core.Domain.Model.Base;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Users;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -21,5 +19,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         }
 
         public ICollection<Activity> Activities { get; set; }
+        public IList<User> Users { get; set; }
+        public User Owner { get; set; }
+        public Guid OwnerId { get; set; }
     }
 }

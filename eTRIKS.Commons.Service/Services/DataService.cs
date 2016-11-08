@@ -1,21 +1,13 @@
-﻿using System.Data;
-using eTRIKS.Commons.Core.Domain.Interfaces;
+﻿using eTRIKS.Commons.Core.Domain.Interfaces;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using eTRIKS.Commons.DataAccess.MongoDB;
-using eTRIKS.Commons.DataAccess;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
-using MongoDB.Bson;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
-using System.Diagnostics;
-using System.Collections.Specialized;
-using System.Globalization;
+using System.Collections;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -145,7 +137,7 @@ namespace eTRIKS.Commons.Service.Services
                             else
                             {
                                 //TODO: HARD CODED PROJECT ID getProjectId
-                                var AEs = await getEventsByMedDRA(1, catGroup.ToList(), catGroup.Key);
+                                var AEs = await getEventsByMedDRA(projectAccession, catGroup.ToList(), catGroup.Key);
                                 domainNode.Terms.AddRange(AEs);
                             }
                         }
@@ -163,7 +155,7 @@ namespace eTRIKS.Commons.Service.Services
                             else
                             {
                                 //TODO: HARD CODED PROJECT ID getProjectId
-                                var AEs = await getEventsByMedDRA(1, catGroup.ToList(), obsCatGrp.Code);
+                                var AEs = await getEventsByMedDRA(projectAccession, catGroup.ToList(), obsCatGrp.Code);
                                 obsCatGrp.Terms.AddRange(AEs);
                             }
                         }
@@ -777,10 +769,10 @@ namespace eTRIKS.Commons.Service.Services
             return node;
 
         }
-        private async Task<List<MedDRAGroupNode>> getEventsByMedDRA(int projectId, List<Observation> observations, string gname)
+        private async Task<List<MedDRAGroupNode>> getEventsByMedDRA(string projectAccession, List<Observation> observations, string gname)
         {
             List<SubjectObservation> adverseEvents =
-                   await _subObservationRepository.FindAllAsync(d => d.DomainCode.Equals("AE")
+                   await _subObservationRepository.FindAllAsync(d => d.DomainCode.Equals("AE") && d.ProjectAcc == projectAccession
                    );
             //&& d.ProjectId==projectId
 
@@ -884,6 +876,7 @@ namespace eTRIKS.Commons.Service.Services
             return AEsByMedDRA;
 
         }
+
         private List<ObservationRequestDTO> getObsRequests(Observation obsObject)
         {
             var reqs = obsObject.Qualifiers.Select(variableDefinition => new ObservationRequestDTO()

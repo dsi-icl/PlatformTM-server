@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.DataAccess
 {
@@ -18,7 +12,7 @@ namespace eTRIKS.Commons.DataAccess
             DataContext = dataContext;
         }
 
-        public DatasetRepository(IDbSet<Dataset> entities) : base(entities)
+        public DatasetRepository(DbSet<Dataset> entities) : base(entities)
         {
             
         }

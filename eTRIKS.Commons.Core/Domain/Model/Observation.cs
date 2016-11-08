@@ -2,9 +2,6 @@
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -39,8 +36,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int? ProjectId { get; set; }
 
         public List<VariableDefinition> Synonyms { get; set; }
-        public List<VariableDefinition> Qualifiers { get; set; } //VSORES, VSLOC ...etc
-        public List<VariableDefinition> Timings { get; set; } //VISIT VSDY VSSTD
+        public virtual List<VariableDefinition> Qualifiers { get; set; } //VSORES, VSLOC ...etc
+        public virtual List<VariableDefinition> Timings { get; set; } //VISIT VSDY VSSTD
 
         public Observation()
         {

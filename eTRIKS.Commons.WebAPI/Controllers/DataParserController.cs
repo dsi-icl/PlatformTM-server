@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
 //using eTRIKS.Commons.DataParser.IOFileManagement;
 using eTRIKS.Commons.Service.Services;
 
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    public class DataParserController : ApiController
+    public class DataParserController : Controller
     {
 
         //private FileHandler _fileHandler;
@@ -28,6 +22,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _fileService = fileService;
         }
 
+        [HttpGet]
+        [Route("api/temp/loadDatamatrixtemplate")]
+        public void loadmatrixTemp()
+        {
+            templateService.loadDataMatrixTemplate();
+        }
 
         [HttpGet]
         [Route("api/temp/loadtemp")]

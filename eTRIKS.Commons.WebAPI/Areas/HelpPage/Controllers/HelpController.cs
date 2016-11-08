@@ -1,6 +1,4 @@
 using System;
-using System.Web.Http;
-using System.Web.Mvc;
 using eTRIKS.Commons.WebAPI.Areas.HelpPage.ModelDescriptions;
 using eTRIKS.Commons.WebAPI.Areas.HelpPage.Models;
 

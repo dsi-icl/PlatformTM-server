@@ -1,11 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using eTRIKS.Commons.Core.Domain.Model.Base;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Data;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 

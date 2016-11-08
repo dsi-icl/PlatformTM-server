@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace eTRIKS.Commons.Core.Domain.Model.Timing
+﻿namespace eTRIKS.Commons.Core.Domain.Model.Timing
 {
     public class TimeInterval
     {
@@ -12,9 +6,6 @@ namespace eTRIKS.Commons.Core.Domain.Model.Timing
         public TimePoint End { get; set; }
         public string Duration { get; set; }
 
-        public TimeInterval()
-        {
-            
-        }
+ 
     }
 }

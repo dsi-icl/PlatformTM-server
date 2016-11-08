@@ -1,18 +1,17 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web.Http;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[Authorize]
-    public class AssayController : ApiController
+    [Authorize]
+    public class AssayController : Controller
     {
          private readonly AssayService _assayService;
 
@@ -35,6 +34,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _assayService.GetSamplesDataPerAssay(projectId, assayId);
         }
 
-       
+        [HttpGet]
+        [Route("api/assays/temp/{assayId}/loadPA/{fileId}")]
+        public HttpResponseMessage AddPA(int assayId, int fileId)
+        {
+            _assayService.addPA(assayId, fileId);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
     }
 }

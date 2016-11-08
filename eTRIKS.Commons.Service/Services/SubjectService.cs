@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
@@ -30,38 +29,37 @@ namespace eTRIKS.Commons.Service.Services
 
         public async Task<bool> LoadSubjects(List<SdtmRow> subjectData, int datasetId)
         {
+            if (subjectData.Count == 0)
+                return false;
+
             var dataset = _datasetRepository.FindSingle(d => d.Id.Equals(datasetId),
                 new List<Expression<Func<Dataset, object>>>()
                 {
                     d => d.Variables.Select(v=>v.VariableDefinition),
-                    d => d.Activity
+                    d => d.Activity.Project
                 });
 
-            //var scos = subjectData.SelectMany(s => s.Qualifiers).GroupBy(q=>q.Key).Select(g=>g.First()).Select(sco => new CharacteristicObject()
-            //{
-            //    Name = sco.Key,
-            //    Code = sco.Key,
-            //    ProjectId = dataset.Activity.ProjectId
-            //    //CVtermId = , should be looked up from OLS
-            //}).ToList();
+            if (dataset == null)
+                return false;
 
-            // _characteristicObjRepository.InsertMany(scos);
-            var scos = new Dictionary<string,CharacteristicObject>();
+            //Project related subject characteristics
             var scoList = _characteristicObjRepository.FindAll(s => s.ProjectId.Equals(dataset.Activity.ProjectId)).ToList();
-            foreach (var co in scoList)
+            var scos = scoList.ToDictionary(co => co.ShortName);
+            //Project related studies
+            var studies = _studtRepository.FindAll(s => s.ProjectId == dataset.Activity.ProjectId);
+            var studyMap = studies.ToDictionary(study => study.Name);
+
+            foreach (var sdtmEntity in subjectData)
             {
-                scos.Add(co.ShortName, co);
-            }
-
-             foreach (var sdtmEntity in subjectData)
-             {
-                 var study = _studtRepository.FindSingle(s => s.Name.Equals(sdtmEntity.VerbatimStudyId));
-
-                 //TODO: HARD CODING ALTERT!!!
-                 string site;
-                 sdtmEntity.Qualifiers.TryGetValue("SITEID", out site);
-                 study.Site = site;
-
+                Study study;
+                if (!studyMap.TryGetValue(sdtmEntity.StudyId, out study))
+                {
+                    study = new Study() {
+                        Name = sdtmEntity.StudyId,
+                        Accession = "S-"+dataset.Activity.Project.Accession.Substring(2)+"-"+ (studies.Count() + 1).ToString("00"),
+                        ProjectId = dataset.Activity.ProjectId
+                    };studyMap.Add(study.Name,study);
+                }
 
                  /**
                   * ADDING SUBJECTS
@@ -71,7 +69,6 @@ namespace eTRIKS.Commons.Service.Services
                      Id = sdtmEntity.USubjId,
                      UniqueSubjectId = sdtmEntity.USubjId,
                      SubjectStudyId = sdtmEntity.SubjectId,
-                     //StudyId = study.Id,//sdtmEntity.DBstudyId,//This StudyId is the STUDYID variable in the SDTM not the DB studyId 
                      Arm = sdtmEntity.Arm, //Will put in characteristics for now
                      ArmCode = sdtmEntity.ArmCode,
                      DatasetId = sdtmEntity.DatasetId,
@@ -79,8 +76,6 @@ namespace eTRIKS.Commons.Service.Services
                      SubjectEndDate = sdtmEntity.RFENDTC,
                      Study = study
                  };
-
-
 
                  /**
                   * ADDING SUBJECT CHARACTERISTICS
@@ -102,7 +97,8 @@ namespace eTRIKS.Commons.Service.Services
                                 ShortName = dsVar.VariableDefinition.Name,
                                 FullName = dsVar.VariableDefinition.Label,
                                 Domain = "DM",
-                                ProjectId = dataset.Activity.ProjectId
+                                ProjectId = dataset.Activity.ProjectId,
+                                //DataType = dsVar.VariableDefinition.DataType
                              };
                              scos.Add(dsVar.VariableDefinition.Name,sco);
                          }
@@ -114,8 +110,6 @@ namespace eTRIKS.Commons.Service.Services
                          {
                              DatasetVariable = dsVar,
                              CharacteristicObject = sco,
-                             //VerbatimName = dsVar.VariableDefinition.Label,
-                             //ControlledTermStr = dsVar.VariableDefinition.Name,
                              VerbatimValue = qualifier.Value,
                              DatasetDomainCode = sdtmEntity.DomainCode,
                              Subject = subject
@@ -125,15 +119,8 @@ namespace eTRIKS.Commons.Service.Services
                          throw new Exception("Qualifier not in dataset template");
                  }
                  _subjectRepository.Insert(subject);
-
-
              }
-             if (!_dataContext.Save().Equals("CREATED"))
-             {
-                 return false;
-             }
-            return true;
-            
+             return _dataContext.Save().Equals("CREATED");
         }
     }
 }

@@ -1,10 +1,6 @@
-﻿using eTRIKS.Commons.Service.Services.UserServices;
-using System;
-using System.Collections.Generic;
+﻿using eTRIKS.Commons.Service.Services.Authentication;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.WebAPI.UserAuthorization.Helpers
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
-    public interface IRepository<TEntity, in TPrimaryKey>
+    public interface IRepository<TEntity, in TPrimaryKey> where TEntity :class
     {
 
        #region Select/Get/Query
@@ -26,19 +25,20 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         Task<List<TEntity>> GetAllAsync();
 
         /// <summary>
-        /// Used to get all entities based on given <see cref="predicate"/>.
+        /// Gets an entity with given primary key.
         /// </summary>
-        /// <param name="predicate">A condition to filter entities</param>
-        /// <returns>List of all entities</returns>
-        //List<TEntity> GetAllList(Expression<Func<TEntity, bool>> predicate);
+        /// <param name="key">Primary key of the entity to get</param>
+        /// <returns>Entity</returns>
+        TEntity Get(TPrimaryKey key);
 
-        //TEntity GetList(Func<TEntity, bool> where, params Expression<Func<TEntity, object>>[] navigationProperties);
+        Task<TEntity> GetAsync(TPrimaryKey key);
 
         IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null,
                                     List<Expression<Func<TEntity, object>>> includeProperties = null,
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,
                                     int? pageSize = null);
+
         Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null);
 
         Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null);
@@ -48,14 +48,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
                            List<Expression<Func<TEntity, object>>> includeProperties = null);
         Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> filterExpression = null);
 
-        /// <summary>
-        /// Gets an entity with given primary key.
-        /// </summary>
-        /// <param name="key">Primary key of the entity to get</param>
-        /// <returns>Entity</returns>
-        TEntity Get(TPrimaryKey key);
 
-        Task<TEntity> GetAsync(TPrimaryKey key);
 
         IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter);
 

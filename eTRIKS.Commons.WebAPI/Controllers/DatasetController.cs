@@ -1,26 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.DTOs;
 
-using System.Web.Http.Cors;
-using eTRIKS.Commons.Core.Domain.Model;
-
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")] 
-    public class DatasetController : ApiController
+    public class DatasetController : Controller
     {
         private DatasetService _datasetService;
         private FileService _fileService;
@@ -33,7 +24,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         
         // GET: api/Dataset
         [HttpGet]
-        [Route("api/Dataset")]
+        [Route("api/templates/clinical")]
         public IEnumerable<DatasetDTO> Get()
         {
             return _datasetService.GetAllDomainTemplates();
@@ -42,7 +33,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
       
         // GET: api/Dataset/5
         [HttpGet]
-        [Route("api/Dataset/{domainId}")]
+        [Route("api/templates/clinical/{domainId}")]
         public DatasetDTO Get(string domainId)
         {
             return _datasetService.GetTemplateDataset(domainId);
@@ -105,7 +96,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public string updateDataset(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
             if (datasetDTO.Id == datasetId)
-                return _datasetService.updateDataset(datasetDTO);
+                return _datasetService.UpdateDataset(datasetDTO);
             return "FAILED to update datasetId";
         }
 
@@ -115,7 +106,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
 
             if (datasetDTO.Id == datasetId)
-                return _datasetService.updateDataset(datasetDTO);
+                return _datasetService.UpdateDataset(datasetDTO);
             return "FAILED to update datasetId";
         }
 
@@ -149,10 +140,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/Datasets/{datasetId}/saveDataFile/file/{fileId}")]
-        public async Task<string> LoadDataFile(int datasetId, int fileId)
+        public bool LoadDataFile(int datasetId, int fileId)
         {
-            _datasetService.SaveDataFile(datasetId,fileId);
-            return "";
+            return  _datasetService.SaveDataFile(datasetId, fileId) == "CREATED";
+           //return  _datasetService.PersistSDTM(datasetId, fileId);
+            
         }
 
         [HttpGet]
@@ -162,14 +154,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return await _datasetService.LoadDataset(datasetId,fileId);
         }
 
-        //[HttpGet]
-        //[Route("api/Datasets/{datasetId}/dataFile/header")]
-        //public async Task<List<Dictionary<string, string>>> LinkFile(int datasetId)
-        //{
-        //    //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-        //    //string path = rawFilesDirectory + studyId;
-        //    return _datasetService.getFileColHeaders(datasetId);
-        //}
+
+
+        [HttpGet]
+        [Route("api/datasets/{datasetId}/compute/files/{fileId}")]
+        public async Task ComputeFields(int datasetId, int fileId)
+        {
+            //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+            //string path = rawFilesDirectory + studyId;
+            await _datasetService.GenerateComputeVars(datasetId);
+        }
 
         [HttpGet]
         [Route("api/datasets/{datasetId}/OriFileInfo/{fileId}")]

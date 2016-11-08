@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.Service.Services
 {
-    
+
     public class CVtermService
     {
         private readonly IRepository<CVterm, string> _CVrepository;

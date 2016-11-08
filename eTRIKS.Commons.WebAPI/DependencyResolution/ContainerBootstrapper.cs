@@ -1,14 +1,7 @@
 using System;
-using System.Web.Http;
-using System.Web.Http.Dispatcher;
-using System.Web.Mvc;
-using Castle.Windsor;
-using Castle.Windsor.Installer;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Persistence;
 using eTRIKS.Commons.WebAPI.DependencyResolution.Plumbing;
-using System.Collections.Generic;
-using System.Web.Http.Dependencies;
 using MongoDB.Bson.Serialization;
 using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 
@@ -39,7 +32,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
 
             BsonSerializer.RegisterSerializer(typeof(SubjectObservation), new SubjectObsSerializer());
             BsonSerializer.RegisterSerializer(typeof(SdtmRow), new SdtmSerializer());
-            BsonSerializer.RegisterSerializer(typeof(MongoDocument),new MongoDocumentSerializer());
+            BsonSerializer.RegisterSerializer(typeof(MongoDocument), new MongoDocumentSerializer());
 
 
             return new ContainerBootstrapper(container);
@@ -50,40 +43,4 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution
             Container.Dispose();
         }
     }
-
-    //internal sealed class WindsorHttpDependencyResolver : IDependencyResolver
-    //{
-    //    private readonly IWindsorContainer _container;
-
-    //    public WindsorHttpDependencyResolver(IWindsorContainer container)
-    //    {
-    //        if (container == null)
-    //        {
-    //            throw new ArgumentNullException("container");
-    //        }
-
-    //        _container = container;
-    //    }
-
-    //    public object GetService(Type t)
-    //    {
-    //        return _container.Kernel.HasComponent(t)
-    //         ? _container.Resolve(t) : null;
-    //    }
-
-    //    public IEnumerable<object> GetServices(Type t)
-    //    {
-    //        return _container.ResolveAll(t)
-    //        .Cast<object>().ToArray();
-    //    }
-
-    //    public IDependencyScope BeginScope()
-    //    {
-    //        return new WindsorDependencyScope(_container);
-    //    }
-
-    //    public void Dispose()
-    //    {
-    //    }
-    //}
 }

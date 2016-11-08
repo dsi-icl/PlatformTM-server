@@ -1,16 +1,9 @@
-﻿using System.Web.UI.WebControls.Expressions;
-using eTRIKS.Commons.Core.Domain.Interfaces;
+﻿using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Core.Domain.Model.Data;
 using eTRIKS.Commons.DataAccess.MongoDB;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.Services.HelperService;
 using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
@@ -294,14 +287,14 @@ namespace eTRIKS.Commons.Service.Services
             return _variableRepository.FindSingle(d => d.Name.Equals(name) && d.ProjectId.Equals(projectId));
         }
         
-        public async Task loadDatasetObservations(Dataset ds,int dataFileId)
+        public async Task<bool> loadDatasetObservations(Dataset ds,int dataFileId)
         {
             VariableDefinition controlledTerm = null;
             VariableDefinition defaultQualifier = null;
             string obsName;
             string obsClass = ds.Domain.Class.ToLower();
             if (obsClass.Equals("relationship"))
-                return;
+                return true;
             //Record qualifiers & Result qualifiers
             List<VariableDefinition> qualifiers = ds.Variables
                 .Select(l => l.VariableDefinition)
@@ -408,8 +401,8 @@ namespace eTRIKS.Commons.Service.Services
                 //obs.DatasetId = ds.Id;
                 _ObservationRepository.Insert(obs);
             }
-            
-            _dataContext.Save();            
+
+            return _dataContext.Save().Equals("CREATED");
         }
 
         public void DeleteDatasetObservations(int DatasetId, int DatafileId)
@@ -538,7 +531,7 @@ namespace eTRIKS.Commons.Service.Services
                 observation.O3Id = O3obj.Id;
                 observation.ObjectOfObservation = O3obj.Name;
                 observation.Study = sdtmRow.StudyId;
-                observation.StudyDBId = study != null ? study.Id : 0;
+                observation.DBStudyId = study != null ? study.Id : 0;
                 observation.SO2Id = sdtmRow.USubjId;
                 observation.SO2Type = "SUBJECT";
 

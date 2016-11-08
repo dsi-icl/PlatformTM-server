@@ -1,6 +1,5 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using System.Runtime.Serialization;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Templates
 {
@@ -18,10 +17,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.Templates
         public string UsageId { get; set; }
         public string controlledTerminologyId { get; set; }
 
-        public  CVterm VariableType { get; set; }
+        public CVterm VariableType { get; set; }
         public CVterm Role { get; set; }
         public CVterm Usage { get; set; }
-        public  DomainTemplate Domain { get; set; }
-        public  Dictionary controlledTerminology { get; set; }
+        public DomainTemplate Domain { get; set; }
+        public Dictionary controlledTerminology { get; set; }
     }
 }

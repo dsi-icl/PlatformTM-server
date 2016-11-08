@@ -1,22 +1,12 @@
-﻿using System.Collections;
-using System.Configuration;
-using System.Diagnostics;
-using System.Net;
-using System.Security.Permissions;
-using AutoMapper;
-using AutoMapper.Internal;
-using CsvHelper;
+﻿using System.Diagnostics;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Bson;
+using System.Collections;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -104,7 +94,7 @@ namespace eTRIKS.Commons.Service.Services
                 file = new DataFile();
                 file.FileName = fi.Name;
                 file.DateAdded = fi.CreationTime.ToShortDateString() + " " + fi.CreationTime.ToShortTimeString();
-                file.State = "New";
+                file.State = "NEW";
                 file.Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf(projectId));
                 file.IsDirectory = false;
                 _fileRepository.Insert(file);
@@ -113,9 +103,10 @@ namespace eTRIKS.Commons.Service.Services
             else
             {
                 file.LastModified = fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString();
-                _fileRepository.Update(file);
                 if (file.LoadedToDB)
-                    file.State = "Modified";
+                    file.State = "UPDATED";
+                _fileRepository.Update(file);
+
             }
             return _dataServiceUnit.Save().Equals("CREATED") ? file : null;
         }
@@ -187,6 +178,8 @@ namespace eTRIKS.Commons.Service.Services
                         Debug.WriteLine(e.Message);
                     }
                 }
+                parser.Dispose();
+            reader.Close();
 
             return dt;
         }
@@ -305,34 +298,39 @@ namespace eTRIKS.Commons.Service.Services
         {
             DataTable usubjids = ReadOriginalFile("temp/CRC305Dusubjids.csv");
             //DataTable cytofSamples = ReadOriginalFile("temp/CyTOFsamples.csv");
-            DataTable luminexSamples = ReadOriginalFile("temp/GhentLuminexSamples_v1.csv");
+            DataTable Samples = ReadOriginalFile("temp/BS_ic.csv");
             //DataTable FACSSamples = ReadOriginalFile("temp/FACSsamples_v1.csv");
             //luminexSamples.TableName = "luminexSamples";
 
-            luminexSamples.Columns.Add("USUBJID");
+            //Samples.Columns.Add("USUBJID");
             List<string> subjidlist = new List<string>();
+            Dictionary<string, string> idmap = new Dictionary<string, string>();
 
             foreach (DataRow row in usubjids.Rows)
             {
-                subjidlist.Add(row[0].ToString());
+                string[] id = row[0].ToString().Split('-');
+                idmap.Add(id[2],row[0].ToString());
             }
 
-            foreach (DataRow row in luminexSamples.Rows)
+            foreach (DataRow row in Samples.Rows)
             {
-                string subjId = row["SubjId"].ToString();
-                string newsubjid = subjidlist.Find(d => d.EndsWith(subjId));
+                string subjId = row["donor"].ToString();
+                //string newsubjid = subjidlist.Find(d => d.EndsWith(subjId));
+                if(subjId == "N/A")
+                    continue;
+                string newsubjid = idmap[subjId];
                 row["USUBJID"] = newsubjid;
             }
             string path = ConfigurationManager.AppSettings["FileDirectory"];
-            StreamWriter writer = File.CreateText(path + "temp\\GhentLuminexSamples_v2.csv");
+            StreamWriter writer = File.CreateText(path + "temp\\BS.csv");
 
-            IEnumerable<String> headerValues = luminexSamples.Columns.Cast<DataColumn>()
+            IEnumerable<String> headerValues = Samples.Columns.Cast<DataColumn>()
                 .Select(column => QuoteValue(column.ColumnName));
 
             writer.WriteLine(String.Join(",", headerValues));
             IEnumerable<String> items;
 
-            foreach (DataRow row in luminexSamples.Rows)
+            foreach (DataRow row in Samples.Rows)
             {
                 items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
                 writer.WriteLine(String.Join(",", items));
@@ -503,6 +501,24 @@ namespace eTRIKS.Commons.Service.Services
             }
             writer.Flush();
             writer.Close();
+        }
+
+        public FileDTO GetFileDTO(int fileId)
+        {
+            var file = _fileRepository.Get(fileId);
+            var dto = new FileDTO()
+            {
+              FileName = file.FileName,
+                dateAdded = file.DateAdded,
+            dateLastModified = file.LastModified ?? file.DateAdded,
+            icon = "",
+            IsDirectory = file.IsDirectory,
+            selected = false,
+            state = file.State,
+            DataFileId = file.Id,
+            path = file.Path
+        };
+            return dto;
         }
     }
 }

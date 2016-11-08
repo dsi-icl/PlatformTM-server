@@ -1,24 +1,20 @@
 ﻿using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services.UserServices;
-using Microsoft.AspNet.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
+using eTRIKS.Commons.Service.Services.UserManagement;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [RoutePrefix("api/accounts")]
-    public class AccountController : ApiController
+    public class AccountController : Controller
     {
-        private readonly UserAccountService userAccountService;
+        private readonly UserAccountService _userAccountService;
+        //private readonly UserManager<ApplicationUser, Guid> _userManager;
 
         public AccountController(UserAccountService userService)
         {
-            userAccountService = userService;
+            _userAccountService = userService;
+            //_userManager = userManager;
+
         }
 
         [Route("signup")]
@@ -29,10 +25,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+           
+            //IdentityResult addUserResult = _userManager.CreateAsync(user, createUserModel.Password);
 
-            //IdentityResult addUserResult = await this.AppUserManager.CreateAsync(user, createUserModel.Password);
-
-            IdentityResult addUserResult = await userAccountService.RegisterUser(userDTO);
+            IdentityResult addUserResult = await _userAccountService.RegisterUser(userDTO);
 
             if (!addUserResult.Succeeded)
             {
@@ -43,7 +39,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             //return Created(locationHeader, TheModelFactory.Create(user));
             //ApplicationUser user = await userAccountService.FindUser(userModel.UserName, userModel.Password);
-            string psk = await userAccountService.GetUserPsk(userDTO);
+            string psk = await _userAccountService.GetUserPsk(userDTO);
             return Ok(new { PSK = psk });
         }
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Data;
+﻿using eTRIKS.Commons.Core.Domain.Model.Data;
 
 namespace eTRIKS.Commons.Service.Services.HelperService
 {

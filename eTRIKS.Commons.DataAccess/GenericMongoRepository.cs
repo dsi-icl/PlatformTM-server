@@ -1,40 +1,34 @@
-﻿using System.Collections;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq.Translators;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
+using eTRIKS.Commons.DataAccess.Configuration;
 
 namespace eTRIKS.Commons.DataAccess
 {
     public class GenericMongoRepository <TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
     {
+        private DataAccessSettings configSettings { get; set; }
         private IMongoDatabase database;
         private MongoClient mongoClient;
         public IMongoCollection<TEntity> collection;
+        public string CollectionName { get; set; }
        
-        public GenericMongoRepository()
+        public GenericMongoRepository(string collectionName)
         {
-            //DataContext = dataContext;
-            //DataContext.Configuration.ProxyCreationEnabled = false;
-            //Entities = DataContext.Set<TEntity>();
-
-            mongoClient = new MongoClient(ConfigurationManager.ConnectionStrings["MongoDBprod"]
-                                            .ConnectionString);
-            database = mongoClient.GetDatabase(ConfigurationManager.AppSettings["NoSQLDatabaseName"]);
-            //collection = database.GetCollection<TEntity>(typeof(TEntity).Name.ToLower() + "s");
-            collection = database.GetCollection<TEntity>("Biospeak_clinical");
+            mongoClient = new MongoClient(configSettings.mongoDBprod);
+            database = mongoClient.GetDatabase(configSettings.noSQLDatabaseName);
+            //collection = database.GetCollection<TEntity>("biospeak_sdtm");
+            collection = database.GetCollection<TEntity>(collectionName);
         }
 
         public async Task<TEntity>  FindAsync(Expression<Func<TEntity, bool>> filter = null)
@@ -171,20 +165,7 @@ namespace eTRIKS.Commons.DataAccess
                 .ToListAsync();
         }
 
-        //public List<TEntity> getGroupedNoSQLrecords(IDictionary<string, string> filterFields, IDictionary<string, string> groupingFields)
-        //{
-        //    return new List<TEntity>();
-        //}
-
-        //public void getNoSQLRecords(string queryString)
-        //{
-
-        //}
-
-        //public void getDistinctNoSQLRecords(string queryString)
-        //{
-
-        //}
+ 
 
         private IQueryable<TEntity> GetAll()
         {
@@ -204,15 +185,13 @@ namespace eTRIKS.Commons.DataAccess
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)
         {
-            throw new NotImplementedException();
+            return filter != null ? collection.Find(filter).ToList() : null;
         }
-
-
 
 
         public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeProperties = null)
         {
-            throw new NotImplementedException();
+            return collection.FindSync(filter).Single();
         }
 
         public TEntity Get(TPrimaryKey key)
@@ -232,15 +211,24 @@ namespace eTRIKS.Commons.DataAccess
 
         public TEntity Insert(TEntity entity)
         {
-            throw new NotImplementedException();
+            
+                collection.InsertOne(entity);
+            return entity;
+
+
         }
 
 
 
         public TEntity Update(TEntity entity)
         {
-            throw new NotImplementedException();
+            var filter = new BsonDocument("_id", Guid.Parse(entity.Id.ToString()));
+            var result = collection.ReplaceOne(filter, entity);
+            //throw new NotImplementedException();
+            return entity;
         }
+
+        
 
         public Task<int> UpdateAsync(TEntity entity)
         {

@@ -4,11 +4,6 @@
 /************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
 namespace eTRIKS.Commons.Service.DTOs
 {
@@ -46,7 +41,8 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Label { get; set; }
         public string Description { get; set; }
         public string DataType { get; set; }
-        public Nullable<bool> IsCurated { get; set; }
+        public bool? IsCurated { get; set; }
+       
         //public CVterm VariableType { get; set; }
         //public string VariableTypeId { get; set; }
         //public CVterm Role { get; set; }
@@ -60,7 +56,15 @@ namespace eTRIKS.Commons.Service.DTOs
         public string DictionaryXrefURL { get; set; }
         //public DerivedMethod DerivedVariableProperties { get; set; }
         //public string DerivedVariablePropertiesId { get; set; }
+        public bool IsComputed { get; set; }
+        public List<ExpressionElement> ExpressionList { get; set; }
 
         public string UsageId { get; set; }
+    }
+    public class ExpressionElement
+    {
+        public string Name { get; set; }
+        public string Type { get; set; } //syntax / variable / term
+        public string val { get; set; }
     }
 }

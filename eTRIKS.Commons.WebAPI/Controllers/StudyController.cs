@@ -4,18 +4,14 @@
 /************************************************************/
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web.Http;
 using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.Services;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    public class StudyController : ApiController
+    public class StudyController : Controller
     {
          private StudyService _studyService;
 
@@ -24,22 +20,53 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _studyService = studyService;
         }
 
-        /*
-        [HttpPost]
-        public void AddDatasetVariables([FromBody] List<VariableDefinitionDTO> varDefDTOList)
+        [HttpGet]
+        [Route("api/studies/{studyId}", Name = "GetstudyById")]
+        public StudyDTO Getstudy(int studyId)
         {
-            List <VariableDefinition> varDefList = new List<VariableDefinition>();
-            for (int i = 0; i < varDefDTOList.Count; i++)
+            return _studyService.GetstudyId(studyId);
+        }
+
+
+        [HttpPost]
+        [Route("api/studies")]
+        public HttpResponseMessage Addstudy([FromBody] StudyDTO studyDTO)
+        {
+            StudyDTO addedstudy = null;
+
+            addedstudy = _studyService.Addstudy(studyDTO);
+
+            if (addedstudy != null)
             {
-                VariableDefinition varDef = new VariableDefinition();
-                varDef.Accession = varDefDTOList[i].;
-                varDef.Name = varDefDTOList[i].Name;
-                varDef.StudyId = varDefDTOList[i].StudyId;
-                // Continue for the rest of the fields
-                varDefList.Add(varDef);
+                var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Created, addedstudy);
+                string uri = Url.Link("GetstudyById", new { studyId = addedstudy.Id });
+                response.Headers.Location = new Uri(uri);
+                return response;
             }
-            _studyService.addDatasetVariables(varDefList);
-        }*/
+            else
+            {
+                var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                return response;
+            }
+        }
+
+        [HttpPut]
+        [Route("api/studies/{studyId}")]
+        public HttpResponseMessage Updatestudy(int studyId, [FromBody] StudyDTO studyDTO)
+        {
+            try
+            {
+                _studyService.Updatestudy(studyDTO, studyId);
+                var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Accepted, studyDTO);
+                string uri = Url.Link("GetstudyById", new { studyId = studyDTO.Id });
+                response.Headers.Location = new Uri(uri);
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.Conflict);
+            }
+        }
 
     }
 }

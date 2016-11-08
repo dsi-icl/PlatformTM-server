@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.Entity;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
+using eTRIKS.Commons.DataAccess.Helpers;
 
 
 namespace eTRIKS.Commons.DataAccess
@@ -26,13 +26,12 @@ namespace eTRIKS.Commons.DataAccess
         public GenericRepository(DbContext dataContext)
         {
             DataContext = dataContext;
-            DataContext.Configuration.ProxyCreationEnabled = false;
             Entities = DataContext.Set<TEntity>();
             
         }
-        public GenericRepository(IDbSet<TEntity> entities)
+        public GenericRepository(DbSet<TEntity> entities)
         {
-            Entities = (DbSet<TEntity>)entities;
+            Entities = entities;
             //dataContext = entities
         }
 
@@ -100,17 +99,18 @@ namespace eTRIKS.Commons.DataAccess
         {
             return Entities.Find(key);
         }
-
         
-
         public TEntity Insert(TEntity entity)
         {
-            return Entities.Add(entity);
+            return Entities.Add(entity).Entity;
         }
 
         public IEnumerable<TEntity> InsertMany(IList<TEntity> entities = null)
         {
-            return Entities.AddRange(entities);
+            // TO-DO This is infamous since the change to .NETCore
+            // I to no know what this funciton is suppose to return, the the contract is borken
+            Entities.AddRange(entities);
+            return entities;
         }
 
         public Task InsertManyAsync(IList<TEntity> entitites = null)

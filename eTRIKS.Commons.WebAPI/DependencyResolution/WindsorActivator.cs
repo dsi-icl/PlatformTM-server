@@ -1,6 +1,3 @@
-using eTRIKS.Commons.WebAPI.DependencyResolution;
-using WebActivatorEx;
-
 //[assembly: PreApplicationStartMethod(typeof(WindsorActivator), "PreStart")]
 //[assembly: ApplicationShutdownMethod(typeof(WindsorActivator), "Shutdown")]
 

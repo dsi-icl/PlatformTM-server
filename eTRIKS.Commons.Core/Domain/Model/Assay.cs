@@ -1,9 +1,5 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -17,6 +13,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string TechnologyPlatformId { get; set; }
         public CVterm MeasurementType { get; set; } //Gene Expression, Protein Profiling ,Cytokines Profiling
         public string MeasurementTypeId { get; set; }
+        public string PlatformAnnotationId { get; set; }
         //To be revised
         /**
          * Will drop assay factor for now since this would in most cases 

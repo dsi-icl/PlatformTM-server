@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using eTRIKS.Commons.Core.Application.Services;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Service.Services{
+namespace eTRIKS.Commons.Service.Services
+{
     public class TemplateService// : ITemplateService
     {
 
@@ -49,11 +48,6 @@ namespace eTRIKS.Commons.Service.Services{
                 return null;
             //return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().Id;
             return _cvTermRepository.FindSingle(o => o.Name.Equals(name)).Id;
-        }
-
-        public string Gettestdomain(string something)
-        {
-            return something;
         }
 
         public string checkDictionaryItem(string OID)
@@ -118,7 +112,7 @@ namespace eTRIKS.Commons.Service.Services{
             //foreach (var row in tbl1.Rows)
             //{
                 var dt = new DomainTemplate();
-            dt.Id = tbl1.Rows[0][0].ToString();
+                dt.Id = tbl1.Rows[0][0].ToString();
                 dt.Name = tbl1.Rows[0][4].ToString();//ds.Tables[0].Rows[i][4].ToString().Trim();
                 dt.Class = tbl1.Rows[0][1].ToString();
                 dt.Description = tbl1.Rows[0][6].ToString();
@@ -173,6 +167,55 @@ namespace eTRIKS.Commons.Service.Services{
                 cv.DictionaryId = row[2].ToString();
                 _cvTermRepository.Insert(cv);
             }
+            _dataServiceUnit.Save();
+        }
+
+        public void loadDataMatrixTemplate()
+        {
+            var dt = new DomainTemplate();
+            dt.Id = "D-CUST-MX";
+            dt.Name = "Assay data matrix";
+            dt.Structure = "A two dimensional data matrix with a single measurement for each feature/sample combination";
+            dt.IsRepeating = false;
+            dt.Class = "Assay Observations";
+            dt.Code = "MX";
+            dt.Description = "A simple template for a two dimensional data matrix used for array data or any other assay data that is represented in a matrix structure, where columns/rows are sample or feature identifiers and cells are measurement values measure in a single measurement (e.g. log intensity";
+
+            dt.Variables.Add(new DomainVariableTemplate()
+            {
+                Id = "V-CUST-MX-X",
+                Name = "X",
+                DataType = "decimal",
+                Description = "Identifiers for columns of the matrix",
+                Order = 1,
+                UsageId = "CL-Compliance-T-1",
+                RoleId = "CL-Role-T-1",
+                Label = "Column Identifier"
+                
+            });
+            dt.Variables.Add(new DomainVariableTemplate()
+            {
+                Id = "V-CUST-MX-Y",
+                Name = "Y",
+                DataType = "decimal",
+                Description = "Identifiers for rows of the matrix",
+                Order = 2,
+                UsageId = "CL-Compliance-T-1",
+                RoleId = "CL-Role-T-1",
+                Label = "Row Identifier"
+            });
+            dt.Variables.Add(new DomainVariableTemplate()
+            {
+                Id = "V-CUST-MX-VAL",
+                Name = "VALUE",
+                DataType = "decimal",
+                Description = "Measured observation value",
+                Order = 3,
+                UsageId = "CL-Compliance-T-1",
+                RoleId = "CL-Role-T-8",
+                Label = "Measured Value"
+            });
+            _templateRepository.Insert(dt);
             _dataServiceUnit.Save();
         }
 

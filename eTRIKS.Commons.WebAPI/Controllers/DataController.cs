@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
+﻿using System.Collections.Generic;
 using eTRIKS.Commons.Service.Services;
 using System.Collections;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     //[RoutePrefix("api/studies")]
-    //[Authorize]
-    public class DataController : ApiController
+    [Authorize]
+    public class DataController : Controller
     {
         private DataService _dataService;
 

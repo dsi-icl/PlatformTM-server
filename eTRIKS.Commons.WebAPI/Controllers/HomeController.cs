@@ -1,6 +1,4 @@
-﻿using System.Web.Mvc;
-
-namespace eTRIKS.Commons.WebAPI.Controllers
+﻿namespace eTRIKS.Commons.WebAPI.Controllers
 {
     public class HomeController : Controller
     {

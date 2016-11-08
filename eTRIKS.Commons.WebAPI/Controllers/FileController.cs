@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Configuration;
-using System.Data;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using System;
@@ -10,13 +8,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
-using System.Web.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [RoutePrefix("api/files")]
-    public class FileController : ApiController
+    public class FileController : Controller
     {
          private FileService _fileService;
 
@@ -25,6 +21,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _fileService = fileService;
         }
 
+        [HttpGet]
+        [Route("{fileId}")]
+        public FileDTO GetFile(int fileId)
+        {
+            return _fileService.GetFileDTO(fileId);
+        }
 
         [HttpPost]
         [Route("project/{projectId}/createdir")]
@@ -35,7 +37,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string newDir = projDir  +"/"+dir.name;
             
              var diInfo =    _fileService.addDirectory(projectId, newDir);
-
+            
             return diInfo == null ? null : diInfo.GetDirectories().Select(d => d.Name).ToList();
         }
 
@@ -52,8 +54,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("project/{projectId}/upload/{dir}")]
-        public async Task<List<string>> UploadFile(string projectId, string dir)
+        [Route("project/{projectId}/upload/{dir?}")]
+        public async Task<List<string>> UploadFile(string projectId, string dir="")
         {
             try
             {
@@ -91,14 +93,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("project/{projectId}/uploadedFiles/{subdir}")]
-        public async Task<List<FileDTO>> GetUploadedFiles(string projectId,string subdir)
+        [Route("project/{projectId}/uploadedFiles/{subdir?}")]
+        public async Task<List<FileDTO>> GetUploadedFiles(string projectId,string subdir="")
         {
             string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
             //string path = rawFilesDirectory + projectId;
             string relativePath = projectId; 
             //if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            if(!subdir.Equals("top"))
+            if(subdir != "")
                 relativePath = relativePath + "\\" + subdir.Replace('_','\\');
 
             return _fileService.getUploadedFiles(projectId, relativePath);
@@ -110,6 +112,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _fileService.getFilePreview(fileId);
         }
+
+
 
         //[HttpGet]
         //[Route("{fileName}/fileHeader")]

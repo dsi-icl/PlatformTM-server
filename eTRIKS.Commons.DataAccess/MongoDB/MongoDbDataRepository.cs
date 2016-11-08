@@ -1,29 +1,25 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
+using eTRIKS.Commons.DataAccess.Configuration;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Bson.Serialization.IdGenerators;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 //using MongoDB.Driver.Builders;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
-using System.Data;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Web;
-
+using Microsoft.AspNetCore.WebUtilities;
+using System.Net;
+using Microsoft.Extensions.Primitives;
 
 namespace eTRIKS.Commons.DataAccess.MongoDB
 {
     public class MongoDbDataRepository
     {
+        private DataAccessSettings configSettings { get; set; }
         public const string mongoCollectionName = "Biospeak_clinical";
         IMongoCollection<BsonDocument> eTriksCollection;
 
@@ -50,9 +46,8 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
             //IC Cloud
             //settings.Server = new MongoServerAddress("146.169.32.143", 27020);
             //return MongoServer.Create(settings).GetDatabase("eTRIKS");
-            MongoClient mongoClient = new MongoClient(ConfigurationManager.ConnectionStrings["MongoDBConnectionString"]
-                                            .ConnectionString);
-            return mongoClient.GetDatabase(ConfigurationManager.AppSettings["NoSQLDatabaseName"]);
+            MongoClient mongoClient = new MongoClient(configSettings.mongoDBprod);
+            return mongoClient.GetDatabase(configSettings.noSQLDatabaseName);
         }
 
         #region CRUD methods
@@ -248,8 +243,16 @@ namespace eTRIKS.Commons.DataAccess.MongoDB
 
         public void exctractFromQueryString(string queryString, out BsonDocument query, out string[] filteredColumnList)
         {
-            var parsedString = HttpUtility.HtmlDecode(queryString);
-            NameValueCollection coll = HttpUtility.ParseQueryString(parsedString);
+
+            // TO-DO Check compatibility of the transformation after port to .NETCore
+            // Here we change IDictionary to NameValueCollection but this may not be necessary
+            var parsedString = WebUtility.HtmlDecode(queryString);
+            IDictionary<string, StringValues> tmp = QueryHelpers.ParseQuery(parsedString);
+            NameValueCollection coll = new NameValueCollection();
+            foreach (var kvp in tmp)
+            {
+                coll.Add(kvp.Key.ToString(), kvp.Value.ToString());
+            }
             query = new BsonDocument();
             int countConditions = 0;
 

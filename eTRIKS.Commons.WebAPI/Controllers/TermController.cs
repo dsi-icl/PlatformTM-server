@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+﻿using System.Collections.Generic;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [RoutePrefix("api/terms")]
-    public class TermController : ApiController
+    public class TermController : Controller
     {
         private CVtermService _cvtermService;
 

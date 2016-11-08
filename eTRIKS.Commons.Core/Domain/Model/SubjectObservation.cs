@@ -2,9 +2,6 @@
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -48,9 +45,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         {
             return "VSTESTCD";
         }
-        private string FindingTestName;
-        private string EventName;
-        private string TreatmentName;
+        
 
 
 
@@ -66,5 +61,6 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public int DatasetId { get; set; }
 
         public string ProjectAcc { get; set; }
+        public int O3Id { get; set; }
     }
 }

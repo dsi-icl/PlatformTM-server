@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using eTRIKS.Commons.Core.Domain.Model.Base;
-using System.Runtime.Serialization;
 
 
 namespace eTRIKS.Commons.Core.Domain.Model.Templates

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
@@ -21,5 +18,6 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public ICollection<Dataset> Datasets { get; set; }
         public ICollection<Visit> Visits { get; set; }
         public ICollection<Arm> Arms { get; set; }
+        public ICollection<HumanSubject> Subjects { get; set; }
     }
 }

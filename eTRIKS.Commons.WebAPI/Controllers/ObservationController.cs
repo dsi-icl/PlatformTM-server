@@ -1,16 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Web.Http;
-using eTRIKS.Commons.Service.Services;
-using eTRIKS.Commons.Core.Domain.Model;
-using System.Threading.Tasks;
+﻿using eTRIKS.Commons.Service.Services;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    public class ObservationController : ApiController
+    public class ObservationController : Controller
     {
         private ObservationService _observationService;
 

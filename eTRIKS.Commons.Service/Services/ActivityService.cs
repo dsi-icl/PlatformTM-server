@@ -6,13 +6,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
-using eTRIKS.Commons.DataAccess.MongoDB;
 
 
 namespace eTRIKS.Commons.Service.Services
@@ -112,9 +109,10 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     var dataset = _datasetService.CreateDataset(datasetDto);
                     activityToUpdate.Datasets.Add(dataset);
+                    _activityRepository.Update(activityToUpdate);
                 }
                 else
-                    _datasetService.updateDataset(datasetDto);                
+                    _datasetService.UpdateDataset(datasetDto);                
             }
             return _activityServiceUnit.Save();
         }
@@ -124,33 +122,7 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        public IEnumerable<ActivityDTO> GetStudyActivities(string projectAccession)
-        {
-            IEnumerable<Activity> activities;
-
-            // Typed lambda expression for Select() method. 
-            activities = _activityRepository.FindAll(
-                    d => d.Project.Accession.Equals(projectAccession),
-                    new List<Expression<Func<Activity, object>>>(){
-                        d => d.Datasets.Select(t => t.Domain),
-                        d => d.Project
-                    }
-                );
-            return activities.Select(p => new ActivityDTO
-            {
-                Name = p.Name,
-                Id = p.Id,
-                ProjectId = p.ProjectId,
-                ProjectAcc = p.Project.Accession,
-                isAssay = typeof (Assay) == p.GetType(),
-                datasets = p.Datasets.Select(m => new DatasetDTO
-                {
-                    Name = m.Domain.Name,
-                    Id = m.Id,
-                    DomainId = m.DomainId
-                }).ToList()
-            }).ToList();
-        }
+        
 
         /**
          * Assay Methods
@@ -237,6 +209,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             Assay assayToUpdate = _assayRepository.Get(assayId);
 
+           
             assayToUpdate.Name = assayDTO.Name;
             assayToUpdate.TechnologyPlatformId = assayDTO.Platform;
             assayToUpdate.TechnologyTypeId = assayDTO.Technology;
@@ -245,15 +218,17 @@ namespace eTRIKS.Commons.Service.Services
 
             foreach (var datasetDto in assayDTO.Datasets)
             {
-                //datasetDto.ProjectId = project.Id;
+                
                 if (datasetDto == null) continue;
+                datasetDto.ProjectId = assayDTO.ProjectId;
                 if (datasetDto.isNew)
                 {
                     var dataset = _datasetService.CreateDataset(datasetDto);
                     assayToUpdate.Datasets.Add(dataset);
+                    _assayRepository.Update(assayToUpdate);
                 }
                 else
-                    _datasetService.updateDataset(datasetDto);
+                    _datasetService.UpdateDataset(datasetDto);
             }
             return _activityServiceUnit.Save();
         }

@@ -1,69 +1,54 @@
-﻿using System.Data.Entity;
-using Castle.MicroKernel.Registration;
-using Castle.MicroKernel.SubSystems.Configuration;
-using Castle.Windsor;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Persistence;
+﻿using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.DataAccess.MongoDB;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using eTRIKS.Commons.DataAccess.UserManagement;
 using eTRIKS.Commons.DataAccess;
+using System;
+using eTRIKS.Commons.Service.Services.UserManagement;
+using eTRIKS.Commons.Persistence;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 {
     public class RepositoriesInstaller : IWindsorInstaller
-    {
-        public void Install(IWindsorContainer container, IConfigurationStore store)
-        {
+	{
+		public void Install(IWindsorContainer container, IConfigurationStore store)
+		{
 
-            container.Register(
+			container.Register(
 
-                //TODO: remove EF and Persistence dependencies
+			   //TODO: remove EF and Persistence dependencies
 
-                //Component.For<DbContext, IServiceUoW>()
-                //    .ImplementedBy<etriksDataContext_prod>(),
-
-                Component.For<IdentityDbContext<ApplicationUser>, IServiceUoW>().LifestylePerWebRequest()
+			    Component.For<DbContext, IServiceUoW>().LifestylePerWebRequest()
                     .ImplementedBy<EtriksDataContextProd>(),
 
-                Component.For<IUserRepository<ApplicationUser, IdentityResult>>()
-                    .ImplementedBy<UserAuthRepository>(),
+			    Component.For<IUserRepository>()
+                    .ImplementedBy<UserRepository>(),
 
-               
-
-                Component.For<MongoDbDataRepository>(),
-
-                Classes
-                    .FromAssemblyNamed("eTRIKS.Commons.DataAccess")
-                    .BasedOn(typeof(IRepository<,>)).LifestylePerWebRequest()
-                    .WithServiceDefaultInterfaces(),
-
-                
-
-                Classes
-                     .FromAssemblyNamed("eTRIKS.Commons.Service")
-                     .InNamespace("eTRIKS.Commons.Service.Services").LifestylePerWebRequest()
-                     .WithServiceSelf()
-                     .WithServiceDefaultInterfaces(),
-
-                Classes
-                     .FromAssemblyNamed("eTRIKS.Commons.Service")
-                     .InNamespace("eTRIKS.Commons.Service.Services.UserServices")
-                     .WithServiceSelf()
-                     .WithServiceDefaultInterfaces());
+			    Component.For<IUserStore<UserAccount, Guid>>()
+                    .ImplementedBy<UserStore>(),
 
 
-            //container.Register(
-            //    );
+			    Component.For<UserAccountService>()
+                    .LifestylePerWebRequest(),
 
-            //container.Register(
-            //     );
-             
+			    Component.For<MongoDbDataRepository>(),
 
-           
-            
+				Classes
+					.FromAssemblyNamed("eTRIKS.Commons.DataAccess")
+					.BasedOn(typeof(IRepository<,>)).LifestylePerWebRequest()
+					.WithServiceDefaultInterfaces(),
 
-        }
-    }
+				Classes
+					 .FromAssemblyNamed("eTRIKS.Commons.Service")
+					 .InNamespace("eTRIKS.Commons.Service.Services").LifestylePerWebRequest()
+					 .WithServiceSelf()
+					 .WithServiceDefaultInterfaces(),
+
+
+				Classes
+					 .FromAssemblyNamed("eTRIKS.Commons.Service")
+					 .InNamespace("eTRIKS.Commons.Service.Services.UserServices")
+					 .WithServiceSelf()
+					 .WithServiceDefaultInterfaces());
+
+		}
+	}
 }

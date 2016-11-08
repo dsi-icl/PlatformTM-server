@@ -1,101 +1,78 @@
-﻿using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.DataAccess.UserManagement;
-using eTRIKS.Commons.Service.Services.UserServices;
-using eTRIKS.Commons.WebAPI.DependencyResolution;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin;
-using Microsoft.Owin.Security.OAuth;
-using Owin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
-using System.Web.Mvc;
-using System.Web.Optimization;
-using System.Web.Routing;
-//using System.Web.Mvc;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using eTRIKS.Commons.DataAccess.Configuration;
 
-[assembly: OwinStartup(typeof(eTRIKS.Commons.WebAPI.Startup))]
-//[assembly: ApplicationShutdownMethod(typeof(WindsorActivator), "Shutdown")]
 namespace eTRIKS.Commons.WebAPI
 {
     public class Startup
     {
-        static ContainerBootstrapper _bootstrapper;
-        public static HttpConfiguration HttpConfiguration { get; private set; }
-        public void Configuration(IAppBuilder app)
+        public Startup(IHostingEnvironment env)
         {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            if (env.IsEnvironment("Development"))
+            {
+                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
+                builder.AddApplicationInsightsSettings(developerMode: true);
+            }
+
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
+        }
+
+        public IConfigurationRoot Configuration { get; }
+
+        // This method gets called by the runtime. Use this method to add services to the container
+        public void ConfigureServices(IServiceCollection services)
+        {
+            // Add framework services.
+            services.AddApplicationInsightsTelemetry(Configuration);
+
+            services.AddMvc();
+
+            // Added - uses IOptions<T> for your settings.
+            services.AddOptions();
+
+            // Added - Confirms that we have a home for our DataAccessSettings
+            services.Configure<DataAccessSettings>(Configuration.GetSection("DataAccessSettings"));
+
             HttpConfiguration HttpConfiguration = new HttpConfiguration();
-            
-            //GlobalConfiguration.Configure(WebApiConfig.Register);
-            //
-            //
-           // 
-            
+
             //Bootstrap & Configure Windsor Container
             _bootstrapper = ContainerBootstrapper.Bootstrap(HttpConfiguration);
-          
+
             //NEED TO CHECK HOW TO DISPOSE CONTAINER
-
-
-            //GlobalConfiguration.Configure(WebApiConfig.Register);
 
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            //var container = new WindsorContainer().Install(
-            //new ControllerInstaller(),
-            //new DefaultInstaller());
-            //var httpDependencyResolver = new WindsorHttpDependencyResolver(container);
+            ConfigureOAuth(app);
 
-            //AreaRegistration.RegisterAllAreas();
-            //GlobalConfiguration.Configure(WebApiConfig.Register);
-            //FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            //RouteConfig.RegisterRoutes(RouteTable.Routes);
-            //BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-           // HttpConfiguration config = new HttpConfiguration();
-           // var httpDependencyResolver = new WindsorHttpDependencyResolver(container);
-           // config.DependencyResolver = httpDependencyResolver;
- 
-            ConfigureOAuth(app,HttpConfiguration);
- 
             WebApiConfig.Register(HttpConfiguration);
-
 
             app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
             app.UseWebApi(HttpConfiguration);
- 
         }
- 
-        public void ConfigureOAuth(IAppBuilder app, HttpConfiguration config)
-        {
-            //Are these needed given IoC
-            //app.CreatePerOwinContext(ApplicationDbContext.Create);
-            //app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
 
-            //var repo = _bootstrapper.Container.Resolve<IUserRepository<ApplicationUser>>();
-            OAuthBearerAuthenticationOptions OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
- 
-            OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
-            {
-                //For Dev enviroment only (on production should be AllowInsecureHttp = false)
-                AllowInsecureHttp = true,
-                TokenEndpointPath = new PathString("/token"),
-                AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-                Provider = new SimpleAuthorizationServerProvider(_bootstrapper.Container.Resolve<IUserRepository<ApplicationUser,IdentityResult>>())
-            };
- 
-            // Token Generation
-            app.UseOAuthAuthorizationServer(OAuthServerOptions);
- 
-            //Token Consumption
-            app.UseOAuthBearerAuthentication(OAuthBearerOptions);
- 
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        {
+            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
+            loggerFactory.AddDebug();
+
+            app.UseApplicationInsightsRequestTelemetry();
+
+            app.UseApplicationInsightsExceptionTelemetry();
+
+            app.UseMvc();
         }
     }
-
 }
