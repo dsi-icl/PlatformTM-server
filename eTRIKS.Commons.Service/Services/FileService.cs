@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Diagnostics;
+using CsvHelper;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
@@ -6,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Collections;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -26,13 +28,13 @@ namespace eTRIKS.Commons.Service.Services
             rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
             stdFilesDirecotry = rawFilesDirectory + "\\Mapped";
         }
-        public List<FileDTO> getUploadedFiles(string projectId,string path)
+        public List<FileDTO> getUploadedFiles(int projectId,string path)
         {
             List<FileDTO> fileDTOs = new List<FileDTO>();
             //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
 
             //List<string> files = Directory.GetFiles(path).ToList<string>();
-            var files = _fileRepository.FindAll(f => f.Project.Accession.Equals(projectId) && f.Path.Equals(path));
+            var files = _fileRepository.FindAll(f => f.ProjectId == projectId && f.Path.Equals(path));
             //DirectoryInfo f = new DirectoryInfo(path);
             foreach (var file in files)
             {
@@ -51,7 +53,7 @@ namespace eTRIKS.Commons.Service.Services
             return fileDTOs;
         }
 
-        public DirectoryInfo addDirectory(string projectId, string newDir)
+        public DirectoryInfo addDirectory(int projectId, string newDir)
         {
             if (Directory.Exists(newDir))
                 return new DirectoryInfo(newDir);
@@ -61,15 +63,15 @@ namespace eTRIKS.Commons.Service.Services
                 //_fileService.addDirectory(projectId, new DirectoryInfo(newDir), projectId);
             
            
-            var project = _projectRepository.FindSingle(p => p.Accession.Equals(projectId));
+            var project = _projectRepository.FindSingle(p => p.Id == projectId);
             if(project ==null)
                 return null;
 
             var file = new DataFile();
             file.FileName = di.Name;
             //file.Path = di.FullName.Substring(di.FullName.IndexOf(projectId));
-            file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf(projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
-            file.DateAdded = di.CreationTime.ToLongDateString();
+            file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf("P-"+projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
+            file.DateAdded = di.CreationTime.ToString("D");
             file.IsDirectory = true;
             file.ProjectId = project.Id;
 
@@ -77,32 +79,32 @@ namespace eTRIKS.Commons.Service.Services
             return _dataServiceUnit.Save().Equals("CREATED") ? di : null;
         }
 
-        public DataFile addOrUpdateFile(string projectId, FileInfo fi)
+        public DataFile addOrUpdateFile(int projectId, FileInfo fi)
         {
             //TODO: projectId
             DataFile file;
             if (fi == null)
                 return null;
-            string filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf(projectId));
-            file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.Project.Accession.Equals(projectId));
+            string filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
+            file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.ProjectId == projectId);
             //TODO: add property isLoadedToDB to the file and only change status to modified if not loadedToDB
             if (file == null)
             {
-                var project = _projectRepository.FindSingle(p => p.Accession.Equals(projectId));
+                var project = _projectRepository.FindSingle(p => p.Id == projectId);
                 if (project == null)
                     return null;
                 file = new DataFile();
                 file.FileName = fi.Name;
-                file.DateAdded = fi.CreationTime.ToShortDateString() + " " + fi.CreationTime.ToShortTimeString();
+                file.DateAdded = fi.CreationTime.ToString("d") + " " + fi.CreationTime.ToString("t");
                 file.State = "NEW";
-                file.Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf(projectId));
+                file.Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
                 file.IsDirectory = false;
                 _fileRepository.Insert(file);
                 file.ProjectId = project.Id;
             }
             else
             {
-                file.LastModified = fi.LastWriteTime.ToShortDateString() + " " + fi.LastWriteTime.ToShortTimeString();
+                file.LastModified = fi.LastWriteTime.ToString("d") + " " + fi.LastWriteTime.ToString("t");
                 if (file.LoadedToDB)
                     file.State = "UPDATED";
                 _fileRepository.Update(file);
@@ -112,17 +114,9 @@ namespace eTRIKS.Commons.Service.Services
         }
 
         #region IO methods
-       
-        public DataTable readStandardFile(string studyId, string fileName)
-        {
-            string filePath = rawFilesDirectory + studyId + "\\Mapped\\" + fileName; 
-            //string filePath = stdFilesDirecotry + "\\" + fileName;
-            return readDataFile(filePath);
-        }
 
         public DataTable ReadOriginalFile(string filePath)
         {
-            //string filePath = rawFilesDirectory + studyId + "\\" + fileName;
             string PATH = rawFilesDirectory + filePath;
             return readDataFile(PATH);
         }
@@ -179,7 +173,7 @@ namespace eTRIKS.Commons.Service.Services
                     }
                 }
                 parser.Dispose();
-            reader.Close();
+            reader.Dispose();
 
             return dt;
         }
@@ -207,39 +201,34 @@ namespace eTRIKS.Commons.Service.Services
                 r.Add("pos", i.ToString());
                 res.Add(r);
             }
-            reader.Close();
+            reader.Dispose();
 
             return res;
         }
 
-        public FileInfo writeDataFile(string filePath, DataTable dt)
+        public FileInfo writeDataFile(int projectId, string filePath, DataTable dt)
         {
-            //TODO: ADD STUDY ID as subfolder
-            string path = ConfigurationManager.AppSettings["FileDirectory"];
-            path +=filePath + "\\Mapped";
-            string projectId = "P-BVS";
-            var DirInfo = addDirectory(projectId, path);
 
-           
+            var PATH = stdFilesDirecotry + filePath;
+            var DirInfo = addDirectory(projectId, PATH);
 
-            string strFilePath = DirInfo.FullName+"\\"+dt.TableName+".csv";
-            
+            string strFilePath = DirInfo.FullName + "\\" + dt.TableName + ".csv";
+
             StreamWriter writer = File.CreateText(strFilePath);
 
             IEnumerable<String> headerValues = dt.Columns.Cast<DataColumn>()
                 .Select(column => QuoteValue(column.ColumnName));
-                
+
             writer.WriteLine(String.Join(",", headerValues));
             IEnumerable<String> items;
 
-            foreach (DataRow row in dt.Rows) {
+            foreach (DataRow row in dt.Rows)
+            {
                 items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
                 writer.WriteLine(String.Join(",", items));
             }
             writer.Flush();
-            writer.Close();
-
-            //addOrUpdateFile(studyId,new FileInfo(strFilePath));
+            writer.Dispose();
             return new FileInfo(strFilePath);
         }
 
@@ -251,14 +240,12 @@ namespace eTRIKS.Commons.Service.Services
 
         #endregion
 
-        public List<string> getDirectories(string projectId)
+        public List<string> getDirectories(int projectId)
         {
-           var dirs =  _fileRepository.FindAll(f => f.IsDirectory.Equals(true) && f.Project.Accession.Equals(projectId));
+           var dirs =  _fileRepository.FindAll(f => f.IsDirectory.Equals(true) && f.ProjectId == projectId);
             if (dirs == null) return null;
             return dirs.Select(d => d.FileName).ToList();
         }
-
-        
 
         public Hashtable getFilePreview(int fileId)
         {
@@ -275,6 +262,7 @@ namespace eTRIKS.Commons.Service.Services
             ht.Add("fileInfo",file.FileName);
             return ht;
         }
+
         private Hashtable getHashtable(DataTable sdtmTable)
         {
             var ht = new Hashtable();
@@ -289,55 +277,55 @@ namespace eTRIKS.Commons.Service.Services
                 headerList.Add(header);
             }
             ht.Add("header", headerList);
-            ht.Add("data", sdtmTable);
+            ht.Add("data", sdtmTable.Rows);
             
             return ht;
         }
 
-        public void tempmethod()
-        {
-            DataTable usubjids = ReadOriginalFile("temp/CRC305Dusubjids.csv");
-            //DataTable cytofSamples = ReadOriginalFile("temp/CyTOFsamples.csv");
-            DataTable Samples = ReadOriginalFile("temp/BS_ic.csv");
-            //DataTable FACSSamples = ReadOriginalFile("temp/FACSsamples_v1.csv");
-            //luminexSamples.TableName = "luminexSamples";
+        //public void tempmethod()
+        //{
+        //    DataTable usubjids = ReadOriginalFile("temp/CRC305Dusubjids.csv");
+        //    //DataTable cytofSamples = ReadOriginalFile("temp/CyTOFsamples.csv");
+        //    DataTable Samples = ReadOriginalFile("temp/BS_ic.csv");
+        //    //DataTable FACSSamples = ReadOriginalFile("temp/FACSsamples_v1.csv");
+        //    //luminexSamples.TableName = "luminexSamples";
 
-            //Samples.Columns.Add("USUBJID");
-            List<string> subjidlist = new List<string>();
-            Dictionary<string, string> idmap = new Dictionary<string, string>();
+        //    //Samples.Columns.Add("USUBJID");
+        //    List<string> subjidlist = new List<string>();
+        //    Dictionary<string, string> idmap = new Dictionary<string, string>();
 
-            foreach (DataRow row in usubjids.Rows)
-            {
-                string[] id = row[0].ToString().Split('-');
-                idmap.Add(id[2],row[0].ToString());
-            }
+        //    foreach (DataRow row in usubjids.Rows)
+        //    {
+        //        string[] id = row[0].ToString().Split('-');
+        //        idmap.Add(id[2],row[0].ToString());
+        //    }
 
-            foreach (DataRow row in Samples.Rows)
-            {
-                string subjId = row["donor"].ToString();
-                //string newsubjid = subjidlist.Find(d => d.EndsWith(subjId));
-                if(subjId == "N/A")
-                    continue;
-                string newsubjid = idmap[subjId];
-                row["USUBJID"] = newsubjid;
-            }
-            string path = ConfigurationManager.AppSettings["FileDirectory"];
-            StreamWriter writer = File.CreateText(path + "temp\\BS.csv");
+        //    foreach (DataRow row in Samples.Rows)
+        //    {
+        //        string subjId = row["donor"].ToString();
+        //        //string newsubjid = subjidlist.Find(d => d.EndsWith(subjId));
+        //        if(subjId == "N/A")
+        //            continue;
+        //        string newsubjid = idmap[subjId];
+        //        row["USUBJID"] = newsubjid;
+        //    }
+        //    string path = ConfigurationManager.AppSettings["FileDirectory"];
+        //    StreamWriter writer = File.CreateText(path + "temp\\BS.csv");
 
-            IEnumerable<String> headerValues = Samples.Columns.Cast<DataColumn>()
-                .Select(column => QuoteValue(column.ColumnName));
+        //    IEnumerable<String> headerValues = Samples.Columns.Cast<DataColumn>()
+        //        .Select(column => QuoteValue(column.ColumnName));
 
-            writer.WriteLine(String.Join(",", headerValues));
-            IEnumerable<String> items;
+        //    writer.WriteLine(String.Join(",", headerValues));
+        //    IEnumerable<String> items;
 
-            foreach (DataRow row in Samples.Rows)
-            {
-                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
-                writer.WriteLine(String.Join(",", items));
-            }
-            writer.Flush();
-            writer.Close();
-        }
+        //    foreach (DataRow row in Samples.Rows)
+        //    {
+        //        items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
+        //        writer.WriteLine(String.Join(",", items));
+        //    }
+        //    writer.Flush();
+        //    writer.Dispose();
+        //}
 
         /**
          *To gather one column we need the following params
@@ -346,166 +334,167 @@ namespace eTRIKS.Commons.Service.Services
          *- name of the key column
          *- name of the value column
          */
-        public void getLongFormat()
-        {
-            DataTable wideDataTable = ReadOriginalFile("temp/CyTOFdata_v2.csv");
-            DataTable longDataTable = new DataTable();
+        //public void getLongFormat()
+        //{
+        //    DataTable wideDataTable = ReadOriginalFile("temp/CyTOFdata_v2.csv");
+        //    DataTable longDataTable = new DataTable();
 
-            List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
-            List<string> gatherColumns = new List<string>();
-            int gatherColumnsFrom = 7;
-            int gatherColumnsTo = 111;
+        //    List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
+        //    List<string> gatherColumns = new List<string>();
+        //    int gatherColumnsFrom = 7;
+        //    int gatherColumnsTo = 111;
 
-            List<int> countColumns = new List<int>(){1,10,19,28};
+        //    List<int> countColumns = new List<int>(){1,10,19,28};
 
-            //Retrieve dataset template for the long format file
-            //identify key column and value Column
-            string keyColumn = "OBSMEA", valueColumn = "OBSVALUE",
-                featureColumn = "FEAT", domainColumn = "DOMAIN";
+        //    //Retrieve dataset template for the long format file
+        //    //identify key column and value Column
+        //    string keyColumn = "OBSMEA", valueColumn = "OBSVALUE",
+        //        featureColumn = "FEAT", domainColumn = "DOMAIN";
 
-            //1- Create new table from the identifier columns + the new columns
-            longDataTable.Columns.Add(domainColumn);
-            foreach (var idCol in ids )
-            {
-                longDataTable.Columns.Add(idCol);
-            }
-            //longDataTable.Columns.Add(popColumn);
-            //longDataTable.Columns.Add(countColumn);
-            longDataTable.Columns.Add(featureColumn);
-            longDataTable.Columns.Add(keyColumn);
-            longDataTable.Columns.Add(valueColumn);
+        //    //1- Create new table from the identifier columns + the new columns
+        //    longDataTable.Columns.Add(domainColumn);
+        //    foreach (var idCol in ids )
+        //    {
+        //        longDataTable.Columns.Add(idCol);
+        //    }
+        //    //longDataTable.Columns.Add(popColumn);
+        //    //longDataTable.Columns.Add(countColumn);
+        //    longDataTable.Columns.Add(featureColumn);
+        //    longDataTable.Columns.Add(keyColumn);
+        //    longDataTable.Columns.Add(valueColumn);
 
-            foreach (DataRow inRow in wideDataTable.Rows)
-            {
+        //    foreach (DataRow inRow in wideDataTable.Rows)
+        //    {
                 
 
-                for (int i = gatherColumnsFrom; i <= gatherColumnsTo; i++)
-                {
-                    DataRow longDataRow = longDataTable.NewRow();
-                    foreach (var idCol in ids)
-                    {
-                        longDataRow[idCol] = inRow[idCol];
-                    }
-                    string[] keyValue = wideDataTable.Columns[i].ToString().Split('.');
-                    longDataRow[keyColumn] = keyValue[0];
-                    longDataRow[valueColumn] = inRow[i];
-                    longDataRow[featureColumn] = keyValue[1];
-                    longDataRow[domainColumn] = "CY";
+        //        for (int i = gatherColumnsFrom; i <= gatherColumnsTo; i++)
+        //        {
+        //            DataRow longDataRow = longDataTable.NewRow();
+        //            foreach (var idCol in ids)
+        //            {
+        //                longDataRow[idCol] = inRow[idCol];
+        //            }
+        //            string[] keyValue = wideDataTable.Columns[i].ToString().Split('.');
+        //            longDataRow[keyColumn] = keyValue[0];
+        //            longDataRow[valueColumn] = inRow[i];
+        //            longDataRow[featureColumn] = keyValue[1];
+        //            longDataRow[domainColumn] = "CY";
 
-                    longDataTable.Rows.Add(longDataRow);
-                }
-                //foreach (DataColumn col in inputDataTable.Columns)
-                //{
+        //            longDataTable.Rows.Add(longDataRow);
+        //        }
+        //        //foreach (DataColumn col in inputDataTable.Columns)
+        //        //{
                     
-                //}
-            }
-           // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
-            string path = ConfigurationManager.AppSettings["FileDirectory"];
-            StreamWriter writer = File.CreateText(path+"temp\\CyTOFdata_long.csv");
+        //        //}
+        //    }
+        //   // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
+        //    string path = ConfigurationManager.AppSettings["FileDirectory"];
+        //    StreamWriter writer = File.CreateText(path+"temp\\CyTOFdata_long.csv");
 
-            IEnumerable<String> headerValues = longDataTable.Columns.Cast<DataColumn>()
-                .Select(column => QuoteValue(column.ColumnName));
+        //    IEnumerable<String> headerValues = longDataTable.Columns.Cast<DataColumn>()
+        //        .Select(column => QuoteValue(column.ColumnName));
 
-            writer.WriteLine(String.Join(",", headerValues));
-            IEnumerable<String> items;
+        //    writer.WriteLine(String.Join(",", headerValues));
+        //    IEnumerable<String> items;
 
-            foreach (DataRow row in longDataTable.Rows)
-            {
-                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
-                writer.WriteLine(String.Join(",", items));
-            }
-            writer.Flush();
-            writer.Close();
-        }
+        //    foreach (DataRow row in longDataTable.Rows)
+        //    {
+        //        items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
+        //        writer.WriteLine(String.Join(",", items));
+        //    }
+        //    writer.Flush();
+        //    writer.Dispose();
+        //}
 
-        public void getLongFormat2()
-        {
-            DataTable wideDataTable = ReadOriginalFile("temp/FACSdata_v2.csv");
-            DataTable longDataTable = new DataTable();
+        //public void getLongFormat2()
+        //{
+        //    DataTable wideDataTable = ReadOriginalFile("temp/FACSdata_v2.csv");
+        //    DataTable longDataTable = new DataTable();
 
-            //List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
-            List<string> ids = new List<string>() { "SAMPLEID" };
-            List<string> gatherColumns = new List<string>();
-            int gatherColumnsFrom = 7;
-            int gatherColumnsTo = 111;
-
-
-
-            List<int> countColumns = new List<int>() { 1, 10, 19, 28 };
-
-            //Retrieve dataset template for the long format file
-            //identify key column and value Column
-            string countColumn = "COUNT", keyColumn = "OBSMEA", valueColumn = "OBSVALUE",
-                featureColumn = "FEAT", domainColumn = "DOMAIN", popColumn = "POPULATION";
+        //    //List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
+        //    List<string> ids = new List<string>() { "SAMPLEID" };
+        //    List<string> gatherColumns = new List<string>();
+        //    int gatherColumnsFrom = 7;
+        //    int gatherColumnsTo = 111;
 
 
 
-            //1- Create new table from the identifier columns + the new columns
-            longDataTable.Columns.Add(domainColumn);
-            foreach (var idCol in ids)
-            {
-                longDataTable.Columns.Add(idCol);
-            }
-            longDataTable.Columns.Add(popColumn);
-            longDataTable.Columns.Add(countColumn);
-            longDataTable.Columns.Add(featureColumn);
-            longDataTable.Columns.Add(keyColumn);
-            longDataTable.Columns.Add(valueColumn);
+        //    List<int> countColumns = new List<int>() { 1, 10, 19, 28 };
 
-            foreach (DataRow inRow in wideDataTable.Rows)
-            {
-                for(int k=0; k<countColumns.Count;k++)
-                {
-                    for (int i = countColumns[k] + 1; k+1==countColumns.Count?i<inRow.ItemArray.Length:i < countColumns[k+1]; i++)
-                    {
-                        DataRow longDataRow = longDataTable.NewRow();
-                        foreach (var idCol in ids)
-                        {
-                            longDataRow[idCol] = inRow[idCol];
-                        }
-                        string[] popCountKeyValue = wideDataTable.Columns[countColumns[k]].ToString().Split('.');
+        //    //Retrieve dataset template for the long format file
+        //    //identify key column and value Column
+        //    string countColumn = "COUNT", keyColumn = "OBSMEA", valueColumn = "OBSVALUE",
+        //        featureColumn = "FEAT", domainColumn = "DOMAIN", popColumn = "POPULATION";
 
-                        longDataRow[popColumn] = popCountKeyValue[0];
-                        longDataRow[countColumn] = inRow[countColumns[k]];
 
-                        string[] keyValue = wideDataTable.Columns[i].ToString().Split('.');
-                        longDataRow[keyColumn] = keyValue[1];
-                        longDataRow[valueColumn] = inRow[i];
-                        longDataRow[featureColumn] = keyValue[2];
-                        longDataRow[domainColumn] = "CY";
 
-                        longDataTable.Rows.Add(longDataRow);
-                    }
-                }
+        //    //1- Create new table from the identifier columns + the new columns
+        //    longDataTable.Columns.Add(domainColumn);
+        //    foreach (var idCol in ids)
+        //    {
+        //        longDataTable.Columns.Add(idCol);
+        //    }
+        //    longDataTable.Columns.Add(popColumn);
+        //    longDataTable.Columns.Add(countColumn);
+        //    longDataTable.Columns.Add(featureColumn);
+        //    longDataTable.Columns.Add(keyColumn);
+        //    longDataTable.Columns.Add(valueColumn);
+
+        //    foreach (DataRow inRow in wideDataTable.Rows)
+        //    {
+        //        for(int k=0; k<countColumns.Count;k++)
+        //        {
+        //            for (int i = countColumns[k] + 1; k+1==countColumns.Count?i<inRow.ItemArray.Length:i < countColumns[k+1]; i++)
+        //            {
+        //                DataRow longDataRow = longDataTable.NewRow();
+        //                foreach (var idCol in ids)
+        //                {
+        //                    longDataRow[idCol] = inRow[idCol];
+        //                }
+        //                string[] popCountKeyValue = wideDataTable.Columns[countColumns[k]].ToString().Split('.');
+
+        //                longDataRow[popColumn] = popCountKeyValue[0];
+        //                longDataRow[countColumn] = inRow[countColumns[k]];
+
+        //                string[] keyValue = wideDataTable.Columns[i].ToString().Split('.');
+        //                longDataRow[keyColumn] = keyValue[1];
+        //                longDataRow[valueColumn] = inRow[i];
+        //                longDataRow[featureColumn] = keyValue[2];
+        //                longDataRow[domainColumn] = "CY";
+
+        //                longDataTable.Rows.Add(longDataRow);
+        //            }
+        //        }
 
                 
-                //foreach (DataColumn col in inputDataTable.Columns)
-                //{
+        //        //foreach (DataColumn col in inputDataTable.Columns)
+        //        //{
 
-                //}
-            }
-            // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
-            string path = ConfigurationManager.AppSettings["FileDirectory"];
-            StreamWriter writer = File.CreateText(path + "temp\\FACSdata_long.csv");
+        //        //}
+        //    }
+        //    // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
+        //    string path = ConfigurationManager.AppSettings["FileDirectory"];
+        //    StreamWriter writer = File.CreateText(path + "temp\\FACSdata_long.csv");
 
-            IEnumerable<String> headerValues = longDataTable.Columns.Cast<DataColumn>()
-                .Select(column => QuoteValue(column.ColumnName));
+        //    IEnumerable<String> headerValues = longDataTable.Columns.Cast<DataColumn>()
+        //        .Select(column => QuoteValue(column.ColumnName));
 
-            writer.WriteLine(String.Join(",", headerValues));
-            IEnumerable<String> items;
+        //    writer.WriteLine(String.Join(",", headerValues));
+        //    IEnumerable<String> items;
 
-            foreach (DataRow row in longDataTable.Rows)
-            {
-                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
-                writer.WriteLine(String.Join(",", items));
-            }
-            writer.Flush();
-            writer.Close();
-        }
+        //    foreach (DataRow row in longDataTable.Rows)
+        //    {
+        //        items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
+        //        writer.WriteLine(String.Join(",", items));
+        //    }
+        //    writer.Flush();
+        //    writer.Dispose();
+        //}
 
         public FileDTO GetFileDTO(int fileId)
         {
             var file = _fileRepository.Get(fileId);
+
             var dto = new FileDTO()
             {
               FileName = file.FileName,

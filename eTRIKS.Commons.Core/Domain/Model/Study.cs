@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
 namespace eTRIKS.Commons.Core.Domain.Model

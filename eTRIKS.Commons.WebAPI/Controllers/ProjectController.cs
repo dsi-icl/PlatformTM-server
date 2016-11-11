@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.Services.UserManagement;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -33,10 +36,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/projects/accession/{projectAcc}", Name = "GetProjectByAcc")]
-        public ProjectDTO GetProject(string projectAcc)
+        [Route("api/projects/accession/{projectId}", Name = "GetProjectByAcc")]
+        public ProjectDTO GetProjectFull(int projectId)
         {
-            return _projectService.GetProjectByAccession(projectAcc);
+            return _projectService.GetProjectFullDetails(projectId);
         }
         [HttpGet]
         [Route("api/projects/id/{projectId}", Name = "GetProjectById")]
@@ -47,7 +50,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/projects/{projectId}/activities")]
-        public IEnumerable<ActivityDTO> GetProjectActivities(string projectId)
+        public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
         {
             return _projectService.GetProjectActivities(projectId);
         }

@@ -1,8 +1,4 @@
-﻿/************************************************************/
-/********   Created By: Dilshan Silva 12-12-2014   **********/
-/******** Services to handle functions on Activity **********/
-/************************************************************/
-
+﻿using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.Services;
 using System;
 using System.Net;
@@ -12,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[RoutePrefix("api/activities")]
     public class ActivityController : Controller
     {
         private ActivityService _activityService;
@@ -66,7 +61,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 response.Headers.Location = new Uri(uri);
                 return response;
             }
-            catch
+            catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
             }
@@ -119,7 +114,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 response.Headers.Location = new Uri(uri);
                 return response;
             }
-            catch
+            catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.Conflict);
             }

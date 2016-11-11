@@ -1,4 +1,4 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Data;
+﻿using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 
 namespace eTRIKS.Commons.Service.Services.HelperService
 {

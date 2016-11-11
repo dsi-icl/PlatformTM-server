@@ -4,6 +4,7 @@ using System.Linq;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.Service.Services
 {

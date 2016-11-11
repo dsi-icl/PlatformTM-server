@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -17,24 +18,24 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
 
         [HttpGet]
-        [Route("api/projects/{projectAcc}/export/datafields")]
-        public List<TreeNodeDTO> GetFields(string projectAcc)
+        [Route("api/projects/{projectId}/export/datafields")]
+        public List<TreeNodeDTO> GetFields(int projectId)
         {
             var name = User.Identity.Name;
-            return _exportService.GetAvailableFields(projectAcc);
+            return _exportService.GetAvailableFields(projectId);
         }
         [HttpPost]
-        [Route("api/projects/{projectAcc}/export/datafields/valueset")]
-        public async Task<DataFilterDTO> GetValueSet(string projectAcc, [FromBody] DataFieldDTO fieldDto)
+        [Route("api/projects/{projectId}/export/datafields/valueset")]
+        public async Task<DataFilterDTO> GetValueSet(int projectId, [FromBody] DataFieldDTO fieldDto)
         {
-            return await _exportService.GetFieldValueSet(projectAcc, fieldDto);
+            return await _exportService.GetFieldValueSet(projectId, fieldDto);
         }
 
         [HttpPost]
-        [Route("api/projects/{projectAcc}/export/table")]
-        public async Task<Hashtable> GetDataPreview(string projectAcc, [FromBody] UserDatasetDTO userDatasetDto)
+        [Route("api/projects/{projectId}/export/table")]
+        public async Task<Hashtable> GetDataPreview(int projectId, [FromBody] UserDatasetDTO userDatasetDto)
         {
-            return await _exportService.ExportDataTable(projectAcc, userDatasetDto);
+            return await _exportService.ExportDataTable(projectId, userDatasetDto);
         }
 
         //[HttpPost]

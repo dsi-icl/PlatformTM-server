@@ -2,7 +2,7 @@
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
 {
     public class Dataset : Identifiable<int>
     {

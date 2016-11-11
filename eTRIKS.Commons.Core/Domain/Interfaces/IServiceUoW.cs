@@ -1,9 +1,7 @@
 ﻿using System;
 using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Application.AccountManagement;
-
 namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
     public interface IServiceUoW : IDisposable
@@ -15,10 +13,6 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         IUserRepository GetUserRepository();
 
         IUserAccountRepository GetUserAccountRepository(); 
-
-        void AddClassMap(string fieldname, string propertyName);
-
-        void setSDTMentityDescriptor(SdtmRowDescriptor descriptor);
 
         string Save();
 

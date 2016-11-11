@@ -17,10 +17,10 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "eTRIKS.Commons.Core": "1.0.0-*",
     "eTRIKS.Commons.DataAccess": "1.0.0-*",
-    "eTRIKS.Commons.Persistence": "1.0.0-*",
     "eTRIKS.Commons.Service": "1.0.0-*",
     "Microsoft.AspNetCore.Mvc.Core": "1.0.0",
-    "Microsoft.AspNetCore.Authorization": "1.0.0"
+    "Microsoft.AspNetCore.Authorization": "1.0.0",
+    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0"
   },
 
   "tools": {

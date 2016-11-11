@@ -1,4 +1,4 @@
-﻿namespace eTRIKS.Commons.Core.Domain.Model
+﻿namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
 {
     public class VariableReference
     { 

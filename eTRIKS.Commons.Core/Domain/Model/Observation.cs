@@ -2,6 +2,7 @@
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using System;
 using System.Collections.Generic;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {

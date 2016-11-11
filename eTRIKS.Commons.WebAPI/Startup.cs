@@ -4,6 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using eTRIKS.Commons.DataAccess.Configuration;
+using Microsoft.EntityFrameworkCore;
+using MySQL.Data.EntityFrameworkCore.Extensions;
+using eTRIKS.Commons.DataAccess;
 
 namespace eTRIKS.Commons.WebAPI
 {
@@ -15,6 +18,9 @@ namespace eTRIKS.Commons.WebAPI
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            //var optionsBuilder = new DbContextOptionsBuilder<EmployeesContext>();
+            //optionsBuilder.UseMySQL(connectionString);
 
             if (env.IsEnvironment("Development"))
             {
@@ -33,6 +39,9 @@ namespace eTRIKS.Commons.WebAPI
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
+
+            services.AddDbContext<BioSPEAKdbContext>(options =>
+                options.UseMySQL(Configuration.GetConnectionString("BioSPEAK_SQL")));
 
             services.AddMvc();
 

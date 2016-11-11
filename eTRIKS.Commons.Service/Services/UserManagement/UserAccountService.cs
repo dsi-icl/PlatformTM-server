@@ -2,9 +2,9 @@
 using eTRIKS.Commons.Core.Domain.Model.Users;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services.Authentication;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace eTRIKS.Commons.Service.Services.UserManagement
 {

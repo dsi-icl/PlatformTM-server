@@ -40,9 +40,9 @@ namespace eTRIKS.Commons.Service.Services
                 Accession = project.Accession
             };
         }
-        public ProjectDTO GetProjectByAccession(string projectAcc)
+        public ProjectDTO GetProjectFullDetails(int projectId)
         {
-            var project = _projectRepository.FindSingle(p=>p.Accession == projectAcc, new List<Expression<Func<Project, object>>>()
+            var project = _projectRepository.FindSingle(p=>p.Id == projectId, new List<Expression<Func<Project, object>>>()
             {
                 p=>p.Studies.Select(s=>s.Project),
                 p=>p.Studies.Select(s=>s.Arms),
@@ -52,8 +52,10 @@ namespace eTRIKS.Commons.Service.Services
             var dto =  new ProjectDTO()
             {
                 Name = project.Name,
-                Title = project.Description,
+                Title = project.Title,
+                Desc = project.Description,
                 Accession = project.Accession,
+                Type = project.Type,
                 Id = project.Id,
                 Users = project.Users?.Select(u=>new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
                 Studies = project.Studies.Select(
@@ -62,6 +64,7 @@ namespace eTRIKS.Commons.Service.Services
                         Accession = s.Accession,
                         Title = s.Description,
                         ProjectAcc = s.Project.Accession,
+                        ProjectId = s.ProjectId,
                         Name = s.Name,
                         Id = s.Id,
                         ArmCount = s.Arms.Count,
@@ -73,12 +76,12 @@ namespace eTRIKS.Commons.Service.Services
             return dto;
         }
 
-        public IEnumerable<ActivityDTO> GetProjectActivities(string projectAccession)
+        public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
         {
             IEnumerable<Activity> Activities;
 
             Activities = _activityRepository.FindAll(
-                    d => d.Project.Accession.Equals(projectAccession),
+                    d => d.ProjectId == projectId,
                     new List<Expression<Func<Activity, object>>>(){
                         d => d.Datasets.Select(t => t.Domain),
                         d => d.Project
@@ -114,7 +117,15 @@ namespace eTRIKS.Commons.Service.Services
                 else
                     accession = accession + "01";
             }
-            var project = new Project() { Name = projectDto.Name, Description = projectDto.Title, Accession = accession, OwnerId = Guid.Parse(ownerId)};
+            var project = new Project()
+            {
+                Name = projectDto.Name,
+                Description = projectDto.Desc,
+                Accession = accession,
+                OwnerId = Guid.Parse(ownerId),
+                Title = projectDto.Title,
+                Type = projectDto.Type
+            };
 
 
             var owner =_userRepository.Get(Guid.Parse(ownerId));
@@ -131,7 +142,9 @@ namespace eTRIKS.Commons.Service.Services
             var projectToUpdate = _projectRepository.Get(projectId);
 
             projectToUpdate.Name = projectDto.Name;
-            projectToUpdate.Description = projectDto.Title;
+            projectToUpdate.Title = projectDto.Title;
+            projectToUpdate.Description = projectDto.Desc;
+            projectToUpdate.Type = projectDto.Type;
             _projectRepository.Update(projectToUpdate);
             return uoW.Save();
         }
@@ -140,12 +153,22 @@ namespace eTRIKS.Commons.Service.Services
         {
             var guidUserID = Guid.Parse(userId);
             var projects = _projectRepository.FindAll(
-                p=>p.Users.Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID).Select(p=> new ProjectDTO()
+                p=>p.Users.Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID, new List<Expression<Func<Project, object>>>()
+                {
+                    //p=>p.Studies.Select(s=>s.Arms),
+                    p=>p.Studies.Select(s=>s.Subjects)
+                   
+                }).Select(p=> new ProjectDTO()
             {
                 Accession = p.Accession,
                 Id = p.Id,
                 Name = p.Name,
-                Title = p.Description
+                Title = p.Title,
+                Desc = p.Description,
+                Type = p.Type,
+                StudyCount = p.Studies.Count,
+                //CohortCount = p.Studies.Sum(s=>s.Arms.Count),
+                SubjectCount = p.Studies.Sum(s=>s.Subjects.Count)
             });
             return projects;
         }

@@ -2,7 +2,7 @@
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Data
+namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
     public class ObjectOfObservation : Identifiable<int>
     {

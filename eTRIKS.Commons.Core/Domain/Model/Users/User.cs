@@ -1,4 +1,5 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.Base;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using System;
 using System.Collections.Generic;
 

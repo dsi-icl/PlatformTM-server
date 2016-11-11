@@ -2,7 +2,6 @@
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace eTRIKS.Commons.Service.Services.UserManagement
 {

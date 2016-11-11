@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http.Authentication;
-using Microsoft.AspNetCore.Authentication;
 
 namespace eTRIKS.Commons.Service.Services.Authentication
 {
@@ -29,7 +27,7 @@ namespace eTRIKS.Commons.Service.Services.Authentication
             var allowedOrigin = "*";
             UserAccount appUser = null;
 
-            context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
+           // context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { allowedOrigin });
 
             // // using (UserAuthRepository _repo = new UserAuthRepository())
             ////  {

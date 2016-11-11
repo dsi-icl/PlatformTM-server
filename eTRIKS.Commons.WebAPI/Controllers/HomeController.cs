@@ -1,4 +1,6 @@
-﻿namespace eTRIKS.Commons.WebAPI.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace eTRIKS.Commons.WebAPI.Controllers
 {
     public class HomeController : Controller
     {

@@ -1,4 +1,4 @@
-﻿namespace eTRIKS.Commons.Core.Domain.Model.Data
+﻿namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
     class SubjectOfObservation
     {

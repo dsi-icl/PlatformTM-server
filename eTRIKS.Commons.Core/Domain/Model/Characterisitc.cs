@@ -1,5 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -14,7 +15,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string CVtermId { get; set; }
         public string DatasetDomainCode { get; set; }
         public VariableReference DatasetVariable { get; set; }
-        public int DatasetVariableId { get; set; }
+        public int? DatasetVariableId { get; set; }
         //public Dataset Dataset { get; set; }
         public int DatasetId { get; set; }
     }

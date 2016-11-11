@@ -23,5 +23,8 @@ namespace eTRIKS.Commons.Service.DTOs
         public string dateLastModified { get; set; }
 
         public string path { get; set; }
+        public bool templateAlmostMatched { get; internal set; }
+        public int percentMatched { get; internal set; }
+        public List<string> unmappedCols { get; internal set; }
     }
 }

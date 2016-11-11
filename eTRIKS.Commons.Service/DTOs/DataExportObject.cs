@@ -1,9 +1,14 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 
 namespace eTRIKS.Commons.Service.DTOs
 {
@@ -14,7 +19,7 @@ namespace eTRIKS.Commons.Service.DTOs
         private readonly IRepository<Study, int> _studyRepository;
         private readonly IRepository<HumanSubject, string> _subjectRepository;
 
-        public List<SubjectObservation> Observations { get; set; }
+        public List<SdtmRow> Observations { get; set; }
         public List<SubjectCharacteristic> SubjChars { get; set; }
         public List<Visit> Visits { get; set; }
         public List<Arm> Arms { get; set; }
@@ -25,7 +30,7 @@ namespace eTRIKS.Commons.Service.DTOs
 
         public DataExportObject()
         {
-            Observations = new List<SubjectObservation>();
+            Observations = new List<SdtmRow>();
             SubjChars = new List<SubjectCharacteristic>();
             Visits = new List<Visit>();
             Arms = new List<Arm>();

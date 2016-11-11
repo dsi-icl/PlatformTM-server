@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
+namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 {
     /*****
      * SDTMENTITY is the generic subject matter than a particular SDTM is collecting observations about
@@ -16,6 +16,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
     {  
         public string StudyId { get; set; }
         public string DomainCode { get; set; }
+        public string Class { get; set; }
         public string SubjectId { get; set; }
         public string USubjId { get; set; }
         public string SampleId { get; set; }
@@ -37,6 +38,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
         public RelativeTimePoint CollectionStudyTimePoint { get; set; } //--TPT
         public TimeInterval StudyDayInterval { get; set; }
         public TimeInterval DateTimeInterval { get; set; }
+        public string Duration { get; set; }
 
 
 
@@ -49,11 +51,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
 
 
         //DM SPECIFIC PROPERTIES ... they are qualifiers for subject for a DM domain
-        public string Arm { get; set; }
-        public string ArmCode { get; set; }
-        public string SiteId { get; set; }
-        public DateTime RFENDTC;
-        public DateTime RFSTDTC;
+        //public string Arm { get; set; }
+        //public string ArmCode { get; set; }
+        //public string SiteId { get; set; }
+        //public DateTime RFENDTC;
+        //public DateTime RFSTDTC;
 
         public bool BaseLineFlag { get; set; } //--BLFL
 

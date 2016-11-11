@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
 {
     public class VariableDefinition : Identifiable<int>
     {
@@ -15,6 +15,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Description { get; set; }
         public string DataType { get; set; }
         public Nullable<bool> IsCurated { get; set; }
+        public string VariableTypeStr { get; set; } //TEMP until OLS is setup
         public CVterm VariableType { get; set; }
         public string VariableTypeId { get; set; }
         public CVterm Role { get; set; }

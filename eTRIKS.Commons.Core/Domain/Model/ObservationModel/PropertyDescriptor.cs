@@ -2,8 +2,9 @@
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Data
+namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
+    //EQUIVALENT TO VARIABLE DEFINITION
     public class PropertyDescriptor : Identifiable<int>
     {
         //public VariableReference DatasetVariable { get; set; }

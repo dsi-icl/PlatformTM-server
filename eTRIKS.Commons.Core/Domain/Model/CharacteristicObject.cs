@@ -12,6 +12,8 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string CVtermId { get; set; }
         public Project Project { get; set; }
         public int ProjectId { get; set; }
+        public string DataType { get; set; }
+
         //public string DataType { get; set; }
 
         //public string DataType { get; set; }

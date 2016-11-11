@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {

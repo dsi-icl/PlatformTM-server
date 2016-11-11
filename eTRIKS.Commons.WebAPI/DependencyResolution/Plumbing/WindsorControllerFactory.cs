@@ -1,5 +1,10 @@
 using System;
 using System.Net.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Dispatcher;
+using System.Web.Mvc;
+using System.Web.Routing;
+using Castle.Windsor;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Plumbing
 {

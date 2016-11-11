@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
@@ -59,12 +60,12 @@ namespace eTRIKS.Commons.Service.Services
                     num = project.Studies.Count;
                     var abbr = studyDto.ProjectAcc.Substring(2, 3);
                     studyDto.Accession = "S-" + abbr + "-" + (num+1).ToString("00");
-                    studyDto.ProjectDBId = project.Id;
+                    studyDto.ProjectId = project.Id;
                 }
             }
             
             
-            var study = new Study() { Name = studyDto.Name, Description = studyDto.Title , Accession = studyDto.Accession, ProjectId = studyDto.ProjectDBId};
+            var study = new Study() { Name = studyDto.Name, Description = studyDto.Title , Accession = studyDto.Accession, ProjectId = studyDto.ProjectId};
 
             study = _studyRepository.Insert(study);
             if (!_studyServiceUnit.Save().Equals("CREATED")) return null;
@@ -85,7 +86,7 @@ namespace eTRIKS.Commons.Service.Services
                 Title = study.Description,
                 Accession = study.Accession,
                 Id = study.Id,
-                ProjectDBId = study.ProjectId,
+                ProjectId = study.ProjectId,
                 ProjectAcc = study.Project.Accession
             };
         }

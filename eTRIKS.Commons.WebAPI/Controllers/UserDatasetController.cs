@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.Services.UserManagement;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -23,14 +26,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("projects/{projectAcc}")]
-        public async Task<List<UserDatasetDTO>> GetUserDatasets(string projectAcc)
+        [Route("projects/{projectId}")]
+        public async Task<List<UserDatasetDTO>> GetUserDatasets(int projectId)
         {
             var userId = User.Identity.GetUserId();
             if (!User.Identity.IsAuthenticated)
                 return null;
             //var account = await _accountService.FindByNameAsync(name);
-            return _userDataService.GetUserDatasets(projectAcc,userId);
+            return _userDataService.GetUserDatasets(projectId, userId);
 
         }
 

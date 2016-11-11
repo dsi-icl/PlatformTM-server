@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Data
+namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
     //IF Observation Data is going to be stored in MySQL then will leave references to other entites such as O3 and Subject
     //As long as the Descriptor is saved in MySQL with references to project, stud

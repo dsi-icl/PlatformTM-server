@@ -10,6 +10,7 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 
 namespace eTRIKS.Commons.Service.Services
@@ -77,12 +78,12 @@ namespace eTRIKS.Commons.Service.Services
 
         public ActivityDTO AddActivity(ActivityDTO activityDTO)
         {
-            var project = _projectRepository.FindSingle(d => d.Accession
-                .Equals(activityDTO.ProjectAcc));
-            var activity = new Activity { Name = activityDTO.Name, ProjectId = project.Id };
+            //var project = _projectRepository.FindSingle(d => d.Accession
+            //    .Equals(activityDTO.ProjectAcc));
+            var activity = new Activity { Name = activityDTO.Name, ProjectId = activityDTO.ProjectId};
             foreach (var datasetDto in activityDTO.datasets)
             {
-                datasetDto.ProjectId = project.Id;
+                datasetDto.ProjectId = activityDTO.ProjectId;
                 var dataset = _datasetService.CreateDataset(datasetDto);
                 activity.Datasets.Add(dataset);
             }
@@ -104,10 +105,11 @@ namespace eTRIKS.Commons.Service.Services
             activityToUpdate.Name = activityDTO.Name;
             foreach (var datasetDto in activityDTO.datasets)
             {
-                //datasetDto.ProjectId = project.Id;
                 if (datasetDto.isNew)
                 {
+                    datasetDto.ProjectId = activityDTO.ProjectId;
                     var dataset = _datasetService.CreateDataset(datasetDto);
+                    
                     activityToUpdate.Datasets.Add(dataset);
                     _activityRepository.Update(activityToUpdate);
                 }

@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")] 
+   // [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")] 
     public class DatasetController : Controller
     {
         private DatasetService _datasetService;
@@ -133,18 +131,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/datasets/{datasetId}/preview/file/{fileId}")]
-        public async Task<Hashtable> getDatasetPreview(int datasetId, int fileId)
+        public Hashtable GetDatasetPreview(int datasetId, int fileId)
         {
-           return _datasetService.getDatasetPreview(datasetId,fileId);
+           return _fileService.getFilePreview(fileId);
         }
 
         [HttpGet]
         [Route("api/Datasets/{datasetId}/saveDataFile/file/{fileId}")]
         public bool LoadDataFile(int datasetId, int fileId)
         {
-            return  _datasetService.SaveDataFile(datasetId, fileId) == "CREATED";
-           //return  _datasetService.PersistSDTM(datasetId, fileId);
-            
+           return  _datasetService.PersistSDTM(datasetId, fileId);            
         }
 
         [HttpGet]
@@ -153,8 +149,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return await _datasetService.LoadDataset(datasetId,fileId);
         }
-
-
 
         [HttpGet]
         [Route("api/datasets/{datasetId}/compute/files/{fileId}")]

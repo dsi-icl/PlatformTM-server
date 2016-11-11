@@ -35,6 +35,7 @@ namespace eTRIKS.Commons.Service.DTOs
 
     public class DatasetVariableDTO
     {
+        public string varType;
         public int Id { get; set; }
         public string Accession { get; set; }
         public string Name { get; set; }

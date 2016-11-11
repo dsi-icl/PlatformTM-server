@@ -2,9 +2,8 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-//using eTRIKS.Commons.DataParser.IOFileManagement;
 using eTRIKS.Commons.Service.Services;
-
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -46,7 +45,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
             //string tempFilepath = "temp/BStemplate.csv";
             //string tempVarFilepath = "temp/BStemplateVars.csv";
-            _fileService.tempmethod();
+           // _fileService.tempmethod();
         }
 
         [HttpGet]
@@ -66,7 +65,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
             //string tempFilepath = "temp/BStemplate.csv";
             //string tempVarFilepath = "temp/BStemplateVars.csv";
-            _fileService.getLongFormat2();
+           // _fileService.getLongFormat2();
         }
 
 

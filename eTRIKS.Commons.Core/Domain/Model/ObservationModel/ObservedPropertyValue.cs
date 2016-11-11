@@ -1,6 +1,6 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Data
+namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
     public abstract class ObservedPropertyValue
     {
@@ -23,7 +23,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data
     {
         public float Value { get; set; }
         public string Unit { get; set; }
-        public CVterm UnirCVterm { get; set; }
+        public CVterm UnitCVterm { get; set; }
     }
 
     public class IntervalValue : ObservedPropertyValue

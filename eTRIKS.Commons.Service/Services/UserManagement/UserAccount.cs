@@ -1,9 +1,8 @@
-﻿using System;
-using eTRIKS.Commons.Core.Application.AccountManagement;
-
+﻿using eTRIKS.Commons.Core.Application.AccountManagement;
+using System;
 namespace eTRIKS.Commons.Service.Services.UserManagement
 {
-    public class UserAccount : TUser
+    public class UserAccount : IUser<Guid>
     {
         public Account Account { get; set; }
         public  Guid Id

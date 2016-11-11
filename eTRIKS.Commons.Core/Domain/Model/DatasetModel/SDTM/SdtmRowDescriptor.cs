@@ -1,9 +1,7 @@
-﻿
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
+namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 {
     public class SdtmRowDescriptor
     {
@@ -49,6 +47,18 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
         public VariableDefinition StartStudyDayVariable { get; set; } //--STDY
         public VariableDefinition EndStudyDayVariable { get; set; } //--ENDY
 
+        //SUBJECT SPECIFIC VARIABLES
+        public VariableDefinition ArmVariable { get; set; }
+        public VariableDefinition ArmCodeVariable { get; set; }
+        public VariableDefinition RefStartDate { get; set; }
+        public VariableDefinition RefEndDate { get; set; }
+        public VariableDefinition SiteIdVariable { get; set; }
+
+        public bool ObsIsAFinding { get; set; } = false;
+        public bool ObsIsAnEvent { get; set; } = false;
+        public bool ObsIsMedDRAcoded { get; set; }
+        public SdtmMedDRADescriptors MedDRAvariables { get; set; }
+
 
 
 
@@ -63,6 +73,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
             descriptor.Class = dataset.Domain.Class;
             descriptor.Domain = dataset.Domain.Name;
             descriptor.DomainCode = dataset.Domain.Code;
+
+            descriptor.ObsIsAFinding = descriptor.Class.ToUpper() == ("FINDINGS");
+            descriptor.ObsIsAnEvent = descriptor.Class.ToUpper() == "EVENTS";
 
             //IDENTIFIERS
             descriptor.StudyIdentifierVariable =
@@ -118,6 +131,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
                         .Where(v => v.RoleId == "CL-Role-T-8")
                         .ToList();
 
+            //MedDRAVariables
+            if (descriptor.ObsIsAnEvent)
+            {
+                descriptor.MedDRAvariables = SdtmMedDRADescriptors.GetSdtmMedDRADescriptors(dataset);
+                // descriptor.ObsIsMedDRAcoded = SdtmMedDRADescriptors.
+            }
+
             //VISIT
             descriptor.VisitNameVariable =
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "VISIT")?.VariableDefinition;
@@ -127,9 +147,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "VISITDY")?.VariableDefinition;
 
             //DATETIME
-            descriptor.DateTimeVariable=
+            descriptor.DateTimeVariable =
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == descriptor.DomainCode + "DTC")?.VariableDefinition;
-            
+
             //STUDYDAY
             descriptor.StudyDayVariable =
                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == descriptor.DomainCode + "DY")?.VariableDefinition;
@@ -156,12 +176,51 @@ namespace eTRIKS.Commons.Core.Domain.Model.Data.SDTM
             //END STUDY DAY
             descriptor.EndStudyDayVariable =
                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == descriptor.DomainCode + "ENDY")?.VariableDefinition;
-            
-            
-            //RFTDTC
+
+
+            //DEMOGRAPHICS SPECIFIC VARIABLES
+            //ARM
+            descriptor.ArmVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARM")?.VariableDefinition;
+            //ARMCODE
+            descriptor.ArmCodeVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARMCD")?.VariableDefinition;
+            //Subject Reference Start Date
+            descriptor.RefStartDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFSTDTC")?.VariableDefinition;
+            //Reference End Date
+            descriptor.RefEndDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFENDTC")?.VariableDefinition;
+            //SITE ID
+            descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
+
             return descriptor;
         }
-    }
 
+        public VariableDefinition GetDefaultQualifier(SdtmRow sdtmRow)
+        {
+            const string numResVar = "STRESN";
+            const string charResVar = "STRESC";
+            const string oriResVar = "ORRES";
+            const string occurVar = "SEV";
+            string s;
+            if (ObsIsAFinding)
+            {
+                if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+numResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + numResVar] != "")
+                {
+                    return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + numResVar));
+                }
+                else if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+charResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + charResVar] != "")
+                {
+                    return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + charResVar));
+                }
+                else
+                {
+                    return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + oriResVar));
+                }
+            }
+            if (ObsIsAnEvent)
+            {
+                return QualifierVariables.Find(rv => rv.Name.Equals(DomainCode + occurVar));
+            }
+            return null;
+        }
+    }
 
 }

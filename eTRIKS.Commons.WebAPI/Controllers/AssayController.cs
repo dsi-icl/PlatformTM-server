@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,15 +21,15 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
          [HttpGet]
-         [Route("api/projects/{projectAcc}/assays")]
-         public List<AssayDTO> GetAssays(string projectAcc)
+         [Route("api/projects/{projectId}/assays")]
+         public List<AssayDTO> GetAssays(int projectId)
          {
-             return _assayService.GetProjectAssays(projectAcc);
+             return _assayService.GetProjectAssays(projectId);
          }
 
         [HttpGet]
         [Route("api/projects/{projectId}/assays/{assayId}/samples")]
-        public Task<Hashtable> GetSamplesData(string projectId, int assayId)
+        public Hashtable GetSamplesData(int projectId, int assayId)
         {
             return _assayService.GetSamplesDataPerAssay(projectId, assayId);
         }

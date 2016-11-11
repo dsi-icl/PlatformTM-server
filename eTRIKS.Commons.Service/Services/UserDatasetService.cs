@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
@@ -21,11 +23,11 @@ namespace eTRIKS.Commons.Service.Services
             _projectRepository = uoW.GetRepository<Project, int>();
         }
 
-        public List<UserDatasetDTO> GetUserDatasets(string projectAcc, string UserId)
+        public List<UserDatasetDTO> GetUserDatasets(int projectId, string UserId)
         {
-            var project = _projectRepository.FindSingle(p => p.Accession == projectAcc);
+            //var project = _projectRepository.FindSingle(p => p.Id == projectId);
             List<UserDataset> datasets = _userDatasetRepository.FindAll(
-                d => d.OwnerId == UserId.ToString() && d.ProjectId == project.Id).ToList();
+                d => d.OwnerId == UserId.ToString() && d.ProjectId == projectId).ToList();
             return datasets.Select(WriteDTO).ToList();
         }
 
@@ -41,8 +43,8 @@ namespace eTRIKS.Commons.Service.Services
             var NewDS = ReadDTO(dto);
             NewDS.OwnerId = userId;
 
-            var project = _projectRepository.FindSingle(p => p.Accession == dto.ProjectAcc);
-            NewDS.ProjectId = project.Id;
+            //var project = _projectRepository.FindSingle(p => p.Accession == dto.ProjectAcc);
+            NewDS.ProjectId = dto.ProjectId;
             NewDS.Id = Guid.NewGuid();
 
             var addedUserDataset = _userDatasetRepository.Insert(NewDS);

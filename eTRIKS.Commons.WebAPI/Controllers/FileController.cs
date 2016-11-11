@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -29,11 +30,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("project/{projectId}/createdir")]
-        public List<string> CreateDirectory(string projectId, [FromBody] DirectoryDTO dir)
+        [Route("projects/{projectId}/createdir")]
+        public List<string> CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
             string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
-            string projDir = fileDir + projectId;
+            string projDir = fileDir + "P-" + projectId;
             string newDir = projDir  +"/"+dir.name;
             
              var diInfo =    _fileService.addDirectory(projectId, newDir);
@@ -42,26 +43,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("project/{projectId}/directories")]
-        public List<string> getDirectories(string projectId)
+        [Route("projects/{projectId}/directories")]
+        public List<string> getDirectories(int projectId)
         {
             return _fileService.getDirectories(projectId);
-            //string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
-            //string projDir = fileDir + projectId;
-            ////string newDir = projDir + "/" + dirName;
-            //if (!Directory.Exists(projDir)) Directory.CreateDirectory(projDir);
-            //return new DirectoryInfo(projDir).GetDirectories().Select(d => d.Name).ToList();
         }
 
         [HttpPost]
-        [Route("project/{projectId}/upload/{dir?}")]
-        public async Task<List<string>> UploadFile(string projectId, string dir="")
+        [Route("projects/{projectId}/upload/{dir?}")]
+        public async Task<List<string>> UploadFile(int projectId, string dir="")
         {
             try
             {
                 //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
                 string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-                string path = rawFilesDirectory + projectId + "\\" + dir  ;
+                string path = rawFilesDirectory + "P-"+ projectId + "\\" + dir  ;
                 if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 if (Request.Content.IsMimeMultipartContent())
                 {
@@ -93,12 +89,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("project/{projectId}/uploadedFiles/{subdir?}")]
-        public async Task<List<FileDTO>> GetUploadedFiles(string projectId,string subdir="")
+        [Route("projects/{projectId}/uploadedFiles/{subdir?}")]
+        public async Task<List<FileDTO>> GetUploadedFiles(int projectId,string subdir="")
         {
             string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
             //string path = rawFilesDirectory + projectId;
-            string relativePath = projectId; 
+            string relativePath = "P-"+projectId; 
             //if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             if(subdir != "")
                 relativePath = relativePath + "\\" + subdir.Replace('_','\\');
@@ -107,26 +103,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("project/{projectId}/preview/{fileId}")]
+        [Route("{fileId}/preview")]
         public async Task<Hashtable> getDatasetPreview(int fileId)
         {
             return _fileService.getFilePreview(fileId);
         }
-
-
-
-        //[HttpGet]
-        //[Route("{fileName}/fileHeader")]
-        //public async Task<List<Dictionary<string, string>>> LinkFile(string fileName)
-        //{
-
-        //    //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-        //    var rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-        //    string path = rawFilesDirectory + studyId;
-        //    string filePath = rawFilesDirectory + "\\" + fileName;
-        //    return _fileService.getFileColHeaders(filePath);
-        //}
-
         
     }
 }

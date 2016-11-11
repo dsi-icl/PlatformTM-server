@@ -62,7 +62,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         /// <param name="entity">Entity</param>
         TEntity Insert(TEntity entity);
         Task<string> InsertAsync(TEntity entity);
-        IEnumerable<TEntity> InsertMany(IList<TEntity> entities = null);
+        void InsertMany(IList<TEntity> entities = null);
         Task InsertManyAsync(IList<TEntity> entitites = null);
 
         #endregion

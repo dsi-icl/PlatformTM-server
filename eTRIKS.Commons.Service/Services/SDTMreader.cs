@@ -1,8 +1,9 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Data.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
+﻿using eTRIKS.Commons.Core.Domain.Model.Timing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
+using eTRIKS.Commons.Service.DTOs;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -21,6 +22,8 @@ namespace eTRIKS.Commons.Service.Services
         public static SdtmRow readSDTMrow(DataRow tableRow, DataTable dataTable, SdtmRowDescriptor descriptor)
         {
             var sdtmrow = new SdtmRow();
+
+            sdtmrow.Class = descriptor.Class;
             foreach (DataColumn column in dataTable.Columns)
             {
                 var colName = column.ColumnName;
@@ -123,9 +126,12 @@ namespace eTRIKS.Commons.Service.Services
                 else if (descriptor.StudyDayVariable?.Name == colName)
                 {
                     //--DY
+                    int num;
+                    if (!int.TryParse(value, out num)) continue;
                     if (sdtmrow.CollectionStudyDay == null)
                         sdtmrow.CollectionStudyDay = new RelativeTimePoint();
-                    sdtmrow.CollectionStudyDay.Number = Int32.Parse(value);
+ 
+                    sdtmrow.CollectionStudyDay.Number = num;
                     sdtmrow.CollectionStudyDay.Name = null;
                 }
                 else if (descriptor.TimePointNameVariable?.Name == colName)
@@ -138,16 +144,16 @@ namespace eTRIKS.Commons.Service.Services
                 else if (descriptor.TimePointNameVariable?.Name == colName)
                 {
                     //--TPTNUM
+                    int num;
+                    if (!int.TryParse(value, out num)) continue;
                     if (sdtmrow.CollectionStudyTimePoint == null)
                         sdtmrow.CollectionStudyTimePoint = new RelativeTimePoint();
-                    sdtmrow.CollectionStudyTimePoint.Number = int.Parse(value);
+                        sdtmrow.CollectionStudyTimePoint.Number = num;
                 }
                 else if (descriptor.DurationVariable?.Name == colName)
                 {
-                    //--TPTNUM
-                    if (sdtmrow.CollectionStudyTimePoint == null)
-                        sdtmrow.CollectionStudyTimePoint = new RelativeTimePoint();
-                    sdtmrow.CollectionStudyTimePoint.Number = int.Parse(value);
+                    //--DUR
+                    sdtmrow.Duration = value;
                 }
                 else if (descriptor.StartDateTimeVariable?.Name == colName)
                 {

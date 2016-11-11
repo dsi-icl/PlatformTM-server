@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -7,7 +8,7 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using System.Collections;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -36,9 +37,9 @@ namespace eTRIKS.Commons.Service.Services
             _datasetService = datasetService;
         }
 
-        public List<AssayDTO> GetProjectAssays(string projectAcc)
+        public List<AssayDTO> GetProjectAssays(int projectId)
         {
-            List<Assay> assays = _assayRepository.FindAll(a => a.Project.Accession.Equals(projectAcc),
+            List<Assay> assays = _assayRepository.FindAll(a => a.ProjectId == projectId,
                 new List<Expression<Func<Assay, object>>>()
                 {
                     a => a.MeasurementType,
@@ -58,7 +59,7 @@ namespace eTRIKS.Commons.Service.Services
             }).ToList();
         }
 
-        public async Task<Hashtable> GetSamplesDataPerAssay(string projectId, int assayId)
+        public Hashtable GetSamplesDataPerAssay(int projectId, int assayId)
         {
             var samples = new List<Biosample>();
             samples = _bioSampleRepository.FindAll

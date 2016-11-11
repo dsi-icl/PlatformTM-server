@@ -1,4 +1,6 @@
-﻿namespace eTRIKS.Commons.Service.DTOs
+﻿using System.Collections.Generic;
+
+namespace eTRIKS.Commons.Service.DTOs
 {
     public class ObservationRequestDTO
     {
@@ -6,13 +8,25 @@
         private string _O3code;
         public string Id
         {
-            get { return _O3code+ (QO2!=null? " ["+QO2+"]":"");}
+            get { return O3id.ToString() + (QO2id!=null ? "_"+QO2id.ToString():""); }
+            //get { return _O3code+ (QO2!=null? "["+QO2+"]":"");}
+            set { _id = value; }
+        }
+        public string Name
+        {
+            //get { return (O3id + QO2id ?? QO2id).ToString(); }
+            get { return _O3code + (QO2 != null ? "[" + QO2 + "]" : ""); }
             set { _id = value; }
         }
 
         public string O3 { get; set; }
         public int O3id { get; set; }
         public string O3variable { get; set; }
+        public bool IsMultipleObservations { get; set; }
+        public List<int> TermIds { get; set; }
+        public bool IsEvent { get; set; }
+        public bool IsFinding { get; set; }
+        public bool IsOntologyEntry { get; set; }
 
         public string O3code
         {
@@ -22,8 +36,13 @@
 
         public string QO2 { get; set; }
         public int? QO2id { get; set; }
-
+        public string DataType { get; set; }
+        public string QO2_label { get; internal set; }
     }
 
+   
+    
+
+    
 
 }

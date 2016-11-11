@@ -1,7 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using eTRIKS.Commons.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
 {
     public class DataFile : Identifiable<int>
     {

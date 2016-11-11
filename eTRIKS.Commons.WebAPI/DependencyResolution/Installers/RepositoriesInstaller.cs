@@ -1,13 +1,17 @@
-﻿using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.DataAccess.MongoDB;
+﻿using Castle.MicroKernel.Registration;
+using Castle.MicroKernel.SubSystems.Configuration;
+using Castle.Windsor;
+using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.DataAccess;
+using Microsoft.AspNet.Identity;
 using System;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Persistence;
+using System.Data.Entity;
 
 namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 {
-    public class RepositoriesInstaller : IWindsorInstaller
+	public class RepositoriesInstaller : IWindsorInstaller
 	{
 		public void Install(IWindsorContainer container, IConfigurationStore store)
 		{
@@ -17,7 +21,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 			   //TODO: remove EF and Persistence dependencies
 
 			    Component.For<DbContext, IServiceUoW>().LifestylePerWebRequest()
-                    .ImplementedBy<EtriksDataContextProd>(),
+                    .ImplementedBy<BioSPEAKdbContext>(),
 
 			    Component.For<IUserRepository>()
                     .ImplementedBy<UserRepository>(),
@@ -29,7 +33,7 @@ namespace eTRIKS.Commons.WebAPI.DependencyResolution.Installers
 			    Component.For<UserAccountService>()
                     .LifestylePerWebRequest(),
 
-			    Component.For<MongoDbDataRepository>(),
+			   
 
 				Classes
 					.FromAssemblyNamed("eTRIKS.Commons.DataAccess")
