@@ -73,7 +73,7 @@ namespace eTRIKS.Commons.Service.Services
             //ds.OwnerId = dto.OwnerId;
             //ds.ProjectId = dto.ProjectId;
             ds.Type = dto.Type;
-            ds.LastModified = DateTime.Now.ToShortDateString();
+            ds.LastModified = DateTime.Now.ToString("d");// ToShortDateString();
         
             ds.Filters= new List<DataFilter>();
             ds.Fields = new List<DataField>();

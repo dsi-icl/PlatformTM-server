@@ -1,13 +1,14 @@
 {
   "dependencies": {
     "Microsoft.NETCore.App": {
-      "version": "1.0.0",
+      "version": "1.0.1",
       "type": "platform"
     },
-    "Microsoft.AspNetCore.Mvc": "1.0.0",
-    "Microsoft.AspNetCore.Routing": "1.0.0",
+    "Microsoft.ApplicationInsights.AspNetCore": "1.0.0",
+    "Microsoft.AspNetCore.Mvc": "1.0.1",
+    "Microsoft.AspNetCore.Routing": "1.0.1",
     "Microsoft.AspNetCore.Server.IISIntegration": "1.0.0",
-    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.1",
     "Microsoft.Extensions.Configuration.EnvironmentVariables": "1.0.0",
     "Microsoft.Extensions.Configuration.FileExtensions": "1.0.0",
     "Microsoft.Extensions.Configuration.Json": "1.0.0",
@@ -17,10 +18,7 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "eTRIKS.Commons.Core": "1.0.0-*",
     "eTRIKS.Commons.DataAccess": "1.0.0-*",
-    "eTRIKS.Commons.Service": "1.0.0-*",
-    "Microsoft.AspNetCore.Mvc.Core": "1.0.0",
-    "Microsoft.AspNetCore.Authorization": "1.0.0",
-    "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "1.0.0"
+    "eTRIKS.Commons.Service": "1.0.0-*"
   },
 
   "tools": {
@@ -29,6 +27,10 @@
 
   "frameworks": {
     "netcoreapp1.0": {
+      "imports": [
+        "dotnet5.6",
+        "portable-net45+win8"
+      ]
     }
   },
 
@@ -46,8 +48,7 @@
   "publishOptions": {
     "include": [
       "wwwroot",
-      "Views",
-      "Areas/**/Views",
+      "**/*.cshtml",
       "appsettings.json",
       "web.config"
     ]

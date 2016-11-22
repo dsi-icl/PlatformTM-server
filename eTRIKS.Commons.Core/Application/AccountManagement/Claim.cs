@@ -11,8 +11,8 @@ namespace eTRIKS.Commons.Core.Application.AccountManagement
         public virtual string ClaimType { get; set; }
         public virtual string ClaimValue { get; set; }
 
-        private Account _user;
-        public virtual Account User
+        private UserAccount _user;
+        public virtual UserAccount User
         {
             get { return _user; }
             set

@@ -36,10 +36,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/assays/temp/{assayId}/loadPA/{fileId}")]
-        public HttpResponseMessage AddPA(int assayId, int fileId)
+        public IActionResult AddPA(int assayId, int fileId)
         {
             _assayService.addPA(assayId, fileId);
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return new OkResult();
         }
     }
 }

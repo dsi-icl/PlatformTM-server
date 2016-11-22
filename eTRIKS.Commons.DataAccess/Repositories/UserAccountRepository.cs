@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.DataAccess
 {
-    public class UserAccountRepository : GenericRepository<Account, Guid>, IUserAccountRepository
+    public class UserAccountRepository : GenericRepository<UserAccount, Guid>, IUserAccountRepository
     {
 
         public UserAccountRepository(DbContext _ctx) : base(_ctx)
@@ -16,22 +16,22 @@ namespace eTRIKS.Commons.DataAccess
             //Entities = DataContext.Set<TEntity>();
         }
 
-        public Account FindByEmail(string email)
+        public UserAccount FindByEmail(string email)
         {
             return Entities.FirstOrDefault(a => a.User.Email == email);
         }
 
-        public Task<Account> FindByEmailAsync(string email)
+        public Task<UserAccount> FindByEmailAsync(string email)
         {
             return Entities.FirstOrDefaultAsync(a => a.User.Email == email);
         }
 
-        public Account FindByUserName(string username)
+        public UserAccount FindByUserName(string username)
         {
             return Entities.FirstOrDefault(a => a.UserName == username);
         }
 
-        public Task<Account> FindByUserNameAsync(string username)
+        public Task<UserAccount> FindByUserNameAsync(string username)
         {
             return Entities.FirstOrDefaultAsync(a => a.UserName == username);
         }

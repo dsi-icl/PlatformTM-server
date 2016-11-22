@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using eTRIKS.Commons.WebAPI.Extensions;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -29,7 +27,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("api/projects")]
         public IEnumerable<ProjectDTO> Get()
         {
-            var userId = User.Identity.GetUserId();
+            var userId = User.GetUserId();
             if (!User.Identity.IsAuthenticated)
                 return null;
             return _projectService.GetProjects(userId);
@@ -57,46 +55,48 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/projects")]
-        public async Task<HttpResponseMessage> AddProject([FromBody] ProjectDTO projectDTO)
+        public IActionResult AddProject([FromBody] ProjectDTO projectDTO)
         {
             ProjectDTO addedProject = null;
 
-            var userId = User.Identity.GetUserId();
+            var userId = User.GetUserId();
             if (!User.Identity.IsAuthenticated)
                 return null;
             //var account = await _accountService.(name);
-            addedProject = await _projectService.AddProject(projectDTO,userId);
+            addedProject = _projectService.AddProject(projectDTO,userId);
 
 
             if (addedProject != null)
             {
-                var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Created, addedProject);
-                string uri = Url.Link("GetProjectById", new { projectId = addedProject.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Created, addedProject);
+                //string uri = Url.Link("GetProjectById", new { projectId = addedProject.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = addedProject.Id }, addedProject);
             }
             else
             {
-                var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                return response;
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 
         [HttpPut]
         [Route("api/projects/{projectId}")]
-        public HttpResponseMessage UpdateProject(int projectId, [FromBody] ProjectDTO projectDTO)
+        public IActionResult UpdateProject(int projectId, [FromBody] ProjectDTO projectDTO)
         {
             try
             {
                 _projectService.UpdateProject(projectDTO, projectId);
-                var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Accepted, projectDTO);
-                string uri = Url.Link("GetProjectById", new { projectId = projectDTO.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Accepted, projectDTO);
+                //string uri = Url.Link("GetProjectById", new { projectId = projectDTO.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = projectDTO.Id }, projectDTO);
+
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict);
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
     }

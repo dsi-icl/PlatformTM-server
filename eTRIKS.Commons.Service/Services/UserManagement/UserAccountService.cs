@@ -2,26 +2,46 @@
 using eTRIKS.Commons.Core.Domain.Model.Users;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Service.Services.UserManagement
 {
-    public class UserAccountService : UserManager<UserAccount, Guid>
+    public class UserAccountService
     {
-        //private readonly ApplicationUserManager _userManager;
+        private readonly UserManager<UserAccount> _userManager;
+        private readonly SignInManager<UserAccount> _signInManager;
 
-        public UserAccountService(IUserStore<UserAccount, Guid> store) : base(store)
+        public UserAccountService(UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager)
         {
+            _userManager = userManager;
+            _signInManager = signInManager;
 
         }
 
-        
+        //    public UserAccountService(IUserStore<UserAccount> store, IOptions<IdentityOptions> optionsAccessor,
+        //    IPasswordHasher<UserAccount> passwordHasher,
+        //    IEnumerable<IUserValidator<UserAccount>> userValidators,
+        //    IEnumerable<IPasswordValidator<UserAccount>> passwordValidators,
+        //    ILookupNormalizer keyNormalizer,
+        //    IdentityErrorDescriber errors,
+        //    IEnumerable<IUserTokenProvider<UserAccount>> tokenProviders,
+        //    ILoggerFactory logger,
+        //    IHttpContextAccessor contextAccessor) :
+        //    base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, tokenProviders, logger, contextAccessor)
+        //    {
+
+        //    }
+
+
 
         public async Task<IdentityResult> RegisterUser(UserDTO userDTO)
         {
-            var Account = new Account()
+            var userAccount = new UserAccount()
             {
                 UserName = userDTO.Username,
                 JoinDate = DateTime.Now.Date,
@@ -34,27 +54,24 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
                     LastName = userDTO.LastName,
                     Organization = userDTO.Organization
                 }
-        };
-
-            var userAccount = new UserAccount(Account);
-
-            var result = await this.CreateAsync(userAccount, userDTO.Password);
+            };
+            var result = await _userManager.CreateAsync(userAccount, userDTO.Password);
             return result;
         }
 
-        public async Task<UserAccount> FindUserAsync(string name, string password)
-        {
-            return await this.FindAsync(name, password);
-        }
+        //public async Task<UserAccount> FindUserAsync(string name, string password)
+        //{
+        //    return await _userManager.FindAsync(name, password);
+        //}
 
 
         public async Task<string> GetUserPsk(UserDTO userDTO)
         {
             string psk = null;
-            var user = await this.FindByNameAsync(userDTO.Username);
+            var user = await _userManager.FindByNameAsync(userDTO.Username);
             if (user != null)
             {
-                psk = user.Account.PSK;
+                psk = user.PSK;
             }
             return psk;
         }

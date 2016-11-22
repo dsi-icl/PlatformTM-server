@@ -6,7 +6,7 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>2cc126fe-9037-4117-b748-25e5c286b121</ProjectGuid>
+    <ProjectGuid>b4246d3f-ed64-4d5a-b1d3-f4647f5c00cf</ProjectGuid>
     <RootNamespace>eTRIKS.Commons.WebAPI</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>

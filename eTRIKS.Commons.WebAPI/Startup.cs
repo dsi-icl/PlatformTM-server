@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using eTRIKS.Commons.DataAccess.Configuration;
-using Microsoft.EntityFrameworkCore;
-using MySQL.Data.EntityFrameworkCore.Extensions;
-using eTRIKS.Commons.DataAccess;
 
 namespace eTRIKS.Commons.WebAPI
 {
@@ -18,9 +18,6 @@ namespace eTRIKS.Commons.WebAPI
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            //var optionsBuilder = new DbContextOptionsBuilder<EmployeesContext>();
-            //optionsBuilder.UseMySQL(connectionString);
 
             if (env.IsEnvironment("Development"))
             {
@@ -40,35 +37,7 @@ namespace eTRIKS.Commons.WebAPI
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
-            services.AddDbContext<BioSPEAKdbContext>(options =>
-                options.UseMySQL(Configuration.GetConnectionString("BioSPEAK_SQL")));
-
             services.AddMvc();
-
-            // Added - uses IOptions<T> for your settings.
-            services.AddOptions();
-
-            // Added - Confirms that we have a home for our DataAccessSettings
-            services.Configure<DataAccessSettings>(Configuration.GetSection("DataAccessSettings"));
-
-            HttpConfiguration HttpConfiguration = new HttpConfiguration();
-
-            //Bootstrap & Configure Windsor Container
-            _bootstrapper = ContainerBootstrapper.Bootstrap(HttpConfiguration);
-
-            //NEED TO CHECK HOW TO DISPOSE CONTAINER
-
-            AreaRegistration.RegisterAllAreas();
-            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            ConfigureOAuth(app);
-
-            WebApiConfig.Register(HttpConfiguration);
-
-            app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            app.UseWebApi(HttpConfiguration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

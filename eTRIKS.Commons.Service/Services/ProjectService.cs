@@ -103,7 +103,7 @@ namespace eTRIKS.Commons.Service.Services
             }).ToList();
         }
 
-        public async Task<ProjectDTO> AddProject(ProjectDTO projectDto, string ownerId)
+        public ProjectDTO AddProject(ProjectDTO projectDto, string ownerId)
         {
             var name = projectDto.Name;
             string novowels = Regex.Replace(name, "(?<!^)[aouieyAOUIEY]", "");

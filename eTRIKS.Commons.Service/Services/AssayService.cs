@@ -17,16 +17,17 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<Dictionary, string> _dictionaryRepository;
         private readonly IRepository<Biosample, int> _bioSampleRepository;
-        private readonly DatasetService _datasetService;
+        //private readonly DatasetService _datasetService;
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<PlatformAnnotation, Guid> _parepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
+        private FileService _fileService;
 
 
 
         private readonly IServiceUoW _dataContext;
 
-        public AssayService(IServiceUoW uoW, DatasetService datasetService)
+        public AssayService(IServiceUoW uoW, FileService fileService)
         {
             _dataContext = uoW;
             _assayRepository = uoW.GetRepository<Assay, int>();
@@ -34,7 +35,7 @@ namespace eTRIKS.Commons.Service.Services
             _projectRepository = uoW.GetRepository<Project, int>();
             _parepository = uoW.GetRepository<PlatformAnnotation, Guid>();
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
-            _datasetService = datasetService;
+            _fileService = fileService;
         }
 
         public List<AssayDTO> GetProjectAssays(int projectId)
@@ -93,13 +94,13 @@ namespace eTRIKS.Commons.Service.Services
         public void addPA(int assayId, int fileId)
         {
 
-            var fileService = new FileService(_dataContext);
+            //var fileService = new FileService(_dataContext);
 
             var dataFile = _dataFileRepository.Get(fileId);
 
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
             //var filePath = "temp\\" + fileName;
-            var dataTable = fileService.ReadOriginalFile(filePath);
+            var dataTable = _fileService.ReadOriginalFile(filePath);
 
             var PA = new PlatformAnnotation();
             PA.Name = "CRC305ABC";

@@ -1,10 +1,9 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.Services;
 using System;
-using System.Net;
-using System.Net.Http;
 using eTRIKS.Commons.Service.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -28,7 +27,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/activities")]
-        public HttpResponseMessage addActivity([FromBody] ActivityDTO activityDTO)
+        public IActionResult addActivity([FromBody] ActivityDTO activityDTO)
         {
             ActivityDTO addedActivity =null;
             if(!activityDTO.isAssay)
@@ -38,32 +37,34 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             if (addedActivity != null)
             {
-                var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Created, addedActivity);
-                string uri = Url.Link("GetActivityById", new { activityId = addedActivity.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Created, addedActivity);
+                //string uri = Url.Link("GetActivityById", new { activityId = addedActivity.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetActivityById", new { activityId = addedActivity.Id }, addedActivity);
+
             }
             else
             {
-                var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                return response;
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 
         [HttpPut]
         [Route("api/activities/{activityId}")]
-        public HttpResponseMessage updateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
+        public IActionResult updateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
         {
             try{
                 _activityService.UpdateActivity(activityDTO, activityId);
-                var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Accepted, activityDTO);
-                string uri = Url.Link("GetActivityById", new { activityId = activityDTO.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Accepted, activityDTO);
+                //string uri = Url.Link("GetActivityById", new { activityId = activityDTO.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetActivityById", new { activityId = activityDTO.Id }, activityDTO);
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict);
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 
@@ -82,7 +83,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/assays")]
-        public HttpResponseMessage addAssay([FromBody] AssayDTO assayDTO)
+        public IActionResult addAssay([FromBody] AssayDTO assayDTO)
         {
             AssayDTO addedAssay = null;
 
@@ -90,33 +91,37 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             if (addedAssay != null)
             {
-                var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Created, addedAssay);
-                string uri = Url.Link("GetAssayById", new { assayId = addedAssay.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Created, addedAssay);
+                //string uri = Url.Link("GetAssayById", new { assayId = addedAssay.Id });
+                //response.Headers.Location = new Uri(uri);
+                return new CreatedAtActionResult("GET", "GetAssayById", new { assayId = addedAssay.Id }, addedAssay);
+
             }
             else
             {
-                var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                return response;
+                //var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                //return response;
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 
         [HttpPut]
         [Route("api/assays/{assayId}")]
-        public HttpResponseMessage updateAssay(int assayId, [FromBody] AssayDTO assayDTO)
+        public IActionResult updateAssay(int assayId, [FromBody] AssayDTO assayDTO)
         {
             try
             {
                 _activityService.UpdateAssay(assayDTO, assayId);
-                var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Accepted, assayDTO);
-                string uri = Url.Link("GetAssayById", new { assayId = assayDTO.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Accepted, assayDTO);
+                //string uri = Url.Link("GetAssayById", new { assayId = assayDTO.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetAssayById", new { assayId = assayDTO.Id }, assayDTO);
+
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict);
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 
