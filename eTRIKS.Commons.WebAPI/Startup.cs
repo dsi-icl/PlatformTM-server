@@ -1,39 +1,38 @@
-﻿using eTRIKS.Commons.DataAccess.Configuration;
-using eTRIKS.Commons.Service.Services.Authentication;
-using eTRIKS.Commons.Service.Services.UserManagement;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Cryptography;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using System;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using eTRIKS.Commons.WebAPI.Auth;
 using Microsoft.AspNetCore.Diagnostics;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
+
+using Microsoft.Extensions.Options;
+using System.Security.Cryptography;
+using eTRIKS.Commons.DataAccess.Configuration;
+using eTRIKS.Commons.Service.Services.Authentication;
+using eTRIKS.Commons.Service.Services.UserManagement;
+
+
 
 namespace eTRIKS.Commons.WebAPI
 {
     public class Startup
     {
 
-        //static ContainerBootstrapper _bootstrapper;
-        //public static HttpConfiguration HttpConfiguration { get; private set; }
-        //public void Configuration(IAppBuilder app)
+        //////static ContainerBootstrapper _bootstrapper;
+        //////public static HttpConfiguration HttpConfiguration { get; private set; }
+        //////public void Configuration(IAppBuilder app)
 
-        const string TokenAudience = "ExampleAudience";
-        const string TokenIssuer = "ExampleIssuer";
-        private RsaSecurityKey key;
-        private TokenAuthOptions tokenOptions;
-        //private readonly UserAccountService _accountService;
-
+        //***************************************************************************************************************************************************** Startup
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -42,7 +41,6 @@ namespace eTRIKS.Commons.WebAPI
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsEnvironment("Development"))
-            //if (env.IsDevelopment()) 
             {
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
@@ -52,15 +50,14 @@ namespace eTRIKS.Commons.WebAPI
             Configuration = builder.Build();
         }
 
+        //*****************************************************************************************************************************************************  IConfigurationRoot
         public IConfigurationRoot Configuration { get; }
-
+    
+        //*****************************************************************************************************************************************************   ConfigureServices
         public void ConfigureServices(IServiceCollection services)
         {
-
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
-
-            ////////services.AddMvc();
 
             // Added - uses IOptions<T> for your settings.
             services.AddOptions();
@@ -69,57 +66,54 @@ namespace eTRIKS.Commons.WebAPI
             services.Configure<DataAccessSettings>(Configuration.GetSection("DataAccessSettings"));
 
 
-            ////////////            HttpConfiguration HttpConfiguration = new HttpConfiguration();
-
-            ////////////            //Bootstrap & Configure Windsor Container
-            ////////////            _bootstrapper = ContainerBootstrapper.Bootstrap(HttpConfiguration);
-
-            ////////////            //NEED TO CHECK HOW TO DISPOSE CONTAINER
-
-            ////////////            AreaRegistration.RegisterAllAreas();
-            ////////////            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            ////////////            RouteConfig.RegisterRoutes(RouteTable.Routes);
-            ////////////            BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            ////////////            ConfigureOAuth(app);
-
-            ////////////            WebApiConfig.Register(HttpConfiguration);
-
-            ////////////            app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            ////////////            app.UseWebApi(HttpConfiguration);
 
 
-            ////////////        }
+            //////                HttpConfiguration HttpConfiguration = new HttpConfiguration();
+
+            //////                //Bootstrap & Configure Windsor Container
+            //////                _bootstrapper = ContainerBootstrapper.Bootstrap(HttpConfiguration);
+
+            //////                //NEED TO CHECK HOW TO DISPOSE CONTAINER
+
+            //////                AreaRegistration.RegisterAllAreas();
+            //////                FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            //////                RouteConfig.RegisterRoutes(RouteTable.Routes);
+            //////                BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            //////                ConfigureOAuth(app);
+
+            //////                WebApiConfig.Register(HttpConfiguration);
+
+            //////                app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
+            //////                app.UseWebApi(HttpConfiguration);
 
 
-            ////////        public void ConfigureOAuth(IAppBuilder app)
-            ////////        {
-            ////////            //Are these needed given IoC
-            ////////            //app.CreatePerOwinContext(ApplicationDbContext.Create);
-            ////////            //app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-
-            ////////            //var repo = _bootstrapper.Container.Resolve<IUserRepository<ApplicationUser>>();
-            ////////            OAuthBearerAuthenticationOptions OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
-
-            ////////            OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
-            ////////            {
-            ////////                //TODO: For Dev enviroment only (on production should be AllowInsecureHttp = false)
-            ////////                AllowInsecureHttp = true,
-            ////////                TokenEndpointPath = new PathString("/token"),
-            ////////                AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-            ////////                Provider = new CustomOAuthServerProvider(_bootstrapper.Container.Resolve<UserAccountService>())
-            ////////            };
-
-            ////////            // Token Generation
-            ////////            app.UseOAuthAuthorizationServer(OAuthServerOptions);
-
-            ////////            //Token Consumption
-            ////////            app.UseOAuthBearerAuthentication(OAuthBearerOptions);
+            //////            }
 
 
+            //////            public void ConfigureOAuth(IAppBuilder app)
+            //////{
 
+            //////    app.CreatePerOwinContext(ApplicationDbContext.Create);
+            //////    app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
 
+            //////    var repo = _bootstrapper.Container.Resolve<IUserRepository<ApplicationUser>>();
+            //////    OAuthBearerAuthenticationOptions OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
 
+            //////    OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
+            //////    {
+            //////        TODO: For Dev enviroment only (on production should be AllowInsecureHttp = false)
+            //////        AllowInsecureHttp = true,
+            //////        TokenEndpointPath = new PathString("/token"),
+            //////        AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
+            //////        Provider = new CustomOAuthServerProvider(_bootstrapper.Container.Resolve<UserAccountService>())
+            //////    };
+
+            //////    Token Generation
+            //////    app.UseOAuthAuthorizationServer(OAuthServerOptions);
+
+            //////    Token Consumption
+            //////    app.UseOAuthBearerAuthentication(OAuthBearerOptions);
 
 
 
@@ -133,24 +127,29 @@ namespace eTRIKS.Commons.WebAPI
             //
             // See the RSAKeyUtils.GetKeyParameters method for an examle of loading from
             // a JSON file.
-            RSAParameters keyParams = RSAKeyUtils.GetRandomKey();
 
-            // Create the key, and a set of token options to record signing credentials 
-            // using that key, along with the other parameters we will need in the 
-            // token controlller.
-            key = new RsaSecurityKey(keyParams);
-            tokenOptions = new TokenAuthOptions()
-            {
-                Audience = TokenAudience,
-                Issuer = TokenIssuer,
-                SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256Signature)
-            };
 
-            // Save the token options into an instance so they're accessible to the 
-            // controller.
-            //replaced AddInstance with AddSingleto
-            services.AddSingleton<TokenAuthOptions>(tokenOptions);
-            //services.AddInstance<TokenAuthOptions>(tokenOptions);
+
+            //RSAParameters keyParams = RSAKeyUtils.GetRandomKey();
+
+            //// Create the key, and a set of token options to record signing credentials 
+            //// using that key, along with the other parameters we will need in the 
+            //// token controlller.
+            //key = new RsaSecurityKey(keyParams);
+            //tokenOptions = new TokenAuthOptions()
+            //{
+            //    Audience = TokenAudience,
+            //    Issuer = TokenIssuer,
+            //    SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256Signature)
+            //};
+
+            //// Save the token options into an instance so they're accessible to the 
+            //// controller.
+            ////replaced AddInstance with AddSingleto
+            //services.AddSingleton<TokenAuthOptions>(tokenOptions);
+            ////services.AddInstance<TokenAuthOptions>(tokenOptions);
+
+            //***********************************************************************   Authentication
 
             // Enable the use of an [Authorize("Bearer")] attribute on methods and classes to protect.
             services.AddAuthorization(auth =>
@@ -162,9 +161,8 @@ namespace eTRIKS.Commons.WebAPI
 
             services.AddMvc();
         }
-
+        //*****************************************************************************************************************************************************   Configure
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
 
@@ -172,59 +170,54 @@ namespace eTRIKS.Commons.WebAPI
             loggerFactory.AddDebug();
 
             app.UseApplicationInsightsRequestTelemetry();
-
             app.UseApplicationInsightsExceptionTelemetry();
 
 
+            // app.UseIISPlatformHandler();
 
-
-
-
-
-
-            app.UseIISPlatformHandler();
             // Register a simple error handler to catch token expiries and change them to a 401, 
             // and return all other errors as a 500. This should almost certainly be improved for
             // a real application.
-            app.UseExceptionHandler(appBuilder =>
-            {
-                appBuilder.Use(async (context, next) =>
-                {
+            app.UseExceptionHandler(appBuilder => {
+                appBuilder.Use(async (context, next) => {
                     var error = context.Features[typeof(IExceptionHandlerFeature)] as IExceptionHandlerFeature;
-                    // This should be much more intelligent - at the moment only expired 
-                    // security tokens are caught - might be worth checking other possible 
-                    // exceptions such as an invalid signature.
+
+                    //when authorization has failed, should retrun a json message to client
                     if (error != null && error.Error is SecurityTokenExpiredException)
                     {
                         context.Response.StatusCode = 401;
-                        // What you choose to return here is up to you, in this case a simple 
-                        // bit of JSON to say you're no longer authenticated.
                         context.Response.ContentType = "application/json";
-                        await context.Response.WriteAsync(
-                            JsonConvert.SerializeObject(
-                                new { authenticated = false, tokenExpired = true }));
+
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(
+                            new { authenticated = false, tokenExpired = true }
+                        ));
                     }
+                    //when orther error, retrun a error message json to client
                     else if (error != null && error.Error != null)
                     {
                         context.Response.StatusCode = 500;
                         context.Response.ContentType = "application/json";
-                        // TODO: Shouldn't pass the exception message straight out, change this.
-                        await context.Response.WriteAsync(
-                            JsonConvert.SerializeObject
-                            (new { success = false, error = error.Error.Message }));
+                        await context.Response.WriteAsync(JsonConvert.SerializeObject(
+                            new { success = false, error = error.Error.Message }
+                        ));
                     }
-                    // We're not trying to handle anything else so just let the default 
-                    // handler handle.
+                    //when no error, do next.
                     else await next();
                 });
             });
 
             var options = new JwtBearerOptions();
-            options.TokenValidationParameters.IssuerSigningKey = key;
-            options.TokenValidationParameters.ValidAudience = tokenOptions.Audience;
-            options.TokenValidationParameters.ValidIssuer = tokenOptions.Issuer;
+            options.TokenValidationParameters.IssuerSigningKey = TokenAuthOption.Key;
+            options.TokenValidationParameters.ValidAudience = TokenAuthOption.Audience;
+            options.TokenValidationParameters.ValidIssuer = TokenAuthOption.Issuer;
+            // When receiving a token, check that we've signed it.
             options.TokenValidationParameters.ValidateIssuerSigningKey = true;
+            // When receiving a token, check that it is still valid.
             options.TokenValidationParameters.ValidateLifetime = true;
+            // This defines the maximum allowable clock skew - i.e. provides a tolerance on the token expiry time 
+            // when validating the lifetime. As we're creating the tokens locally and validating them on the same 
+            // machines which should have synchronised time, this can be set to zero. Where external tokens are
+            // used, some leeway here could be useful.
             options.TokenValidationParameters.ClockSkew = TimeSpan.FromMinutes(0);
 
             app.UseJwtBearerAuthentication(options);
@@ -233,8 +226,15 @@ namespace eTRIKS.Commons.WebAPI
             app.UseStaticFiles();
 
             // Add MVC to the request pipeline.
-            app.UseMvc();
+            //app.UseMvc();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Login}/{action=Index}");
+            });
         }
+        //***************************************************************************************************************************************************** 
         /// public static void Main(string[] args) => WebApplication.Run(args);
     }
 
