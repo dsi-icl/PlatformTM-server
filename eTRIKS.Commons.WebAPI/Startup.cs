@@ -7,32 +7,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using eTRIKS.Commons.WebAPI.Auth;
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-
-using Microsoft.Extensions.Options;
-using System.Security.Cryptography;
-using eTRIKS.Commons.DataAccess.Configuration;
-using eTRIKS.Commons.Service.Services.Authentication;
-using eTRIKS.Commons.Service.Services.UserManagement;
-
-
 
 namespace eTRIKS.Commons.WebAPI
 {
     public class Startup
     {
-
-        //////static ContainerBootstrapper _bootstrapper;
-        //////public static HttpConfiguration HttpConfiguration { get; private set; }
-        //////public void Configuration(IAppBuilder app)
-
-        //***************************************************************************************************************************************************** Startup
+        public IConfigurationRoot Configuration { get; }
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -50,118 +30,17 @@ namespace eTRIKS.Commons.WebAPI
             Configuration = builder.Build();
         }
 
-        //*****************************************************************************************************************************************************  IConfigurationRoot
-        public IConfigurationRoot Configuration { get; }
-    
-        //*****************************************************************************************************************************************************   ConfigureServices
+        
+
+        // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
 
-            // Added - uses IOptions<T> for your settings.
-            services.AddOptions();
-
-            // Added - Confirms that we have a home for our DataAccessSettings
-            services.Configure<DataAccessSettings>(Configuration.GetSection("DataAccessSettings"));
-
-
-
-
-            //////                HttpConfiguration HttpConfiguration = new HttpConfiguration();
-
-            //////                //Bootstrap & Configure Windsor Container
-            //////                _bootstrapper = ContainerBootstrapper.Bootstrap(HttpConfiguration);
-
-            //////                //NEED TO CHECK HOW TO DISPOSE CONTAINER
-
-            //////                AreaRegistration.RegisterAllAreas();
-            //////                FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-            //////                RouteConfig.RegisterRoutes(RouteTable.Routes);
-            //////                BundleConfig.RegisterBundles(BundleTable.Bundles);
-
-            //////                ConfigureOAuth(app);
-
-            //////                WebApiConfig.Register(HttpConfiguration);
-
-            //////                app.UseCors(Microsoft.Owin.Cors.CorsOptions.AllowAll);
-            //////                app.UseWebApi(HttpConfiguration);
-
-
-            //////            }
-
-
-            //////            public void ConfigureOAuth(IAppBuilder app)
-            //////{
-
-            //////    app.CreatePerOwinContext(ApplicationDbContext.Create);
-            //////    app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
-
-            //////    var repo = _bootstrapper.Container.Resolve<IUserRepository<ApplicationUser>>();
-            //////    OAuthBearerAuthenticationOptions OAuthBearerOptions = new OAuthBearerAuthenticationOptions();
-
-            //////    OAuthAuthorizationServerOptions OAuthServerOptions = new OAuthAuthorizationServerOptions()
-            //////    {
-            //////        TODO: For Dev enviroment only (on production should be AllowInsecureHttp = false)
-            //////        AllowInsecureHttp = true,
-            //////        TokenEndpointPath = new PathString("/token"),
-            //////        AccessTokenExpireTimeSpan = TimeSpan.FromDays(1),
-            //////        Provider = new CustomOAuthServerProvider(_bootstrapper.Container.Resolve<UserAccountService>())
-            //////    };
-
-            //////    Token Generation
-            //////    app.UseOAuthAuthorizationServer(OAuthServerOptions);
-
-            //////    Token Consumption
-            //////    app.UseOAuthBearerAuthentication(OAuthBearerOptions);
-
-
-
-
-
-            // *** CHANGE THIS FOR PRODUCTION USE ***
-            // Here, we're generating a random key to sign tokens - obviously this means
-            // that each time the app is started the key will change, and multiple servers 
-            // all have different keys. This should be changed to load a key from a file 
-            // securely delivered to your application, controlled by configuration.
-            //
-            // See the RSAKeyUtils.GetKeyParameters method for an examle of loading from
-            // a JSON file.
-
-
-
-            //RSAParameters keyParams = RSAKeyUtils.GetRandomKey();
-
-            //// Create the key, and a set of token options to record signing credentials 
-            //// using that key, along with the other parameters we will need in the 
-            //// token controlller.
-            //key = new RsaSecurityKey(keyParams);
-            //tokenOptions = new TokenAuthOptions()
-            //{
-            //    Audience = TokenAudience,
-            //    Issuer = TokenIssuer,
-            //    SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256Signature)
-            //};
-
-            //// Save the token options into an instance so they're accessible to the 
-            //// controller.
-            ////replaced AddInstance with AddSingleto
-            //services.AddSingleton<TokenAuthOptions>(tokenOptions);
-            ////services.AddInstance<TokenAuthOptions>(tokenOptions);
-
-            //***********************************************************************   Authentication
-
-            // Enable the use of an [Authorize("Bearer")] attribute on methods and classes to protect.
-            services.AddAuthorization(auth =>
-            {
-                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme‌​)
-                    .RequireAuthenticatedUser().Build());
-            });
-
             services.AddMvc();
         }
-        //*****************************************************************************************************************************************************   Configure
+
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {

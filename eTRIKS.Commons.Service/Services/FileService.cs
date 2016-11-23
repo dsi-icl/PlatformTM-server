@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using Microsoft.Extensions.Options;
+using eTRIKS.Commons.Service.Configuration;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -17,23 +19,25 @@ namespace eTRIKS.Commons.Service.Services
         private IServiceUoW _dataServiceUnit;
         private IRepository<DataFile, int> _fileRepository;
         private IRepository<Project, int> _projectRepository;
-        private string rawFilesDirectory;
+        private FileStorageSettings ConfigSettings { get; set; }
+        private string uploadedFilesDirectory;
         private string stdFilesDirecotry;
 
-        public FileService(IServiceUoW uoW)
+        public FileService(IServiceUoW uoW, IOptions<FileStorageSettings> settings)
         {
             _dataServiceUnit = uoW;
             _fileRepository = uoW.GetRepository<DataFile, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
-            rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-            stdFilesDirecotry = rawFilesDirectory + "\\Mapped";
+            ConfigSettings = settings.Value;
+            uploadedFilesDirectory = ConfigSettings.FileDirectory;//ConfigurationManager.AppSettings["FileDirectory"];
+            stdFilesDirecotry = uploadedFilesDirectory + "\\Mapped";
         }
         public List<FileDTO> getUploadedFiles(int projectId,string path)
         {
             List<FileDTO> fileDTOs = new List<FileDTO>();
-            //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
+            
 
-            //List<string> files = Directory.GetFiles(path).ToList<string>();
+
             var files = _fileRepository.FindAll(f => f.ProjectId == projectId && f.Path.Equals(path));
             //DirectoryInfo f = new DirectoryInfo(path);
             foreach (var file in files)
@@ -117,7 +121,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public DataTable ReadOriginalFile(string filePath)
         {
-            string PATH = rawFilesDirectory + filePath;
+            string PATH = uploadedFilesDirectory + filePath;
             return readDataFile(PATH);
         }
 
@@ -181,8 +185,7 @@ namespace eTRIKS.Commons.Service.Services
         public List<Dictionary<string, string>> getFileColHeaders(string filePath)
         {
             //Parse header of the file
-            string delim = ",";
-            string PATH = rawFilesDirectory + filePath;// + studyId + "\\" + fileName;
+            string PATH = uploadedFilesDirectory + filePath;// + studyId + "\\" + fileName;
             StreamReader reader = File.OpenText(PATH);
             string firstline = reader.ReadLine();
 
@@ -508,6 +511,15 @@ namespace eTRIKS.Commons.Service.Services
             path = file.Path
         };
             return dto;
+        }
+
+        public string GetFullPath(string projectId, string subdir)
+        {
+            //string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            string projDir = uploadedFilesDirectory + "P-" + projectId;
+            string newDir = projDir + "/" + subdir;
+
+            return Path.Combine(uploadedFilesDirectory, "P-" + projectId, subdir);
         }
     }
 }

@@ -10,12 +10,12 @@ namespace eTRIKS.Commons.Service.Services.Authentication
         public static string GeneratePresharedKey()
         {
             byte[] key = new byte[10]; // 80 bits
-            using (var rngProvider = new RNGCryptoServiceProvider())
-            {
-                rngProvider.GetBytes(key);
-            }
-
-            return key.ToBase32String();
+            //using (var rngProvider = new RandomNumberGenerator())
+            //{
+            //    rngProvider.GetBytes(key);
+            //}
+            //key = RandomNumberGenerator.Create().ToString();
+            return RandomNumberGenerator.Create().ToString();
         }
 
         public static IList<string> GetListOfOTPs(string base32EncodedSecret)
@@ -37,7 +37,7 @@ namespace eTRIKS.Commons.Service.Services.Authentication
             byte[] message = BitConverter.GetBytes(counter).Reverse().ToArray(); //Intel machine (little endian) 
             byte[] secret = base32EncodedSecret.ToByteArray();
 
-            HMACSHA1 hmac = new HMACSHA1(secret, true);
+            HMACSHA1 hmac = new HMACSHA1(secret);
 
             byte[] hash = hmac.ComputeHash(message);
             int offset = hash[hash.Length - 1] & 0xf;

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace eTRIKS.Commons.Persistence.Mapping
 {
-    internal class AccountMap : EntityTypeConfiguration<Account>
+    internal class AccountMap : EntityTypeConfiguration<UserAccount>
     {
         //public AccountMap()
         //{
@@ -19,7 +19,7 @@ namespace eTRIKS.Commons.Persistence.Mapping
         //    this.ToTable("UserAccounts");
         //    this.Property(t => t.Id).HasColumnName("UserAccountId");
         //}
-        public override void Map(EntityTypeBuilder<Account> builder)
+        public override void Map(EntityTypeBuilder<UserAccount> builder)
         {
             builder.HasKey(t => t.Id);
 

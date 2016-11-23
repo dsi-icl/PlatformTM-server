@@ -18,13 +18,16 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<DomainVariableTemplate, string> _templateVariableRepository;
         private readonly IRepository<CVterm, string> _cvTermRepository;
         private readonly IRepository<Dictionary, string> _dictionaryRepository;
+        private FileService _fileService;
 
-        public TemplateService(IServiceUoW uoW){
+        public TemplateService(IServiceUoW uoW, FileService fileService)
+        {
             _dataServiceUnit = uoW;
             _templateRepository = uoW.GetRepository<DomainTemplate, string>();
             _templateVariableRepository = uoW.GetRepository<DomainVariableTemplate,string>();
             _cvTermRepository = uoW.GetRepository<CVterm, string>();
             _dictionaryRepository = uoW.GetRepository<Dictionary, string>();
+            _fileService = fileService;
         }
 
         public IEnumerable<DomainTemplate> GetAllDomains()
@@ -108,8 +111,8 @@ namespace eTRIKS.Commons.Service.Services
 
         public void loadDatasetTemplate(string templateDefFilename, string varDefFilename)
         {
-            var fileservice = new FileService(_dataServiceUnit);
-            var tbl1 = fileservice.ReadOriginalFile(templateDefFilename);
+            //var fileservice = new FileService(_dataServiceUnit);
+            var tbl1 = _fileService.ReadOriginalFile(templateDefFilename);
             //foreach (var row in tbl1.Rows)
             //{
                 var dt = new DomainTemplate();
@@ -123,7 +126,7 @@ namespace eTRIKS.Commons.Service.Services
 
             
 
-            var tbl2 = fileservice.ReadOriginalFile(varDefFilename);
+            var tbl2 = _fileService.ReadOriginalFile(varDefFilename);
             foreach (DataRow row in tbl2.Rows)
             {
                 var dvt = new DomainVariableTemplate();
@@ -147,10 +150,10 @@ namespace eTRIKS.Commons.Service.Services
 
         public void loadCVterms(string DictFilename, string CVsfFilename)
         {
-            var fileservice = new FileService(_dataServiceUnit);
+           // var fileservice = new FileService(_dataServiceUnit);
            // var tbl1 = fileservice.ReadOriginalFile(DictFilename);
 
-            var tbl1 = fileservice.ReadOriginalFile(CVsfFilename);
+            var tbl1 = _fileService.ReadOriginalFile(CVsfFilename);
             //foreach (DataRow row in tbl1.Rows)
             //{
             //  Dictionary dict  = new Dictionary();

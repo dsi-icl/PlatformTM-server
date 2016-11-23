@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace eTRIKS.Commons.Core.Application.AccountManagement
 {
-    public class Account : Identifiable<Guid>
+    public class UserAccount : Identifiable<Guid>
     {
         public string UserName { get; set; }
         public virtual bool EmailConfirmed { get; set; }
@@ -25,7 +25,7 @@ namespace eTRIKS.Commons.Core.Application.AccountManagement
             get { return _claims ?? (_claims = new List<Claim>()); }
             set { _claims = value; }
         }
-        public Account()
+        public UserAccount()
         {
             Id = Guid.NewGuid();
         }

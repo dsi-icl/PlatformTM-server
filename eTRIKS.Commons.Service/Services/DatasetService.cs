@@ -29,9 +29,9 @@ namespace eTRIKS.Commons.Service.Services
         //private readonly IRepository<MongoDocument, Guid> _mongoDocRepository;
         private readonly IRepository<SubjectObservation, Guid> _subObservationRepository;
         //private readonly IRepository<Observation, int> _observationRepository;
-        // private FileService _fileService;
+        private FileService _fileService;
 
-        public DatasetService(IServiceUoW uoW)
+        public DatasetService(IServiceUoW uoW, FileService fileService)
         {
             _dataServiceUnit = uoW;
             //_templateRepository = uoW.GetRepository<DomainTemplate, string>();
@@ -46,9 +46,9 @@ namespace eTRIKS.Commons.Service.Services
             //_mongoDocRepository = uoW.GetRepository<MongoDocument, Guid>();
             _humanSubjectRepository = uoW.GetRepository<HumanSubject, string>();
             _subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
-           // _observationRepository = uoW.GetRepository<Observation, int>();
+            // _observationRepository = uoW.GetRepository<Observation, int>();
 
-            //_fileService = new FileService(_dataServiceUnit);
+            _fileService = fileService;
         }
 
         /// <summary>
@@ -437,8 +437,8 @@ namespace eTRIKS.Commons.Service.Services
             var dataFile = _dataFileRepository.Get(fileId);
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
-            FileService fileService = new FileService(_dataServiceUnit);
-            DataTable inputDataTable = fileService.ReadOriginalFile(filePath);
+            //FileService fileService = new FileService(_dataServiceUnit);
+            DataTable inputDataTable = _fileService.ReadOriginalFile(filePath);
             DataTable sdtmTable = new DataTable();
 
             //var varMaps = new List<DataTemplateMap.VariableMap>();
@@ -522,8 +522,8 @@ namespace eTRIKS.Commons.Service.Services
                 string dsName = dataset.Activity.Name+"_" +dataset.DomainId;
                 sdtmTable.TableName = dsName;
                 //Write new transformed to file 
-                var fileInfo = fileService.writeDataFile(projectId, dataFile.Path, sdtmTable);
-                standardFile = fileService.addOrUpdateFile(projectId, fileInfo);
+                var fileInfo = _fileService.writeDataFile(projectId, dataFile.Path, sdtmTable);
+                standardFile = _fileService.addOrUpdateFile(projectId, fileInfo);
                 //var file = _dataFileRepository.Get(4);
                 //Update dataset
                 dataset.DataFiles.Add(standardFile);//.StandardDataFile = dsName + ".csv";
@@ -566,8 +566,8 @@ namespace eTRIKS.Commons.Service.Services
             }
 
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
-            var fileService = new FileService(_dataServiceUnit);
-            var dataTable = fileService.ReadOriginalFile(filePath);
+            //var fileService = new FileService(_dataServiceUnit);
+            var dataTable = _fileService.ReadOriginalFile(filePath);
 
             var sdtmRowDescriptor = SdtmRowDescriptor.GetSdtmRowDescriptor(dataset);
             var SDTM = new List<SdtmRow>();
@@ -947,8 +947,8 @@ namespace eTRIKS.Commons.Service.Services
             var dataFile = _dataFileRepository.Get(fileId);
             var studyId = dataset.Activity.ProjectId;
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
-            var fileService = new FileService(_dataServiceUnit);
-            var colHeaders = fileService.getFileColHeaders(filePath);
+            //var fileService = new FileService(_dataServiceUnit);
+            var colHeaders = _fileService.getFileColHeaders(filePath);
             
             FileDTO fileDto = new FileDTO();
             fileDto.FileName = dataFile.FileName;

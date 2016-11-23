@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Net;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-   // [EnableCors(origins: "http://localhost:63342", headers: "*", methods: "*")] 
+    [Route("api/templates")]
     public class DatasetController : Controller
     {
         private DatasetService _datasetService;
@@ -20,18 +22,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _fileService = fileService;
         }
         
-        // GET: api/Dataset
-        [HttpGet]
-        [Route("api/templates/clinical")]
+        [HttpGet("clinical")]
         public IEnumerable<DatasetDTO> Get()
         {
             return _datasetService.GetAllDomainTemplates();
         }
-
-      
-        // GET: api/Dataset/5
-        [HttpGet]
-        [Route("api/templates/clinical/{domainId}")]
+        
+        [HttpGet("clinical/{domainId}")]
         public DatasetDTO Get(string domainId)
         {
             return _datasetService.GetTemplateDataset(domainId);
@@ -58,8 +55,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _datasetService.GetAssayDataTemplates();
         }
 
-
-
         [HttpGet]
         [Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]
         public DatasetDTO GetActivityDataset(int datasetId)
@@ -68,38 +63,39 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
 
+        //[HttpPost]
+        //[Route("api/Dataset")]
+        //public IActionResult addDataset([FromBody] DatasetDTO datasetDTO)
+        //{
+        //    var addedDataset = _datasetService.addDataset(datasetDTO);
+        //    datasetDTO.Id = addedDataset.Id;
+        //    if (addedDataset != null)
+        //    {
+        //        var response = new HttpResponseMessage(HttpStatusCode.Created);
+        //        response.Content = datasetDTO;
+        //        string uri = Url.Link("GetDatasetById", new { datasetId = addedDataset.Id, activityId = datasetDTO.ActivityId });
+        //        response.Headers.Location = new Uri(uri);
+        //        return response;
+        //    }
+        //    else
+        //    {
+        //        var response = Request.CreateResponse(HttpStatusCode.Conflict);
+        //        return response;
+        //    }
+        //}
+
+
+        //[HttpPut]
+        //[Route("api/Dataset/{datasetId}")]
+        //public string updateDataset(int datasetId, [FromBody] DatasetDTO datasetDTO)
+        //{
+        //    if (datasetDTO.Id == datasetId)
+        //        return _datasetService.UpdateDataset(datasetDTO);
+        //    return "FAILED to update datasetId";
+        //}
+
         [HttpPost]
-        [Route("api/Dataset")]
-        public HttpResponseMessage addDataset([FromBody] DatasetDTO datasetDTO)
-        {
-            var addedDataset = _datasetService.addDataset(datasetDTO);
-            datasetDTO.Id = addedDataset.Id;
-            if (addedDataset != null)
-            {
-                var response = Request.CreateResponse<DatasetDTO>(HttpStatusCode.Created, datasetDTO);
-                string uri = Url.Link("GetDatasetById", new { datasetId = addedDataset.Id, activityId = datasetDTO.ActivityId });
-                response.Headers.Location = new Uri(uri);
-                return response;
-            }
-            else
-            {
-                var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                return response;
-            }
-        }
-
-
-        [HttpPut]
-        [Route("api/Dataset/{datasetId}")]
-        public string updateDataset(int datasetId, [FromBody] DatasetDTO datasetDTO)
-        {
-            if (datasetDTO.Id == datasetId)
-                return _datasetService.UpdateDataset(datasetDTO);
-            return "FAILED to update datasetId";
-        }
-
-        [HttpPost]
-        [Route("api/Datasets/{datasetId}/update")]
+        [Route("api/datasets/{datasetId}/update")]
         public string updateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
 
@@ -121,7 +117,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/Datasets/{datasetId}/mapToTemplate/file/{fileId}")]
+        [Route("api/datasets/{datasetId}/mapToTemplate/file/{fileId}")]
         public async Task<int?> MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
         {
             //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
@@ -137,7 +133,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/Datasets/{datasetId}/saveDataFile/file/{fileId}")]
+        [Route("api/datasets/{datasetId}/saveDataFile/file/{fileId}")]
         public bool LoadDataFile(int datasetId, int fileId)
         {
            return  _datasetService.PersistSDTM(datasetId, fileId);            

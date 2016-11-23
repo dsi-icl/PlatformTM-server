@@ -5,6 +5,7 @@ using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -27,7 +28,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpPost]
         [Route("api/studies")]
-        public HttpResponseMessage Addstudy([FromBody] StudyDTO studyDTO)
+        public IActionResult Addstudy([FromBody] StudyDTO studyDTO)
         {
             StudyDTO addedstudy = null;
 
@@ -35,33 +36,35 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             if (addedstudy != null)
             {
-                var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Created, addedstudy);
-                string uri = Url.Link("GetstudyById", new { studyId = addedstudy.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Created, addedstudy);
+                //string uri = Url.Link("GetstudyById", new { studyId = addedstudy.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetstudyById", new { studyId = addedstudy.Id }, studyDTO);
             }
             else
             {
-                var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                return response;
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 
         [HttpPut]
         [Route("api/studies/{studyId}")]
-        public HttpResponseMessage Updatestudy(int studyId, [FromBody] StudyDTO studyDTO)
+        public IActionResult Updatestudy(int studyId, [FromBody] StudyDTO studyDTO)
         {
             try
             {
                 _studyService.Updatestudy(studyDTO, studyId);
-                var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Accepted, studyDTO);
-                string uri = Url.Link("GetstudyById", new { studyId = studyDTO.Id });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                //var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Accepted, studyDTO);
+                //string uri = Url.Link("GetstudyById", new { studyId = studyDTO.Id });
+                //response.Headers.Location = new Uri(uri);
+                //return response;
+                return new CreatedAtActionResult("GET", "GetstudyById", new { studyId = studyDTO.Id }, studyDTO);
+
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.Conflict);
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using eTRIKS.Commons.Service.DTOs;
+﻿using eTRIKS.Commons.Core.Application.AccountManagement;
+using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -7,59 +8,58 @@ using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [RoutePrefix("api/accounts")]
+    //[RoutePrefix("api/accounts")]
     public class AccountController : Controller
     {
         private readonly UserAccountService _userAccountService;
+        //private readonly UserManager<UserAccount> _userManager;
+        //private readonly SignInManager<UserAccount> _signInManager;
         //private readonly UserManager<ApplicationUser, Guid> _userManager;
 
-        public AccountController(UserAccountService userService)
+        public AccountController(UserAccountService userAccountService)
         {
-            _userAccountService = userService;
             //_userManager = userManager;
-
+            //_signInManager = signInManager;
+            _userAccountService = userAccountService;
         }
 
         [Route("signup")]
-        public async Task<IHttpActionResult> CreateUser(UserDTO userDTO)
+        public async Task<IActionResult> CreateUser(UserDTO userDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-
-           
             //IdentityResult addUserResult = _userManager.CreateAsync(user, createUserModel.Password);
-
-            IdentityResult addUserResult = await _userAccountService.RegisterUser(userDTO);
-
-            if (!addUserResult.Succeeded)
+            var result = await _userAccountService.RegisterUser(userDTO);
+            if (result.Succeeded)
             {
-                return GetErrorResult(addUserResult);
+                // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
+                // Send an email with this link
+                //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                //var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+                //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
+                //    "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
+                //await _signInManager.SignInAsync(user, isPersistent: false);
+                //_logger.LogInformation(3, "User created a new account with password.");
+                //return RedirectToAction(nameof(HomeController.Index), "Home");
+
+                string psk = await _userAccountService.GetUserPsk(userDTO);
+                return Ok(new { PSK = psk });
+                //return Ok(new { PSK = psk });
             }
-
-            //Uri locationHeader = new Uri(Url.Link("GetUserById", new { id = user.Id }));
-
-            //return Created(locationHeader, TheModelFactory.Create(user));
-            //ApplicationUser user = await userAccountService.FindUser(userModel.UserName, userModel.Password);
-            string psk = await _userAccountService.GetUserPsk(userDTO);
-            return Ok(new { PSK = psk });
+            return GetErrorResult(result);
+            
         }
-
-        private IHttpActionResult GetErrorResult(IdentityResult result)
+        private IActionResult GetErrorResult(IdentityResult result)
         {
-            if (result == null)
-            {
-                return InternalServerError();
-            }
-
             if (!result.Succeeded)
             {
                 if (result.Errors != null)
                 {
-                    foreach (string error in result.Errors)
+                    foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError("", error);
+                        ModelState.AddModelError("", error.Description);
                     }
                 }
 

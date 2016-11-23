@@ -18,6 +18,7 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IRepository<Project, int> _projectRepository;
         private readonly IRepository<Activity, int> _activityRepository;
+        private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<User, Guid> _userRepository;
 
         private IServiceUoW uoW;
@@ -27,6 +28,7 @@ namespace eTRIKS.Commons.Service.Services
             this.uoW = uoW;
             _projectRepository = uoW.GetRepository<Project, int>();
             _activityRepository = uoW.GetRepository<Activity, int>();
+            _assayRepository = uoW.GetRepository<Assay, int>();
             _userRepository = uoW.GetRepository<User, Guid>();
         }
 
@@ -40,6 +42,7 @@ namespace eTRIKS.Commons.Service.Services
                 Accession = project.Accession
             };
         }
+
         public ProjectDTO GetProjectFullDetails(int projectId)
         {
             var project = _projectRepository.FindSingle(p=>p.Id == projectId, new List<Expression<Func<Project, object>>>()
@@ -75,35 +78,8 @@ namespace eTRIKS.Commons.Service.Services
             //var ownusers.Add(proj);
             return dto;
         }
-
-        public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
-        {
-            IEnumerable<Activity> Activities;
-
-            Activities = _activityRepository.FindAll(
-                    d => d.ProjectId == projectId,
-                    new List<Expression<Func<Activity, object>>>(){
-                        d => d.Datasets.Select(t => t.Domain),
-                        d => d.Project
-                    }
-                );
-            return Activities.Select(p => new ActivityDTO
-            {
-                Name = p.Name,
-                Id = p.Id,
-                ProjectId = p.ProjectId,
-                ProjectAcc = p.Project.Accession,
-                isAssay = typeof(Assay) == p.GetType(),
-                datasets = p.Datasets.Select(m => new DatasetDTO
-                {
-                    Name = m.Domain.Name,
-                    Id = m.Id,
-                    DomainId = m.DomainId
-                }).ToList()
-            }).ToList();
-        }
-
-        public async Task<ProjectDTO> AddProject(ProjectDTO projectDto, string ownerId)
+    
+        public ProjectDTO AddProject(ProjectDTO projectDto, string ownerId)
         {
             var name = projectDto.Name;
             string novowels = Regex.Replace(name, "(?<!^)[aouieyAOUIEY]", "");
@@ -171,6 +147,54 @@ namespace eTRIKS.Commons.Service.Services
                 SubjectCount = p.Studies.Sum(s=>s.Subjects.Count)
             });
             return projects;
+        }
+
+        public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
+        {
+            IEnumerable<Activity> Activities;
+
+            Activities = _activityRepository.FindAll(
+                    d => d.ProjectId == projectId,
+                    new List<Expression<Func<Activity, object>>>(){
+                        d => d.Datasets.Select(t => t.Domain),
+                        d => d.Project
+                    }
+                );
+            return Activities.Select(p => new ActivityDTO
+            {
+                Name = p.Name,
+                Id = p.Id,
+                ProjectId = p.ProjectId,
+                ProjectAcc = p.Project.Accession,
+                isAssay = typeof(Assay) == p.GetType(),
+                datasets = p.Datasets.Select(m => new DatasetDTO
+                {
+                    Name = m.Domain.Name,
+                    Id = m.Id,
+                    DomainId = m.DomainId
+                }).ToList()
+            }).ToList();
+        }
+        public List<AssayDTO> GetProjectAssays(int projectId)
+        {
+            List<Assay> assays = _assayRepository.FindAll(a => a.ProjectId == projectId,
+                new List<Expression<Func<Assay, object>>>()
+                {
+                    a => a.MeasurementType,
+                    a => a.TechnologyPlatform,
+                    a => a.TechnologyType
+                }).ToList();
+
+            if (assays.Count == 0)
+                return null;
+            return assays.Select(p => new AssayDTO()
+            {
+                Id = p.Id,
+                Type = p.MeasurementType != null ? p.MeasurementType.Name : "",
+                Platform = p.TechnologyPlatform != null ? p.TechnologyPlatform.Name : "",
+                Technology = p.TechnologyType != null ? p.TechnologyType.Name : "",
+                Name = p.Name
+            }).ToList();
         }
     }
 }
