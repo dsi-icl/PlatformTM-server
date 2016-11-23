@@ -10,6 +10,7 @@ using System.Net;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Route("api/templates")]
     public class DatasetController : Controller
     {
         private DatasetService _datasetService;
@@ -21,15 +22,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _fileService = fileService;
         }
         
-        [HttpGet]
-        [Route("api/templates/clinical")]
+        [HttpGet("clinical")]
         public IEnumerable<DatasetDTO> Get()
         {
             return _datasetService.GetAllDomainTemplates();
         }
         
-        [HttpGet]
-        [Route("api/templates/clinical/{domainId}")]
+        [HttpGet("clinical/{domainId}")]
         public DatasetDTO Get(string domainId)
         {
             return _datasetService.GetTemplateDataset(domainId);

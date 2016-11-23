@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Route("api/activities")]
     public class ActivityController : Controller
     {
         private ActivityService _activityService;
@@ -18,15 +19,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _assayService = assayService;
         }
 
-        [HttpGet]
-        [Route("api/activities/{activityId}", Name="GetActivityById")]
+        [HttpGet("{activityId}", Name = "GetActivityById")]
         public ActivityDTO getActivity(int activityId)
         {
             return _activityService.GetActivity(activityId);
         }
 
         [HttpPost]
-        [Route("api/activities")]
         public IActionResult addActivity([FromBody] ActivityDTO activityDTO)
         {
             ActivityDTO addedActivity =null;
@@ -50,8 +49,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("api/activities/{activityId}")]
+        [HttpPut("{activityId}")]
         public IActionResult updateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
         {
             try{
@@ -69,62 +67,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         
-        /**
-         * Assay Methods
-         * 
-         * */
-
-        [HttpGet]
-        [Route("api/assays/{assayId}", Name = "GetAssayById")]
-        public AssayDTO getAssay(int assayId)
-        {
-            return _activityService.GetAssay(assayId);
-        }
-
-        [HttpPost]
-        [Route("api/assays")]
-        public IActionResult addAssay([FromBody] AssayDTO assayDTO)
-        {
-            AssayDTO addedAssay = null;
-
-            addedAssay = _activityService.AddAssay(assayDTO);
-
-            if (addedAssay != null)
-            {
-                //var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Created, addedAssay);
-                //string uri = Url.Link("GetAssayById", new { assayId = addedAssay.Id });
-                //response.Headers.Location = new Uri(uri);
-                return new CreatedAtActionResult("GET", "GetAssayById", new { assayId = addedAssay.Id }, addedAssay);
-
-            }
-            else
-            {
-                //var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                //return response;
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
-        }
-
-        [HttpPut]
-        [Route("api/assays/{assayId}")]
-        public IActionResult updateAssay(int assayId, [FromBody] AssayDTO assayDTO)
-        {
-            try
-            {
-                _activityService.UpdateAssay(assayDTO, assayId);
-                //var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Accepted, assayDTO);
-                //string uri = Url.Link("GetAssayById", new { assayId = assayDTO.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
-                return new CreatedAtActionResult("GET", "GetAssayById", new { assayId = assayDTO.Id }, assayDTO);
-
-            }
-            catch (Exception e)
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
-        }
-
- 
+       
     }
 }

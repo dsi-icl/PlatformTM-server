@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using eTRIKS.Commons.WebAPI.Extensions;
+using System.Collections;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -98,6 +99,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             {
                 return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
+        }
+
+        [HttpGet]
+        [Route("api/projects/{projectId}/assays")]
+        public List<AssayDTO> GetAssays(int projectId)
+        {
+            return _projectService.GetProjectAssays(projectId);
         }
     }
 }
