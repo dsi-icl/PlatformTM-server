@@ -9,13 +9,11 @@ using System.Security.Claims;
 using System.Security.Principal;
 using Microsoft.IdentityModel.Tokens;
 using eTRIKS.Commons.WebAPI.Auth;
-
-
-
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using eTRIKS.Commons.Service.Services.UserManagement;
-//using System.Threading.Tasks;
+using eTRIKS.Commons.Service.DTOs;
+using eTRIKS.Commons.Core.Application.AccountManagement;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -24,90 +22,66 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     {
         private readonly TokenAuthOption TokenAuthOptions;
         private readonly UserAccountService _accountService;
-        //UserAccountService _accountService { get; set; }
+       
         
         public TokenAuthController(TokenAuthOption tokenOptions, UserAccountService userService)
         {
             this.TokenAuthOptions = TokenAuthOptions;
             _accountService = userService;
-            //this.bearerOptions = options.Value;
-            //this.signingCredentials = signingCredentials;
+
         }
-      
+
 
         //***********************************************************************************   Authentication   (GetAuthToken)
+        //[HttpPost]
+        //public string GetAuthToken(User user)
+        //{
+        //    var existUser = UserStorage.Users.FirstOrDefault(u => u.Username == user.Username && u.Password == user.Password);
+
+        //    if (existUser != null)
+        //    {
+        //        var requestAt = DateTime.Now;
+        //        var expiresIn = requestAt + TokenAuthOption.ExpiresSpan;
+        //        var token = GenerateToken(existUser, expiresIn);
+
+        //        return JsonConvert.SerializeObject(new
+        //        {
+        //            stateCode = 1,
+        //            requertAt = requestAt,
+        //            expiresIn = TokenAuthOption.ExpiresSpan.TotalSeconds,
+        //            accessToken = token
+        //        });
+        //    }
+        //    else
+        //    {
+        //        return JsonConvert.SerializeObject(new { stateCode = -1, errors = "Username or password is invalid" });
+        //    }
+        //}
+
+
         [HttpPost]
-        public string GetAuthToken(User user)
+        public async Task<dynamic> GetAuthToken([FromBody] UserDTO userDTO)
         {
-            var existUser = UserStorage.Users.FirstOrDefault(u => u.Username == user.Username && u.Password == user.Password);
-
-            if (existUser != null)
+            var result = await _accountService.SignIn(userDTO);
+            // Obviously, at this point you need to validate the username and password against whatever system you wish.
+            if (result.Succeeded)
             {
-                var requestAt = DateTime.Now;
-                var expiresIn = requestAt + TokenAuthOption.ExpiresSpan;
-                var token = GenerateToken(existUser, expiresIn);
-
-                return JsonConvert.SerializeObject(new
-                {
-                    stateCode = 1,
-                    requertAt = requestAt,
-                    expiresIn = TokenAuthOption.ExpiresSpan.TotalSeconds,
-                    accessToken = token
-                });
+                DateTime expires = DateTime.UtcNow.AddMinutes(2);
+                var token = GenerateToken(userDTO, expires);
+                return new { authenticated = true, entityId = 1, token = token, tokenExpires = expires };
             }
-            else
-            {
-                return JsonConvert.SerializeObject(new { stateCode = -1, errors = "Username or password is invalid" });
-            }
+            return new { authenticated = false };
         }
 
-                
-        ////////[HttpPost]
-        ////////public async Task<dynamic> Post([FromBody] User user)
-        ////////// public dynamic Post([FromBody] AuthRequest req)
-        ////////{
-        ////////    UserAccount appUser = null;
-        ////////    var allowedOrigin = "*";
-        ////////    appUser = await _accountService.FindUserAsync(user.username, user.password);
-
-        ////////    // appUser = _accountService(u => u.Username == user.Username && u.Password == user.Password);
-        ////////    // Obviously, at this point you need to validate the username and password against whatever system you wish.
-        ////////    //if ((req.username == "TEST" && req.password == "TEST") || (req.username == "TEST2" && req.password == "TEST"))
-
-        ////////    /////following is ddedd (start)
-        ////////    //var allowedOrigin = "*";
-        ////////    //    UserAccount appUser = null;
-
-        ////////    //appUser = await _userAccountService.FindUserAsync(req.username, req.password);
-
-        ////////    if (appUser != null)
-
-        ////////    /////following is ddedd (finish)
-        ////////    {
-        ////////        DateTime? expires = DateTime.UtcNow.AddMinutes(2);
-        ////////        var token = GenerateToken(user.username, expires);
-        ////////        // var token = GetToken(req.username, expires);
-        ////////        return new { authenticated = true, entityId = 1, token = token, tokenExpires = expires };
-        ////////    }
-
-        ////////    {
-        ////////        user.SetError("invalid_grant", "The user name or password is incorrect.");
-        ////////        return;
-        ////////    }
-        ////////    return new { authenticated = false };
-        ////////}
-
-
-
         //***********************************************************************************     GenerateToken (GetToken)
-        private string GenerateToken(User user, DateTime expires)
+        private string GenerateToken(UserDTO userDTO, DateTime expires)
         {
             var handler = new JwtSecurityTokenHandler();
 
             ClaimsIdentity identity = new ClaimsIdentity(
-                new GenericIdentity(user.Username, "TokenAuth"),
+                new GenericIdentity(userDTO.Username, "TokenAuth"),
                 new[] {
-                    new Claim("ID", user.ID.ToString())
+                    new System.Security.Claims.Claim("ID", userDTO.Username)
                 }
             );
 
@@ -122,28 +96,27 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return handler.WriteToken(securityToken);
         }
     }
-    //***********************************************************************************     USER
-    public class User
-    {
-        public Guid ID { get; set; }
+    ////***********************************************************************************     USER
+    //public class User
+    //{
+    //    public Guid ID { get; set; }
 
-        public string Username { get; set; }
+    //    public string Username { get; set; }
 
-        public string Password { get; set; }
-    }
-    //***********************************************************************************     UserStorage  (like userService)
-    public static class UserStorage
-    {
-        public static List<User> Users { get; set; } = new List<User> {
-            new User {ID=Guid.NewGuid(),Username="user1",Password = "user1psd" },
-            new User {ID=Guid.NewGuid(),Username="user2",Password = "user2psd" },
-            new User {ID=Guid.NewGuid(),Username="user3",Password = "user3psd" }
-        };
-    }
+    //    public string Password { get; set; }
+    //}
+    ////***********************************************************************************     UserStorage 
+    //public static class UserStorage
+    //{
+    //    public static List<User> Users { get; set; } = new List<User> {
+    //        new User {ID=Guid.NewGuid(),Username="user1",Password = "user1psd" },
+    //        new User {ID=Guid.NewGuid(),Username="user2",Password = "user2psd" },
+    //        new User {ID=Guid.NewGuid(),Username="user3",Password = "user3psd" }
+    //    };
+    //}
 
 
 
-    // *********************************************************************************************************************************************************************  [Authorize("Bearer")]
     //////[HttpGet]
     //////[Authorize("Bearer")]
     //////public dynamic Get()

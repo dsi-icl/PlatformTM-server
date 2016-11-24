@@ -7,12 +7,19 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Http;
+using eTRIKS.Commons.WebAPI.Auth;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using eTRIKS.Commons.DataAccess.Configuration;
 
 namespace eTRIKS.Commons.WebAPI
 {
     public class Startup
     {
-        public IConfigurationRoot Configuration { get; }
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -30,13 +37,27 @@ namespace eTRIKS.Commons.WebAPI
             Configuration = builder.Build();
         }
 
-        
+        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
             services.AddApplicationInsightsTelemetry(Configuration);
+
+            // Added - uses IOptions<T> for your settings.
+            services.AddOptions();
+
+            // Added - Confirms that we have a home for our DataAccessSettings
+            services.Configure<DataAccessSettings>(Configuration.GetSection("DataAccessSettings"));
+
+
+            services.AddAuthorization(auth =>
+            {
+                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme‌​)
+                    .RequireAuthenticatedUser().Build());
+            });
 
             services.AddMvc();
         }

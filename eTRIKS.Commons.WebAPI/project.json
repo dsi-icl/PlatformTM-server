@@ -18,7 +18,10 @@
     "Microsoft.Extensions.Options.ConfigurationExtensions": "1.0.0",
     "eTRIKS.Commons.Core": "1.0.0-*",
     "eTRIKS.Commons.DataAccess": "1.0.0-*",
-    "eTRIKS.Commons.Service": "1.0.0-*"
+    "eTRIKS.Commons.Service": "1.0.0-*",
+    "Microsoft.AspNetCore.Diagnostics": "1.1.0",
+    "Microsoft.AspNetCore.Authentication.JwtBearer": "1.1.0",
+    "Microsoft.AspNetCore.StaticFiles": "1.1.0"
   },
 
   "tools": {
