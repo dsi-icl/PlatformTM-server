@@ -63,7 +63,20 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
         //{
         //    return await _userManager.FindAsync(name, password);
         //}
+        public async Task<SignInResult> SignIn(UserDTO userDTO)
+        {
+            SignInResult result = await _signInManager.PasswordSignInAsync(userDTO.Username, userDTO.Password, false, false);
+            return result;
+        }
 
+        public async Task<bool> CheckUser(UserDTO userDTO)
+        {
+            var user = await _userManager.FindByNameAsync(userDTO.Username);
+
+            if (user != null)
+                return await _userManager.CheckPasswordAsync(user, userDTO.Password);
+            return false;
+        }
 
         public async Task<string> GetUserPsk(UserDTO userDTO)
         {
