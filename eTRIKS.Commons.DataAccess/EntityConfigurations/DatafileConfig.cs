@@ -1,5 +1,5 @@
 ﻿using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.DataAccess.Helpers;
+using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

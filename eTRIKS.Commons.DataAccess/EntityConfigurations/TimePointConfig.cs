@@ -1,6 +1,6 @@
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.DataAccess.Helpers;
+using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

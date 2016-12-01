@@ -1,6 +1,6 @@
 using System;
 using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.DataAccess.Helpers;
+using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace eTRIKS.Commons.DataAccess.EntityConfigurations

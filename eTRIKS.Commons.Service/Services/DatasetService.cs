@@ -20,16 +20,10 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<Dataset, int> _datasetRepository;
-        private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
-        private readonly IRepository<HumanSubject, string> _humanSubjectRepository;
-        private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
-        //private readonly IRepository<MongoDocument, Guid> _mongoDocRepository;
-        private readonly IRepository<SubjectObservation, Guid> _subObservationRepository;
-        //private readonly IRepository<Observation, int> _observationRepository;
-        private FileService _fileService;
+        private readonly FileService _fileService;
 
         public DatasetService(IServiceUoW uoW, FileService fileService)
         {
@@ -37,11 +31,7 @@ namespace eTRIKS.Commons.Service.Services
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
-            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
-            _activityRepository = uoW.GetRepository<Activity, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
-            _humanSubjectRepository = uoW.GetRepository<HumanSubject, string>();
-            _subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
 
             _fileService = fileService;
         }
@@ -166,11 +156,7 @@ namespace eTRIKS.Commons.Service.Services
             var dataset = CreateDataset(datasetDTO);
 
             _datasetRepository.Insert(dataset);
-            if (_dataServiceUnit.Save().Equals("CREATED"))
-            {
-                return dataset;
-            }
-            return null;
+            return _dataServiceUnit.Save().Equals("CREATED") ? dataset : null;
         }
 
         public Dataset CreateDataset(DatasetDTO datasetDTO)
@@ -856,7 +842,7 @@ namespace eTRIKS.Commons.Service.Services
 
             };
 
-        public FileDTO getDatasetFileInfo(int datasetId, int fileId)
+        public FileDTO CheckFileTemplateMatch(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
             //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));

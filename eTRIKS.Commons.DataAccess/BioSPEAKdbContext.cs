@@ -8,9 +8,16 @@ using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.Core.Domain.Model.Timing;
+using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.DataAccess.Configuration;
 using eTRIKS.Commons.DataAccess.EntityConfigurations;
-using eTRIKS.Commons.DataAccess.Helpers;
+using eTRIKS.Commons.DataAccess.Extensions;
 using eTRIKS.Commons.DataAccess.Repositories;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
@@ -139,53 +146,53 @@ namespace eTRIKS.Commons.DataAccess
             base.OnModelCreating(modelBuilder);
 
 
-            modelBuilder.AddConfiguration(new AccountConfig());
-            modelBuilder.AddConfiguration(new ActivityConfig());
-            modelBuilder.AddConfiguration(new ArmConfig());
-            modelBuilder.AddConfiguration(new AssayConfig());
+            modelBuilder.AddConfiguration<UserAccount>(new AccountConfig());
+            modelBuilder.AddConfiguration<Activity>(new ActivityConfig());
+            modelBuilder.AddConfiguration<Arm>(new ArmConfig());
+            modelBuilder.AddConfiguration<Assay>(new AssayConfig());
 
-            modelBuilder.AddConfiguration(new BioSampleConfig());
-            modelBuilder.AddConfiguration(new CharacterisitcConfig());
-            modelBuilder.AddConfiguration(new CharacteristicObjectConfig());
-            modelBuilder.AddConfiguration(new ClaimConfig());
+            modelBuilder.AddConfiguration<Biosample>(new BioSampleConfig());
+            modelBuilder.AddConfiguration<Characterisitc>(new CharacterisitcConfig());
+            modelBuilder.AddConfiguration<CharacteristicObject>(new CharacteristicObjectConfig());
+            modelBuilder.AddConfiguration<UserClaim>(new ClaimConfig());
 
 
 
-            modelBuilder.AddConfiguration(new DomainTemplateConfig());
-            modelBuilder.AddConfiguration(new DomainTemplateVariableConfig());
-            modelBuilder.AddConfiguration(new CVtermConfig());
-            modelBuilder.AddConfiguration(new DbConfig());
-            modelBuilder.AddConfiguration(new DBxrefConfig());
-            modelBuilder.AddConfiguration(new DictionaryConfig());
+            modelBuilder.AddConfiguration<DomainTemplate>(new DomainTemplateConfig());
+            modelBuilder.AddConfiguration<DomainVariableTemplate>(new DomainTemplateVariableConfig());
+            modelBuilder.AddConfiguration<CVterm>(new CVtermConfig());
+            modelBuilder.AddConfiguration<DB>(new DbConfig());
+            modelBuilder.AddConfiguration<Dbxref>(new DBxrefConfig());
+            modelBuilder.AddConfiguration<Dictionary>(new DictionaryConfig());
 
             
-            modelBuilder.AddConfiguration(new DatafileConfig());
-            modelBuilder.AddConfiguration(new DatasetConfig());
-            modelBuilder.AddConfiguration(new DatasetDatafileConfig());
+            modelBuilder.AddConfiguration<DataFile>(new DatafileConfig());
+            modelBuilder.AddConfiguration<Dataset>(new DatasetConfig());
+            modelBuilder.AddConfiguration<DatasetDatafile>(new DatasetDatafileConfig());
 
-            modelBuilder.AddConfiguration(new ObservationConfig());
-            modelBuilder.AddConfiguration(new ObservationQualifiersConfig());
-            modelBuilder.AddConfiguration(new ObservationSynonymConfig());
-            modelBuilder.AddConfiguration(new ObservationTimingsConfig());
+            modelBuilder.AddConfiguration<Observation>(new ObservationConfig());
+            modelBuilder.AddConfiguration<ObservationQualifier>(new ObservationQualifiersConfig());
+            modelBuilder.AddConfiguration<ObservationSynonym>(new ObservationSynonymConfig());
+            modelBuilder.AddConfiguration<ObservationTiming>(new ObservationTimingsConfig());
 
-            modelBuilder.AddConfiguration(new ProjectConfig());
-            modelBuilder.AddConfiguration(new ProjectUserConfig());
+            modelBuilder.AddConfiguration<Project>(new ProjectConfig());
+            modelBuilder.AddConfiguration<ProjectUser>(new ProjectUserConfig());
 
-            modelBuilder.AddConfiguration(new StudyConfig());
-            modelBuilder.AddConfiguration(new StudyDatasetConfig());
-            modelBuilder.AddConfiguration(new StudyArmConfig());
+            modelBuilder.AddConfiguration<Study>(new StudyConfig());
+            modelBuilder.AddConfiguration<StudyDataset>(new StudyDatasetConfig());
+            modelBuilder.AddConfiguration<StudyArm>(new StudyArmConfig());
 
-            modelBuilder.AddConfiguration(new SubjectConfig());
+            modelBuilder.AddConfiguration<HumanSubject>(new SubjectConfig());
 
-            modelBuilder.AddConfiguration(new TimePointConfig());
+            modelBuilder.AddConfiguration<TimePoint>(new TimePointConfig());
 
-            modelBuilder.AddConfiguration(new UserConfig());
+            modelBuilder.AddConfiguration<User>(new UserConfig());
 
 
-            modelBuilder.AddConfiguration(new VariableDefConfig());
-            modelBuilder.AddConfiguration(new VariableRefConfig());
+            modelBuilder.AddConfiguration<VariableDefinition>(new VariableDefConfig());
+            modelBuilder.AddConfiguration<VariableReference>(new VariableRefConfig());
 
-            modelBuilder.AddConfiguration(new VisitConfig());
+            modelBuilder.AddConfiguration<Visit>(new VisitConfig());
 
            
 

@@ -14,6 +14,8 @@ using eTRIKS.Commons.DataAccess;
 using MySQL.Data.Entity.Extensions;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
+using eTRIKS.Commons.Service.Configuration;
+using Newtonsoft.Json.Serialization;
 
 namespace eTRIKS.Commons.WebAPI
 {
@@ -57,6 +59,7 @@ namespace eTRIKS.Commons.WebAPI
             services.AddApplicationInsightsTelemetry(Configuration);
             
             services.Configure<DataAccessSettings>(Configuration.GetSection("DBSettings"));
+            services.Configure<FileStorageSettings>(Configuration.GetSection("FileStorageSettings"));
 
             services.AddDbContext<BioSPEAKdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
             services.AddScoped<IServiceUoW, BioSPEAKdbContext>();
@@ -82,9 +85,14 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<UserDatasetService>();
             services.AddScoped<UserAccountService>();
 
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(opts =>
+                 {
+                     // Force Camel Case to JSON
+                     opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                 });
 
-           
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

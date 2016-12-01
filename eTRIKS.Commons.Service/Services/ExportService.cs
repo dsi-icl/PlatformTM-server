@@ -90,10 +90,10 @@ namespace eTRIKS.Commons.Service.Services
                    _observationRepository.FindAll(
                        o => o.ProjectId == projectId,
                        new List<string>(){
-                           "Timings",
+                           "Timings.Qualifier",
                            //"Studies.Project",
                            "TopicVariable",
-                           "Qualifiers"
+                           "Qualifiers.Qualifier"
                        }
                        ).ToList();
 

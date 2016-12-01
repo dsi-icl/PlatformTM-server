@@ -50,9 +50,9 @@ namespace eTRIKS.Commons.Service.Services
                 new List<string>()
                 {
                    "Studies.Project",
-                    "Studies.Arms)",
+                    "Studies.Arms.Arm",
                     "Activities",
-                    "Users"
+                    "Users.User"
                 });
             var dto =  new ProjectDTO()
             {
@@ -63,7 +63,7 @@ namespace eTRIKS.Commons.Service.Services
                 Type = project.Type,
                 Id = project.Id,
                 Users = project.Users?
-                    .Select(u=>u.User) //STUPID EF1.1
+                    .Select(u => u.User) //STUPID EF1.1
                     .Select(u => new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
                 //Users = project.Users?.Select(u=>new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
                 Studies = project.Studies.Select(

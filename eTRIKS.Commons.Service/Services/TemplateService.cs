@@ -61,7 +61,7 @@ namespace eTRIKS.Commons.Service.Services
             //TODO: create a method in Generic Repository that takes an expression as a parameter
             // and uses it in a select method.
             var domains = _templateRepository.FindAll(
-                d => d.Id.StartsWith("D-SDTM"), 
+                d => d.Id.Contains("D-SDTM"), 
                 new List<string>()
                 {
                     "Variables"

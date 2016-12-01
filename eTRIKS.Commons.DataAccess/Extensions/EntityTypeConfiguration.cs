@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
 
-namespace eTRIKS.Commons.DataAccess.Helpers
+namespace eTRIKS.Commons.DataAccess.Extensions
 {
     public abstract class EntityTypeConfiguration<TEntity>
         where TEntity : class

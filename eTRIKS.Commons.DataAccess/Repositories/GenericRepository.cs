@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.DataAccess.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace eTRIKS.Commons.DataAccess.Repositories
