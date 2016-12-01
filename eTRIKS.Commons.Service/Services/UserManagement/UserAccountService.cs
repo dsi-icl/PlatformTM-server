@@ -62,7 +62,7 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
 
         //public async Task<UserAccount> FindUserAsync(string name, string password)
         //{
-        //    return await _userManager.f(name, password);
+        //    return await _userManager.FindAsync(name, password);
         //}
 
         public async Task<SignInResult> SignIn(UserDTO userDTO)
@@ -71,7 +71,7 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             return result;
         }
 
-        public async  Task<bool> CheckUser(UserDTO userDTO)
+        public async Task<bool> CheckUser(UserDTO userDTO)
         {
             var user = await _userManager.FindByNameAsync(userDTO.Username);
 
