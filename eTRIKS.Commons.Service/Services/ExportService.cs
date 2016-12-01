@@ -20,11 +20,9 @@ namespace eTRIKS.Commons.Service.Services
     {
         private IRepository<HumanSubject, string> _subjectRepository;
         private IRepository<DomainTemplate, string> _domainTemplate;
-        //private readonly IRepository<SubjectObservation, Guid> _subObservationRepository;
         private readonly IRepository<CharacteristicObject, int> _characObjRepository;
         private IServiceUoW _dataContext;
         private readonly IRepository<Core.Domain.Model.Observation, int> _observationRepository;
-        //private readonly IRepository<UserDataset, int> _userDatasetRepository;
         private readonly IRepository<Visit, int> _visitRepository;
         private readonly IRepository<SubjectCharacteristic,int> _subjectCharacteristicRepository;
         private readonly IRepository<Study, int> _studyRepository;
@@ -35,13 +33,11 @@ namespace eTRIKS.Commons.Service.Services
         public ExportService(IServiceUoW uoW)
         {
             _dataContext = uoW;
-            //_subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _observationRepository = uoW.GetRepository<Core.Domain.Model.Observation, int>();
             _characObjRepository = uoW.GetRepository<CharacteristicObject, int>();
             _domainTemplate = uoW.GetRepository<DomainTemplate, string>();
             _visitRepository = uoW.GetRepository<Visit, int>();
-            //_userDatasetRepository = uoW.GetRepository<UserDataset, int>();
             _subjectCharacteristicRepository = uoW.GetRepository<SubjectCharacteristic, int>();
             _studyRepository = uoW.GetRepository<Study,int>();
             _armRepository = uoW.GetRepository<Arm, string>();
@@ -93,13 +89,12 @@ namespace eTRIKS.Commons.Service.Services
             List<Observation> studyObservations =
                    _observationRepository.FindAll(
                        o => o.ProjectId == projectId,
-                       new List<Expression<Func<Observation, object>>>(){
-                           d =>d.Timings,
-                           d => d.Studies.Select(s => s.Project),
-                           d => d.TopicVariable,
-                           d => d.Qualifiers
-
-                            }
+                       new List<string>(){
+                           "Timings",
+                           //"Studies.Project",
+                           "TopicVariable",
+                           "Qualifiers"
+                       }
                        ).ToList();
 
             var groupedByClDmGp = studyObservations.GroupBy(ob => new { ob.Class, ob.DomainCode, ob.DomainName, ob.Group });
@@ -117,7 +112,7 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     var node = createOrFindTreeNode(groupNode.Children, obs.Id.ToString(), obs.ControlledTermStr, "", true);
 
-                    foreach (var q in obs.Qualifiers)
+                    foreach (var q in obs.Qualifiers.Select(o=>o.Qualifier))
                     {
                         var qnode = createOrFindTreeNode(node.Children, node.Id + "_" + q.Id, q.Label, q.DataType, false);
                         qnode.Field = new DataFieldDTO()
@@ -133,7 +128,7 @@ namespace eTRIKS.Commons.Service.Services
 
                         };
                     }
-                    foreach (var q in obs.Timings)
+                    foreach (var q in obs.Timings.Select(t=>t.Qualifier))
                     {
                         var qnode = createOrFindTreeNode(node.Children, node.Id + "_" + q.Id, q.Label, q.DataType, false);
                         qnode.Field = new DataFieldDTO()
@@ -157,7 +152,7 @@ namespace eTRIKS.Commons.Service.Services
             return roots;
         }
         
-        public async Task<DataFilterDTO> GetFieldValueSet(int projectId, DataFieldDTO field )
+        public DataFilterDTO GetFieldValueSet(int projectId, DataFieldDTO field )
         {
             //TODO: 
 
@@ -189,7 +184,7 @@ namespace eTRIKS.Commons.Service.Services
             }
             else if (field.Entity == typeof(Arm).FullName)
             {
-                var arms = _armRepository.FindAll(a => a.Studies.All(s => s.ProjectId == projectId));//Studies.All(t=>t.Project.Accession == projectAcc));
+                var arms = _armRepository.FindAll(a => a.Studies.Select(s=>s.Study).All(s => s.ProjectId == projectId));//Studies.All(t=>t.Project.Accession == projectAcc));
                 //visits.GroupBy(v=>v.Study)
                 var vals = arms.Select(v => v.Name).ToList();
                 filter.Field = field;
@@ -268,17 +263,17 @@ namespace eTRIKS.Commons.Service.Services
             return filter;
         }
 
-        public async Task<Hashtable> ExportDataTable(int projectId, UserDatasetDTO userDatasetDto)
+        public Hashtable ExportDataTable(int projectId, UserDatasetDTO userDatasetDto)
         {
             UserDataset userdataset = getUserDataset(userDatasetDto);
-            DataExportObject exportData =  await GetExportData(projectId, userdataset);
+            DataExportObject exportData =  GetExportData(projectId, userdataset);
 
             var dataTable = CreateDataTable(exportData,userdataset);
             var ht = getHashtable(dataTable);
             return ht;
         }
 
-        private async Task<DataExportObject> GetExportData(int projectId, UserDataset userDataset)
+        private DataExportObject GetExportData(int projectId, UserDataset userDataset)
         {
 
             DataExportObject exportData = new DataExportObject();
@@ -319,7 +314,7 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     var characteristics = _subjectCharacteristicRepository.FindAll(
                         sc => sc.Subject.Study.ProjectId == projectId && selField.EntityId == sc.CharacteristicObjectId,
-                        new List<Expression<Func<SubjectCharacteristic, object>>>() { sc => sc.Subject }).ToList();
+                        new List<string>() { "Subject" }).ToList();
                     //APPLY filter here?
                     exportData.SubjChars.AddRange(characteristics);
                     exportData.IsSubjectIncluded = true;
@@ -338,7 +333,7 @@ namespace eTRIKS.Commons.Service.Services
                 }
                 else if (selField.Entity == typeof(Study).FullName)
                 {
-                    var studies = _studyRepository.FindAll(s => s.ProjectId == projectId, new List<Expression<Func<Study, object>>>() { s => s.Subjects }).ToList();
+                    var studies = _studyRepository.FindAll(s => s.ProjectId == projectId, new List<string>() { "Subjects" }).ToList();
                     exportData.Studies = studies;
                 }
                 else if (selField.Entity == typeof(Visit).FullName)
@@ -482,20 +477,20 @@ namespace eTRIKS.Commons.Service.Services
 
         private void fillExportDataArms( DataExportObject exportData, int projectId)
         {
-            var arms = _armRepository.FindAll(a => a.Studies.All(s => s.ProjectId == projectId)).ToList();
+            var arms = _armRepository.FindAll(a => a.Studies.Select(s=>s.Study).All(s => s.ProjectId == projectId)).ToList();
             //Apply filter?
             exportData.Arms = arms;
             exportData.SubjectArms = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId,
-                new List<Expression<Func<HumanSubject, object>>>() { s => s.StudyArm }).ToList();
+                new List<string>() { "StudyArm" }).ToList();
             exportData.StudyArms = _studyRepository.FindAll(s => s.ProjectId == projectId,
-                new List<Expression<Func<Study, object>>>() { s => s.Arms }).ToList();
+                new List<string>() { "Arms" }).ToList();
         }
 
         private void fillSubjCharData( DataExportObject exportData ,DataField field, int projectId)
         {
             var characteristics = _subjectCharacteristicRepository.FindAll(
                         sc => sc.Subject.Study.ProjectId == projectId && field.EntityId == sc.CharacteristicObjectId,
-                        new List<Expression<Func<SubjectCharacteristic, object>>>() { sc => sc.Subject }).ToList();
+                        new List<string>() { "Subject" }).ToList();
             //APPLY filter here?
             //exportData = exportData;
             exportData.SubjChars.AddRange(characteristics);
@@ -584,9 +579,9 @@ namespace eTRIKS.Commons.Service.Services
                 i++;
 
                 var domain = _domainTemplate.FindSingle(d => d.Code.Equals(obsGrp.Key.DomainCode),
-                    new List<Expression<Func<DomainTemplate, object>>>()
+                    new List<string>()
                     {
-                        v => v.Variables
+                        "Variables"
                     });
 
                 var Class = domain.Class;

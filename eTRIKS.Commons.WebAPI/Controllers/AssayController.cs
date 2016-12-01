@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/assays")]
     public class AssayController : Controller
     {

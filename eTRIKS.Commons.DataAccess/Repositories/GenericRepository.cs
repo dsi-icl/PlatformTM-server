@@ -1,27 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess.Helpers;
+using Microsoft.EntityFrameworkCore;
 
-
-
-namespace eTRIKS.Commons.DataAccess
+namespace eTRIKS.Commons.DataAccess.Repositories
 {
     public class GenericRepository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
     {
-        //TODO: IS THIS REALLY NEEDED?
-        //THIS AS IT IS RIGHT NOW WITH NO DEPENDENCE ON EF MAKES THIS REPOSITORY IMPLEMENTATION
-        //AN INDEPENDENT IMPLMENETATION THAT COULD BE USED FOR TESTING AS WELL IF A TESTDATACONTEXT IS PASSED
-        //TO DATACONTEXT INSTEAD OF ETRIKSDATACONTEXT
-        // IF THIS GETS CHANGED TO DbContext DataContext instead of IDataContext DataContext
-        // THEN this means we will have to create ANOTHER Repository Implementation for TESTING instead of using
-        // this one and only passnig it a different context (or a different DBset)
         protected DbContext DataContext { get; set; }
         protected DbSet<TEntity> Entities { get; set; }
         public GenericRepository(DbContext dataContext)
@@ -30,6 +21,7 @@ namespace eTRIKS.Commons.DataAccess
             //DataContext.Configuration.ProxyCreationEnabled = false;
             Entities = DataContext.Set<TEntity>();
             
+            
         }
         public GenericRepository(DbSet<TEntity> entities)
         {
@@ -37,24 +29,14 @@ namespace eTRIKS.Commons.DataAccess
             //dataContext = entities
         }
 
-        public IQueryable<TEntity> GetAll()
-        {
-            return Entities;
-        }
         public TEntity Get(TPrimaryKey key)
         {
             return Entities.Find(key);
         }
 
-        public IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter)
-        {
-            IQueryable<TEntity> dbQuery = Entities;
-            return dbQuery.Where(filter);
-        }
-
-
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, 
-                                    List<Expression<Func<TEntity, object>>> includeProperties = null,
+                                    //List<Expression<Func<TEntity, object>>> includeProperties = null,
+                                    List<string> includeProperties = null,
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,
                                     int? pageSize = null)
@@ -63,8 +45,8 @@ namespace eTRIKS.Commons.DataAccess
             IQueryable<TEntity> query = Entities;
 
             if (includeProperties != null)
-                includeProperties.ForEach(i => 
-                    query = query.Include<TEntity, object>(i));
+                includeProperties.ForEach(i =>
+                    query = query.Include(i));
 
             if (filter != null)
                 query = query.Where(filter);
@@ -92,7 +74,7 @@ namespace eTRIKS.Commons.DataAccess
 
 
         public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null,
-                                    List<Expression<Func<TEntity, object>>> includeProperties = null)
+                                    List<string> includeProperties = null)
         {
             return FindAll(filter, includeProperties).SingleOrDefault();
         }

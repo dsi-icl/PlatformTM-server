@@ -3,6 +3,7 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -19,10 +20,12 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Project()
         {
             Studies = new List<Study>();
+            Users = new List<ProjectUser>();
         }
 
         public ICollection<Activity> Activities { get; set; }
-        public IList<User> Users { get; set; }
+        //public IList<User> Users { get; set; }
+        public IList<ProjectUser> Users { get; set; }
         public User Owner { get; set; }
         public Guid OwnerId { get; set; }
     }

@@ -15,6 +15,7 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
     {
         private readonly UserManager<UserAccount> _userManager;
         private readonly SignInManager<UserAccount> _signInManager;
+       // private readonly RoleManager<UserRole> _roleManager;
 
         public UserAccountService(UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager)
         {
@@ -61,8 +62,23 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
 
         //public async Task<UserAccount> FindUserAsync(string name, string password)
         //{
-        //    return await _userManager.FindAsync(name, password);
+        //    return await _userManager.f(name, password);
         //}
+
+        public async Task<SignInResult> SignIn(UserDTO userDTO)
+        {
+            SignInResult result = await _signInManager.PasswordSignInAsync(userDTO.Username, userDTO.Password, false, false);
+            return result;
+        }
+
+        public async  Task<bool> CheckUser(UserDTO userDTO)
+        {
+            var user = await _userManager.FindByNameAsync(userDTO.Username);
+
+            if (user != null)
+                return await _userManager.CheckPasswordAsync(user, userDTO.Password);
+            return false;
+        }
 
 
         public async Task<string> GetUserPsk(UserDTO userDTO)

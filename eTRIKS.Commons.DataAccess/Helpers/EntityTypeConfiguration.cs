@@ -10,7 +10,7 @@ namespace eTRIKS.Commons.DataAccess.Helpers
     public abstract class EntityTypeConfiguration<TEntity>
         where TEntity : class
     {
-        public abstract void Map(EntityTypeBuilder<TEntity> builder);
+        public abstract void Configure(EntityTypeBuilder<TEntity> builder);
     }
 
     public static class ModelBuilderExtensions
@@ -18,7 +18,7 @@ namespace eTRIKS.Commons.DataAccess.Helpers
         public static void AddConfiguration<TEntity>(this ModelBuilder modelBuilder, EntityTypeConfiguration<TEntity> configuration)
             where TEntity : class
         {
-            configuration.Map(modelBuilder.Entity<TEntity>());
+            configuration.Configure(modelBuilder.Entity<TEntity>());
         }
     }
 }

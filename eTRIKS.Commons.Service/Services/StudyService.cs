@@ -50,14 +50,13 @@ namespace eTRIKS.Commons.Service.Services
             if (studyDto.ProjectAcc != null)
             {
                 var project = _projectRepository.FindSingle(p => p.Accession == studyDto.ProjectAcc,
-                new List<Expression<Func<Project, object>>>()
+                new List<string>()
                 {
-                    p => p.Studies
+                    "Studies"
                 });
                 
                 if (project != null) {
-                    int num = 1;
-                    num = project.Studies.Count;
+                    var num = project.Studies.Count;
                     var abbr = studyDto.ProjectAcc.Substring(2, 3);
                     studyDto.Accession = "S-" + abbr + "-" + (num+1).ToString("00");
                     studyDto.ProjectId = project.Id;
@@ -76,10 +75,11 @@ namespace eTRIKS.Commons.Service.Services
 
         public StudyDTO GetstudyId(int studyId)
         {
-            var study = _studyRepository.FindSingle(s => s.Id == studyId,new List<Expression<Func<Study, object>>>()
-            {
-                s=>s.Project
-            });
+            var study = _studyRepository.FindSingle(s => s.Id == studyId,
+                new List<string>()
+                {
+                   "Project"
+                });
             return new StudyDTO()
             {
                 Name = study.Name,

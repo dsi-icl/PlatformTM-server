@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
@@ -11,52 +12,140 @@ namespace eTRIKS.Commons.Service.Services
     public class TemplateService// : ITemplateService
     {
 
-        private IServiceUoW _dataServiceUnit;
+        private readonly IServiceUoW _dataServiceUnit;
 
-        //TODO: should be replaced with only one repository to include only the Aggregate Root (i.e. DomainTemplate)
-        private readonly IRepository<DomainTemplate,string> _templateRepository;
-        private readonly IRepository<DomainVariableTemplate, string> _templateVariableRepository;
         private readonly IRepository<CVterm, string> _cvTermRepository;
         private readonly IRepository<Dictionary, string> _dictionaryRepository;
-        private FileService _fileService;
+        private readonly IRepository<DomainTemplate, string> _templateRepository;
+        private readonly FileService _fileService;
 
         public TemplateService(IServiceUoW uoW, FileService fileService)
         {
             _dataServiceUnit = uoW;
             _templateRepository = uoW.GetRepository<DomainTemplate, string>();
-            _templateVariableRepository = uoW.GetRepository<DomainVariableTemplate,string>();
+
             _cvTermRepository = uoW.GetRepository<CVterm, string>();
             _dictionaryRepository = uoW.GetRepository<Dictionary, string>();
             _fileService = fileService;
         }
 
-        public IEnumerable<DomainTemplate> GetAllDomains()
-        {
-            return _templateRepository.GetAll().ToList();
-        }
 
-        public DomainTemplate GetDomainTemplateById(string oid)
+        /// <summary>
+        /// Retrieves Domain dataset from Template Tables for "New" datasets
+        /// </summary>
+        /// <param name="domainId"></param>
+        public DatasetDTO GetTemplateDataset(string domainId)
         {
-            return _templateRepository.Get(oid);
-        }
+            DomainTemplate domainTemplate = _templateRepository.FindAll(
+                d => d.Id.Equals(domainId),
+                new List<string>()
+                {
+                   "Variables.controlledTerminology.Xref.DB"
+                }
+                ).FirstOrDefault<DomainTemplate>();
 
-        public DomainTemplate GetDomainWithVariables(string oid)
-        {
-            //TODO:figure out the query for that in IRepository
-           return _templateRepository.Get(oid);
-        }
 
-        public string getOIDOfCVterm(string name)
-        {
-            if (name.Length < 1)
+            //TODO: USE AutoMapper instead of this manual mapping
+
+            if (domainTemplate == null)
                 return null;
-            //return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().Id;
-            return _cvTermRepository.FindSingle(o => o.Name.Equals(name)).Id;
+
+            var dto = GetDatasetDTO(domainTemplate);
+
+            return dto;
         }
 
-        public string checkDictionaryItem(string OID)
+        public List<DatasetDTO> GetAllDomainTemplates()
         {
-            return _dictionaryRepository.GetRecords(o => o.Id.Equals(OID)).First().Id;
+            //leaky abstraction
+            //TODO: create a method in Generic Repository that takes an expression as a parameter
+            // and uses it in a select method.
+            var domains = _templateRepository.FindAll(
+                d => d.Id.StartsWith("D-SDTM"), 
+                new List<string>()
+                {
+                    "Variables"
+                }).ToList()
+                  .OrderBy(d => d.Class);
+            return domains.Select(GetDatasetDTO).ToList();
+        }
+
+        public List<DatasetDTO> GetAssayFeatureTemplates()
+        {
+            var ds = GetTemplateDataset("D-ASSAY-FEAT");
+            return new List<DatasetDTO>() { ds };
+        }
+
+        public List<DatasetDTO> GetAssaySampleTemplates()
+        {
+            var ds = GetTemplateDataset("D-SDTM-BS");
+            return new List<DatasetDTO> { ds };
+        }
+
+        public List<DatasetDTO> GetAssayDataTemplates()
+        {
+            var templates = _templateRepository.FindAll(
+                d => d.Class == "Assay Observations", 
+                new List<string>()
+                {
+                    "Variables"
+                });
+            List<DatasetDTO> templateDTOs = new List<DatasetDTO>();
+            foreach (var ds in templates)
+            {
+                templateDTOs.Add(GetDatasetDTO(ds));
+            }
+            return templateDTOs;
+        }
+
+
+        private DatasetDTO GetDatasetDTO(DomainTemplate domainTemplate)
+        {
+            DatasetDTO dto = new DatasetDTO();
+
+            dto.Class = domainTemplate.Class;
+            dto.Description = domainTemplate.Description;
+            dto.Name = domainTemplate.Name;
+            dto.DomainId = domainTemplate.Id;
+            dto.Structure = domainTemplate.Structure;
+            dto.Code = domainTemplate.Code;
+
+            foreach (DomainVariableTemplate vt in domainTemplate.Variables.OrderBy(c => c.Order))
+            {
+                DatasetVariableDTO dv = new DatasetVariableDTO();
+                dv.Name = vt.Name;
+                dv.Description = vt.Description;
+                dv.Label = vt.Label;
+                dv.Accession = vt.Id;
+                dv.RoleId = vt.RoleId;
+                dv.DataType = vt.DataType;
+                dv.UsageId = vt.UsageId;
+                //if (vt.controlledTerminology != null)
+                //{
+                //    dv.DictionaryName = vt.controlledTerminology.Name;
+                //    dv.DictionaryDefinition = vt.controlledTerminology.Definition;
+                //    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.DB.UrlPrefix +
+                //                           vt.controlledTerminology.Xref.Accession;
+                //}
+                dv.IsRequired = false;
+                dv.KeySequence = null;
+                dv.OrderNumber = null;
+                dv.IsCurated = true;
+                dv.IsComputed = false;
+                dv.varType = "STANDARD";
+
+                if (dv.UsageId.Equals("CL-Compliance-T-1") || dv.UsageId.Equals("CL-Compliance-T-2"))
+                {
+                    dv.isSelected = true;
+
+                    if (dv.UsageId.Equals("CL-Compliance-T-1"))
+                        dv.IsRequired = true;
+                }
+
+                dto.variables.Add(dv);
+            }
+            return dto;
+
         }
 
         public void addDictionaryItem(Dictionary dictionaryItem)
@@ -71,41 +160,7 @@ namespace eTRIKS.Commons.Service.Services
             _dataServiceUnit.Save();
         }
 
-        public string addDomainTemplate(List<DomainTemplate> dtList)
-        {
-            for (int i = 0; i < dtList.Count; i++)
-            {
-                _templateRepository.Insert(dtList[i]);
-            }
-            return _dataServiceUnit.Save();
-        }
 
-        public string updateDomainTemplate(List<DomainTemplate> dtList)
-        {
-            for (int i = 0; i < dtList.Count; i++)
-            {
-                _templateRepository.Update(dtList[i]);
-            }
-            return _dataServiceUnit.Save();
-        }
-
-        public string addDomainTemplateVariables(List<DomainVariableTemplate> dvtList)
-        {
-            for (int i = 0; i < dvtList.Count; i++)
-            {
-                _templateVariableRepository.Insert(dvtList[i]);
-            }
-            return _dataServiceUnit.Save();
-        }
-
-        public string updateDomainTemplateVariables(List<DomainVariableTemplate> dvtList)
-        {
-            for (int i = 0; i < dvtList.Count; i++)
-            {
-                _templateVariableRepository.Update(dvtList[i]);
-            }
-            return _dataServiceUnit.Save();
-        }
 
         #region temp loader methods
 
@@ -172,6 +227,14 @@ namespace eTRIKS.Commons.Service.Services
                 _cvTermRepository.Insert(cv);
             }
             _dataServiceUnit.Save();
+        }
+
+        public string getOIDOfCVterm(string name)
+        {
+            if (name.Length < 1)
+                return null;
+            //return _cvTermRepository.GetRecords(o => o.Name.Equals(name)).First().Id;
+            return _cvTermRepository.FindSingle(o => o.Name.Equals(name)).Id;
         }
 
         public void loadDataMatrixTemplate()

@@ -12,6 +12,8 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
         private readonly IServiceUoW _unitOfWork;
         private readonly IUserRepository _userRepository;
         private readonly IUserAccountRepository _accountRepository;
+        private bool _disposed;
+
         public UserStore(IServiceUoW uoW)
         {
             _unitOfWork = uoW;
@@ -90,8 +92,22 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+                //handle.Dispose();
+            _disposed = true;
+        }
+
+        //public void Dispose()
+        //{
+        //    throw new NotImplementedException();
+        //}
         //public Task CreateAsync(UserAccount userAccount)
         //{
         //    _userRepository.Insert(userAccount.Account.User);

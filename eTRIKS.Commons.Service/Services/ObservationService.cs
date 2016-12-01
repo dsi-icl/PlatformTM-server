@@ -507,8 +507,6 @@ namespace eTRIKS.Commons.Service.Services
 
         internal bool LoadObservations(List<SdtmRow> sdtmData, SdtmRowDescriptor sdtmRowDescriptor, bool reload)
         {
-            
-            const string AECVtermIdVar = "AEPTCD";
             var dsDomainCode = sdtmRowDescriptor.DomainCode;
 
             var datasetId = sdtmData.First().DatasetId;
@@ -531,11 +529,11 @@ namespace eTRIKS.Commons.Service.Services
                 obsDescriptor.DomainName = sdtmRowDescriptor.Domain;
                 obsDescriptor.TopicVariable = sdtmRowDescriptor.TopicVariable;
 
-                if (sdtmRowDescriptor.ObsIsAFinding)
-                    obsDescriptor.Qualifiers = sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList();
-                else
-                    obsDescriptor.Qualifiers = sdtmRowDescriptor.QualifierVariables;
-                //ob.Timings = sdtmRowDescriptor.
+                //if (sdtmRowDescriptor.ObsIsAFinding)
+                //    obsDescriptor.Qualifiers = sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList();
+                //else
+                //    obsDescriptor.Qualifiers = sdtmRowDescriptor.QualifierVariables;
+                
                 obsDescriptor.ControlledTermStr = observation.Key.o3CVterm;
 
                 obsDescriptor.DatasetId = datasetId;

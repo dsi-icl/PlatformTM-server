@@ -3,18 +3,26 @@
 
   "dependencies": {
     "eTRIKS.Commons.Core": "1.0.0-*",
-    "MongoDB.Driver": "2.3.0-beta1",
-    "System.Collections.Specialized": "4.0.1",
-    "Microsoft.EntityFrameworkCore": "1.0.0",
-    "System.Runtime.InteropServices": "4.1.0",
+    "MongoDB.Driver": "2.4.0",
     "Newtonsoft.Json": "9.0.1",
-    "Microsoft.IdentityModel.Protocols": "2.0.0",
-    "Microsoft.AspNetCore.WebUtilities": "1.0.0",
-    "MySql.Data.EntityFrameworkCore": "7.0.6-IR31"
+    "Microsoft.AspNetCore.WebUtilities": "1.1.0",
+    "Microsoft.EntityFrameworkCore": "1.1.0",
+    "Microsoft.IdentityModel.Protocols": "2.1.0",
+    "System.Collections.Specialized": "4.3.0",
+    "System.Runtime.InteropServices": "4.3.0",
+    "SapientGuardian.EntityFrameworkCore.MySql": "7.1.14",
+    "Microsoft.EntityFrameworkCore.Relational": "1.1.0"
   },
 
   "frameworks": {
-    "netcoreapp1.0": {
+    "netcoreapp1.1": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.1.0"
+        }
+      },
+      "imports": "dnxcore50"
     }
   }
 }

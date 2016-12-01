@@ -170,7 +170,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("api/files/{fileId}/preview")]
-        public async Task<Hashtable> getDatasetPreview(int fileId)
+        public Hashtable getDatasetPreview(int fileId)
         {
             return _fileService.getFilePreview(fileId);
         }

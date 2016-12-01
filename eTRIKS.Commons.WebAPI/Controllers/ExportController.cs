@@ -26,16 +26,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
         [HttpPost]
         [Route("api/projects/{projectId}/export/datafields/valueset")]
-        public async Task<DataFilterDTO> GetValueSet(int projectId, [FromBody] DataFieldDTO fieldDto)
+        public  DataFilterDTO GetValueSet(int projectId, [FromBody] DataFieldDTO fieldDto)
         {
-            return await _exportService.GetFieldValueSet(projectId, fieldDto);
+            return _exportService.GetFieldValueSet(projectId, fieldDto);
         }
 
         [HttpPost]
         [Route("api/projects/{projectId}/export/table")]
-        public async Task<Hashtable> GetDataPreview(int projectId, [FromBody] UserDatasetDTO userDatasetDto)
+        public  Hashtable GetDataPreview(int projectId, [FromBody] UserDatasetDTO userDatasetDto)
         {
-            return await _exportService.ExportDataTable(projectId, userDatasetDto);
+            return _exportService.ExportDataTable(projectId, userDatasetDto);
         }
 
         //[HttpPost]

@@ -7,7 +7,7 @@ namespace eTRIKS.Commons.DataAccess.Configuration
 {
     public class DataAccessSettings
     {
-        public string mongoDBprod { get; set; }
+        public string MongoDBconnection { get; set; }
         public string noSQLDatabaseName { get; set; }
     }
 }

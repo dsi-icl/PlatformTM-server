@@ -8,16 +8,18 @@ using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using System.Threading.Tasks;
-using MySQL.Data.EntityFrameworkCore.Extensions;
+using eTRIKS.Commons.DataAccess.Configuration;
+using eTRIKS.Commons.DataAccess.EntityConfigurations;
 using eTRIKS.Commons.DataAccess.Helpers;
-using eTRIKS.Commons.Persistence.Mapping;
+using eTRIKS.Commons.DataAccess.Repositories;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace eTRIKS.Commons.DataAccess
 {
-
-    //[DbConfigurationType(typeof(MySqlEFConfiguration))]
     public class BioSPEAKdbContext : DbContext, IServiceUoW
     {
+        private readonly IOptions<DataAccessSettings> _dbsettings;
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
@@ -26,7 +28,8 @@ namespace eTRIKS.Commons.DataAccess
         private bool _disposed;
 
 
-        public BioSPEAKdbContext(DbContextOptions<BioSPEAKdbContext> options) : base(options){
+        public BioSPEAKdbContext(DbContextOptions<BioSPEAKdbContext> options, IOptions<DataAccessSettings> settings) : base(options){
+            _dbsettings = settings;
             _repositories = new Dictionary<Type, object>();
             _disposed = false;
         }
@@ -72,41 +75,34 @@ namespace eTRIKS.Commons.DataAccess
                 return _repositories[typeof(TEntity)] as IRepository<TEntity, TPrimaryKey>;
             }
 
-            // If the repository for that Model class doesn't exist, create it
-            if (typeof(TEntity).Name.Equals("SubjectObservation"))
+            if (typeof(TEntity).Name.Equals("SdtmRow") || typeof(TEntity) == (typeof(PlatformAnnotation)))
             {
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>("Biospeak_clinical");
-                _repositories.Add(typeof(TEntity), MongoRepository);
-                return MongoRepository;
-            }
+                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
 
-            if (typeof(TEntity).Name.Equals("MongoDocument"))
-            {
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>("Biospeak_clinical");
-                _repositories.Add(typeof(TEntity), MongoRepository);
-                return MongoRepository;
-            }
-            if (typeof(TEntity).Name.Equals("SdtmRow") || typeof(TEntity)==(typeof(PlatformAnnotation)))
-            {
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>("Biospeak_clinical");
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb,"Biospeak_clinical");
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
             if (typeof(TEntity) == (typeof(UserDataset)))
             {
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>("userDatasets");
+                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb,"userDatasets");
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
 
             var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
-
-            // Add it to the dictionary
             _repositories.Add(typeof(TEntity), repository);
 
             return repository;
         }
 
+        public void Register<TEntity, TPrimaryKey>(IRepository<TEntity, TPrimaryKey> repository) where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
+        {
+            _repositories.Add(typeof(TEntity), repository);
+        }
         public string Save()
         {
             try
@@ -124,7 +120,7 @@ namespace eTRIKS.Commons.DataAccess
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -132,41 +128,74 @@ namespace eTRIKS.Commons.DataAccess
 
         protected virtual void Dispose(bool disposing)
         {
-            if (this._disposed) return;
+            if (_disposed) return;
             if (disposing)
                 base.Dispose();
-            this._disposed = true;
+            _disposed = true;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            //modelBuilder.AddConfiguration(new DomainTemplateMap());
-            //modelBuilder.AddConfiguration(new DomainVariableTemplateMap());
-            //modelBuilder.AddConfiguration(new DatasetMap());
-            //modelBuilder.AddConfiguration(new ActivityMap());
-            //modelBuilder.AddConfiguration(new CVtermMap());
-            //modelBuilder.AddConfiguration(new DbMap());
-            //modelBuilder.AddConfiguration(new DBxrefMap());
-            //modelBuilder.AddConfiguration(new DerivedVariablePropertiesMap());
-            //modelBuilder.AddConfiguration(new DictionaryMap());
-            //modelBuilder.AddConfiguration(new StudyMap());
-            //modelBuilder.AddConfiguration(new VariableDefMap());
-            //modelBuilder.AddConfiguration(new VariableRefMap());
-            //modelBuilder.AddConfiguration(new ObservationMap());
-            //modelBuilder.AddConfiguration(new ProjectMap());
-            //modelBuilder.AddConfiguration(new DataFileMap());
-            //modelBuilder.AddConfiguration(new VisitMap());
-            //modelBuilder.AddConfiguration(new SubjectMap());
-            //modelBuilder.AddConfiguration(new BioSampleMap());
-            //modelBuilder.AddConfiguration(new CharacterisitcMap());
-            //modelBuilder.AddConfiguration(new CharacteristicObjectMap());
-            //modelBuilder.AddConfiguration(new ArmMap());
-            //modelBuilder.AddConfiguration(new UserMap());
-            //modelBuilder.AddConfiguration(new AccountMap());
-            //modelBuilder.AddConfiguration(new ClaimMap());
+
+            modelBuilder.AddConfiguration(new AccountConfig());
+            modelBuilder.AddConfiguration(new ActivityConfig());
+            modelBuilder.AddConfiguration(new ArmConfig());
+            modelBuilder.AddConfiguration(new AssayConfig());
+
+            modelBuilder.AddConfiguration(new BioSampleConfig());
+            modelBuilder.AddConfiguration(new CharacterisitcConfig());
+            modelBuilder.AddConfiguration(new CharacteristicObjectConfig());
+            modelBuilder.AddConfiguration(new ClaimConfig());
+
+
+
+            modelBuilder.AddConfiguration(new DomainTemplateConfig());
+            modelBuilder.AddConfiguration(new DomainTemplateVariableConfig());
+            modelBuilder.AddConfiguration(new CVtermConfig());
+            modelBuilder.AddConfiguration(new DbConfig());
+            modelBuilder.AddConfiguration(new DBxrefConfig());
+            modelBuilder.AddConfiguration(new DictionaryConfig());
+
+            
+            modelBuilder.AddConfiguration(new DatafileConfig());
+            modelBuilder.AddConfiguration(new DatasetConfig());
+            modelBuilder.AddConfiguration(new DatasetDatafileConfig());
+
+            modelBuilder.AddConfiguration(new ObservationConfig());
+            modelBuilder.AddConfiguration(new ObservationQualifiersConfig());
+            modelBuilder.AddConfiguration(new ObservationSynonymConfig());
+            modelBuilder.AddConfiguration(new ObservationTimingsConfig());
+
+            modelBuilder.AddConfiguration(new ProjectConfig());
+            modelBuilder.AddConfiguration(new ProjectUserConfig());
+
+            modelBuilder.AddConfiguration(new StudyConfig());
+            modelBuilder.AddConfiguration(new StudyDatasetConfig());
+            modelBuilder.AddConfiguration(new StudyArmConfig());
+
+            modelBuilder.AddConfiguration(new SubjectConfig());
+
+            modelBuilder.AddConfiguration(new TimePointConfig());
+
+            modelBuilder.AddConfiguration(new UserConfig());
+
+
+            modelBuilder.AddConfiguration(new VariableDefConfig());
+            modelBuilder.AddConfiguration(new VariableRefConfig());
+
+            modelBuilder.AddConfiguration(new VisitConfig());
+
            
+
+            
+
+
+            
+           
+           
+
         }
 
         public Task<int> SaveChangesAsync()

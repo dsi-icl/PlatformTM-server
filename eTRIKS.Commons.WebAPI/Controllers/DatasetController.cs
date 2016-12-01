@@ -10,7 +10,7 @@ using System.Net;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/templates")]
+    [Route("api/datasets")]
     public class DatasetController : Controller
     {
         private DatasetService _datasetService;
@@ -21,42 +21,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _datasetService = datasetService;
             _fileService = fileService;
         }
-        
-        [HttpGet("clinical")]
-        public IEnumerable<DatasetDTO> Get()
-        {
-            return _datasetService.GetAllDomainTemplates();
-        }
-        
-        [HttpGet("clinical/{domainId}")]
-        public DatasetDTO Get(string domainId)
-        {
-            return _datasetService.GetTemplateDataset(domainId);
-        }
 
-        [HttpGet]
-        [Route("api/templates/assay/features")]
-        public List<DatasetDTO> GetAssayFeatureTemplates()
-        {
-            return _datasetService.GetAssayFeatureTemplates();
-        }
+       
 
-        [HttpGet]
-        [Route("api/templates/assay/samples")]
-        public List<DatasetDTO> GetAssaySampleTemplates()
-        {
-            return _datasetService.GetAssaySampleTemplates();
-        }
-
-        [HttpGet]
-        [Route("api/templates/assay/data")]
-        public List<DatasetDTO> GetAssayDataTemplates()
-        {
-            return _datasetService.GetAssayDataTemplates();
-        }
-
-        [HttpGet]
-        [Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]
+        //[HttpGet]
+        //[Route("api/activities/{activityId}/datasets/{datasetId}", Name = "GetDatasetById")]
         public DatasetDTO GetActivityDataset(int datasetId)
         {
             return _datasetService.GetActivityDatasetDTO(datasetId);
@@ -94,8 +63,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    return "FAILED to update datasetId";
         //}
 
-        [HttpPost]
-        [Route("api/datasets/{datasetId}/update")]
+        //[HttpPost]
+        //[Route("api/datasets/{datasetId}/update")]
         public string updateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
 
@@ -109,45 +78,45 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
         }
 
-        [HttpGet]
-        [Route("api/datasets/{datasetId}/templateMap")]
+        //[HttpGet]
+        //[Route("api/datasets/{datasetId}/templateMap")]
         public DataTemplateMap getDatasetTemplateMap(int datasetId)
         {
             return  _datasetService.GetTemplateMaps(datasetId);
         }
 
-        [HttpPost]
-        [Route("api/datasets/{datasetId}/mapToTemplate/file/{fileId}")]
-        public async Task<int?> MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
+        //[HttpPost]
+        //[Route("api/datasets/{datasetId}/mapToTemplate/file/{fileId}")]
+        public int? MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
         {
             //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
             //string filePath = PATH + "\\" + fileName;
             return _datasetService.mapToTemplate(datasetId,fileId, dataTemplateMap);
         }
 
-        [HttpGet]
-        [Route("api/datasets/{datasetId}/preview/file/{fileId}")]
+        //[HttpGet]
+        //[Route("api/datasets/{datasetId}/preview/file/{fileId}")]
         public Hashtable GetDatasetPreview(int datasetId, int fileId)
         {
            return _fileService.getFilePreview(fileId);
         }
 
-        [HttpGet]
-        [Route("api/datasets/{datasetId}/saveDataFile/file/{fileId}")]
+        //[HttpGet]
+        //[Route("api/datasets/{datasetId}/saveDataFile/file/{fileId}")]
         public bool LoadDataFile(int datasetId, int fileId)
         {
            return  _datasetService.PersistSDTM(datasetId, fileId);            
         }
 
-        [HttpGet]
-        [Route("api/datasets/{datasetId}/loadData/file/{fileId}")]
+        //[HttpGet]
+        //[Route("api/datasets/{datasetId}/loadData/file/{fileId}")]
         public async Task<bool> LoadData(int datasetId, int fileId)
         {
             return await _datasetService.LoadDataset(datasetId,fileId);
         }
 
-        [HttpGet]
-        [Route("api/datasets/{datasetId}/compute/files/{fileId}")]
+        //[HttpGet]
+        //[Route("api/datasets/{datasetId}/compute/files/{fileId}")]
         public async Task ComputeFields(int datasetId, int fileId)
         {
             //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
@@ -155,9 +124,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             await _datasetService.GenerateComputeVars(datasetId);
         }
 
-        [HttpGet]
-        [Route("api/datasets/{datasetId}/OriFileInfo/{fileId}")]
-        public async Task<FileDTO> checkTemplateMatch(int datasetId, int fileId)
+        //[HttpGet]
+        //[Route("api/datasets/{datasetId}/OriFileInfo/{fileId}")]
+        public FileDTO checkTemplateMatch(int datasetId, int fileId)
         {
              return _datasetService.getDatasetFileInfo(datasetId,fileId);
         }

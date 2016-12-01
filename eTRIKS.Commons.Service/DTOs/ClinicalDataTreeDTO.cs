@@ -39,14 +39,14 @@ namespace eTRIKS.Commons.Service.DTOs
         public int Id { get; set; }
         public string Code { get; set; }
 
-        public override bool Equals(Object obj)
-        {
-            GenericNode nodeObj = obj as GenericNode;
-            if (nodeObj == null)
-                return false;
-            else
-                return Name.Equals(nodeObj.Name);
-        }
+        //public override bool Equals(Object obj)
+        //{
+        //    GenericNode nodeObj = obj as GenericNode;
+        //    if (nodeObj == null)
+        //        return false;
+        //    else
+        //        return Name.Equals(nodeObj.Name);
+        //}
     }
 
     public class ObservationNode : GenericNode

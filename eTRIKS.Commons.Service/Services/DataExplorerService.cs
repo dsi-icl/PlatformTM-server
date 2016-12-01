@@ -72,8 +72,9 @@ namespace eTRIKS.Commons.Service.Services
                 obsRequest.O3id += observations[i].O3id;
             }
             int fobsid = obsRequest.TermIds[0];
-            var observation = _observationRepository.FindSingle(o => o.Id == fobsid, new List<Expression<Func<Observation, object>>>() {
-                    o=>o.Qualifiers
+            var observation = _observationRepository.FindSingle(o => o.Id == fobsid, 
+                new List<string>() {
+                    "Qualifiers"
                 });
             var reqs = observation.Qualifiers.Select(variableDefinition => new ObservationRequestDTO()
             {
@@ -86,10 +87,10 @@ namespace eTRIKS.Commons.Service.Services
                 IsMultipleObservations = obsRequest.IsMultipleObservations,
                 TermIds = obsRequest.TermIds,
 
-                QO2 = variableDefinition.Name,
-                QO2id = variableDefinition.Id,
-                DataType = variableDefinition.DataType,
-                QO2_label = variableDefinition.Label,
+                QO2 = variableDefinition.Qualifier.Name,
+                QO2id = variableDefinition.Qualifier.Id,
+                DataType = variableDefinition.Qualifier.DataType,
+                QO2_label = variableDefinition.Qualifier.Label,
             }).ToList();
 
             return new ObservationNode() {DefaultObservation=obsRequest,Qualifiers = reqs, Id=int.Parse(obsRequest.Id), Name=obsRequest.Name };
@@ -99,13 +100,12 @@ namespace eTRIKS.Commons.Service.Services
         {
 
             //TODO: will replace Observation here with ObservationDescriptor
-            List<Observation> studyObservations;// =
-
-                studyObservations =_observationRepository.FindAll(o => o.ProjectId == projectId,
-                new List<Expression<Func<Observation, object>>>(){
-                        d => d.Studies.Select(s => s.Project),
-                        d => d.DefaultQualifier,
-                        d => d.Qualifiers
+            List<Observation> studyObservations = _observationRepository.FindAll(
+                    o => o.ProjectId == projectId, 
+                    new List<string>()
+                    {
+                        "DefaultQualifier",
+                        "Qualifiers.Qualifier"
                     }).ToList();
 
 
@@ -209,9 +209,9 @@ namespace eTRIKS.Commons.Service.Services
         {
             List<HumanSubject> subjects = _subjectRepository.FindAll(
                 s => s.Study.ProjectId == projectId,
-                new List<Expression<Func<HumanSubject, object>>>()
-                {   d=> d.SubjectCharacteristics.Select(s=>s.CharacteristicObject),
-                    d=>d.Study
+                new List<string>()
+                {   "SubjectCharacteristics.CharacteristicObject",
+                    "Study"
                 }).ToList();
 
 
@@ -224,23 +224,18 @@ namespace eTRIKS.Commons.Service.Services
                 Hashtable ht = new Hashtable();
                 ht.Add("subjectId", subject.UniqueSubjectId);
                 
-
-                
-
-                
-
-                if (subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SEX")) != null)
-                {
-                    SCs.Add("sex"); ht.Add("sex", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SEX")).VerbatimValue);
-                }
-                if (subject.SubjectCharacteristics.SingleOrDefault(sc=> sc.CharacteristicObject.ShortName.ToUpper().Equals("AGE")) != null)
-                {
-                    SCs.Add("age"); ht.Add("age", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("AGE")).VerbatimValue);
-                }
-                if (subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SITEID")) != null)
-                {
-                    SCs.Add("siteid"); ht.Add("siteid", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SITEID")).VerbatimValue);
-                }
+                //if (subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SEX")) != null)
+                //{
+                //    SCs.Add("sex"); ht.Add("sex", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SEX")).VerbatimValue);
+                //}
+                //if (subject.SubjectCharacteristics.SingleOrDefault(sc=> sc.CharacteristicObject.ShortName.ToUpper().Equals("AGE")) != null)
+                //{
+                //    SCs.Add("age"); ht.Add("age", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("AGE")).VerbatimValue);
+                //}
+                //if (subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SITEID")) != null)
+                //{
+                //    SCs.Add("siteid"); ht.Add("siteid", subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObject.ShortName.ToUpper().Equals("SITEID")).VerbatimValue);
+                //}
                 if (subject.Study.Name != null)
                 {
                     SCs.Add("study"); ht.Add("study", subject.Study.Name);
@@ -347,9 +342,9 @@ namespace eTRIKS.Commons.Service.Services
                 }).ToList();
             var projectId = events.First().ProjectId;
             var allSubjects = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId, 
-                new List<Expression<Func<HumanSubject, object>>>()
+                new List<string>()
                 {
-                    s=>s.Study
+                   "Study"
                 }).ToList();
 
             //HACK FOR AEOCCUR
@@ -659,10 +654,10 @@ namespace eTRIKS.Commons.Service.Services
                 O3 = obsObject.Name,//obsObject.ControlledTermStr,
                 O3id = obsObject.Id,
                 O3code = obsObject.Name.ToLower(),
-                QO2 = variableDefinition.Name,
-                QO2id = variableDefinition.Id,
-                DataType = variableDefinition.DataType,
-                QO2_label = variableDefinition.Label,
+                QO2 = variableDefinition.Qualifier.Name,
+                QO2id = variableDefinition.Qualifier.Id,
+                DataType = variableDefinition.Qualifier.DataType,
+                QO2_label = variableDefinition.Qualifier.Label,
                 IsEvent = obsObject.Class.ToUpper() == "EVENTS",
                 IsFinding = obsObject.Class.ToUpper() == "FINDINGS",
                 IsMultipleObservations = IsMultiple,

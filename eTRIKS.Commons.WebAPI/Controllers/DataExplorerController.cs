@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[RoutePrefix("api/apps/explore")]
-    [Authorize]
+    [Route("api/apps/explore")]
+    //[Authorize]
     public class DataExplorerController : Controller
     {
         private DataExplorerService _dataService;
@@ -19,36 +19,31 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _dataService = dataService;
         }
 
-        [HttpGet]
-        [Route("api/apps/explore/projects/{projectId}/subjcharacteristics/browse")]
+        [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
         public List<ObservationRequestDTO> getSubjectCharacteristics(int projectId)
         {
             return _dataService.GetSubjectCharacteristics(projectId);
         }
 
-        [HttpPost]
-        [Route("api/apps/explore/projects/{projectId}/subjects/search")]
+        [HttpPost("projects/{projectId}/subjects/search")]
         public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {
             return  _dataService.GetSubjectData(projectId, requestedSCs);
         }
 
-        [HttpPost]
-        [Route("api/apps/explore/projects/{projectId}/observations/clinical/search")]
+        [HttpPost("projects/{projectId}/observations/clinical/search")]
         public Hashtable GetObservations(int projectId, [FromBody] List<ObservationRequestDTO> observations)
         {
             return _dataService.GetObservationsData(projectId, observations);
         }
 
-        [HttpPost]
-        [Route("api/apps/explore/projects/{projectId}/observations/clinical/group")]
+        [HttpPost("projects/{projectId}/observations/clinical/group")]
         public ObservationNode GroupObservations(int projectId, [FromBody] List<ObservationRequestDTO> observations)
         {
             return _dataService.GroupObservations(projectId, observations);
         }
 
-        [HttpGet]
-        [Route("api/apps/explore/projects/{projectId}/observations/clinical/browse")]
+        [HttpGet("projects/{projectId}/observations/clinical/browse")]
         public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(int projectId)
         {
             return await _dataService.GetClinicalObsTree(projectId);

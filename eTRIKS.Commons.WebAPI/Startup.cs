@@ -7,6 +7,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using eTRIKS.Commons.DataAccess.Configuration;
+using eTRIKS.Commons.Service.Services;
+using eTRIKS.Commons.Core.Domain.Interfaces;
+using eTRIKS.Commons.DataAccess;
+using MySQL.Data.Entity.Extensions;
+using eTRIKS.Commons.Service.Services.UserManagement;
+using eTRIKS.Commons.Core.Application.AccountManagement;
 
 namespace eTRIKS.Commons.WebAPI
 {
@@ -24,6 +31,8 @@ namespace eTRIKS.Commons.WebAPI
             {
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
+               
+
             }
 
             builder.AddEnvironmentVariables();
@@ -36,9 +45,46 @@ namespace eTRIKS.Commons.WebAPI
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials());
+            });
+            services.AddOptions();
             services.AddApplicationInsightsTelemetry(Configuration);
+            
+            services.Configure<DataAccessSettings>(Configuration.GetSection("DBSettings"));
+
+            services.AddDbContext<BioSPEAKdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
+            services.AddScoped<IServiceUoW, BioSPEAKdbContext>();
+
+            services.AddIdentity<UserAccount, Role>()
+                .AddUserStore<UserStore>()
+                .AddRoleStore<RoleStore>();
+
+            services.AddScoped<ActivityService>();
+            services.AddScoped<AssayService>();
+            services.AddScoped<BioSampleService>();
+            services.AddScoped<CVtermService>();
+            services.AddScoped<DataExplorerService>();
+            services.AddScoped<DatasetService>();
+            services.AddScoped<ExportService>();
+            services.AddScoped<FileService>();
+            services.AddScoped<ObservationService>();
+            services.AddScoped<ProjectService>();
+            services.AddScoped<SDTMreader>();
+            services.AddScoped<StudyService>();
+            services.AddScoped<SubjectService>();
+            services.AddScoped<TemplateService>();
+            services.AddScoped<UserDatasetService>();
+            services.AddScoped<UserAccountService>();
 
             services.AddMvc();
+
+           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -47,14 +93,17 @@ namespace eTRIKS.Commons.WebAPI
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseCors("CorsPolicy");
+
+            app.UseDeveloperExceptionPage();
+
             app.UseApplicationInsightsRequestTelemetry();
 
             app.UseApplicationInsightsExceptionTelemetry();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
-            });
+            app.UseIdentity();
+
+            app.UseMvc();
         }
     }
 }
