@@ -28,5 +28,6 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public IList<ProjectUser> Users { get; set; }
         public User Owner { get; set; }
         public Guid OwnerId { get; set; }
+        public bool IsPublic { get; set; }
     }
 }

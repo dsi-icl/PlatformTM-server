@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Route("api/terms")]
     public class TermController : Controller
     {
         private CVtermService _cvtermService;
@@ -16,12 +17,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _cvtermService = cvTermService;
         }
 
-
-        [HttpGet]
-        [Route("api/terms/assay/measurementTypes")]
+        [HttpGet("assay/measurementTypes")]
         public List<AssayDefTermsDTO> GetAssayMeasurementTypes()
         {
-
             return _cvtermService.GetAssayDefTerms();
         }
     }

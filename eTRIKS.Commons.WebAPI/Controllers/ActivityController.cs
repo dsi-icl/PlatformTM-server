@@ -10,7 +10,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     [Route("api/activities")]
     public class ActivityController : Controller
     {
-        private ActivityService _activityService;
+        private readonly ActivityService _activityService;
         private AssayService _assayService;
 
         public ActivityController(ActivityService activityService, AssayService assayService)

@@ -8,10 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using eTRIKS.Commons.WebAPI.Extensions;
 using System.Collections;
+using System.Security.Claims;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[Authorize]
     [Route("api/projects")]
     public class ProjectController : Controller
     {
@@ -28,10 +28,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet]
         public IEnumerable<ProjectDTO> Get()
         {
-            var userId = User.GetUserId();
-            if (!User.Identity.IsAuthenticated)
-                return null;
-            return _projectService.GetProjects(userId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return !User.Identity.IsAuthenticated ? null : _projectService.GetProjects(userId);
         }
 
         [HttpGet("accession/{projectId}", Name = "GetProjectByAcc")]
@@ -97,10 +95,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpGet("{projectId}/assays")]
-        public List<AssayDTO> GetAssays(int projectId)
-        {
-            return _projectService.GetProjectAssays(projectId);
-        }
+        //[HttpGet("{projectId}/assays")]
+        //public List<AssayDTO> GetAssays(int projectId)
+        //{
+        //    return _projectService.GetProjectAssays(projectId);
+        //}
     }
 }

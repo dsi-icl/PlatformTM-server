@@ -61,7 +61,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    return "FAILED to update datasetId";
         //}
 
-        [HttpPost("api/datasets/{datasetId}/update")]
+        [HttpPost("{datasetId}/update")]
         public string updateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
 

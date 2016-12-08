@@ -12,12 +12,15 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Service.Services
 {
+    
     public class DataExplorerService
     {
         private readonly IRepository<Observation, int> _observationRepository;
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<CharacteristicObject, int> _characObjRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
+        private readonly IRepository<Assay, int> _assayRepository;
+
 
         private readonly IServiceUoW _dataContext;
         public DataExplorerService(IServiceUoW uoW)
@@ -27,6 +30,8 @@ namespace eTRIKS.Commons.Service.Services
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _characObjRepository = uoW.GetRepository<CharacteristicObject, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _assayRepository = uoW.GetRepository<Assay, int>();
+
 
         }
 
@@ -74,7 +79,7 @@ namespace eTRIKS.Commons.Service.Services
             int fobsid = obsRequest.TermIds[0];
             var observation = _observationRepository.FindSingle(o => o.Id == fobsid, 
                 new List<string>() {
-                    "Qualifiers"
+                    "Qualifiers.Qualifier"
                 });
             var reqs = observation.Qualifiers.Select(variableDefinition => new ObservationRequestDTO()
             {
@@ -249,7 +254,8 @@ namespace eTRIKS.Commons.Service.Services
                 if (reqObservations != null)
                     foreach (var requestDto in reqObservations)
                     {
-                        var charVal = subject.SubjectCharacteristics.Single(sc => sc.CharacteristicObjectId.Equals(requestDto.O3id));
+                        var charVal = subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicObjectId.Equals(requestDto.O3id));
+                        if (charVal == null) continue;
                         ht.Add(requestDto.O3code, charVal.VerbatimValue);
                         SCs.Add(requestDto.O3code.ToLower());
                     }
@@ -671,8 +677,30 @@ namespace eTRIKS.Commons.Service.Services
         }
         #endregion
 
+        #region Assay Browsing methods
+        public List<AssayDTO> GetProjectAssays(int projectId)
+        {
+            List<Assay> assays = _assayRepository.FindAll(a => a.ProjectId == projectId,
+                new List<string>()
+                {
+                    "MeasurementType",
+                    "TechnologyPlatform",
+                    "TechnologyType"
+                }).ToList();
+
+            if (assays.Count == 0)
+                return null;
+            return assays.Select(p => new AssayDTO()
+            {
+                Id = p.Id,
+                Type = p.MeasurementType != null ? p.MeasurementType.Name : "",
+                Platform = p.TechnologyPlatform != null ? p.TechnologyPlatform.Name : "",
+                Technology = p.TechnologyType != null ? p.TechnologyType.Name : "",
+                Name = p.Name
+            }).ToList();
+        }
+        #endregion
 
 
-        
     }
 }

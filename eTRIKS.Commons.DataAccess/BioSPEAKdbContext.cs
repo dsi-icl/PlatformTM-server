@@ -207,7 +207,17 @@ namespace eTRIKS.Commons.DataAccess
 
         public Task<int> SaveChangesAsync()
         {
-            throw new NotImplementedException();
+            try
+            {
+                return base.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                //tran.Dispose();
+                while (e.InnerException != null)
+                    e = e.InnerException;
+                throw e;
+            }
         }
     }
 }

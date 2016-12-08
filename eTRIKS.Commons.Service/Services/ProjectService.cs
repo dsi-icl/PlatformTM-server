@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class ProjectService
     {
-        private IRepository<Project, int> _projectRepository;
+        private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<User, Guid> _userRepository;
@@ -136,7 +136,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             var guidUserID = Guid.Parse(userId);
             var projects = _projectRepository.FindAll(
-                p=>p.Users.Select(u=>u.User).Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID, 
+                p=>p.Users.Select(u=>u.User).Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID || p.IsPublic, 
                 new List<string>()
                 {
                    "Studies.Arms",
@@ -181,26 +181,6 @@ namespace eTRIKS.Commons.Service.Services
                 }).ToList()
             }).ToList();
         }
-        public List<AssayDTO> GetProjectAssays(int projectId)
-        {
-            List<Assay> assays = _assayRepository.FindAll(a => a.ProjectId == projectId,
-                new List<string>()
-                {
-                    "MeasurementType",
-                    "TechnologyPlatform",
-                    "TechnologyType"
-                }).ToList();
-
-            if (assays.Count == 0)
-                return null;
-            return assays.Select(p => new AssayDTO()
-            {
-                Id = p.Id,
-                Type = p.MeasurementType != null ? p.MeasurementType.Name : "",
-                Platform = p.TechnologyPlatform != null ? p.TechnologyPlatform.Name : "",
-                Technology = p.TechnologyType != null ? p.TechnologyType.Name : "",
-                Name = p.Name
-            }).ToList();
-        }
+        
     }
 }

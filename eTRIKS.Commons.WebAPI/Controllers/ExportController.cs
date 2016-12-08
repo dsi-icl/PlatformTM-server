@@ -7,9 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Route("api/apps/exportwizard")]
     public class ExportController : Controller
     {
-         private ExportService _exportService;
+         private readonly ExportService _exportService;
 
          public ExportController(ExportService exportService)
         {
@@ -18,21 +19,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
 
         [HttpGet]
-        [Route("api/projects/{projectId}/export/datafields")]
+        [Route("projects/{projectId}/datafields")]
         public List<TreeNodeDTO> GetFields(int projectId)
         {
             var name = User.Identity.Name;
             return _exportService.GetAvailableFields(projectId);
         }
         [HttpPost]
-        [Route("api/projects/{projectId}/export/datafields/valueset")]
+        [Route("projects/{projectId}/datafields/valueset")]
         public  DataFilterDTO GetValueSet(int projectId, [FromBody] DataFieldDTO fieldDto)
         {
             return _exportService.GetFieldValueSet(projectId, fieldDto);
         }
 
         [HttpPost]
-        [Route("api/projects/{projectId}/export/table")]
+        [Route("projects/{projectId}/preview")]
         public  Hashtable GetDataPreview(int projectId, [FromBody] UserDatasetDTO userDatasetDto)
         {
             return _exportService.ExportDataTable(projectId, userDatasetDto);

@@ -14,10 +14,10 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[RoutePrefix("api/files")]
+    [Route("api/files")]
     public class FileController : Controller
     {
-         private FileService _fileService;
+        private readonly FileService _fileService;
         private IHostingEnvironment _environment;
 
         public FileController(FileService fileService, IHostingEnvironment env)
@@ -26,15 +26,19 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _environment = env;
         }
 
-        [HttpGet]
-        [Route("api/files/{fileId}")]
+        [HttpGet("{fileId}")]
         public FileDTO GetFile(int fileId)
         {
             return _fileService.GetFileDTO(fileId);
         }
 
-        [HttpPost]
-        [Route("api/files/projects/{projectId}/createdir")]
+        [HttpGet("{fileId}/preview")]
+        public Hashtable GetFilePreview(int fileId)
+        {
+            return _fileService.getFilePreview(fileId);
+        }
+
+        [HttpPost("/projects/{projectId}/createdir")]
         public List<string> CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
 
@@ -42,12 +46,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             
             var diInfo =    _fileService.addDirectory(projectId, fullpath);
             
-            return diInfo == null ? null : diInfo.GetDirectories().Select(d => d.Name).ToList();
+            return diInfo?.GetDirectories().Select(d => d.Name).ToList();
         }
 
         [HttpGet]
-        [Route("api/files/projects/{projectId}/directories")]
-        public List<string> getDirectories(int projectId)
+        [Route("projects/{projectId}/directories")]
+        public List<string> GetDirectories(int projectId)
         {
             return _fileService.getDirectories(projectId);
         }
@@ -92,8 +96,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    }
         //}
 
-        [HttpPost]
-        [Route("api/files/projects/{projectId}/upload/{dir?}")]
+        [HttpPost("projects/{projectId}/upload/{dir?}")]
         public async Task<IActionResult> UploadFile(int projectId, ICollection<IFormFile> files, string dir = "")
         {
             try
@@ -151,8 +154,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("api/files/projects/{projectId}/uploadedFiles/{subdir?}")]
+        [HttpGet("projects/{projectId}/uploadedFiles/{subdir?}")]
         public  List<FileDTO> GetUploadedFiles(int projectId,string subdir="")
         {
             //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
@@ -168,12 +170,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _fileService.getUploadedFiles(projectId, relativePath);
         }
 
-        [HttpGet]
-        [Route("api/files/{fileId}/preview")]
-        public Hashtable getDatasetPreview(int fileId)
-        {
-            return _fileService.getFilePreview(fileId);
-        }
+        
         
     }
 }
