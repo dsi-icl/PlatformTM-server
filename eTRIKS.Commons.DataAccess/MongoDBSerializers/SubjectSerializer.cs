@@ -60,7 +60,6 @@ namespace eTRIKS.Commons.Persistence
                             break;
                         case "RFENDTC":
                             string dateStr_e = reader.ReadString();
-                            DateTime dte;
                             if (dateStr_e != null)
                             {
                                 if(Regex.IsMatch(dateStr_e, "(((0|1)[1-9]|2[1-9]|3[0-1])\\/(0[1-9]|1[0-2])\\/((19|20)\\d\\d))$"))

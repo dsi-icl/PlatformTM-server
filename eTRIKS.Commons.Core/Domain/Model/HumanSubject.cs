@@ -18,6 +18,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Arm { get; set; } //Should be replace by ARM class reference
         public string ArmCode { get; set; } //Should be replace by ARM class reference
         public Arm StudyArm { get; set; }
+        public string StudyArmId { get; set; }
         public Dataset Dataset { get; set; }
         public int DatasetId { get; set; }
         public ICollection<SubjectCharacteristic> SubjectCharacteristics { get; set; }

@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using eTRIKS.Commons.WebAPI.Extensions;
 using System.Collections;
+using System.Security.Claims;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Authorize]
+    [Route("api/projects")]
     public class ProjectController : Controller
     {
         private ProjectService _projectService;
@@ -25,37 +26,31 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("api/projects")]
         public IEnumerable<ProjectDTO> Get()
         {
-            var userId = User.GetUserId();
-            if (!User.Identity.IsAuthenticated)
-                return null;
-            return _projectService.GetProjects(userId);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return !User.Identity.IsAuthenticated ? null : _projectService.GetProjects(userId);
         }
 
-        [HttpGet]
-        [Route("api/projects/accession/{projectId}", Name = "GetProjectByAcc")]
+        [HttpGet("accession/{projectId}", Name = "GetProjectByAcc")]
         public ProjectDTO GetProjectFull(int projectId)
         {
             return _projectService.GetProjectFullDetails(projectId);
         }
-        [HttpGet]
-        [Route("api/projects/id/{projectId}", Name = "GetProjectById")]
+
+        [HttpGet("id/{projectId}", Name = "GetProjectById")]
         public ProjectDTO GetProject(int projectId)
         {
             return _projectService.GetProjectById(projectId);
         }
 
-        [HttpGet]
-        [Route("api/projects/{projectId}/activities")]
+        [HttpGet("{projectId}/activities")]
         public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
         {
             return _projectService.GetProjectActivities(projectId);
         }
 
         [HttpPost]
-        [Route("api/projects")]
         public IActionResult AddProject([FromBody] ProjectDTO projectDTO)
         {
             ProjectDTO addedProject = null;
@@ -81,8 +76,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("api/projects/{projectId}")]
+        [HttpPut("{projectId}")]
         public IActionResult UpdateProject(int projectId, [FromBody] ProjectDTO projectDTO)
         {
             try
@@ -101,11 +95,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("api/projects/{projectId}/assays")]
-        public List<AssayDTO> GetAssays(int projectId)
-        {
-            return _projectService.GetProjectAssays(projectId);
-        }
+        //[HttpGet("{projectId}/assays")]
+        //public List<AssayDTO> GetAssays(int projectId)
+        //{
+        //    return _projectService.GetProjectAssays(projectId);
+        //}
     }
 }

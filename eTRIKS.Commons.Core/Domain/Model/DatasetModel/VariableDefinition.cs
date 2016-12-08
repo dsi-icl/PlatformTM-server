@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
 {
@@ -22,8 +23,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
         public string RoleId { get; set; }
         public Project Project { get; set; }
         public int ProjectId { get; set; }
-        public List<VariableDefinition> VariableQualifiers { get; set; }
+        //public List<VariableDefinition> VariableQualifiers { get; set; }
 
+        public List<VariableQualifier> VariableQualifiers { get; set; }
         public bool? IsComputed { get; set; }
         public string ComputedVarExpression { get; set; }
         //public List<VariableDefinition> Synonyms { get; set; } 

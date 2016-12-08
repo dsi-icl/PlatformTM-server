@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.Service.DTOs;
 
 
@@ -16,7 +17,7 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class ProjectService
     {
-        private IRepository<Project, int> _projectRepository;
+        private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<User, Guid> _userRepository;
@@ -45,13 +46,14 @@ namespace eTRIKS.Commons.Service.Services
 
         public ProjectDTO GetProjectFullDetails(int projectId)
         {
-            var project = _projectRepository.FindSingle(p=>p.Id == projectId, new List<Expression<Func<Project, object>>>()
-            {
-                p=>p.Studies.Select(s=>s.Project),
-                p=>p.Studies.Select(s=>s.Arms),
-                p=>p.Activities,
-                p=>p.Users
-            });
+            var project = _projectRepository.FindSingle(p=>p.Id == projectId, 
+                new List<string>()
+                {
+                   "Studies.Project",
+                    "Studies.Arms.Arm",
+                    "Activities",
+                    "Users.User"
+                });
             var dto =  new ProjectDTO()
             {
                 Name = project.Name,
@@ -60,7 +62,10 @@ namespace eTRIKS.Commons.Service.Services
                 Accession = project.Accession,
                 Type = project.Type,
                 Id = project.Id,
-                Users = project.Users?.Select(u=>new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
+                Users = project.Users?
+                    .Select(u => u.User) //STUPID EF1.1
+                    .Select(u => new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
+                //Users = project.Users?.Select(u=>new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
                 Studies = project.Studies.Select(
                     s=>new StudyDTO()
                     {
@@ -71,7 +76,8 @@ namespace eTRIKS.Commons.Service.Services
                         Name = s.Name,
                         Id = s.Id,
                         ArmCount = s.Arms.Count,
-                        ArmNames = s.Arms.SelectMany(a=>new string[] {a.Name} )
+                        ArmNames = s.Arms.Select(a=>a.Arm).SelectMany(a => new string[] { a.Name })
+                        //ArmNames = s.Arms.SelectMany(a=>new string[] {a.Name} )
                     }).ToList()
             };
             //var users = project.Users?.Select(u => new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList();
@@ -104,8 +110,9 @@ namespace eTRIKS.Commons.Service.Services
             };
 
 
-            var owner =_userRepository.Get(Guid.Parse(ownerId));
-            project.Users = new List<User>() {owner};
+            //var owner =_userRepository.Get(Guid.Parse(ownerId));
+            //project.Users = new List<User>() {owner};
+            project.Users.Add(new ProjectUser() {ProjectId = projectDto.Id,UserId = Guid.Parse(ownerId) });
             project = _projectRepository.Insert(project);
             if (!uoW.Save().Equals("CREATED")) return null;
             projectDto.Id = project.Id;
@@ -129,11 +136,11 @@ namespace eTRIKS.Commons.Service.Services
         {
             var guidUserID = Guid.Parse(userId);
             var projects = _projectRepository.FindAll(
-                p=>p.Users.Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID, new List<Expression<Func<Project, object>>>()
+                p=>p.Users.Select(u=>u.User).Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID || p.IsPublic, 
+                new List<string>()
                 {
-                    //p=>p.Studies.Select(s=>s.Arms),
-                    p=>p.Studies.Select(s=>s.Subjects)
-                   
+                   "Studies.Arms",
+                   "Studies.Subjects"
                 }).Select(p=> new ProjectDTO()
             {
                 Accession = p.Accession,
@@ -143,7 +150,7 @@ namespace eTRIKS.Commons.Service.Services
                 Desc = p.Description,
                 Type = p.Type,
                 StudyCount = p.Studies.Count,
-                //CohortCount = p.Studies.Sum(s=>s.Arms.Count),
+                CohortCount = p.Studies.Sum(s=>s.Arms.Count),
                 SubjectCount = p.Studies.Sum(s=>s.Subjects.Count)
             });
             return projects;
@@ -152,12 +159,11 @@ namespace eTRIKS.Commons.Service.Services
         public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
         {
             IEnumerable<Activity> Activities;
-
             Activities = _activityRepository.FindAll(
                     d => d.ProjectId == projectId,
-                    new List<Expression<Func<Activity, object>>>(){
-                        d => d.Datasets.Select(t => t.Domain),
-                        d => d.Project
+                    new List<string>(){
+                        "Datasets.Domain",
+                        "Project"
                     }
                 );
             return Activities.Select(p => new ActivityDTO
@@ -175,26 +181,6 @@ namespace eTRIKS.Commons.Service.Services
                 }).ToList()
             }).ToList();
         }
-        public List<AssayDTO> GetProjectAssays(int projectId)
-        {
-            List<Assay> assays = _assayRepository.FindAll(a => a.ProjectId == projectId,
-                new List<Expression<Func<Assay, object>>>()
-                {
-                    a => a.MeasurementType,
-                    a => a.TechnologyPlatform,
-                    a => a.TechnologyType
-                }).ToList();
-
-            if (assays.Count == 0)
-                return null;
-            return assays.Select(p => new AssayDTO()
-            {
-                Id = p.Id,
-                Type = p.MeasurementType != null ? p.MeasurementType.Name : "",
-                Platform = p.TechnologyPlatform != null ? p.TechnologyPlatform.Name : "",
-                Technology = p.TechnologyType != null ? p.TechnologyType.Name : "",
-                Name = p.Name
-            }).ToList();
-        }
+        
     }
 }

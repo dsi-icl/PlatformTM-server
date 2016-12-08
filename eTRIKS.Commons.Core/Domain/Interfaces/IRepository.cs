@@ -11,12 +11,7 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
        #region Select/Get/Query
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns>IQueryable to be used to select entities from database</returns>
-        IQueryable<TEntity> GetAll();
-
+       
         /// <summary>
         /// Used to get all entities.
         /// </summary>
@@ -34,7 +29,8 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
         Task<TEntity> GetAsync(TPrimaryKey key);
 
         IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null,
-                                    List<Expression<Func<TEntity, object>>> includeProperties = null,
+                                    //List<Expression<Func<TEntity, object>>> includeProperties = null,
+                                    List<string> includeProperties = null,
                                     Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
                                     int? page = null,
                                     int? pageSize = null);
@@ -45,12 +41,8 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
 
         TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null,
-                           List<Expression<Func<TEntity, object>>> includeProperties = null);
+                           List<string> includeProperties = null);
         Task<TEntity> FindAsync(Expression<Func<TEntity, bool>> filterExpression = null);
-
-
-
-        IEnumerable<TEntity> GetRecords(Expression<Func<TEntity, bool>> filter);
 
         #endregion
 

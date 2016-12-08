@@ -14,10 +14,10 @@ namespace eTRIKS.Commons.Service.DTOs
 {
     public class DataExportObject
     {
-        private readonly IRepository<Arm, string> _armRepository;
-        private readonly IRepository<SubjectCharacteristic, int> _subjectCharacteristicRepository;
-        private readonly IRepository<Study, int> _studyRepository;
-        private readonly IRepository<HumanSubject, string> _subjectRepository;
+        //private readonly IRepository<Arm, string> _armRepository;
+        //private readonly IRepository<SubjectCharacteristic, int> _subjectCharacteristicRepository;
+        //private readonly IRepository<Study, int> _studyRepository;
+        //private readonly IRepository<HumanSubject, string> _subjectRepository;
 
         public List<SdtmRow> Observations { get; set; }
         public List<SubjectCharacteristic> SubjChars { get; set; }

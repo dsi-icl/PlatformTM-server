@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Authorize]
     [Route("api/assays")]
     public class AssayController : Controller
     {
@@ -23,13 +22,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("{assayId}", Name = "GetAssayById")]
-        public AssayDTO getAssay(int assayId)
+        public AssayDTO GetAssay(int assayId)
         {
             return _assayService.GetAssay(assayId);
         }
 
         [HttpPost]
-        public IActionResult addAssay([FromBody] AssayDTO assayDTO)
+        public IActionResult AddAssay([FromBody] AssayDTO assayDTO)
         {
             AssayDTO addedAssay = null;
 
@@ -52,7 +51,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPut("{assayId}")]
-        public IActionResult updateAssay(int assayId, [FromBody] AssayDTO assayDTO)
+        public IActionResult UpdateAssay(int assayId, [FromBody] AssayDTO assayDTO)
         {
             try
             {
@@ -69,7 +68,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
-
 
         [HttpGet("{assayId}/samples")]
         public Hashtable GetAssaySamples(int assayId)

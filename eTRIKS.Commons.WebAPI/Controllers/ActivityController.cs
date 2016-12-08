@@ -10,7 +10,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     [Route("api/activities")]
     public class ActivityController : Controller
     {
-        private ActivityService _activityService;
+        private readonly ActivityService _activityService;
         private AssayService _assayService;
 
         public ActivityController(ActivityService activityService, AssayService assayService)
@@ -20,13 +20,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("{activityId}", Name = "GetActivityById")]
-        public ActivityDTO getActivity(int activityId)
+        public ActivityDTO GetActivity(int activityId)
         {
             return _activityService.GetActivity(activityId);
         }
 
         [HttpPost]
-        public IActionResult addActivity([FromBody] ActivityDTO activityDTO)
+        public IActionResult AddActivity([FromBody] ActivityDTO activityDTO)
         {
             ActivityDTO addedActivity =null;
             if(!activityDTO.isAssay)
@@ -50,7 +50,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPut("{activityId}")]
-        public IActionResult updateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
+        public IActionResult UpdateActivity(int activityId, [FromBody] ActivityDTO activityDTO)
         {
             try{
                 _activityService.UpdateActivity(activityDTO, activityId);

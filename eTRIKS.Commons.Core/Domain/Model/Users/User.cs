@@ -2,6 +2,7 @@
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using System;
 using System.Collections.Generic;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Core.Domain.Model.Users
 {
@@ -18,7 +19,8 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users
 
         //public List<UserDataset> Datasets { get; set; }
 
-        public List<Project> AffiliatedProjects { get; set; }
+        //public List<Project> AffiliatedProjects { get; set; }
+        public IList<ProjectUser> AffiliatedProjects { get; set; }
         public User()
         {
             this.Id = Guid.NewGuid();

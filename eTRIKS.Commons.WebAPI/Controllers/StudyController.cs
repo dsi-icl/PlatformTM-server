@@ -9,25 +9,23 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Route("api/studies")]
     public class StudyController : Controller
     {
-         private StudyService _studyService;
+         private readonly StudyService _studyService;
 
          public StudyController(StudyService studyService)
         {
             _studyService = studyService;
         }
 
-        [HttpGet]
-        [Route("api/studies/{studyId}", Name = "GetstudyById")]
+        [HttpGet("{studyId}", Name = "GetstudyById")]
         public StudyDTO Getstudy(int studyId)
         {
             return _studyService.GetstudyId(studyId);
         }
 
-
         [HttpPost]
-        [Route("api/studies")]
         public IActionResult Addstudy([FromBody] StudyDTO studyDTO)
         {
             StudyDTO addedstudy = null;
@@ -48,8 +46,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("api/studies/{studyId}")]
+        [HttpPut("{studyId}")]
         public IActionResult Updatestudy(int studyId, [FromBody] StudyDTO studyDTO)
         {
             try

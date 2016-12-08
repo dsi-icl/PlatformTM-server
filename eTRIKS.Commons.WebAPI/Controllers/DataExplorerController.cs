@@ -8,50 +8,50 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[RoutePrefix("api/apps/explore")]
-    [Authorize]
+    [Route("api/apps/explore")]
     public class DataExplorerController : Controller
     {
-        private DataExplorerService _dataService;
+        private readonly DataExplorerService _explorerService;
 
-        public DataExplorerController(DataExplorerService dataService)
+        public DataExplorerController(DataExplorerService explorerService)
         {
-            _dataService = dataService;
+            _explorerService = explorerService;
         }
 
-        [HttpGet]
-        [Route("api/apps/explore/projects/{projectId}/subjcharacteristics/browse")]
+        [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
         public List<ObservationRequestDTO> getSubjectCharacteristics(int projectId)
         {
-            return _dataService.GetSubjectCharacteristics(projectId);
+            return _explorerService.GetSubjectCharacteristics(projectId);
         }
 
-        [HttpPost]
-        [Route("api/apps/explore/projects/{projectId}/subjects/search")]
+        [HttpPost("projects/{projectId}/subjects/search")]
         public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {
-            return  _dataService.GetSubjectData(projectId, requestedSCs);
+            return  _explorerService.GetSubjectData(projectId, requestedSCs);
         }
 
-        [HttpPost]
-        [Route("api/apps/explore/projects/{projectId}/observations/clinical/search")]
+        [HttpPost("projects/{projectId}/observations/clinical/search")]
         public Hashtable GetObservations(int projectId, [FromBody] List<ObservationRequestDTO> observations)
         {
-            return _dataService.GetObservationsData(projectId, observations);
+            return _explorerService.GetObservationsData(projectId, observations);
         }
 
-        [HttpPost]
-        [Route("api/apps/explore/projects/{projectId}/observations/clinical/group")]
+        [HttpPost("projects/{projectId}/observations/clinical/group")]
         public ObservationNode GroupObservations(int projectId, [FromBody] List<ObservationRequestDTO> observations)
         {
-            return _dataService.GroupObservations(projectId, observations);
+            return _explorerService.GroupObservations(projectId, observations);
         }
 
-        [HttpGet]
-        [Route("api/apps/explore/projects/{projectId}/observations/clinical/browse")]
-        public async Task<IEnumerable<ClinicalDataTreeDTO>> getClinicalTree(int projectId)
+        [HttpGet("projects/{projectId}/observations/clinical/browse")]
+        public async Task<IEnumerable<ClinicalDataTreeDTO>> GetClinicalTree(int projectId)
         {
-            return await _dataService.GetClinicalObsTree(projectId);
+            return await _explorerService.GetClinicalObsTree(projectId);
+        }
+
+        [HttpGet("projects/{projectId}/assays/browse")]
+        public List<AssayDTO> GetAssays(int projectId)
+        {
+            return _explorerService.GetProjectAssays(projectId);
         }
 
     }
