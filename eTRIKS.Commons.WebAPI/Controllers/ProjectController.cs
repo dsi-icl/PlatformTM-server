@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/projects")]
+    [Route("projects")]
     public class ProjectController : Controller
     {
         private ProjectService _projectService;

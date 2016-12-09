@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/datasets")]
+    [Route("datasets")]
     public class DatasetController : Controller
     {
         private readonly DatasetService _datasetService;

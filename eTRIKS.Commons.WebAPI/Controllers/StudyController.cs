@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/studies")]
+    [Route("studies")]
     public class StudyController : Controller
     {
          private readonly StudyService _studyService;

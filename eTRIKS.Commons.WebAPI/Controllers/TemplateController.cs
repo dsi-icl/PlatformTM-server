@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/templates")]
+    [Route("templates")]
     public class TemplateController : Controller
     {
         private readonly TemplateService _templateService;

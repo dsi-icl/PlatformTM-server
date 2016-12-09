@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/apps/explore")]
+    [Route("apps/explore")]
     public class DataExplorerController : Controller
     {
         private readonly DataExplorerService _explorerService;
