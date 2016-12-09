@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/apps/exportwizard")]
+    [Route("apps/exportwizard")]
     public class ExportController : Controller
     {
          private readonly ExportService _exportService;

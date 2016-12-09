@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/activities")]
+    [Route("activities")]
     public class ActivityController : Controller
     {
         private readonly ActivityService _activityService;

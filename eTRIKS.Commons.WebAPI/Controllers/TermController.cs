@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/terms")]
+    [Route("terms")]
     public class TermController : Controller
     {
         private CVtermService _cvtermService;

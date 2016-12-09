@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/accounts")]
+    [Route("accounts")]
     public class AccountController : Controller
     {
         private readonly UserAccountService _userAccountService;

@@ -11,7 +11,7 @@ using eTRIKS.Commons.WebAPI.Extensions;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/mydatasets")]
+    [Route("mydatasets")]
     public class UserDatasetController : Controller
     {
         private readonly UserDatasetService _userDataService;

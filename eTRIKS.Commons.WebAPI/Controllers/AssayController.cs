@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/assays")]
+    [Route("assays")]
     public class AssayController : Controller
     {
         private readonly AssayService _assayService;

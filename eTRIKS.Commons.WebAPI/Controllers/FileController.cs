@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("api/files")]
+    [Route("files")]
     public class FileController : Controller
     {
         private readonly FileService _fileService;
@@ -38,7 +38,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _fileService.getFilePreview(fileId);
         }
 
-        [HttpPost("/projects/{projectId}/createdir")]
+        [HttpPost("projects/{projectId}/createdir")]
         public List<string> CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
 
@@ -97,7 +97,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //}
 
         [HttpPost("projects/{projectId}/upload/{dir?}")]
-        public async Task<IActionResult> UploadFile(int projectId, ICollection<IFormFile> files, string dir = "")
+        public async Task<IActionResult> UploadFile(int projectId, [FromBody]ICollection<IFormFile> files, string dir = "")
         {
             try
             {
