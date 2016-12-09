@@ -20,17 +20,9 @@
   },
 
   "tools": {
-    "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.0.0-preview2-final"
+    "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.1.0-preview4-final",
   },
 
-  //"frameworks": {
-  //  "netcoreapp1.1": {
-  //    "imports": [
-  //      "dotnet5.6",
-  //      "portable-net45+win8"
-  //    ]
-  //  }
-  //},
   "frameworks": {
     "netcoreapp1.1": {
       "dependencies": {
@@ -64,6 +56,6 @@
   },
 
   "scripts": {
-    "postpublish": [ "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%" ]
+    "postpublish": "dotnet publish-iis --publish-folder %publish:OutputPath% --framework %publish:FullTargetFramework%"
   }
 }

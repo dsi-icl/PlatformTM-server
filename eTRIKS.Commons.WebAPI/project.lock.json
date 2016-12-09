@@ -10588,13 +10588,13 @@
   },
   "tools": {
     ".NETCoreApp,Version=v1.0": {
-      "Microsoft.AspNetCore.Server.IISIntegration.Tools/1.0.0-preview2-final": {
+      "Microsoft.AspNetCore.Server.IISIntegration.Tools/1.1.0-preview4-final": {
         "type": "package",
         "dependencies": {
           "Microsoft.DotNet.ProjectModel": "1.0.0-rc3-003121",
-          "Microsoft.Extensions.CommandLineUtils": "1.0.0",
-          "Microsoft.NETCore.App": "1.0.0",
-          "System.Diagnostics.Process": "4.1.0"
+          "Microsoft.Extensions.CommandLineUtils": "1.1.0",
+          "Microsoft.NETCore.App": "1.1.0",
+          "System.Diagnostics.Process": "4.3.0"
         },
         "compile": {
           "lib/netcoreapp1.0/dotnet-publish-iis.dll": {}
@@ -10607,7 +10607,7 @@
   },
   "projectFileToolGroups": {
     ".NETCoreApp,Version=v1.0": [
-      "Microsoft.AspNetCore.Server.IISIntegration.Tools >= 1.0.0-preview2-final"
+      "Microsoft.AspNetCore.Server.IISIntegration.Tools >= 1.1.0-preview4-final"
     ]
   }
 }
