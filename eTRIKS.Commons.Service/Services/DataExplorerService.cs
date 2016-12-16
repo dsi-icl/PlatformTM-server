@@ -7,8 +7,12 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using System.Linq.Expressions;
+using System.Xml.Linq;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -20,7 +24,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<CharacteristicObject, int> _characObjRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-
+        private readonly IRepository<User, Guid> _userRepository;
 
         private readonly IServiceUoW _dataContext;
         public DataExplorerService(IServiceUoW uoW)
@@ -31,10 +35,51 @@ namespace eTRIKS.Commons.Service.Services
             _characObjRepository = uoW.GetRepository<CharacteristicObject, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-
+            _userRepository = uoW.GetRepository<User, Guid>();
 
         }
+        
 
+        
+        public void SaveDataCart(List<ObservationRequestDTO> oRequests, Guid userId)
+        // public void List<CombinedQuery> SaveDataCart(int projectId, List<ObservationRequestDTO> oRequests, Guid userId)
+        //  public List<CombinedQuery> saveDataCart(int projectId, ObservationRequestDTO oRequest, CombinedQuery combinedQuery)
+        {
+            // var cQueries1 = new List<ObservationRequestDTO>();
+            var cQuery = new CombinedQuery();
+
+            //iterate over oRequests
+            foreach (var request in oRequests)
+            {
+                ObservationQuery oq = new ObservationQuery()
+                {
+                    ObservarionObject = request.O3,
+                    ObservarionObjectId = request.O3id,
+                    ObservarionQualifier = request.QO2,
+                    ObservarionQualifierId = request.QO2id,
+                    DataType = request.DataType,
+                    FilterExactValues = request.FilterExactValues,
+                    FilterRangeFrom = request.FilterRangeFrom,
+                    FilterRangeTo = request.FilterRangeTo,
+                    IsFiltered = request.IsFiltered
+                };
+
+                if (request.IsSubjectCharacteristics)
+                    cQuery.SubjectCharacteristics.Add(oq);
+                if (request.IsClinicalObservations)
+                    cQuery.ClinicalObservations.Add(oq);
+            }
+
+            // get user and add the query 
+            var user = _userRepository.Get(userId);
+            user.SavedQueries.Add(cQuery);
+
+            //save the user to db.
+            _userRepository.Insert(user);
+            _dataContext.Save();
+        }
+
+        
         #region Observation Browser methods
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {
@@ -46,7 +91,9 @@ namespace eTRIKS.Commons.Service.Services
                 O3 = sc.FullName,
                 O3id = sc.Id,
                 O3code = sc.ShortName,
-                DataType = sc.DataType
+                DataType = sc.DataType,
+                IsSubjectCharacteristics = true
+
             }).ToList();
 
             var armSC = new ObservationRequestDTO() {O3 = "Arm", O3code = "ARM", O3id = 999, DataType = "string"};
@@ -469,7 +516,12 @@ namespace eTRIKS.Commons.Service.Services
                     DataType = obsObject.DefaultQualifier.DataType,
                     QO2_label = obsObject.DefaultQualifier.Label,
                     IsEvent = obsObject.Class.ToUpper() == "EVENTS",
-                    IsFinding = obsObject.Class.ToUpper() == "FINDINGS"
+                    IsFinding = obsObject.Class.ToUpper() == "FINDINGS",
+                    IsClinicalObservations = true
+
+
+
+
                     //Id = obsObject.Name.ToLower() + "_" + obsObject.DefaultQualifier.Name
                 }
             };
@@ -523,7 +575,8 @@ namespace eTRIKS.Commons.Service.Services
                         QO2 = "AEOCCUR",
                         QO2_label = "OCCURENCE",
                         TermIds = SOCs.Select(s => s.DBTopicId).Distinct().ToList(),
-                        IsEvent = true
+                        IsEvent = true,
+                        IsClinicalObservations = true
 
 
                     },
@@ -554,7 +607,8 @@ namespace eTRIKS.Commons.Service.Services
                                 QO2 = "AESEV",
                                 QO2_label = "Severity",
                                 TermIds = HLGTs.Select(s => s.DBTopicId).Distinct().ToList(),
-                                IsEvent = true
+                                IsEvent = true,
+                                IsClinicalObservations = true
 
                             },
                             Qualifiers = getObsRequests(observations.FirstOrDefault(o => o.Id == HLGTs.FirstOrDefault().DBTopicId), true, HLGTs.Select(p => p.DBTopicId).Distinct().ToList()),
@@ -585,7 +639,8 @@ namespace eTRIKS.Commons.Service.Services
                                         QO2 = "AESEV",
                                         QO2_label = "Severity",
                                         TermIds = HLTs.Select(s => s.DBTopicId).Distinct().ToList(),
-                                        IsEvent = true
+                                        IsEvent = true,
+                                        IsClinicalObservations = true
 
                                     },
                                     Qualifiers = getObsRequests(observations.FirstOrDefault(o => o.Id == HLTs.FirstOrDefault().DBTopicId), true, HLTs.Select(p => p.DBTopicId).Distinct().ToList()),
@@ -617,6 +672,7 @@ namespace eTRIKS.Commons.Service.Services
                                                 IsMultipleObservations = true,
                                                 TermIds = PTs.Select(p => p.DBTopicId).Distinct().ToList(),
                                                 IsEvent = true,
+                                                IsClinicalObservations = true,
                                                 //QO2id = obsObject.DefaultQualifier.Id,
                                                 //Id = obsObject.Name.ToLower() + "_" + obsObject.DefaultQualifier.Name
                                                 DataType = "string"//observations.FirstOrDefault(o=>o.ControlledTermStr.Equals(PTs.Key)).

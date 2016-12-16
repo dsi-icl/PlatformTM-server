@@ -23,6 +23,19 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _explorerService.GetSubjectCharacteristics(projectId);
         }
+        
+
+        [HttpPost]
+        [Route("projects/{projectId}/SaveDataCart")]
+        public void SaveDataCart([FromBody] List<ObservationRequestDTO> oRequests, System.Guid userId)
+
+        {
+
+            _explorerService.SaveDataCart(oRequests, userId);
+
+        }
+    
+
 
         [HttpPost("projects/{projectId}/subjects/search")]
         public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
