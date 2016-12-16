@@ -1,34 +1,38 @@
-﻿using System.Diagnostics;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Base;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Interfaces;
+using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.DataAccess.Configuration;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver;
 
-namespace eTRIKS.Commons.DataAccess
+namespace eTRIKS.Commons.DataAccess.Repositories
 {
     public class GenericMongoRepository <TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
-        where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
+        where TEntity : class, IEntity<TPrimaryKey>
     {
         private DataAccessSettings configSettings { get; set; }
-        private IMongoDatabase database;
+        private IMongoDatabase _database;
         private MongoClient mongoClient;
         public IMongoCollection<TEntity> collection;
         public string CollectionName { get; set; }
        
         public GenericMongoRepository(string collectionName)
         {
-            mongoClient = new MongoClient(configSettings.mongoDBprod);
-            database = mongoClient.GetDatabase(configSettings.noSQLDatabaseName);
-            //collection = database.GetCollection<TEntity>("biospeak_sdtm");
-            collection = database.GetCollection<TEntity>(collectionName);
+            mongoClient = new MongoClient(configSettings.MongoDBconnection);
+            _database = mongoClient.GetDatabase(configSettings.noSQLDatabaseName);
+            collection = _database.GetCollection<TEntity>(collectionName);
+        }
+
+        public GenericMongoRepository(IMongoDatabase database, string collectionName)
+        {
+            _database = database;
+            collection = _database.GetCollection<TEntity>(collectionName);
         }
 
         public async Task<TEntity>  FindAsync(Expression<Func<TEntity, bool>> filter = null)
@@ -68,14 +72,6 @@ namespace eTRIKS.Commons.DataAccess
             return await collection.Find(filterDoc).ToListAsync();
         }
 
-
-        private void TEST()
-        {
-            var filterBuilder = Builders<HumanSubject>.Filter;
-            var filter = filterBuilder.Eq("STUDYID", "CRC305C");
-
-            collection.Find(filter.ToBsonDocument()).ToListAsync();
-        }
 
         public async Task<string> InsertAsync(TEntity entity)
         {
@@ -177,29 +173,19 @@ namespace eTRIKS.Commons.DataAccess
 
  
 
-        private IQueryable<TEntity> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        IQueryable<TEntity> IRepository<TEntity, TPrimaryKey>.GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
+      
         public Task<List<TEntity>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)
+        public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)
         {
             return filter != null ? collection.Find(filter).ToList() : null;
         }
 
 
-        public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null, List<Expression<Func<TEntity, object>>> includeProperties = null)
+        public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null)
         {
             return collection.FindSync(filter).Single();
         }

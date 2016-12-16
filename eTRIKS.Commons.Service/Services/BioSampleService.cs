@@ -28,12 +28,12 @@ namespace eTRIKS.Commons.Service.Services
             _characteristicObjRepository = uoW.GetRepository<CharacteristicObject, int>();
         }
 
-        public async Task<bool> LoadBioSamples(List<SdtmRow> sampleData, int datasetId)
+        public bool LoadBioSamples(List<SdtmRow> sampleData, int datasetId)
         {
             var dataset = _datasetRepository.FindSingle(d => d.Id.Equals(datasetId),
-                new List<Expression<Func<Dataset, object>>>()
+                new List<string>()
                 {
-                    d => d.Variables.Select(v=>v.VariableDefinition)
+                    "Variables.VariableDefinition"
                 });
             var studyMap = new Dictionary<string, int>();
 
@@ -63,7 +63,7 @@ namespace eTRIKS.Commons.Service.Services
                     SubjectId = sdtmEntity.USubjId,
                     StudyId = studyid,
                     //Visit = sdtmEntity.Visit,
-                    CollectionStudyDay = sdtmEntity.CollectionStudyDay,
+                    //CollectionStudyDay = sdtmEntity.CollectionStudyDay,
                     DatasetId = sdtmEntity.DatasetId,
                     IsBaseline = sdtmEntity.BaseLineFlag
                 };

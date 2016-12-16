@@ -22,9 +22,9 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public ICollection<SampleCharacteristic> SampleCharacteristics { get; set; }
         public Visit Visit { get; set; }
         public int? VisitId { get; set; }
-        public AbsoluteTimePoint CollectionDateTime { get; set; } //Date of Collection / --DTC
-        public RelativeTimePoint CollectionStudyDay { get; set; } //--DY
-        public RelativeTimePoint CollectionStudyTimePoint { get; set; } //--TPT
+        //public AbsoluteTimePoint CollectionDateTime { get; set; } //Date of Collection / --DTC
+        //public RelativeTimePoint CollectionStudyDay { get; set; } //--DY
+        //public RelativeTimePoint CollectionStudyTimePoint { get; set; } //--TPT
         //public TimeInterval ObsInterval { get; set; }
 
         public Biosample()

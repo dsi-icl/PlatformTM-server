@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
 using System.Threading;
+using Microsoft.EntityFrameworkCore;
 
 namespace eTRIKS.Commons.Service.Services.UserManagement
 {
@@ -12,52 +13,64 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
         private readonly IServiceUoW _unitOfWork;
         private readonly IUserRepository _userRepository;
         private readonly IUserAccountRepository _accountRepository;
-        public UserStore(IServiceUoW uoW)
+        public IdentityErrorDescriber ErrorDescriber { get; set; }
+        private bool _disposed;
+
+        public UserStore(IServiceUoW uoW, IdentityErrorDescriber describer = null)
         {
             _unitOfWork = uoW;
             _userRepository = uoW.GetUserRepository();
             _accountRepository = uoW.GetUserAccountRepository();
-
+            ErrorDescriber = describer ?? new IdentityErrorDescriber();
         }
 
-        public Task SetPasswordHashAsync(UserAccount user, string passwordHash, CancellationToken cancellationToken)
+        public Task SetPasswordHashAsync(UserAccount account, string passwordHash, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            account.PasswordHash = passwordHash;
+            return Task.FromResult(0);
         }
 
-        public Task<string> GetPasswordHashAsync(UserAccount user, CancellationToken cancellationToken)
+        public Task<string> GetPasswordHashAsync(UserAccount account, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (account == null)
+                throw new ArgumentNullException("UserAccount");
+            return Task.FromResult<string>(account.PasswordHash);
         }
 
         public Task<bool> HasPasswordAsync(UserAccount user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.PasswordHash != null);
         }
 
-        public Task<string> GetUserIdAsync(UserAccount user, CancellationToken cancellationToken)
+        public Task<string> GetUserIdAsync(UserAccount account, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (account == null)
+                throw new ArgumentNullException("UserAccount");
+            return Task.FromResult<string>(account.UserId.ToString());
         }
 
-        public Task<string> GetUserNameAsync(UserAccount user, CancellationToken cancellationToken)
+        public Task<string> GetUserNameAsync(UserAccount account, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (account == null)
+                throw new ArgumentNullException("UserAccount");
+            return Task.FromResult<string>(account.UserName);
         }
 
         public Task SetUserNameAsync(UserAccount user, string userName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.UserName = userName;
+            return Task.FromResult(true);
         }
 
         public Task<string> GetNormalizedUserNameAsync(UserAccount user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(user.UserName);
         }
 
         public Task SetNormalizedUserNameAsync(UserAccount user, string normalizedName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            user.UserName = normalizedName;
+            return Task.FromResult(true);
         }
 
         public Task<IdentityResult> CreateAsync(UserAccount userAccount, CancellationToken cancellationToken)
@@ -68,9 +81,22 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task<IdentityResult> UpdateAsync(UserAccount user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(UserAccount user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            try
+            {
+                 _accountRepository.Update(user);
+                 await _unitOfWork.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return IdentityResult.Failed(ErrorDescriber.ConcurrencyFailure());
+            }
+            return IdentityResult.Success;
         }
 
         public Task<IdentityResult> DeleteAsync(UserAccount user, CancellationToken cancellationToken)
@@ -83,15 +109,29 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             throw new NotImplementedException();
         }
 
-        public Task<UserAccount> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<UserAccount> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await _accountRepository.FindByUserNameAsync(normalizedUserName);
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+                //handle.Dispose();
+            _disposed = true;
+        }
+
+        //public void Dispose()
+        //{
+        //    throw new NotImplementedException();
+        //}
         //public Task CreateAsync(UserAccount userAccount)
         //{
         //    _userRepository.Insert(userAccount.Account.User);

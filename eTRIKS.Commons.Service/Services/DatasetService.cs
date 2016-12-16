@@ -12,6 +12,7 @@ using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -19,75 +20,23 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<Dataset, int> _datasetRepository;
-        private readonly IRepository<DomainTemplate, string> _domainRepository;
-        private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
-        private readonly IRepository<HumanSubject, string> _humanSubjectRepository;
-        private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
-        //private readonly IRepository<MongoDocument, Guid> _mongoDocRepository;
-        private readonly IRepository<SubjectObservation, Guid> _subObservationRepository;
-        //private readonly IRepository<Observation, int> _observationRepository;
-        private FileService _fileService;
+        private readonly FileService _fileService;
 
         public DatasetService(IServiceUoW uoW, FileService fileService)
         {
             _dataServiceUnit = uoW;
-            //_templateRepository = uoW.GetRepository<DomainTemplate, string>();
-            //_templateVariableRepository = uoW.GetRepository<DomainTemplateVariable,string>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
-            _domainRepository = uoW.GetRepository<DomainTemplate, string>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
-            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
-            _activityRepository = uoW.GetRepository<Activity, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
-            //_mongoDocRepository = uoW.GetRepository<MongoDocument, Guid>();
-            _humanSubjectRepository = uoW.GetRepository<HumanSubject, string>();
-            _subObservationRepository = uoW.GetRepository<SubjectObservation, Guid>();
-            // _observationRepository = uoW.GetRepository<Observation, int>();
 
             _fileService = fileService;
         }
 
-        /// <summary>
-        /// Retrieves Domain dataset from Template Tables for "New" datasets
-        /// </summary>
-        /// <param name="domainId"></param>
-        public DatasetDTO GetTemplateDataset(string domainId)
-        {
-            DomainTemplate domainTemplate = _domainRepository.FindAll(
-                d => d.Id.Equals(domainId),
-                new List<Expression<Func<DomainTemplate, object>>>()
-                {
-                    d => d.Variables.Select(c => c.controlledTerminology.Xref.DB)
-                }
-                ).FirstOrDefault<DomainTemplate>();
-
-
-            //TODO: USE AutoMapper instead of this manual mapping
-
-            if (domainTemplate == null)
-                return null;
-
-            var dto = GetDatasetDTO(domainTemplate);
-           
-            return dto;
-        }
-
-        public List<DatasetDTO> GetAllDomainTemplates()
-        {
-            //leaky abstraction
-            //TODO: create a method in Generic Repository that takes an expression as a parameter
-            // and uses it in a select method.
-            var domains =  _domainRepository.FindAll(
-                d=>d.Id.StartsWith("D-SDTM"),new List<Expression<Func<DomainTemplate, object>>>()
-            {
-                s=>s.Variables
-            }).ToList().OrderBy(d=>d.Class);
-            return domains.Select(GetDatasetDTO).ToList();
-        }
+       
 
         /// <summary>
         /// Retrieves dataset for selected activity including Variable_Defs
@@ -97,13 +46,12 @@ namespace eTRIKS.Commons.Service.Services
         {
             Dataset ds = _datasetRepository.FindSingle(
                 d => d.Id.Equals(datasetId),
-                new List<Expression<Func<Dataset, object>>>()
+                new List<string>()
                 {
-                    d => d.Variables.Select(t => t.VariableDefinition),
-                    d => d.Activity,
-                    d => d.DataFiles,
-                    d => d.Activity.Project,
-                    d => d.Domain
+                    "Variables.VariableDefinition",
+                    "DataFiles",
+                    "Activity.Project",
+                    "Domain"
                 });
             return ds;
         }
@@ -120,11 +68,11 @@ namespace eTRIKS.Commons.Service.Services
             DatasetDTO dto = new DatasetDTO();
             Dataset ds = _datasetRepository.FindSingle(
                 d => d.Id.Equals(datasetId),
-                new List<Expression<Func<Dataset, object>>>()
+                new List<string>()
                 {
-                    d => d.Variables.Select(t => t.VariableDefinition),
-                    d => d.Domain.Variables.Select(t => t.controlledTerminology.Xref.DB),
-                    d => d.Activity
+                    "Variables.VariableDefinition",
+                    "Domain.Variables.controlledTerminology.Xref.DB",
+                    "Activity"
                 });
 
             dto.Id = ds.Id; //Set DatasetDTO id to Dataset.Id (int)
@@ -208,11 +156,7 @@ namespace eTRIKS.Commons.Service.Services
             var dataset = CreateDataset(datasetDTO);
 
             _datasetRepository.Insert(dataset);
-            if (_dataServiceUnit.Save().Equals("CREATED"))
-            {
-                return dataset;
-            }
-            return null;
+            return _dataServiceUnit.Save().Equals("CREATED") ? dataset : null;
         }
 
         public Dataset CreateDataset(DatasetDTO datasetDTO)
@@ -341,11 +285,11 @@ namespace eTRIKS.Commons.Service.Services
 
             var ds = _datasetRepository.FindSingle(
                 d => d.Id.Equals(datasetId),
-                new List<Expression<Func<Dataset, object>>>()
+                new List<string>()
                 {
-                    d => d.Variables.Select(t => t.VariableDefinition.Role),
-                    d => d.Domain,
-                    d => d.Activity
+                    "Variables.VariableDefinition.Role",
+                    "Domain",
+                    "Activity"
                 });
             //when querying for variables exclude synonym and variable qualifiers as these will be retrieved from their associated main variables
             //CL-Role-4 & CL-Role 5
@@ -525,8 +469,13 @@ namespace eTRIKS.Commons.Service.Services
                 var fileInfo = _fileService.writeDataFile(projectId, dataFile.Path, sdtmTable);
                 standardFile = _fileService.addOrUpdateFile(projectId, fileInfo);
                 //var file = _dataFileRepository.Get(4);
+                
                 //Update dataset
-                dataset.DataFiles.Add(standardFile);//.StandardDataFile = dsName + ".csv";
+                //STUPID EF 1.1
+                //dataset.DataFiles.Add(standardFile);
+                dataset.DataFiles.Add(new DatasetDatafile() {DatasetId = datasetId,DatafileId = dataFile.Id});
+                /////////////////////////////////////
+
                 _datasetRepository.Update(dataset);
                 _dataServiceUnit.Save();
             }
@@ -591,6 +540,7 @@ namespace eTRIKS.Commons.Service.Services
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e.Message);
                 return false;
             }
             
@@ -604,16 +554,15 @@ namespace eTRIKS.Commons.Service.Services
 
         public async Task<bool> LoadDataset(int datasetId, int fileId)
         {
-            Dataset dataset = _datasetRepository
-                .FindSingle(ds => ds.Id.Equals(datasetId),
-                 new List<Expression<Func<Dataset, object>>>(){
-                        d => d.Domain, 
-                        d => d.Variables,
-                        d => d.Activity,
-                        d => d.Activity.Project.Studies,
-                        d=>d.Variables.Select(k=>k.VariableDefinition)
-                });
+            //Dataset dataset = _datasetRepository
+            //    .FindSingle(ds => ds.Id.Equals(datasetId),
+            //     new List<string>(){
+            //            "Domain", 
+            //            "Activity.Project.Studies",
+            //            "Variables.VariableDefinition"
+            //    });
 
+            Dataset dataset = GetActivityDataset(datasetId);
             var reload = false;
             var loaded = false;
 
@@ -641,7 +590,7 @@ namespace eTRIKS.Commons.Service.Services
                 else if (dataset.Domain.Code.Equals("BS"))
                 {
                     var sampleService = new BioSampleService(_dataServiceUnit);
-                    loaded = await sampleService.LoadBioSamples(sdtmData, datasetId);
+                    loaded = sampleService.LoadBioSamples(sdtmData, datasetId);
                 }
                 else if (dataset.Domain.Code.Equals("CY") || dataset.Domain.Code.Equals("HD"))
                 {
@@ -663,11 +612,12 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     dataFile.State = "LOADED";
                     _dataFileRepository.Update(dataFile);
-                    if (!dataset.DataFiles.Any(d => d.Id.Equals(fileId)))
+                    if (!dataset.DataFiles.Select(d=>d.Datafile).Any(d => d.Id.Equals(fileId)))
                     {
                         //Adding a new datafile to this dataset
-                        var datafile = _dataFileRepository.Get(fileId);
-                        dataset.DataFiles.Add(datafile);
+                        //var datafile = _dataFileRepository.Get(fileId);
+                        //dataset.DataFiles.Add(datafile);
+                        dataset.DataFiles.Add(new DatasetDatafile() { DatasetId = datasetId, DatafileId = dataFile.Id });
                         _datasetRepository.Update(dataset);
                     }
                     _dataServiceUnit.Save();
@@ -878,54 +828,7 @@ namespace eTRIKS.Commons.Service.Services
            
         }
 
-        private DatasetDTO GetDatasetDTO(DomainTemplate domainTemplate)
-        {
-            DatasetDTO dto = new DatasetDTO();
-
-            dto.Class = domainTemplate.Class;
-            dto.Description = domainTemplate.Description;
-            dto.Name = domainTemplate.Name;
-            dto.DomainId = domainTemplate.Id;
-            dto.Structure = domainTemplate.Structure;
-            dto.Code = domainTemplate.Code;
-
-            foreach (DomainVariableTemplate vt in domainTemplate.Variables.OrderBy(c => c.Order))
-            {
-                DatasetVariableDTO dv = new DatasetVariableDTO();
-                dv.Name = vt.Name;
-                dv.Description = vt.Description;
-                dv.Label = vt.Label;
-                dv.Accession = vt.Id;
-                dv.RoleId = vt.RoleId;
-                dv.DataType = vt.DataType;
-                dv.UsageId = vt.UsageId;
-                if (vt.controlledTerminology != null)
-                {
-                    dv.DictionaryName = vt.controlledTerminology.Name;
-                    dv.DictionaryDefinition = vt.controlledTerminology.Definition;
-                    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.DB.UrlPrefix +
-                                           vt.controlledTerminology.Xref.Accession;
-                }
-                dv.IsRequired = false;
-                dv.KeySequence = null;
-                dv.OrderNumber = null;
-                dv.IsCurated = true;
-                dv.IsComputed = false;
-                dv.varType = "STANDARD";
-
-                if (dv.UsageId.Equals("CL-Compliance-T-1") || dv.UsageId.Equals("CL-Compliance-T-2"))
-                {
-                    dv.isSelected = true;
-
-                    if (dv.UsageId.Equals("CL-Compliance-T-1"))
-                        dv.IsRequired = true;
-                }
-
-                dto.variables.Add(dv);
-            }
-            return dto;
-
-        }
+        
 
         private static readonly Expression<Func<DomainTemplate, DatasetDTO>> AsDatasetDto =
             x => new DatasetDTO
@@ -939,7 +842,7 @@ namespace eTRIKS.Commons.Service.Services
 
             };
 
-        public FileDTO getDatasetFileInfo(int datasetId, int fileId)
+        public FileDTO CheckFileTemplateMatch(int datasetId, int fileId)
         {
             var dataset = GetActivityDataset(datasetId);
             //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
@@ -989,31 +892,7 @@ namespace eTRIKS.Commons.Service.Services
             return fileDto;
         }
 
-        public List<DatasetDTO> GetAssayFeatureTemplates()
-        {
-            var ds = GetTemplateDataset("D-ASSAY-FEAT");
-            return new List<DatasetDTO>(){ds};
-        }
-
-        public List<DatasetDTO> GetAssaySampleTemplates()
-        {
-            var ds =  GetTemplateDataset("D-SDTM-BS");
-            return new List<DatasetDTO> {ds};
-        }
-
-        public List<DatasetDTO> GetAssayDataTemplates()
-        {
-            var templates = _domainRepository.FindAll(d => d.Class == "Assay Observations",new List<Expression<Func<DomainTemplate, object>>>()
-            {
-                d=> d.Variables
-            });
-            List<DatasetDTO> templateDTOs = new List<DatasetDTO>();
-            foreach(var ds in templates)
-            {
-                templateDTOs.Add(GetDatasetDTO(ds));
-            }
-            return templateDTOs;
-        }
+        
     }
 
 }

@@ -18,10 +18,6 @@ namespace eTRIKS.Commons.Service.Services
     public class ActivityService
     {
         private readonly IRepository<Activity, int> _activityRepository;
-        private readonly IRepository<Dataset, int> _dataSetRepository;
-        private readonly IRepository<VariableDefinition, int> _variableDefinition;
-        private readonly IRepository<Assay, int> _assayRepository;
-        private readonly IRepository<Project, int> _projectRepository;
         private readonly IServiceUoW _activityServiceUnit;
         private readonly DatasetService _datasetService;
 
@@ -30,34 +26,15 @@ namespace eTRIKS.Commons.Service.Services
         {
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
-            _assayRepository = uoW.GetRepository<Assay, int>();
-            _dataSetRepository = uoW.GetRepository<Dataset, int>();
-            _projectRepository = uoW.GetRepository<Project, int>();
-            _variableDefinition =  uoW.GetRepository<VariableDefinition, int>();
             _datasetService = datasetService;
         }
-
-
-
-        
-
-        //public bool checkExist(int activityId)
-        //{
-        //    Activity activity = new Activity();
-        //    activity =_activityRepository.Get(activityId);
-        //    if (activity == null)
-        //    {
-        //        return false;
-        //    }
-        //    return true;
-        //}
 
         public ActivityDTO GetActivity(int activityId)
         {
             Activity activity = _activityRepository.FindSingle(
                 d => d.Id.Equals(activityId),
-                new List<Expression<Func<Activity, object>>>(){
-                        d => d.Datasets.Select(t => t.Domain)
+                new List<string>(){
+                        "Datasets.Domain"
                 }
             );
 

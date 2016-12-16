@@ -11,7 +11,7 @@ using eTRIKS.Commons.WebAPI.Extensions;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Authorize]
+    [Route("mydatasets")]
     public class UserDatasetController : Controller
     {
         private readonly UserDatasetService _userDataService;
@@ -23,20 +23,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _accountService = accountService;
         }
 
-        [HttpGet]
-        [Route("api/mydatasets/projects/{projectId}")]
+        [HttpGet("projects/{projectId}")]
         public List<UserDatasetDTO> GetUserDatasets(int projectId)
         {
             var userId = User.GetUserId();
             if (!User.Identity.IsAuthenticated)
                 return null;
-            //var account = await _accountService.FindByNameAsync(name);
             return _userDataService.GetUserDatasets(projectId, userId);
 
         }
 
-        [HttpGet]
-        [Route("api/mydatasets/{datasetId}", Name = "GetUserDatasetById")]
+        [HttpGet("{datasetId}", Name = "GetUserDatasetById")]
         public  UserDatasetDTO GetUserDataset(string datasetId)
         {
             var userId = User.GetUserId();
@@ -44,7 +41,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPost]
-        [Route("api/mydatasets")]
         public IActionResult AddUserDataset([FromBody] UserDatasetDTO dto)
         {
             UserDatasetDTO addedUserDataset = null;
@@ -69,8 +65,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpPut]
-        [Route("api/mydatasets/{datasetId}")]
+        [HttpPut("{datasetId}")]
         public IActionResult UpdateUserDataset(Guid datasetId, [FromBody] UserDatasetDTO dto)
         {
             try

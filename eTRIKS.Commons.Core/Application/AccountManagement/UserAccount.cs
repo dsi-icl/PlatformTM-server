@@ -18,11 +18,11 @@ namespace eTRIKS.Commons.Core.Application.AccountManagement
 
         public User User { get; set; }
         public Guid UserId { get; set; }
-        private ICollection<Claim> _claims;
+        private ICollection<UserClaim> _claims;
 
-        public virtual ICollection<Claim> Claims
+        public virtual ICollection<UserClaim> Claims
         {
-            get { return _claims ?? (_claims = new List<Claim>()); }
+            get { return _claims ?? (_claims = new List<UserClaim>()); }
             set { _claims = value; }
         }
         public UserAccount()

@@ -6,10 +6,11 @@ using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Service.Services
 {
-    class SubjectService
+    public class SubjectService
     {
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<Study, int> _studtRepository;
@@ -37,10 +38,10 @@ namespace eTRIKS.Commons.Service.Services
             var scoList = _characteristicObjRepository.FindAll(s => s.ProjectId == projectId).ToList();
             var scos = scoList.ToDictionary(co => co.ShortName);
             //Project related studies
-            var studies = _studtRepository.FindAll(s => s.ProjectId == projectId, new List<System.Linq.Expressions.Expression<Func<Study, object>>> {s=>s.Arms });
+            var studies = _studtRepository.FindAll(s => s.ProjectId == projectId, new List<string> {"Arms"});
             var studyMap = studies.ToDictionary(study => study.Name);
-            //Project related studies
-            var arms = studies.SelectMany(s => s.Arms);
+            //Project related arms
+            var arms = studies.SelectMany(s => s.Arms.Select(a=>a.Arm));
             var armMap = arms.ToDictionary(arm => arm.Name);
 
             foreach (var sdtmSubject in subjectData)
@@ -63,8 +64,8 @@ namespace eTRIKS.Commons.Service.Services
                         Code = sdtmSubject.Qualifiers[sdtmRowDescriptor.ArmCodeVariable.Name],
                         Name = sdtmSubject.QualifierSynonyms[sdtmRowDescriptor.ArmVariable.Name]
                     };
-                    if(arm.Studies==null) arm.Studies = new List<Study>();
-                    if(!arm.Studies.Exists(s=>s.Name == study.Name)) arm.Studies.Add(study);
+                    if(arm.Studies==null) arm.Studies = new List<StudyArm>();
+                    if(!arm.Studies.Exists(s=>s.Study.Name == study.Name)) arm.Studies.Add(new StudyArm() {Arm = arm,Study = study});
                     armMap.Add(arm.Name,arm);
                 }
 

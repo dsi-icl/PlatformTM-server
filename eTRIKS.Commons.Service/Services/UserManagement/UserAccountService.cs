@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace eTRIKS.Commons.Service.Services.UserManagement
@@ -15,6 +16,7 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
     {
         private readonly UserManager<UserAccount> _userManager;
         private readonly SignInManager<UserAccount> _signInManager;
+       // private readonly RoleManager<UserRole> _roleManager;
 
         public UserAccountService(UserManager<UserAccount> userManager, SignInManager<UserAccount> signInManager)
         {
@@ -59,10 +61,18 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             return result;
         }
 
-        //public async Task<UserAccount> FindUserAsync(string name, string password)
-        //{
-        //    return await _userManager.FindAsync(name, password);
-        //}
+        public async Task<UserAccount> FindUserAsync(string username, string password)
+        {
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null) return null;
+            return await _userManager.CheckPasswordAsync(user, password) ? user : null;
+        }
+
+        public async Task<ClaimsPrincipal> GetClaimsPrincipleForUser(UserAccount user)
+        {
+           return await _signInManager.CreateUserPrincipalAsync(user);
+        }
+
         public async Task<SignInResult> SignIn(UserDTO userDTO)
         {
             SignInResult result = await _signInManager.PasswordSignInAsync(userDTO.Username, userDTO.Password, false, false);
@@ -77,6 +87,7 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
                 return await _userManager.CheckPasswordAsync(user, userDTO.Password);
             return false;
         }
+
 
         public async Task<string> GetUserPsk(UserDTO userDTO)
         {

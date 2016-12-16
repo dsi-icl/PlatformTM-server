@@ -3,6 +3,7 @@ using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using System;
 using System.Collections.Generic;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
@@ -27,7 +28,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string Subgroup { get; set; } //null 
         public VariableDefinition DefaultQualifier { get; set; }
         public int? DefaultQualifierId { get; set; }
-        public List<Study> Studies { get; set; }
+        //public List<Study> Studies { get; set; }
         public bool? isSubjCharacteristic { get; set; }
         public int? DatasetId { get; set; }
         public Dataset Dataset { get; set; }
@@ -36,16 +37,16 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Project Project { get; set; }
         public int? ProjectId { get; set; }
 
-        public List<VariableDefinition> Synonyms { get; set; }
-        public virtual List<VariableDefinition> Qualifiers { get; set; } //VSORES, VSLOC ...etc
-        public virtual List<VariableDefinition> Timings { get; set; } //VISIT VSDY VSSTD
+        public List<ObservationSynonym> Synonyms { get; set; }
+        public virtual List<ObservationQualifier> Qualifiers { get; set; } //VSORES, VSLOC ...etc
+        public virtual List<ObservationTiming> Timings { get; set; } //VISIT VSDY VSSTD
 
         public Observation()
         {
-            Studies = new List<Study>();
-            Synonyms = new List<VariableDefinition>();
-            Qualifiers = new List<VariableDefinition>();
-            Timings = new List<VariableDefinition>();
+            //Studies = new List<Study>();
+            Synonyms = new List<ObservationSynonym>();
+            Qualifiers = new List<ObservationQualifier>();
+            Timings = new List<ObservationTiming>();
         }
     }
 }

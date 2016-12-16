@@ -15,28 +15,18 @@ namespace eTRIKS.Commons.Service.Services
     public class AssayService
     {
        
-        private readonly IRepository<Dictionary, string> _dictionaryRepository;
         private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-        private readonly IRepository<PlatformAnnotation, Guid> _parepository;
-        private readonly IRepository<DataFile, int> _dataFileRepository;
-        //private FileService _fileService;
-        private DatasetService _datasetService;
-
-
-
+        private readonly DatasetService _datasetService;
         private readonly IServiceUoW _dataContext;
 
         public AssayService(IServiceUoW uoW, DatasetService datasetService)
         {
             _dataContext = uoW;
-            
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-            _parepository = uoW.GetRepository<PlatformAnnotation, Guid>();
-            _dataFileRepository = uoW.GetRepository<DataFile, int>();
             _datasetService = datasetService;
         }
 
@@ -48,12 +38,12 @@ namespace eTRIKS.Commons.Service.Services
         {
             var assay = _assayRepository.FindSingle(
                 d => d.Id.Equals(assayId),
-                new List<Expression<Func<Assay, object>>>(){
-                        d => d.Datasets.Select(t => t.Domain),
-                        d => d.TechnologyType,
-                        d => d.TechnologyPlatform,
-                        d => d.MeasurementType,
-                        d => d.DesignType
+                new List<string>(){
+                        "Datasets.Domain",
+                        "TechnologyType",
+                        "TechnologyPlatform",
+                        "MeasurementType",
+                        "DesignType"
                 }
             );
 
@@ -155,11 +145,12 @@ namespace eTRIKS.Commons.Service.Services
         {
             var samples = new List<Biosample>();
             samples = _bioSampleRepository.FindAll
-                (bs => bs.AssayId.Equals(assayId), new List<Expression<Func<Biosample, object>>>()
+                (bs => bs.AssayId.Equals(assayId), 
+                new List<string>()
                 {
-                    d => d.Study,
-                    d =>d.Subject,
-                    d => d.CollectionStudyDay
+                    "Study",
+                    "Subject",
+                    //"CollectionStudyDay"
                 }).ToList();
 
             List<Hashtable> sample_table = new List<Hashtable>();
@@ -171,7 +162,7 @@ namespace eTRIKS.Commons.Service.Services
                 ht.Add("subjectId", sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing");
                 ht.Add("studyId", sample.Study.Name);
                 ht.Add("sampleId", sample.BiosampleStudyId);
-                ht.Add("studyDay#", sample.CollectionStudyDay?.Number);
+                //ht.Add("studyDay#", sample.CollectionStudyDay?.Number);
                 sample_table.Add(ht);
             }
             Hashtable returnObject = new Hashtable();

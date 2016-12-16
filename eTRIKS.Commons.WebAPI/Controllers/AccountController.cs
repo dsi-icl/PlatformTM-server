@@ -4,11 +4,12 @@ using eTRIKS.Commons.Service.Services.UserManagement;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    //[RoutePrefix("api/accounts")]
+    [Route("accounts")]
     public class AccountController : Controller
     {
         private readonly UserAccountService _userAccountService;
@@ -18,19 +19,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         public AccountController(UserAccountService userAccountService)
         {
-            //_userManager = userManager;
-            //_signInManager = signInManager;
             _userAccountService = userAccountService;
         }
 
-        [Route("signup")]
-        public async Task<IActionResult> CreateUser(UserDTO userDTO)
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register([FromBody] UserDTO userDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            //IdentityResult addUserResult = _userManager.CreateAsync(user, createUserModel.Password);
             var result = await _userAccountService.RegisterUser(userDTO);
             if (result.Succeeded)
             {
@@ -44,9 +43,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 //_logger.LogInformation(3, "User created a new account with password.");
                 //return RedirectToAction(nameof(HomeController.Index), "Home");
 
-                string psk = await _userAccountService.GetUserPsk(userDTO);
+                var psk = await _userAccountService.GetUserPsk(userDTO);
                 return Ok(new { PSK = psk });
-                //return Ok(new { PSK = psk });
             }
             return GetErrorResult(result);
             
