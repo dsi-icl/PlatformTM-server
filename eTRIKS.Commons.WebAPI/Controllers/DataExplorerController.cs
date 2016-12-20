@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
 using eTRIKS.Commons.Service.Services;
 using System.Collections;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using eTRIKS.Commons.WebAPI.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -23,6 +27,46 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _explorerService.GetSubjectCharacteristics(projectId);
         }
+        
+        [HttpPost]
+        [Route("projects/{projectId}/SaveQueries")]
+        public IActionResult SaveQueries(CombinedQueryDTO cdto, int projectId)
+       {
+         var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        //retrieve user combined queries 
+          var savedQueries =  _explorerService.SaveQueries(cdto, userId, projectId);
+            
+            if (savedQueries != null)
+            {
+                return new CreatedAtActionResult("GET", "GetSavedQueriesById", new { savedQueriesId = savedQueries.Id }, savedQueries);
+            }
+            else
+            {
+               return new StatusCodeResult(StatusCodes.Status409Conflict);
+            }
+        }
+
+        [Route("projects/{projectId}/GetSavedQueries")]
+        [HttpGet]
+        //public IEnumerable<CombinedQueryDTO> Get()
+        public List<CombinedQuery> GetSavedQueries(int projectId) 
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            return _explorerService.GetSavedQueries(projectId, userId);
+        }
+
+        //[Route("projects/{projectId}/UpdateQueries")]
+        //[HttpGet]
+        ////public IEnumerable<CombinedQueryDTO> Get()
+        //public List<CombinedQuery> UpdateQueries(CombinedQueryDTO cdto, int projectId)
+        //{
+        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        //    if (!User.Identity.IsAuthenticated)
+        //        return null;
+        //    return _explorerService.UpdateQueries(cdto, projectId, userId);
+        //}
 
         [HttpPost("projects/{projectId}/subjects/search")]
         public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
