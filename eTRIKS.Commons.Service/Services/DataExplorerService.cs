@@ -43,13 +43,14 @@ namespace eTRIKS.Commons.Service.Services
         }
 
 
-        public void SaveQueries(CombinedQueryDTO cdto, string userId, int projectId)
+        public CombinedQuery  SaveQueries(CombinedQueryDTO cdto, string userId, int projectId)
         {
             CombinedQuery cQuery = new CombinedQuery();
             
             cQuery.Name = cdto.Name;
             cQuery.UserId = Guid.Parse(userId);
             cQuery.ProjectId = projectId;
+            cQuery.Id = Guid.NewGuid();
 
             var requests = cdto.ObsRequest;
            
@@ -73,7 +74,8 @@ namespace eTRIKS.Commons.Service.Services
                 if (request.IsClinicalObservations)
                     cQuery.ClinicalObservations.Add(oq);
             }
-           _combinedQueryRepository.Insert(cQuery);
+            
+         return  _combinedQueryRepository.Insert(cQuery);
         }
 
 

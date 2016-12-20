@@ -8,6 +8,7 @@ using eTRIKS.Commons.Service.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using eTRIKS.Commons.WebAPI.Extensions;
+using Microsoft.AspNetCore.Http;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -26,17 +27,23 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _explorerService.GetSubjectCharacteristics(projectId);
         }
-
-
-
+        
         [HttpPost]
         [Route("projects/{projectId}/SaveQueries")]
-        public void SaveQueries(CombinedQueryDTO cdto, int projectId)
+        public IActionResult SaveQueries(CombinedQueryDTO cdto, int projectId)
        {
          var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        //retrieve user combined queries we will directly query mongo using userId we get from the controller
-            _explorerService.SaveQueries(cdto, userId, projectId);
-
+        //retrieve user combined queries 
+          var savedQueries =  _explorerService.SaveQueries(cdto, userId, projectId);
+            
+            if (savedQueries != null)
+            {
+                return new CreatedAtActionResult("GET", "GetSavedQueriesById", new { savedQueriesId = savedQueries.Id }, savedQueries);
+            }
+            else
+            {
+               return new StatusCodeResult(StatusCodes.Status409Conflict);
+            }
         }
 
         [Route("projects/{projectId}/GetSavedQueries")]
