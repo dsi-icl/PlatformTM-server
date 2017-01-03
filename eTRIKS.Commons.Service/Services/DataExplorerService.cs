@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using MongoDB.Bson.Serialization.Serializers;
 
@@ -25,6 +26,8 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<User, Guid> _userRepository;
+        private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
+        
 
         private readonly IServiceUoW _dataContext;
         public DataExplorerService(IServiceUoW uoW)
@@ -36,20 +39,22 @@ namespace eTRIKS.Commons.Service.Services
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _assayRepository = uoW.GetRepository<Assay, int>();
             _userRepository = uoW.GetRepository<User, Guid>();
-
+            _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
         }
-        
 
-        
-        public void SaveDataCart(List<ObservationRequestDTO> oRequests, Guid userId)
-        // public void List<CombinedQuery> SaveDataCart(int projectId, List<ObservationRequestDTO> oRequests, Guid userId)
-        //  public List<CombinedQuery> saveDataCart(int projectId, ObservationRequestDTO oRequest, CombinedQuery combinedQuery)
+
+        public CombinedQuery  SaveQueries(CombinedQueryDTO cdto, string userId, int projectId)
         {
-            // var cQueries1 = new List<ObservationRequestDTO>();
-            var cQuery = new CombinedQuery();
+            CombinedQuery cQuery = new CombinedQuery();
+            
+            cQuery.Name = cdto.Name;
+            cQuery.UserId = Guid.Parse(userId);
+            cQuery.ProjectId = projectId;
+            cQuery.Id = Guid.NewGuid();
 
-            //iterate over oRequests
-            foreach (var request in oRequests)
+            var requests = cdto.ObsRequest;
+           
+            foreach (var request in requests)
             {
                 ObservationQuery oq = new ObservationQuery()
                 {
@@ -69,17 +74,38 @@ namespace eTRIKS.Commons.Service.Services
                 if (request.IsClinicalObservations)
                     cQuery.ClinicalObservations.Add(oq);
             }
-
-            // get user and add the query 
-            var user = _userRepository.Get(userId);
-            user.SavedQueries.Add(cQuery);
-
-            //save the user to db.
-            _userRepository.Insert(user);
-            _dataContext.Save();
+            
+         return  _combinedQueryRepository.Insert(cQuery);
         }
 
-        
+
+        public List<CombinedQuery> GetSavedQueries(int projectId, string userId)
+        {
+
+            List<CombinedQuery> cart = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId).ToList();
+
+            return cart;
+        }
+
+
+        //************************************************************** To Be Completed *******************************************************
+
+        //public void UpdateQueries(CombinedQueryDTO cdto, string userId, int projectId)
+        //  //  public List<CombinedQuery> UpdateCart(CombinedQueryDTO cdto, int projectId, string userId)
+        //{
+        //    CombinedQuery cartToUpdate =
+        //   _combinedQueryRepository.FindSingle(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId && d.Name == cdto.Name);
+        //        //ombinedQuery combinedQuery = new CombinedQuery();
+        //        //   _combinedQuery.Update(cartToUpdate);
+
+
+        //        cartToUpdate.Name = cdto.Name;
+        //        //cartToUpdate.UserId = Guid.Parse(userId);
+        //        //cartToUpdate.ProjectId = projectId;
+        //        _combinedQueryRepository.Update(cartToUpdate);
+        //    }
+
+
         #region Observation Browser methods
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {

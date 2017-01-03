@@ -23,12 +23,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users
         //public List<Project> AffiliatedProjects { get; set; }
         public IList<ProjectUser> AffiliatedProjects { get; set; }
 
-        public List<CombinedQuery> SavedQueries { get; set; }
-
-        public User()
+      public User()
         {
             this.Id = Guid.NewGuid();
-            //SavedQueries = new List<CombinedQuery>();
            }
     }
 }

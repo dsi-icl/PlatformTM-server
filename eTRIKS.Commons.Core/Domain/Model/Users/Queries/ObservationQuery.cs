@@ -6,7 +6,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
     {
         public string ObservarionObject { get; set; } //O3   EntityName  Age/BMI     ObservationName
         public int ObservarionObjectId { get; set; } //O3id   EntityId
-        public string ObservarionQualifier { get; set; } //QO2  PropertyId (results/occurance)
+        public string ObservarionQualifier { get; set; } //QO2  (results/occurance)
         public int? ObservarionQualifierId { get; set; } //QO2id    PropertyId
         public string DataType { get; set; }
 
