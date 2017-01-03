@@ -27,20 +27,22 @@ namespace eTRIKS.Commons.Service.DTOs
         public bool IsEvent { get; set; }
         public bool IsFinding { get; set; }
         public bool IsOntologyEntry { get; set; }
+        public string OntologyEntryName { get; set; }
+        public string OntologyEntryValue { get; set; }
         public string O3code
         {
             get { return _O3code; } 
             set { _O3code = value.ToLower(); } 
         }
         public string QO2 { get; set; }
-        public int? QO2id { get; set; }
+        public int QO2id { get; set; }
         public string DataType { get; set; }
         public string QO2_label { get; internal set; }
 
-
-
         public bool IsSubjectCharacteristics { get; set; }
         public bool IsClinicalObservations { get; set; }
+        public bool IsDesignElement { get; set; }
+        public string DesignElementType { get; set; }
         public List<string> FilterExactValues { get; set; } //the set of values selected by the user
         public float FilterRangeFrom { get; set; } //the from value selected by user
         public float FilterRangeTo { get; set; } //the to value selected by user

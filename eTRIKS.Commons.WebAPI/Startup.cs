@@ -96,6 +96,7 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<TemplateService>();
             services.AddScoped<UserDatasetService>();
             services.AddScoped<UserAccountService>();
+            services.AddScoped<CheckoutService>();
 
 
             services.AddAuthorization(auth =>
@@ -105,13 +106,14 @@ namespace eTRIKS.Commons.WebAPI
                     .RequireAuthenticatedUser().Build());
             });
 
-            services.AddMvc(config => 
+            services.AddMvc(config =>
             {
                 var policy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
+            //services.AddMvc()
             .AddJsonOptions(opts =>
                  {
                      // Force Camel Case to JSON

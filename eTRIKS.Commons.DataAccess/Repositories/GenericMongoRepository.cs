@@ -187,12 +187,12 @@ namespace eTRIKS.Commons.DataAccess.Repositories
 
         public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null)
         {
-            return collection.FindSync(filter).Single();
+            return collection.FindSync(filter).SingleOrDefault();
         }
 
         public TEntity Get(TPrimaryKey key)
         {
-            throw new NotImplementedException();
+            return collection.FindSync(i => i.Id.Equals(key)).SingleOrDefault();
         }
 
         public Task<TEntity> GetAsync(TPrimaryKey key)

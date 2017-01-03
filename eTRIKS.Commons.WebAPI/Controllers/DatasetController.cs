@@ -109,6 +109,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return await _datasetService.LoadDataset(datasetId,fileId);
         }
 
+        [HttpGet("{datasetId}/unloadData/file/{fileId}")]
+        public IActionResult UnloadData(int datasetId, int fileId)
+        {
+            _datasetService.UnloadDataset(datasetId,fileId);
+            return Ok();
+        }
+
         //[HttpGet]
         //[Route("api/datasets/{datasetId}/compute/files/{fileId}")]
         public async Task ComputeFields(int datasetId, int fileId)

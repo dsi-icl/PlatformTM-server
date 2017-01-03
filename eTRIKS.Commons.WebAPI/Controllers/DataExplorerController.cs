@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eTRIKS.Commons.Service.Services;
 using System.Collections;
 using System.Security.Claims;
@@ -23,32 +24,37 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
-        public List<ObservationRequestDTO> getSubjectCharacteristics(int projectId)
+        public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {
             return _explorerService.GetSubjectCharacteristics(projectId);
         }
         
-        [HttpPost]
-        [Route("projects/{projectId}/SaveQueries")]
-        public IActionResult SaveQueries(CombinedQueryDTO cdto, int projectId)
+        [HttpPost("projects/{projectId}/saveQuery")]
+        public IActionResult SaveQuery(int projectId, [FromBody] CombinedQueryDTO cdto )
        {
-         var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        //retrieve user combined queries 
-          var savedQueries =  _explorerService.SaveQueries(cdto, userId, projectId);
+          var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+          var savedQuery =  _explorerService.SaveQuery(cdto, userId, projectId);
             
-            if (savedQueries != null)
-            {
-                return new CreatedAtActionResult("GET", "GetSavedQueriesById", new { savedQueriesId = savedQueries.Id }, savedQueries);
-            }
-            else
-            {
-               return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+            if (savedQuery != null)
+                return new CreatedAtRouteResult("GetSavedQuery", new { projectId = projectId, queryId = savedQuery.Id.ToString() }, savedQuery);
+            
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+       }
+
+
+        [HttpGet("projects/{projectId}/queries/{queryId}", Name = "GetSavedQuery")]
+        public IActionResult GetSavedQuery(int projectId, string queryId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            var query =  _explorerService.GetSavedCombinedQuery(projectId, userId,queryId);
+            if(query != null)
+                return Ok(query);
+            return NotFound();
         }
 
-        [Route("projects/{projectId}/GetSavedQueries")]
-        [HttpGet]
-        //public IEnumerable<CombinedQueryDTO> Get()
+        [HttpGet("projects/{projectId}/GetSavedQueries", Name = "")]
         public List<CombinedQuery> GetSavedQueries(int projectId) 
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -56,6 +62,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 return null;
             return _explorerService.GetSavedQueries(projectId, userId);
         }
+
+       
 
         //[Route("projects/{projectId}/UpdateQueries")]
         //[HttpGet]

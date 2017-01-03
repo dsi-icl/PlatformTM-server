@@ -12,9 +12,17 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         public List<ObservationQuery> SubjectCharacteristics { get; set; }
         public List<ObservationQuery> ClinicalObservations { get; set; }
        // public List<ObservationQuery> AssayParameters { get; set; }
+       public List<ObservationQuery> DesignElements { get; set; }
 
         public Guid UserId { get; set; }
         public int ProjectId { get; set; }
         public string Name { get; set; }
+
+        public CombinedQuery()
+        {
+            SubjectCharacteristics = new List<ObservationQuery>();
+            ClinicalObservations = new List<ObservationQuery>();
+            DesignElements = new List<ObservationQuery>();
+        }
     }
 }

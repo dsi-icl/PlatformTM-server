@@ -36,7 +36,7 @@ namespace eTRIKS.Commons.Service.DTOs
     public class GenericNode
     {
         public string Name { get; set; }
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Code { get; set; }
 
         //public override bool Equals(Object obj)
@@ -72,12 +72,12 @@ namespace eTRIKS.Commons.Service.DTOs
 
     public class MedDRAGroupNode : GroupNode
     {
-        public string Variable { get; set; }
-        public string GroupTerm { get; set; }
-        public List<int> TermIds { get; set; }
+        //public string Variable { get; set; }
+        //public string GroupTerm { get; set; }
+        //public List<int> TermIds { get; set; }
         public bool IsSelectable { get; set; }
         public ObservationRequestDTO DefaultObservation { get; set; }
-        public List<string> TermNames { get; internal set; }
+        //public List<string> TermNames { get; internal set; }
         public string Group { get; internal set; }
         public List<ObservationRequestDTO> Qualifiers { get; internal set; }
 

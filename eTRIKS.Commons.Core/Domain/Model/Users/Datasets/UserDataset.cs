@@ -11,18 +11,17 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public string Name { get; set; }
         public string Description { get; set; }
         public List<string> Tags { get; set; }
-        //public User Owner { get; set; }
         public string OwnerId { get; set; }
-        //public Project Project { get; set; }
         public int ProjectId { get; set; }
-        public List<DataField> Fields { get; set; }
+        //public List<DataField> Fields { get; set; }
+        public List<DatasetField> Fields { get; set; }
         public List<DataFilter> Filters { get; set; }
         public string LastModified { get; set; }
         public string Type { get; set; }
 
         public UserDataset()
         {
-            Fields = new List<DataField>();
+            Fields = new List<DatasetField>();
             Filters = new List<DataFilter>();
         }
     }

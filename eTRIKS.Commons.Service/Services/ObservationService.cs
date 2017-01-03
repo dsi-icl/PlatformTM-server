@@ -13,35 +13,35 @@ namespace eTRIKS.Commons.Service.Services
     public class ObservationService
     {
         private readonly IServiceUoW _dataContext;
-        private readonly IRepository<Activity, int> _activityRepository;
+        //private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Observation, int> _ObservationRepository;
-        private readonly IRepository<VariableDefinition, int> _variableRepository;
-        private readonly IRepository<Dataset, int> _datasetRepository;
-        private readonly IRepository<ObjectOfObservation, int> _O3Repository;
-        private readonly IRepository<PropertyDescriptor, int> _ObsDescriptorRepository;
-        private readonly IRepository<ObservationDescriptor, int> _ObsDescriptionRepository;
+        //private readonly IRepository<VariableDefinition, int> _variableRepository;
+        //private readonly IRepository<Dataset, int> _datasetRepository;
+        //private readonly IRepository<ObjectOfObservation, int> _O3Repository;
+        //private readonly IRepository<PropertyDescriptor, int> _ObsDescriptorRepository;
+        //private readonly IRepository<ObservationDescriptor, int> _ObsDescriptionRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
 
         //MongoDB Repositories
-        private IRepository<HumanSubject, string> subjectRepository;
+        //private IRepository<HumanSubject, string> subjectRepository;
 
-        private IRepository<Study, int> _studyRepository;
+        //private IRepository<Study, int> _studyRepository;
 
 
         public ObservationService(IServiceUoW uoW)
         {
             _dataContext = uoW;
-            _activityRepository = uoW.GetRepository<Activity, int>();
+            //_activityRepository = uoW.GetRepository<Activity, int>();
             _ObservationRepository = uoW.GetRepository<Observation, int>();
-            _datasetRepository = uoW.GetRepository<Dataset, int>();
+            //_datasetRepository = uoW.GetRepository<Dataset, int>();
 
-            _variableRepository = uoW.GetRepository<VariableDefinition, int>();
-            subjectRepository = uoW.GetRepository<HumanSubject, string>();
+            //_variableRepository = uoW.GetRepository<VariableDefinition, int>();
+            //subjectRepository = uoW.GetRepository<HumanSubject, string>();
 
-            _studyRepository = uoW.GetRepository<Study, int>();
-            _O3Repository = uoW.GetRepository<ObjectOfObservation, int>();
-            _ObsDescriptionRepository = uoW.GetRepository<ObservationDescriptor, int>();
-            _ObsDescriptorRepository = uoW.GetRepository<PropertyDescriptor, int>();
+            //_studyRepository = uoW.GetRepository<Study, int>();
+            //_O3Repository = uoW.GetRepository<ObjectOfObservation, int>();
+            //_ObsDescriptionRepository = uoW.GetRepository<ObservationDescriptor, int>();
+            //_ObsDescriptorRepository = uoW.GetRepository<PropertyDescriptor, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
 
         }
@@ -516,6 +516,11 @@ namespace eTRIKS.Commons.Service.Services
             if (reload)
                 _ObservationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == dataFileId);
 
+
+            //Retrieve ObjectOfObservations previously loaded for this project
+            //var projectO3s = _ObservationRepository.FindAll(o => o.ProjectId == projectId && o.DomainCode == dsDomainCode).ToList();
+           
+            //List<string> obsKeys = projectO3s.Select(currObservation => currObservation.Name + currObservation.Group + currObservation.Class).ToList();
 
             var observations = sdtmData.GroupBy(o => new {o3 = o.Topic, group = o.Group, subgroup = o.Subgroup, o3CVterm = o.TopicControlledTerm??o.TopicSynonym});
             foreach (var observation in observations)

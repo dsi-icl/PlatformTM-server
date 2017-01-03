@@ -14,6 +14,7 @@ using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.DataAccess.Configuration;
 using eTRIKS.Commons.DataAccess.EntityConfigurations;
@@ -91,7 +92,7 @@ namespace eTRIKS.Commons.DataAccess
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
-            if (typeof(TEntity) == (typeof(UserDataset)))
+            if (typeof(TEntity) == typeof(UserDataset) || typeof(TEntity) == typeof(CombinedQuery))
             {
                 var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
@@ -114,8 +115,7 @@ namespace eTRIKS.Commons.DataAccess
         {
             try
             {
-                base.SaveChanges();
-                // tran.Complete();
+                var ret = base.SaveChanges();
                 return "CREATED";
             }
             catch (Exception e)

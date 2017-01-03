@@ -8,7 +8,7 @@ namespace eTRIKS.Commons.Service.DTOs
     public class CombinedQueryDTO
     {
       public string Name {get;set;}
-      public List<ObservationRequestDTO> ObsRequest { get; set; }
+      public List<ObservationRequestDTO> ObsRequests { get; set; }
 
     }
 }

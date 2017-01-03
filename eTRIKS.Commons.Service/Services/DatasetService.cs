@@ -23,6 +23,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
+        private readonly IRepository<Observation, int> _observationRepository;
         private readonly FileService _fileService;
 
         public DatasetService(IServiceUoW uoW, FileService fileService)
@@ -32,6 +33,7 @@ namespace eTRIKS.Commons.Service.Services
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _observationRepository = uoW.GetRepository<Observation, int>();
 
             _fileService = fileService;
         }
@@ -638,6 +640,14 @@ namespace eTRIKS.Commons.Service.Services
             return loaded;
         }
 
+        public void UnloadDataset(int datasetId, int fileId)
+        {
+            _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+            Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+            _observationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == fileId);
+            _dataServiceUnit.Save();
+        }
+
         public async Task GenerateComputeVars(int datasetId)
         {
             var dataset = GetActivityDataset(datasetId);
@@ -822,13 +832,6 @@ namespace eTRIKS.Commons.Service.Services
                     return 0;
             }
         }
-
-        public void UnloadDataset(int datasetId, int fileId)
-        {
-           
-        }
-
-        
 
         private static readonly Expression<Func<DomainTemplate, DatasetDTO>> AsDatasetDto =
             x => new DatasetDTO
