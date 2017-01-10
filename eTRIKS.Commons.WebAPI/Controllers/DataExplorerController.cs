@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using eTRIKS.Commons.Service.Services;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
@@ -57,16 +58,29 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _explorerService.GetSavedQueries(projectId, userId);
         }
 
-        //[Route("projects/{projectId}/UpdateQueries")]
-        //[HttpGet]
-        ////public IEnumerable<CombinedQueryDTO> Get()
-        //public List<CombinedQuery> UpdateQueries(CombinedQueryDTO cdto, int projectId)
-        //{
-        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        //    if (!User.Identity.IsAuthenticated)
-        //        return null;
-        //    return _explorerService.UpdateQueries(cdto, projectId, userId);
-        //}
+        /*
+        [Route("projects/{projectId}/UpdateQueries")]
+        [HttpGet]
+        //public IEnumerable<CombinedQueryDTO> Get()
+        public List<CombinedQuery> UpdateQueries(CombinedQueryDTO cdto, int projectId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            return _explorerService.UpdateQueries(cdto, projectId, userId);
+        }
+        */
+         
+        [Route("projects/{projectId}/downloadCSV")]
+        [HttpGet]
+        public void DownloadCsv(DataTable dtTable)
+        {
+            HttpContext.Response.Clear();
+            HttpContext.Response.ContentType = "text/csv";
+            HttpContext.Response.Headers.Add("content-disposition", "attachment;filename=data.csv");
+            HttpContext.Response.WriteAsync(_explorerService.ExportToCSVFile(dtTable));
+            //HttpContext.Abort();
+        }
 
         [HttpPost("projects/{projectId}/subjects/search")]
         public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)

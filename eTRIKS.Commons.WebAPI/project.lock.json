@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     ".NETCoreApp,Version=v1.1": {
-      "CsvHelper/3.0.0-beta7": {
+      "CsvHelper/2.16.3": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
@@ -4035,7 +4035,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v1.1",
         "dependencies": {
-          "CsvHelper": "3.0.0-beta7",
+          "CsvHelper": "2.16.3",
           "Microsoft.AspNetCore.Authentication": "1.1.0",
           "Microsoft.AspNetCore.Http.Abstractions": "1.1.0",
           "Microsoft.AspNetCore.Identity": "1.1.0",
@@ -4056,12 +4056,12 @@
     }
   },
   "libraries": {
-    "CsvHelper/3.0.0-beta7": {
-      "sha512": "Bbpeo/4Zvrpe0M4UfVV3qc/C92EtHErbJ+inaRPLr72MMBbXKtvAAvymeOxoxqOjcx4zEgygcWt2CAomIXqmJg==",
+    "CsvHelper/2.16.3": {
+      "sha512": "RTxNM9Q6MDg3WpGorrK7E9eXsjGhtDLYx5dBuHol5kHDpu7kND2NveHDVCFQgGxowuDB57ettaOEn3EJqiJ1oQ==",
       "type": "package",
-      "path": "CsvHelper/3.0.0-beta7",
+      "path": "CsvHelper/2.16.3",
       "files": [
-        "CsvHelper.3.0.0-beta7.nupkg.sha512",
+        "CsvHelper.2.16.3.nupkg.sha512",
         "CsvHelper.nuspec",
         "lib/net20/CsvHelper.dll",
         "lib/net20/CsvHelper.xml",
@@ -4071,8 +4071,6 @@
         "lib/net40/CsvHelper.xml",
         "lib/net45/CsvHelper.dll",
         "lib/net45/CsvHelper.xml",
-        "lib/net451/CsvHelper.dll",
-        "lib/net451/CsvHelper.xml",
         "lib/netstandard1.3/CsvHelper.dll",
         "lib/netstandard1.3/CsvHelper.xml",
         "lib/portable40-net40+sl5+win8+wp8+wpa81/CsvHelper.dll",
