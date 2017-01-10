@@ -7,12 +7,12 @@ namespace eTRIKS.Commons.Service.DTOs
     public class ClinicalDataTreeDTO
     {
         public string Class;
-        public ICollection<GroupNode> Activities { get; set; }
+        //public ICollection<GroupNode> Activities { get; set; }
         public ICollection<GroupNode> Domains { get; set; }
 
         public ClinicalDataTreeDTO()
         {
-            Activities = new List<GroupNode>();
+            //Activities = new List<GroupNode>();
             Domains = new List<GroupNode>();
         }
     }
@@ -32,54 +32,44 @@ namespace eTRIKS.Commons.Service.DTOs
 
     [KnownType(typeof(ObservationNode))]
     [KnownType(typeof(GroupNode))]
-    [KnownType(typeof(MedDRATermNode))]
+    //[KnownType(typeof(ObservationGroupNode))]
     public class GenericNode
     {
         public string Name { get; set; }
         public string Id { get; set; }
         public string Code { get; set; }
-
-        //public override bool Equals(Object obj)
-        //{
-        //    GenericNode nodeObj = obj as GenericNode;
-        //    if (nodeObj == null)
-        //        return false;
-        //    else
-        //        return Name.Equals(nodeObj.Name);
-        //}
+        public bool IsSelectable { get; set; }
     }
 
     public class ObservationNode : GenericNode
     {
-        public ObservationRequestDTO DefaultObservation;
-        public List<ObservationRequestDTO> Qualifiers;
+        public ObservationRequestDTO DefaultObservation { get; set; }
+        public List<ObservationRequestDTO> Qualifiers { get; set; }
     }
+
+    //public class ObservationGroupNode : GenericNode
+    //{
+    //    public ObsRequestGroupDTO DefaultObservation;
+    //    public List<ObsRequestGroupDTO> Qualifiers;
+    //}
 
     [KnownType(typeof(MedDRAGroupNode))]
     public class GroupNode : GenericNode
     {
         public int Count { get; internal set; }
         public bool IsDomain { get; internal set; }
-
         public List<GenericNode> Terms;
         public GroupNode()
         {
             Terms = new List<GenericNode>();
         }
-
-
     }
 
     public class MedDRAGroupNode : GroupNode
     {
-        //public string Variable { get; set; }
-        //public string GroupTerm { get; set; }
-        //public List<int> TermIds { get; set; }
-        public bool IsSelectable { get; set; }
         public ObservationRequestDTO DefaultObservation { get; set; }
-        //public List<string> TermNames { get; internal set; }
-        public string Group { get; internal set; }
-        public List<ObservationRequestDTO> Qualifiers { get; internal set; }
+        //public List<ObservationRequestDTO> Qualifiers { get; internal set; }
+        //public string Group { get; internal set; }
 
         public MedDRAGroupNode()
         {
@@ -88,11 +78,13 @@ namespace eTRIKS.Commons.Service.DTOs
         }
     }
 
-    public class MedDRATermNode : GenericNode
-    {
-        public ObservationRequestDTO DefaultObservation;
-        public List<ObservationRequestDTO> Qualifiers;
-        public string Variable { get; set; }
-    }
+
+
+    //public class MedDRATermNode : GenericNode
+    //{
+    //    public ObservationRequestDTO DefaultObservation;
+    //    public List<ObservationRequestDTO> Qualifiers;
+    //    //public string Variable { get; set; }
+    //}
 
 }

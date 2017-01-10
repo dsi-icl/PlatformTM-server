@@ -19,8 +19,8 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
                 if (QueryObject != null)
                 {
                     if (QueryObjectType == nameof(SubjectCharacteristic))
-                        return "SubjectCharacteristics[" + QueryObject.ObservationObject + "]";
-                    return QueryObject.ObservationObject + (QueryObject.ObservationQualifier != null ? "[" + QueryObject.ObservationQualifier + "]" : "");
+                        return "SubjectCharacteristics[" + QueryObject.QueryObjectName + "]";
+                    return QueryObject.TermName + (QueryObject.PropertyLabel != null ? "[" + QueryObject.PropertyLabel + "]" : "");
                 }
                     
                 return _name;
@@ -31,7 +31,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
 
         public DatasetField()
         {
-            
+            //QueryObjects = new List<ObservationQuery>();
             ColumnHeader = FieldName;
         }
     }

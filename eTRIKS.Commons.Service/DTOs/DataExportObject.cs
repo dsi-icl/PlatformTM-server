@@ -48,13 +48,15 @@ namespace eTRIKS.Commons.Service.DTOs
 
             //filter by subCharacteristics
             if (SubjChars.Any())
-            Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.UniqueSubjectId)).ToList();
+            Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.Id)).ToList();
             Debug.WriteLine(Subjects.Count, " AFTER SubjChars");
 
             //filter by visits
             //TODO
 
-            Observations = Observations?.FindAll(o => Subjects.Select(s => s.UniqueSubjectId).Contains(o.SubjectId));
+            //TODO : WILL RETRIEVE SUBJECTS THAT HAVE SAME UNIQUE IDS ACROSS PROJECTS  (i.e. need to load observations to Mongo with 
+            //TODO: DB subjectId
+            Observations = Observations?.FindAll(o => Subjects.Select(s => s.UniqueSubjectId).Contains(o.USubjId));
         }
 
 

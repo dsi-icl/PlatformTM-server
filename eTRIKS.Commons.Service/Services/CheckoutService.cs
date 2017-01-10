@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,47 +42,61 @@ namespace eTRIKS.Commons.Service.Services
             phenoDataset.Type = "PHENO";
             phenoDataset.Name = "Phenotypes";
             //CREATE DATAFIELDS
+
+            //TEMP //SHOULD ADD SUBJECTID and UNIQUE SUBJECT ID to CHARACTERISTICS/CHARACTERISTICS_OBJ
             phenoDataset.Fields.Add(new DatasetField()
             {
-                FieldName = "SubjectId",
+                FieldName = "Subject[UniqueId]",
                 ColumnHeader = "SubjectId",
                 ColumnHeaderIsEditable = false
             });
+
+            //ADD DESIGN ELEMENT FIELDS (STUDY, VISIT, ARM...etc)
             phenoDataset.Fields.AddRange(query.DesignElements.Select(qObj => new DatasetField()
             {
                 QueryObject = qObj,
-                QueryObjectType = qObj.ObservationObject, //TEMP should consider to add type to obsquery if used as generic query
-                ColumnHeader = qObj.ObservationObject
+                QueryObjectType = qObj.TermName, //TEMP should consider to add type to obsquery if used as generic query
+                ColumnHeader = qObj.TermName
             }));
+
+            //ADD SUBJECT CHARACTERISTICS (AGE, RACE, SEX ...etc) 
             phenoDataset.Fields.AddRange(query.SubjectCharacteristics.Select(qObj => new DatasetField()
             {
                 QueryObject = qObj,
                 QueryObjectType = nameof(SubjectCharacteristic),
-                ColumnHeader = qObj.ObservationObject
+                ColumnHeader = qObj.ObservationName
             }));
-            //TEMP //SHOULD ADD SUBJECTID and UNIQUE SUBJECT ID to CHARACTERISTICS/CHARACTERISTICS_OBJ
+
+            //ADD CLINICAL OBSERVATIONS
             phenoDataset.Fields.AddRange(query.ClinicalObservations.Select(qObj => new DatasetField()
             {
                 QueryObject = qObj,
                 QueryObjectType = nameof(SdtmRow),
-                ColumnHeader = qObj.ObservationObjectShortName+"["+qObj.ObservationQualifier+"]"
+                ColumnHeader = qObj.ObservationObjectShortName+"["+qObj.PropertyName+"]"
             }));
 
+            phenoDataset.Fields.AddRange(query.GroupedObservations.Select(gObs => new DatasetField()
+            {
+                QueryObject = gObs,
+                QueryObjectType = nameof(SdtmRow),
+                ColumnHeader = gObs.Name
+            }));
             _userDatasetRepository.Insert(phenoDataset);
             _dataContext.Save();
 
             return new List<UserDataset>() {phenoDataset};
         }
 
-        public DataTable ExportDataset(int projectId, string datasetId)
+        public DataTable ExportDataset(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            var projectId = dataset.ProjectId;
 
             var exportData = _exportService.GetDatasetContent(projectId, dataset);
 
-            //var dt = _exportService.GetDatasetTable(exportData);
+            var dt = _exportService.GetDatasetTable(exportData,dataset);
 
-            return new DataTable();
+            return dt;
         }
     }
 }

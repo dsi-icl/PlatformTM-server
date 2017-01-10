@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,6 +35,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public IEnumerable<string> GetCheckoutDatasets()
         {
             return new string[] { "value1", "value2" };
+        }
+
+        [HttpGet("datasets/{datasetId}/preview")]
+        public DataTable GetDataPreview(string datasetId)
+        {
+            return _checkoutService.ExportDataset(datasetId);//.(projectId, userDatasetDto);
         }
         /*
         // GET api/values/5

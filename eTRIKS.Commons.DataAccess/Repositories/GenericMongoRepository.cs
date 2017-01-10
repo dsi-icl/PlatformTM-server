@@ -181,7 +181,7 @@ namespace eTRIKS.Commons.DataAccess.Repositories
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)
         {
-            return filter != null ? collection.Find(filter).ToList() : null;
+            return filter != null ? collection.AsQueryable().Where(filter).ToList() : null;
         }
 
 

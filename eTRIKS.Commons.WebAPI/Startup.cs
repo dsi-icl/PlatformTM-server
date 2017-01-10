@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 namespace eTRIKS.Commons.WebAPI
@@ -118,6 +119,7 @@ namespace eTRIKS.Commons.WebAPI
                  {
                      // Force Camel Case to JSON
                      opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                     //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
                  });
 
 
