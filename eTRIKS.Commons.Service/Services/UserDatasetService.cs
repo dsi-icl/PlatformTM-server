@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Service.DTOs;
 
@@ -76,7 +78,7 @@ namespace eTRIKS.Commons.Service.Services
             ds.LastModified = DateTime.Now.ToString("d");// ToShortDateString();
         
             ds.Filters= new List<DataFilter>();
-            ds.Fields = new List<DataField>();
+            //ds.Fields = new List<DataField>();
             foreach (var filterDto in dto.Filters)
             {
 
@@ -100,7 +102,7 @@ namespace eTRIKS.Commons.Service.Services
 
             foreach (var fieldDto in dto.Fields)
             {
-                ds.Fields.Add(getDataField(fieldDto));
+               // ds.Fields.Add(getDataField(fieldDto));
             }
             return ds;
         }
@@ -120,16 +122,16 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     
                 }).ToList(),
-                Fields = dataset.Fields.Select(f => new DataFieldDTO()
-                {
-                    Entity = f.Entity,
-                    EntityId = f.EntityId,
-                    Property = f.Property,
-                    PropertyId = f.PropertyId,
-                    DataType = f.DataType,
-                    IsFiltered = f.IsFiltered,
-                    FieldName = f.FieldName
-                }).ToList()
+                //Fields = dataset.Fields.Select(f => new DataFieldDTO()
+                //{
+                //    Entity = f.Entity,
+                //    EntityId = f.EntityId,
+                //    Property = f.Property,
+                //    PropertyId = f.PropertyId,
+                //    DataType = f.DataType,
+                //    IsFiltered = f.IsFiltered,
+                //    FieldName = f.FieldName
+                //}).ToList()
             };
         }
 

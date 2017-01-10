@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -14,18 +15,13 @@ namespace eTRIKS.Commons.Service.DTOs
 {
     public class DataExportObject
     {
-        //private readonly IRepository<Arm, string> _armRepository;
-        //private readonly IRepository<SubjectCharacteristic, int> _subjectCharacteristicRepository;
-        //private readonly IRepository<Study, int> _studyRepository;
-        //private readonly IRepository<HumanSubject, string> _subjectRepository;
-
         public List<SdtmRow> Observations { get; set; }
         public List<SubjectCharacteristic> SubjChars { get; set; }
         public List<Visit> Visits { get; set; }
         public List<Arm> Arms { get; set; }
         public List<Study> Studies { get; set; }
-        public List<HumanSubject> SubjectArms { get; set; }
-        public List<Study> StudyArms { get; internal set; }
+        public List<HumanSubject> Subjects { get; set; }
+        //public List<Study> StudiesWithArmsIncluded { get; internal set; }
         public bool IsSubjectIncluded { get; set; }
 
         public DataExportObject()
@@ -35,23 +31,40 @@ namespace eTRIKS.Commons.Service.DTOs
             Visits = new List<Visit>();
             Arms = new List<Arm>();
             Studies = new List<Study>();
-
-            //_subjectCharacteristicRepository = uoW.GetRepository<SubjectCharacteristic, int>();
-            //_studyRepository = uoW.GetRepository<Study, int>();
-            //_armRepository = uoW.GetRepository<Arm, string>();
-            //_subjectRepository = uoW.GetRepository<HumanSubject, string>();
         }
-
-        public IEnumerable JoinSubjObs()
+       
+        public void FilterAndJoin()
         {
-            return Observations.Join(SubjChars, o => o.SubjectId, s => s.SubjectId, (o, s) => new {o, s}).ToList();
+            //filter subjects by studies
+            if(Arms.Any())
+                Subjects = Subjects.FindAll(s => Arms.Select(a => a.Name).Contains(s.StudyArm.Name)).ToList();
+
+            Debug.WriteLine(Subjects.Count," AFTER ARMS");
+
+            //filter subjects by arms
+            if(Studies.Any())
+                Subjects = Subjects.FindAll(s => Studies.Select(st => st.Name).Contains(s.Study.Name)).ToList();
+            Debug.WriteLine(Subjects.Count, " AFTER Studies");
+
+            //filter by subCharacteristics
+            if (SubjChars.Any())
+            Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.Id)).ToList();
+            Debug.WriteLine(Subjects.Count, " AFTER SubjChars");
+
+            //filter by visits
+            //TODO
+
+            //TODO : WILL RETRIEVE SUBJECTS THAT HAVE SAME UNIQUE IDS ACROSS PROJECTS  (i.e. need to load observations to Mongo with 
+            //TODO: DB subjectId
+            Observations = Observations?.FindAll(o => Subjects.Select(s => s.UniqueSubjectId).Contains(o.USubjId));
         }
+
 
 
 
         public string GetArmForSubject(string subjectId)
         {
-            return SubjectArms.Find(a => a.Id == subjectId)?.StudyArm.Name;
+            return Subjects.Find(a => a.Id == subjectId)?.StudyArm.Name;
         }
 
         public string GetSubjCharacterisiticForSubject(string subjectId, int characteristicId)

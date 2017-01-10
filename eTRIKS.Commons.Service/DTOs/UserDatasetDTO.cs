@@ -19,7 +19,16 @@ namespace eTRIKS.Commons.Service.DTOs
         public List<DataFilterDTO> Filters { get; set; }
         //public List<ComputedDataField> ComputedFields { get; set; }
 
+        public  UserDatasetDTO()
+        {
+            Fields = new List<DataFieldDTO>();
+            Filters = new List<DataFilterDTO>();
+        }
+
+
     }
+
+
 
     public class DataFilterDTO
     {
@@ -42,8 +51,13 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Property { get; set; }    //The property of the model to be added as the data field
         public int PropertyId { get; set; }  //The id of the property if normalized as objects (Only applicable in case of Characteristics and Observations)
         //public string ValuesProperty { get; set; } //Only applicable in case of observations and characteristics
+        private string _columnHeader;
+        public string ColumnHeader
+        {
+            get{ return Entity + (Property != null ? "[" + Property + "]" : ""); } 
+            set { _columnHeader = value; }
+        }
 
-        public string DisplayName { get; set; }
         public string DataType { get; set; }
         public bool IsFiltered { get; set; }
     }

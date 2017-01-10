@@ -13,167 +13,39 @@ namespace eTRIKS.Commons.Service.Services
     public class ObservationService
     {
         private readonly IServiceUoW _dataContext;
-        private readonly IRepository<Activity, int> _activityRepository;
+        //private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Observation, int> _ObservationRepository;
-        private readonly IRepository<VariableDefinition, int> _variableRepository;
-        private readonly IRepository<Dataset, int> _datasetRepository;
-        private readonly IRepository<ObjectOfObservation, int> _O3Repository;
-        private readonly IRepository<PropertyDescriptor, int> _ObsDescriptorRepository;
-        private readonly IRepository<ObservationDescriptor, int> _ObsDescriptionRepository;
+        //private readonly IRepository<VariableDefinition, int> _variableRepository;
+        //private readonly IRepository<Dataset, int> _datasetRepository;
+        //private readonly IRepository<ObjectOfObservation, int> _O3Repository;
+        //private readonly IRepository<PropertyDescriptor, int> _ObsDescriptorRepository;
+        //private readonly IRepository<ObservationDescriptor, int> _ObsDescriptionRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
 
         //MongoDB Repositories
-        private IRepository<HumanSubject, string> subjectRepository;
+        //private IRepository<HumanSubject, string> subjectRepository;
 
-        private IRepository<Study, int> _studyRepository;
+        //private IRepository<Study, int> _studyRepository;
 
 
         public ObservationService(IServiceUoW uoW)
         {
             _dataContext = uoW;
-            _activityRepository = uoW.GetRepository<Activity, int>();
+            //_activityRepository = uoW.GetRepository<Activity, int>();
             _ObservationRepository = uoW.GetRepository<Observation, int>();
-            _datasetRepository = uoW.GetRepository<Dataset, int>();
+            //_datasetRepository = uoW.GetRepository<Dataset, int>();
 
-            _variableRepository = uoW.GetRepository<VariableDefinition, int>();
-            subjectRepository = uoW.GetRepository<HumanSubject, string>();
+            //_variableRepository = uoW.GetRepository<VariableDefinition, int>();
+            //subjectRepository = uoW.GetRepository<HumanSubject, string>();
 
-            _studyRepository = uoW.GetRepository<Study, int>();
-            _O3Repository = uoW.GetRepository<ObjectOfObservation, int>();
-            _ObsDescriptionRepository = uoW.GetRepository<ObservationDescriptor, int>();
-            _ObsDescriptorRepository = uoW.GetRepository<PropertyDescriptor, int>();
+            //_studyRepository = uoW.GetRepository<Study, int>();
+            //_O3Repository = uoW.GetRepository<ObjectOfObservation, int>();
+            //_ObsDescriptionRepository = uoW.GetRepository<ObservationDescriptor, int>();
+            //_ObsDescriptorRepository = uoW.GetRepository<PropertyDescriptor, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
 
         }
 
-
-
-
-
-
-        //private VariableDefinition getVarDef(string name, int projectId)
-        //{
-        //    return _variableRepository.FindSingle(d => d.Name.Equals(name) && d.ProjectId.Equals(projectId));
-        //}
-
-        /*
-    public async Task<bool> loadDatasetObservations(Dataset ds,int dataFileId)
-    {
-        VariableDefinition controlledTerm = null;
-        VariableDefinition defaultQualifier = null;
-        string obsName;
-        string obsClass = ds.Domain.Class.ToLower();
-        if (obsClass.Equals("relationship"))
-            return true;
-        //Record qualifiers & Result qualifiers
-        List<VariableDefinition> qualifiers = ds.Variables
-            .Select(l => l.VariableDefinition)
-            .Where(v => v.RoleId == "CL-Role-T-3" || v.RoleId == "CL-Role-T-8")
-            .ToList();
-
-        List<VariableDefinition> timings = ds.Variables
-            .Select(l => l.VariableDefinition)
-            .Where(v => v.RoleId == "CL-Role-T-6")
-            .ToList();
-
-        VariableDefinition topic = ds.Variables
-            .Select(l => l.VariableDefinition).First(v => v.RoleId == "CL-Role-T-2");
-
-        controlledTerm = ds.Variables
-            .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == ds.Domain.Code + "DECOD");
-
-        if (obsClass.Equals("findings"))
-        {
-
-            controlledTerm = ds.Variables
-                .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == ds.Domain.Code + "TEST");
-            //topic = ds.Variables
-            //                    .Select(l => l.VariableDefinition)
-            //                    .Where(v => v.Name == ds.Domain.Code + "TESTCD")
-            //                    .FirstOrDefault();
-            obsName = controlledTerm.Name;
-            defaultQualifier = getVarDef(ds.Domain.Code + "ORRES",ds.Activity.ProjectId);
-        }
-
-        if (obsClass.Equals("events"))
-        {
-            if(ds.Domain.Code.Equals("AE"))
-                defaultQualifier = getVarDef(ds.Domain.Code + "SEV", ds.Activity.ProjectId);
-            else
-            {
-                defaultQualifier = getVarDef(ds.Domain.Code + "OCCUR", ds.Activity.ProjectId);
-            }
-        }
-
-
-        obsName = topic.Name;
-
-        //Formulate Query
-        var filterFields = new Dictionary<string, object>
-        {
-            {"DOMAIN", ds.Domain.Code},
-            {"DBPROJECTACC", ds.Activity.Project.Accession},
-            {"DBDATASETID",ds.Id},
-            {"DBDATAFILEID",dataFileId}
-        };
-
-        var groupFields = new Dictionary<string, string>
-        {
-            {"Name", "$" + obsName},
-
-
-            // {"Name", "$" + controlledTerm.Name}, ///FOR AEs only skip AETERM and only use DECOD
-                                                  ///
-                                                  /// 
-
-            {"Group", "$" + ds.Domain.Code + "CAT"},
-            {"Subgroup", "$" + ds.Domain.Code + "SCAT"}
-        };
-        if(controlledTerm!=null)
-            groupFields.Add("ControlledTermStr", "$" + controlledTerm.Name);
-        //End of formulate Query
-
-        MongoDbDataRepository mongoDataService = new MongoDbDataRepository();
-        List<Observation> observations = await mongoDataService.getGroupedNoSQLrecords(filterFields, groupFields);
-
-        List<Observation> curr_observations =
-            _ObservationRepository.FindAll(o => o.ProjectId == ds.Activity.ProjectId && o.DomainCode.Equals(ds.Domain.Code)).ToList();
-
-        List<string> obsKeys = new List<string>();
-        foreach (var currObservation in curr_observations)
-        {
-            obsKeys.Add(currObservation.Name+currObservation.Group+currObservation.Class);
-        }
-
-            observations = observations.Where(o => o.Group != "").ToList();
-
-        foreach (Observation obs in observations)
-        {
-
-            string key = obs.Name + obs.Group + ds.Domain.Class;
-            if(obsKeys.Contains(key))
-                continue;
-            obs.Class = ds.Domain.Class;
-            obs.DomainCode = ds.Domain.Code;
-            obs.DomainName = ds.Domain.Name;
-            obs.TopicVariable = topic;
-            obs.Qualifiers = qualifiers;
-            obs.Timings = timings;
-
-
-           // obs.ControlledTermStr = controlledTerm;
-
-            obs.DefaultQualifier = defaultQualifier;
-            //TODO: CHECK THAT
-            //obs.Studies.AddRange(ds.Activity.Project.Studies);
-            obs.ProjectId = ds.Activity.ProjectId;
-            //obs.DatafileId = dataFileId;
-            //obs.DatasetId = ds.Id;
-            _ObservationRepository.Insert(obs);
-        }
-
-        return _dataContext.Save().Equals("CREATED");
-    }*/
 
         public void DeleteDatasetObservations(int DatasetId, int DatafileId)
         {
@@ -517,6 +389,11 @@ namespace eTRIKS.Commons.Service.Services
                 _ObservationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == dataFileId);
 
 
+            //Retrieve ObjectOfObservations previously loaded for this project
+            //var projectO3s = _ObservationRepository.FindAll(o => o.ProjectId == projectId && o.DomainCode == dsDomainCode).ToList();
+           
+            //List<string> obsKeys = projectO3s.Select(currObservation => currObservation.Name + currObservation.Group + currObservation.Class).ToList();
+
             var observations = sdtmData.GroupBy(o => new {o3 = o.Topic, group = o.Group, subgroup = o.Subgroup, o3CVterm = o.TopicControlledTerm??o.TopicSynonym});
             foreach (var observation in observations)
             {
@@ -533,7 +410,7 @@ namespace eTRIKS.Commons.Service.Services
                 //    obsDescriptor.Qualifiers = sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList();
                 //else
                 //    obsDescriptor.Qualifiers = sdtmRowDescriptor.QualifierVariables;
-                
+
                 obsDescriptor.ControlledTermStr = observation.Key.o3CVterm;
 
                 obsDescriptor.DatasetId = datasetId;

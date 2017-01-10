@@ -181,18 +181,18 @@ namespace eTRIKS.Commons.DataAccess.Repositories
 
         public IEnumerable<TEntity> FindAll(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, int? page = null, int? pageSize = null)
         {
-            return filter != null ? collection.Find(filter).ToList() : null;
+            return filter != null ? collection.AsQueryable().Where(filter).ToList() : null;
         }
 
 
         public TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null)
         {
-            return collection.FindSync(filter).Single();
+            return collection.FindSync(filter).SingleOrDefault();
         }
 
         public TEntity Get(TPrimaryKey key)
         {
-            throw new NotImplementedException();
+            return collection.FindSync(i => i.Id.Equals(key)).SingleOrDefault();
         }
 
         public Task<TEntity> GetAsync(TPrimaryKey key)
