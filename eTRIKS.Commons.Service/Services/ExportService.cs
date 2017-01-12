@@ -300,13 +300,6 @@ namespace eTRIKS.Commons.Service.Services
                 switch (selField.QueryObjectType)
                 {
                     case nameof(SdtmRow):
-                        //var observations = _sdtmRepository.FindAll(
-                        //    s => s.DBTopicId == selField.QueryObject.TermId
-                        //    && (selField.QueryObject.IsFiltered && selField.QueryObject.DataType.Equals("string"))
-                        //        ? selField.QueryObject.FilterExactValues.Contains(s.Qualifiers[selField.QueryObject.PropertyName])
-                        //        : int.Parse(s.Qualifiers[selField.QueryObject.PropertyName]) >= selField.QueryObject.FilterRangeFrom
-                        //   ).ToList();
-
                         exportData.Observations.AddRange(getObservations(selField.QueryObject));
                         exportData.IsSubjectIncluded = true;
                         break;
@@ -361,11 +354,11 @@ namespace eTRIKS.Commons.Service.Services
             #region Create Table Columns
             var datatable = new DataTable();
 
-            datatable.Columns.Add("SUBJECTID");
-            datatable.Columns.Add("STUDYID");
+            //datatable.Columns.Add("subjectid");
+            datatable.Columns.Add("studyid");
             foreach (var field in dataset.Fields)
             {
-                datatable.Columns.Add(field.FieldName);
+                datatable.Columns.Add(field.ColumnHeader.ToLower());
             }
 
             #endregion
@@ -383,6 +376,11 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     var row = datatable.NewRow();
 
+                    #region Design Elements
+
+                    //arm//visit//studt//
+                    #endregion
+
                     #region Subject Characteristics
 
                     foreach (var subjCharField in subjCharacsFields)
@@ -391,7 +389,7 @@ namespace eTRIKS.Commons.Service.Services
                             sc => sc.CharacteristicObjectId.Equals(subjCharField.QueryObject.TermId)
                                && sc.Subject.UniqueSubjectId == uniqSubjectId);
                         if (charVal != null)
-                            row[subjCharField.FieldName] = charVal.VerbatimValue;
+                            row[subjCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
 
                     }
 
@@ -404,23 +402,42 @@ namespace eTRIKS.Commons.Service.Services
                         SdtmRow obs = null;
                         foreach (var field in fieldgrp) //AEOCCUR / AESEV
                         {
+                            
+                            //ONTOLOGY TERM REQUEST
+                            if (field.QueryObject.IsOntologyEntry)
+                                obs = subjectObservations.FirstOrDefault(
+                               o => ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[field.QueryObject.TermCategory]);
 
+                            //GROUP OF OBSERVATIONS
+                            else if (field.QueryObject.GetType() == typeof(GroupedObservationsQuery))
+                            {
+                                //ASSUMPTION: GROUPS AREONLY COMPOSED OF ONTOLOGY ENTRY
+                                foreach (var observation in ((GroupedObservationsQuery)field.QueryObject).GroupedObservations)
+                                {
+                                    obs = subjectObservations.FirstOrDefault(
+                                        o=> observation.TermId.ToString() == o.QualifierQualifiers[observation.TermCategory]);
+                                    if (obs != null) break;
+                                }
+                            }
+                            //SINGLE OBSERVATION OBJECT TERM REQUEST
+                            else
+                            {
+                                obs = subjectObservations.FirstOrDefault(
+                                o => ((ObservationQuery)field.QueryObject).TermId == o.DBTopicId);
+                            }
 
-                            obs = subjectObservations.FirstOrDefault(
-                                o => ((ObservationQuery) field.QueryObject).TermId == o.DBTopicId);
+                            
 
-                            //obs = subjectObservations.FirstOrDefault(
-                            //    o => ((ObservationQuery)field.QueryObject).ter == o.DBTopicId);
+                           //WRITE OBSERVATION INSTANCE TO TABLE
 
-
-                            string val = "";
-                            obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
-                            if(val == null)
-                                obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
-                            row[field.FieldName] = val;
-                            if (obs != null) row["SUBJECTID"] = obs.USubjId;
-                            if (obs != null) row["STUDYID"] = obs.StudyId;
-                        }
+                           string val = "";
+                           obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+                           if(val == null)
+                               obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+                           row[field.ColumnHeader.ToLower()] = val;
+                           if (obs != null) row["subjectid"] = obs.USubjId;
+                           if (obs != null) row["studyid"] = obs.StudyId;
+                       }
                         subjectObservations.Remove(obs);
                     }
 
@@ -434,7 +451,7 @@ namespace eTRIKS.Commons.Service.Services
 
         private List<SdtmRow> getObservations(Query query)
         {
-            List<SdtmRow> observations = null;// = new IEnumerable<SdtmRow>();
+            List<SdtmRow> observations = new List<SdtmRow>();
 
             switch (query.GetType().Name)
             {
@@ -442,34 +459,36 @@ namespace eTRIKS.Commons.Service.Services
                     var oq = (ObservationQuery) query;
 
                     observations = oq.IsOntologyEntry 
-                        ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[oq.TermCategory] == oq.TermId.ToString()).ToList()
-                        : _sdtmRepository.FindAll(s => s.DBTopicId == oq.TermId).ToList();
+                        ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[oq.TermCategory] == oq.TermId.ToString() && s.Group == oq.Group && s.ProjectId == query.ProjectId).ToList()
+                        : _sdtmRepository.FindAll(s => s.DBTopicId == oq.TermId && s.ProjectId == query.ProjectId).ToList();
 
                     //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
                     observations.ForEach(o=>o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p=>p.Key,p=>p.Value));
 
-                    observations = oq.DataType == "string"
-                            ? observations.FindAll(s => oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
-                            : observations.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
-                                                        float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
-                    break;
+                    if(oq.IsFiltered)
+                        observations = oq.DataType == "string"
+                                ? observations.FindAll(s => oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+                                : observations.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
+                                                            float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
+                break;
                 case nameof(GroupedObservationsQuery):
                     var groupQuery = (GroupedObservationsQuery)query;
                     foreach (var obq in groupQuery.GroupedObservations)
                     {
-                        var groupedObservations = obq.IsOntologyEntry
-                            ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[obq.TermCategory] == obq.TermId.ToString()
-                                                           && (obq.IsFiltered && obq.DataType.Equals("string"))
-                                ? obq.FilterExactValues.Contains(s.Qualifiers[obq.PropertyName])
-                                : int.Parse(s.Qualifiers[obq.PropertyName]) >= obq.FilterRangeFrom && int.Parse(s.Qualifiers[obq.PropertyName]) <= obq.FilterRangeTo
-                                ).ToList()
-                            : _sdtmRepository.FindAll(s => obq.TermId == s.DBTopicId
-                                                           && (obq.IsFiltered && obq.DataType.Equals("string"))
-                                ? obq.FilterExactValues.Contains(s.Qualifiers[obq.PropertyName])
-                                : int.Parse(s.Qualifiers[obq.PropertyName]) >= obq.FilterRangeFrom && int.Parse(s.Qualifiers[obq.PropertyName]) <= obq.FilterRangeTo
-                                ).ToList();
+                        var groupobservations = obq.IsOntologyEntry
+                            ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[obq.TermCategory] == obq.TermId.ToString() && s.Group == obq.Group && s.ProjectId == query.ProjectId).ToList()
+                            : _sdtmRepository.FindAll(s => obq.TermId == s.DBTopicId && s.ProjectId == query.ProjectId).ToList();
 
-                        observations.ToList().AddRange(groupedObservations);
+                        if (obq.IsFiltered)
+                            groupobservations = obq.DataType == "string"
+                                ? groupobservations.FindAll(
+                                    s => obq.FilterExactValues.Contains(s.Qualifiers[obq.PropertyName]))
+                                : groupobservations.FindAll(
+                                    s =>
+                                        int.Parse(s.Qualifiers[obq.PropertyName]) >= obq.FilterRangeFrom &&
+                                        int.Parse(s.Qualifiers[obq.PropertyName]) <= obq.FilterRangeTo);
+
+                        observations.AddRange(groupobservations);
                         //obsGrpReq.TermIds.AddRange(observations.Select(o => o.DBTopicId));
                     }
                     break;

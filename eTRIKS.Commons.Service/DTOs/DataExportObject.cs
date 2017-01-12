@@ -46,7 +46,7 @@ namespace eTRIKS.Commons.Service.DTOs
                 Subjects = Subjects.FindAll(s => Studies.Select(st => st.Name).Contains(s.Study.Name)).ToList();
             Debug.WriteLine(Subjects.Count, " AFTER Studies");
 
-            //filter by subCharacteristics
+            //filter subjects by subCharacteristics
             if (SubjChars.Any())
             Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.Id)).ToList();
             Debug.WriteLine(Subjects.Count, " AFTER SubjChars");
@@ -56,7 +56,12 @@ namespace eTRIKS.Commons.Service.DTOs
 
             //TODO : WILL RETRIEVE SUBJECTS THAT HAVE SAME UNIQUE IDS ACROSS PROJECTS  (i.e. need to load observations to Mongo with 
             //TODO: DB subjectId
+            //filter observations for filtered subjects
             Observations = Observations?.FindAll(o => Subjects.Select(s => s.UniqueSubjectId).Contains(o.USubjId));
+
+            //filter subjects by selected observations
+            Subjects = Subjects.FindAll(s => Observations.Select(o => o.USubjId).Contains(s.UniqueSubjectId));
+            Debug.WriteLine(Subjects.Count, " AFTER syncing with observations");
         }
 
 

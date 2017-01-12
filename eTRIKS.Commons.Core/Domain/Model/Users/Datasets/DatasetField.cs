@@ -19,8 +19,8 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
                 if (QueryObject != null)
                 {
                     if (QueryObjectType == nameof(SubjectCharacteristic))
-                        return "SubjectCharacteristics[" + QueryObject.QueryObjectName + "]";
-                    return QueryObject.TermName + (QueryObject.PropertyLabel != null ? "[" + QueryObject.PropertyLabel + "]" : "");
+                        return "SubjectCharacteristics" + QueryObject.QueryObjectName + "";
+                    return QueryObject.TermName + (QueryObject.PropertyLabel != null ? "" + QueryObject.PropertyLabel + "" : "");
                 }
                     
                 return _name;

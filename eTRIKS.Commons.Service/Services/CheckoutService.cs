@@ -47,7 +47,7 @@ namespace eTRIKS.Commons.Service.Services
             phenoDataset.Fields.Add(new DatasetField()
             {
                 FieldName = "Subject[UniqueId]",
-                ColumnHeader = "SubjectId",
+                ColumnHeader = "subjectid",
                 ColumnHeaderIsEditable = false
             });
 
@@ -72,14 +72,14 @@ namespace eTRIKS.Commons.Service.Services
             {
                 QueryObject = qObj,
                 QueryObjectType = nameof(SdtmRow),
-                ColumnHeader = qObj.ObservationObjectShortName+"["+qObj.PropertyName+"]"
+                ColumnHeader = qObj.ObservationName
             }));
 
             phenoDataset.Fields.AddRange(query.GroupedObservations.Select(gObs => new DatasetField()
             {
                 QueryObject = gObs,
                 QueryObjectType = nameof(SdtmRow),
-                ColumnHeader = gObs.Name
+                ColumnHeader = gObs.ObservationName
             }));
             _userDatasetRepository.Insert(phenoDataset);
             _dataContext.Save();
