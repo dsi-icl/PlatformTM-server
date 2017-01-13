@@ -8,6 +8,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         public string QueryObjectName { get; set; }
         public string Entity { get; set; } //Study //SubjectCharacteristics //
         public string DataType { get; set; }
+        public int ProjectId { get; set; }
         public List<string> FilterExactValues { get; set; } //the set of values selected by the user
         public float FilterRangeFrom { get; set; } //the from value selected by user
         public float FilterRangeTo { get; set; } //the to value selected by user
@@ -24,10 +25,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
                     return FilterRangeFrom + " -> " + FilterRangeTo;
                 return "";
             }
-        }
-
-        
+        }  
     }
+
     public class ObservationQuery : Query
     {
         public string TermName { get { return base.QueryObjectName; } set { base.QueryObjectName = value; } } //O3   EntityName  Age/BMI     ObservationName INJECTION SITE PAIN
@@ -37,7 +37,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         public int PropertyId { get; set; } //QO2id    PropertyId
         //public string DataType { get; set; }
        // public string ObservationObjectType { get; set; } //Single //Multiple //OntologyEntry
-        public string ObservationName => TermName + " [" + PropertyName + "] ";
+        public string ObservationName => TermName + (PropertyName != null?" [" + PropertyName + "] ":"");
 
         //TEMP properties for CVterms until we have real OEs
         public bool IsOntologyEntry { get; set; }
@@ -64,6 +64,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         //    //set { _id = value; }
         //}
         public string ObservationObjectShortName { get; set; }
+        public string Group { get; set; }
     }
     public class GroupedObservationsQuery : ObservationQuery
     {

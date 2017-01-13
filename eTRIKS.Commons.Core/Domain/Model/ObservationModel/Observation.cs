@@ -16,10 +16,14 @@ namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
         public string Study { get; set; } //CRC305A CRC305B
         public int StudyDBId { get; set; }
 
-        public List<ObservedPropertyValue> ObservedProperties { get; set; } //the measures being observed (e.g. OCCURENCE, RESULT, DOSAGE ...
-        public ObservedPropertyValue DefaultObservedProperty { get; set; }
-        public List<ObservedPropertyValue> TemporalProperties { get; set; } //Date of collection, duration, interval ...etc
-        public List<ObservedPropertyValue> TimeSeriesDescriptors { get; set; } //Visit, Study day, timepoint ..etc
+        //public List<ObservedPropertyValue> ObservedProperties { get; set; } //the measures being observed (e.g. OCCURENCE, RESULT, DOSAGE ...
+        //public ObservedPropertyValue DefaultObservedProperty { get; set; }
+        //public List<ObservedPropertyValue> TemporalProperties { get; set; } //Date of collection, duration, interval ...etc
+        //public List<ObservedPropertyValue> TimeSeriesDescriptors { get; set; } //Visit, Study day, timepoint ..etc
+
+        public ObservedPropertyValue ObservedValue { get; set; }
+        public ObservedPropertyValue TemporalValue { get; set; }
+        public ObservedPropertyValue TimeSeriesValue { get; set; }
 
         //TODO: need to decide whether I shuold keep these here or move to feature obj and subj class... 
         public List<ObservedPropertyValue> FeatureProperties { get; set; } //Properties about the feature/O3 featured in this observation NOT the observation itself

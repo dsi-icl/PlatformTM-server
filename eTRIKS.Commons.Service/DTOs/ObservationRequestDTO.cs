@@ -11,7 +11,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Id => O3id + (QO2id!=0 ? "_"+QO2id : "");
         public string Name => (O3code + (QO2 != null ? "[" + QO2 + "]" : "")).ToLower();
 
-       
+        public int ProjectId { get; set; }
         public string O3variable { get; set; }
         public bool IsMultipleObservations { get; set; }
         public List<int> TermIds { get; set; }
@@ -41,6 +41,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public float FilterRangeFrom { get; set; } //the from value selected by user
         public float FilterRangeTo { get; set; } //the to value selected by user
         public bool IsFiltered { get; set; }
+        public string Group { get; set; }
 
         public ObservationRequestDTO()
         {
