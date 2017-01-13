@@ -406,16 +406,22 @@ namespace eTRIKS.Commons.Service.Services
 
 
             //Retrieve sdtmrows for requested OEs  (MedDRA headers)
-            //WARNING!!!
-            //BECAUSE THE QUERY IS USING OE VALUE ONLY, OBSERVATIONS WITH DIFFERENT GROUPS ARE RETRIEVED
-            foreach (var obsReq in obsRequests.Where(or=>or.IsOntologyEntry))
+           // var test2 = obsRequests.Where(or => or.IsMultipleObservations).
+            var qTerms =  obsRequests.FindAll(or => or.IsOntologyEntry)
+                                        .Select(o=> new {name=o.OntologyEntryCategoryName,value = o.OntologyEntryValue, group= o.Group}).Distinct().ToList();
+            foreach (var qTerm in qTerms)
             {
-               var observations = _sdtmRepository.FindAll(
-                        s => s.QualifierQualifiers[obsReq.OntologyEntryCategoryName] == obsReq.OntologyEntryValue
+               var observations = qTerm.group!=null ?
+                    _sdtmRepository.FindAll(
+                        s => s.QualifierQualifiers[qTerm.name] == qTerm.value
                         && s.ProjectId == projectId
-                        && s.Group == obsReq.Group)
+                        && s.Group == qTerm.group)
+                    .ToList()
+                    : _sdtmRepository.FindAll(
+                        s => s.QualifierQualifiers[qTerm.name] == qTerm.value
+                        && s.ProjectId == projectId)
                     .ToList();
-                obsReq.TermIds.AddRange(observations.Select(o=>o.DBTopicId).Distinct().ToList());
+                //obsRequests.FindAll(or=>or.OntologyEntryValue==qTerm.value && qTerm?.group==or.Group).ForEach(oq=>oq.TermIds.AddRange((observations.Select(o => o.DBTopicId).Distinct())));
                 sdtmObservations.AddRange(observations);
             }
 
@@ -505,8 +511,8 @@ namespace eTRIKS.Commons.Service.Services
             var appendedEvents = events.ToList();
             foreach (var obsreq in reqObservations.Where(r => r.QO2 == "AEOCCUR"))
             {
-                var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId) && !s.Qualifiers.ContainsKey("AEOCCUR")).ToList();
-                //var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId)).ToList();
+               // var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId) && !s.Qualifiers.ContainsKey("AEOCCUR")).ToList();
+                var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId)).ToList();
 
                 //var matchedEvents2 = events.FindAll(s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue && !s.Qualifiers.ContainsKey("AEOCCUR")).ToList();
                 //var matchedEvents3 = events.FindAll(s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue).ToList();
@@ -515,26 +521,29 @@ namespace eTRIKS.Commons.Service.Services
                 matchedEvents.FindAll(c=>!c.Qualifiers.ContainsKey("AEOCCUR")).ForEach(m => m.Qualifiers.Add("AEOCCUR", "Y"));
 
                 var subjectIdsEventOccured = matchedEvents.Select(e => e.USubjId).Distinct().ToList();
-                var missingSubjects = allSubjects.FindAll(s => !subjectIdsEventOccured.Contains(s.UniqueSubjectId));
-                var noOccurEvents = missingSubjects.Select(subj => new SdtmRow()
+                var subjectsNoOccur = allSubjects.FindAll(s => !subjectIdsEventOccured.Contains(s.UniqueSubjectId));
+                var noOccurEvents= new List<SdtmRow>();
+                foreach (var termId in obsreq.TermIds)
                 {
-                    USubjId = subj.UniqueSubjectId,
-                    StudyId = subj.Study.Name,
-                    Topic = obsreq.O3,
-                    DBTopicId = obsreq.TermIds[0],
-                    Id = Guid.NewGuid(),
-                    ActivityId = matchedEvents.First().ActivityId,
-                    DatasetId = matchedEvents.First().DatasetId,
-                    DatafileId = matchedEvents.First().DatafileId,
-                    ProjectId = matchedEvents.First().ProjectId,
-                    ProjectAccession = matchedEvents.First().ProjectAccession,
-                    Class = matchedEvents.First().Class,
-                    Group = matchedEvents.First().Group,
-                    TopicControlledTerm = matchedEvents.First().TopicControlledTerm,
-                    Qualifiers = new Dictionary<string, string>() {{"AEOCCUR", "N"}},
-                    QualifierQualifiers = matchedEvents.First().QualifierQualifiers
-                }).ToList();
-
+                    noOccurEvents.AddRange(subjectsNoOccur.Select(subj => new SdtmRow()
+                    {
+                        USubjId = subj.UniqueSubjectId,
+                        StudyId = subj.Study.Name,
+                        Topic = obsreq.O3,
+                        DBTopicId = termId,//obsreq.TermIds[0],
+                        Id = Guid.NewGuid(),
+                        ActivityId = matchedEvents.First().ActivityId,
+                        DatasetId = matchedEvents.First().DatasetId,
+                        DatafileId = matchedEvents.First().DatafileId,
+                        ProjectId = matchedEvents.First().ProjectId,
+                        ProjectAccession = matchedEvents.First().ProjectAccession,
+                        Class = matchedEvents.First().Class,
+                        Group = matchedEvents.First().Group,
+                        TopicControlledTerm = matchedEvents.First().TopicControlledTerm,
+                        Qualifiers = new Dictionary<string, string>() { { "AEOCCUR", "N" } },
+                        QualifierQualifiers = matchedEvents.First().QualifierQualifiers
+                    }).ToList());
+                }
                 appendedEvents.AddRange(noOccurEvents);
 
 
@@ -590,7 +599,7 @@ namespace eTRIKS.Commons.Service.Services
                 Name = obsObject.ControlledTermStr,
                 Id = obsObject.Id.ToString(),
                 Code = obsObject.Name.ToLower(),
-                Qualifiers = getObsRequests(obsObject),
+                Qualifiers = createObsRequests(obsObject),
  
                 DefaultObservation = new ObservationRequestDTO()
                 {
@@ -612,6 +621,35 @@ namespace eTRIKS.Commons.Service.Services
             node.DefaultObservation.O3 = obsObject.Name;
             return node;
 
+        }
+
+        private List<ObservationRequestDTO> createObsRequests(Observation obsObject, bool IsMultiple = false, bool IsOntologyEntry = false)
+        {
+            var allQualifiers = obsObject.Qualifiers.Select(q => q.Qualifier).ToList();
+            allQualifiers.AddRange(obsObject.Timings.Select(a => a.Qualifier));
+
+            var reqs = allQualifiers.Select(variableDefinition => new ObservationRequestDTO()
+            {
+
+                O3 = obsObject.Name,//obsObject.ControlledTermStr,
+                O3id = obsObject.Id,
+                O3code = obsObject.Name.ToLower(),
+                QO2 = variableDefinition.Name,
+                QO2id = variableDefinition.Id,
+                DataType = variableDefinition.DataType,
+                QO2_label = variableDefinition.Label,
+                IsEvent = obsObject.Class.ToUpper() == "EVENTS",
+                IsFinding = obsObject.Class.ToUpper() == "FINDINGS",
+                IsMultipleObservations = IsMultiple,
+                IsOntologyEntry = IsOntologyEntry,
+                ProjectId = obsObject.ProjectId.Value,
+
+                //TermIds = termIds,
+                //Id = obsObject.Name.ToLower() + "_" + variableDefinition.Name
+                //Qualifiers = obsObject.Qualifiers.Select(q => q.Name).ToList(),
+                //DefaultQualifier = obsObject.DefaultQualifier.Name
+            }).ToList();
+            return reqs;
         }
 
         private async Task<List<MedDRAGroupNode>> getEventsByMedDRA(int projectId, List<Observation> observations, string gcode, string gname)
@@ -708,7 +746,7 @@ namespace eTRIKS.Commons.Service.Services
                                     Terms = (
                                         from ae in HLTs
                                         group ae by ae.TopicControlledTerm into PTs //ae.qualifiers.SingleOrDefault(q => q.Key.Equals("AEDECOD")).Value into PTs
-                                        select  createMedDRATermNode(PTs,"AEPTCD",gcode)).ToList<GenericNode>()
+                                        select  createMedDRATermNode(PTs,"AEPTCD",gcode,gname)).ToList<GenericNode>()
                                         //select new ObservationNode()
                                         //{
                                         //    Id = PTs.FirstOrDefault().QualifierQualifiers.SingleOrDefault(q => q.Key.Equals("AEPTCD")).Value,
@@ -742,36 +780,7 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        private List<ObservationRequestDTO> getObsRequests(Observation obsObject, bool IsMultiple = false, bool IsOntologyEntry = false)
-        {
-            var allQualifiers = obsObject.Qualifiers.Select(q=>q.Qualifier).ToList();
-            allQualifiers.AddRange(obsObject.Timings.Select(a=>a.Qualifier));
-
-            var reqs = allQualifiers.Select(variableDefinition => new ObservationRequestDTO()
-            {
-
-                O3 = obsObject.Name,//obsObject.ControlledTermStr,
-                O3id = obsObject.Id,
-                O3code = obsObject.Name.ToLower(),
-                QO2 = variableDefinition.Name,
-                QO2id = variableDefinition.Id,
-                DataType = variableDefinition.DataType,
-                QO2_label = variableDefinition.Label,
-                IsEvent = obsObject.Class.ToUpper() == "EVENTS",
-                IsFinding = obsObject.Class.ToUpper() == "FINDINGS",
-                IsMultipleObservations = IsMultiple,
-                IsOntologyEntry = IsOntologyEntry,
-                ProjectId = obsObject.ProjectId.Value,
-
-                //TermIds = termIds,
-                //Id = obsObject.Name.ToLower() + "_" + variableDefinition.Name
-                //Qualifiers = obsObject.Qualifiers.Select(q => q.Name).ToList(),
-                //DefaultQualifier = obsObject.DefaultQualifier.Name
-            }).ToList();
-            return reqs;
-        }
-
-        private ObservationNode createMedDRATermNode(IGrouping<string,SdtmRow> PTs, string oeCategory, string gcode )
+        private ObservationNode createMedDRATermNode(IGrouping<string,SdtmRow> PTs, string oeCategory, string gcode, string gname )
         {
             
             var obsId = PTs.FirstOrDefault().QualifierQualifiers.SingleOrDefault(q => q.Key.Equals(oeCategory)).Value;
@@ -790,6 +799,7 @@ namespace eTRIKS.Commons.Service.Services
                     QO2 = "AEOCCUR",
                     QO2_label = "OCCURENCE",
 
+                    Group = gname,
                     TermIds = PTs.Select(p => p.DBTopicId).Distinct().ToList(),
                     IsEvent = true,
                     IsClinicalObservations = true,
@@ -826,12 +836,14 @@ namespace eTRIKS.Commons.Service.Services
                 QO2id = qualifier.Id,
                 DataType = qualifier.DataType,
                 QO2_label = qualifier.Label,
+                Group = gname,
                 IsEvent = node.DefaultObservation.IsEvent,
                 IsFinding = node.DefaultObservation.IsFinding,
                 IsOntologyEntry = node.DefaultObservation.IsOntologyEntry,
                 OntologyEntryCategoryName = oeCategory,
                 OntologyEntryValue = node.DefaultObservation.O3id.ToString(),
-                ProjectId = node.DefaultObservation.ProjectId
+                ProjectId = node.DefaultObservation.ProjectId,
+                TermIds = PTs.Select(p => p.DBTopicId).Distinct().ToList(),
             }).ToList();
 
             node.Qualifiers = obsRequests;

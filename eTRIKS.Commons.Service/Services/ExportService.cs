@@ -305,17 +305,40 @@ namespace eTRIKS.Commons.Service.Services
                         break;
                     case nameof(SubjectCharacteristic):
                         //TODO:Need to do a separate query for dates
-                        var obsQuery = (ObservationQuery) selField.QueryObject;
+                        var obsQuery = selField.QueryObject;
                         var characteristics = _subjectCharacteristicRepository.FindAll(
-                            sc => sc.Subject.Study.ProjectId == projectId
-                                && obsQuery.TermId == sc.CharacteristicObjectId,
-                                //&& (obsQuery.IsFiltered && obsQuery.DataType.Equals("string"))
-                                //    ? obsQuery.FilterExactValues.Contains(sc.VerbatimValue)
-                                //    : int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom && int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo,
-                            new List<string>() { "Subject" }).ToList();
+                           sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicObjectId,
+                           new List<string>() { "Subject" }).ToList();
+
+                        if (characteristics.Any() && obsQuery.IsFiltered)
+                        {
+                            characteristics = (obsQuery.DataType == "string")
+                                ? characteristics.FindAll(sc => obsQuery.FilterExactValues.Contains(sc.VerbatimValue))
+                                : characteristics.FindAll(sc =>
+                                                            int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
+                                                            int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
+                        }
                         exportData.SubjChars.AddRange(characteristics);
                         exportData.IsSubjectIncluded = true;
                         break;
+                    //case nameof(SampleCharacteristic):
+                    //    //TODO:Need to do a separate query for dates
+                    //    var obsQuery = selField.QueryObject;
+                    //    var characteristics = _subjectCharacteristicRepository.FindAll(
+                    //       sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicObjectId,
+                    //       new List<string>() { "Subject" }).ToList();
+
+                    //    if (characteristics.Any() && obsQuery.IsFiltered)
+                    //    {
+                    //        characteristics = (obsQuery.DataType == "string")
+                    //            ? characteristics.FindAll(sc => obsQuery.FilterExactValues.Contains(sc.VerbatimValue))
+                    //            : characteristics.FindAll(sc =>
+                    //                                        int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
+                    //                                        int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
+                    //    }
+                    //    exportData.SubjChars.AddRange(characteristics);
+                    //    exportData.IsSubjectIncluded = true;
+                    //    break;
                     case nameof(Arm):
                         if (selField.QueryObject.IsFiltered)
                             exportData.Arms = _armRepository.FindAll(
@@ -323,7 +346,7 @@ namespace eTRIKS.Commons.Service.Services
                                 && selField.QueryObject.FilterExactValues.Contains(a.Name)).ToList();
                         else
                             exportData.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)).ToList();
+                                a => a.Studies.Select(s=>s.Study.ProjectId).Contains(projectId)).ToList();
                         break;
                     case nameof(Study):
                         var studies = _studyRepository.FindAll(
@@ -364,20 +387,26 @@ namespace eTRIKS.Commons.Service.Services
             #endregion
 
 
-            var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
+            //var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
 
             var fieldsByO3Id = dataset.Fields.FindAll(f=> f.QueryObjectType == nameof(SdtmRow)).GroupBy(f => f.QueryObject.QueryObjectName).ToList();
             var subjCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SubjectCharacteristic)).ToList();
-            foreach (var obsGroup in subjGroupedObservations)
+            foreach (var subject in exportData.Subjects)
             {
-                var subjectObservations = obsGroup.Select(group => group).ToList();
-                var uniqSubjectId = subjectObservations.FirstOrDefault().USubjId;
-                while (subjectObservations.Any())
+                var uniqSubjectId = subject.UniqueSubjectId;
+                var subjectObservations = exportData.Observations.FindAll(o => o.USubjId == uniqSubjectId).ToList();
+                var subjectCharacteristics = exportData.SubjChars.FindAll(sc => sc.SubjectId == subject.Id).ToList();
+                //var uniqSubjectId = subjectObservations.FirstOrDefault().USubjId;
+
+                var firstRow = true;
+                while (subjectObservations.Any() || firstRow )
                 {
                     var row = datatable.NewRow();
+                    firstRow = false;
 
                     #region Design Elements
-
+                    row["subjectid"] = uniqSubjectId;
+                    row["studyid"] = subject.Study.Name;
                     //arm//visit//studt//
                     #endregion
 
@@ -385,9 +414,8 @@ namespace eTRIKS.Commons.Service.Services
 
                     foreach (var subjCharField in subjCharacsFields)
                     {
-                        var charVal = exportData.SubjChars.SingleOrDefault(
-                            sc => sc.CharacteristicObjectId.Equals(subjCharField.QueryObject.TermId)
-                               && sc.Subject.UniqueSubjectId == uniqSubjectId);
+                        var charVal = subjectCharacteristics.SingleOrDefault(
+                                        sc => sc.CharacteristicObjectId.Equals(subjCharField.QueryObject.TermId));
                         if (charVal != null)
                             row[subjCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
 
@@ -402,7 +430,6 @@ namespace eTRIKS.Commons.Service.Services
                         SdtmRow obs = null;
                         foreach (var field in fieldgrp) //AEOCCUR / AESEV
                         {
-                            
                             //ONTOLOGY TERM REQUEST
                             if (field.QueryObject.IsOntologyEntry)
                                 obs = subjectObservations.FirstOrDefault(
@@ -428,15 +455,13 @@ namespace eTRIKS.Commons.Service.Services
 
                             
 
-                           //WRITE OBSERVATION INSTANCE TO TABLE
+                           //WRITE OBSERVATION INSTANCE TO ROW
 
                            string val = "";
                            obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
                            if(val == null)
                                obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
-                           row[field.ColumnHeader.ToLower()] = val;
-                           if (obs != null) row["subjectid"] = obs.USubjId;
-                           if (obs != null) row["studyid"] = obs.StudyId;
+                           row[field.ColumnHeader.ToLower()] = val;   
                        }
                         subjectObservations.Remove(obs);
                     }
