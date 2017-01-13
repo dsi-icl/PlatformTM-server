@@ -114,7 +114,7 @@ namespace eTRIKS.Commons.WebAPI
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
-            //services.AddMvc()
+           // services.AddMvc()
             .AddJsonOptions(opts =>
                  {
                      // Force Camel Case to JSON

@@ -7,6 +7,7 @@ using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -40,8 +41,32 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("datasets/{datasetId}/preview")]
         public DataTable GetDataPreview(string datasetId)
         {
+            
             return _checkoutService.ExportDataset(datasetId);//.(projectId, userDatasetDto);
+            
+            // return _checkoutService.ExportDataset(datasetId);//.(projectId, userDatasetDto);
         }
+
+
+        [Route("datasets/{datasetId}/download")]
+        [HttpGet]
+       // public void DownloadDatasets(DataTable dtTable)
+        public void DownloadDatasets(string datasetId)
+        {
+
+            var dtTable = _checkoutService.ExportDataset(datasetId);
+            HttpContext.Response.Clear();
+            HttpContext.Response.ContentType = "text/csv";
+            HttpContext.Response.Headers.Add("content-disposition", "attachment;filename=data.csv");
+            // HttpContext.Response.WriteAsync(_checkoutService.downloadDatasets(dtTable));
+            HttpContext.Response.WriteAsync(_checkoutService.downloadDatasets(dtTable));
+            //HttpContext.Abort();
+        }
+
+
+
+
+
         /*
         // GET api/values/5
         [HttpGet("{id}")]

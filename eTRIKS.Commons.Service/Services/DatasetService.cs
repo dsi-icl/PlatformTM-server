@@ -648,6 +648,36 @@ namespace eTRIKS.Commons.Service.Services
             _dataServiceUnit.Save();
         }
 
+
+
+        //public bool UnloadDataset(int datasetId, int fileId)
+        //{
+        //    bool successUnloadDataset = true;
+        //    //bool success = true;
+        //    try
+        //    {
+        //        // 1- Delete related observations 
+        //        _observationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == fileId);
+        //        // 2- Delete dataset from MongoDB
+        //        _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+
+        //        Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+        //    }
+
+        //    // in case an error hapens it returns false for success and therefore the main file would not be deleted. (try method)
+        //    catch (Exception e)
+        //    {
+        //        Debug.WriteLine(e.Message);
+        //        successUnloadDataset = false;
+        //    }
+
+        //    //3- Delete actual file (but this is going to happen in fileService) 
+        //    _dataServiceUnit.Save();
+        //    return successUnloadDataset;
+        //}
+
+
+
         public async Task GenerateComputeVars(int datasetId)
         {
             var dataset = GetActivityDataset(datasetId);
