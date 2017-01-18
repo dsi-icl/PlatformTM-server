@@ -77,17 +77,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
         */
          
-        [Route("projects/{projectId}/downloadCSV")]
-        [HttpGet]
-        public void DownloadCsv(DataTable dtTable)
-        {
-            HttpContext.Response.Clear();
-            HttpContext.Response.ContentType = "text/csv";
-            HttpContext.Response.Headers.Add("content-disposition", "attachment;filename=data.csv");
-            HttpContext.Response.WriteAsync(_explorerService.ExportToCSVFile(dtTable));
-            //HttpContext.Abort();
-        }
-
         [HttpPost("projects/{projectId}/subjects/search")]
         public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {

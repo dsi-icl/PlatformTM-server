@@ -96,8 +96,10 @@ namespace eTRIKS.Commons.Service.Services
             var exportData = _exportService.GetDatasetContent(projectId, dataset);
 
             var dt = _exportService.GetDatasetTable(exportData,dataset);
+            dt.TableName = dataset.Name;
 
             return dt;
+            
         }
 
         public string downloadDatasets(DataTable dtTable)

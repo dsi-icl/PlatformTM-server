@@ -1,13 +1,19 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Net.Http.Headers;
+using ContentDispositionHeaderValue = System.Net.Http.Headers.ContentDispositionHeaderValue;
 
 // For more information on enabling Web API for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -50,20 +56,24 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [Route("datasets/{datasetId}/download")]
         [HttpGet]
-       // public void DownloadDatasets(DataTable dtTable)
         public void DownloadDatasets(string datasetId)
         {
 
             var dtTable = _checkoutService.ExportDataset(datasetId);
+            // trick to get the file name
+            string fileName = dtTable.TableName;
+            var csvFile = _checkoutService.downloadDatasets(dtTable);
+
+
             HttpContext.Response.Clear();
             HttpContext.Response.ContentType = "text/csv";
-            HttpContext.Response.Headers.Add("content-disposition", "attachment;filename=data.csv");
-            // HttpContext.Response.WriteAsync(_checkoutService.downloadDatasets(dtTable));
-            HttpContext.Response.WriteAsync(_checkoutService.downloadDatasets(dtTable));
-            //HttpContext.Abort();
+            HttpContext.Response.Headers.Count();
+            HttpContext.Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".csv");
+            HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+          
+            HttpContext.Response.WriteAsync(csvFile);
+            
         }
-
-
 
 
 
@@ -94,4 +104,4 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
         */
     }
-}
+    }
