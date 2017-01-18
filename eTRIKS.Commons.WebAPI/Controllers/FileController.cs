@@ -32,6 +32,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _fileService.GetFileDTO(fileId);
         }
 
+        [HttpGet]
+        [Route("remove/{fileId}")]
+        public void DeleteFile(int fileId)
+        {
+            _fileService.DeleteFile(fileId);
+        }
+
+
         [HttpGet("{fileId}/preview")]
         public Hashtable GetFilePreview(int fileId)
         {

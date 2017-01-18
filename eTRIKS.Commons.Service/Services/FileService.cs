@@ -9,8 +9,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using Microsoft.Extensions.Options;
 using eTRIKS.Commons.Service.Configuration;
+using Microsoft.IdentityModel.Protocols;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -23,6 +25,11 @@ namespace eTRIKS.Commons.Service.Services
         private string uploadedFilesDirectory;
         private string stdFilesDirecotry;
 
+
+        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
+        private readonly IRepository<Observation, int> _observationRepository;
+        // private DatasetService _datasetService;
+
         public FileService(IServiceUoW uoW, IOptions<FileStorageSettings> settings)
         {
             _dataServiceUnit = uoW;
@@ -31,6 +38,12 @@ namespace eTRIKS.Commons.Service.Services
             ConfigSettings = settings.Value;
             uploadedFilesDirectory = ConfigSettings.FileDirectory;//ConfigurationManager.AppSettings["FileDirectory"];
             stdFilesDirecotry = uploadedFilesDirectory + "\\Mapped";
+
+
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _observationRepository = uoW.GetRepository<Observation, int>();
+            // _datasetService = datasetService;
+            //  _datasetService = new DatasetService(uoW);
         }
         public List<FileDTO> getUploadedFiles(int projectId,string path)
         {
@@ -81,6 +94,56 @@ namespace eTRIKS.Commons.Service.Services
 
             _fileRepository.Insert(file);
             return _dataServiceUnit.Save().Equals("CREATED") ? di : null;
+        }
+
+        public void DeleteFile(int fileId)
+        {
+            // var selectFile = _fileRepository.FindSingle(f => f.Id == fileId, new List<System.Linq.Expressions.Expression<Func<DataFile, object>>>() { d=>d.Datasets });
+            var selectFile = _fileRepository.FindSingle(f => f.Id == fileId, new List<string> { "Datasets" });
+
+            bool success = false;
+            if (selectFile.State == "LOADED")
+            {
+                var datasetId = selectFile.Datasets.First().DatasetId;
+               UnloadFile(datasetId, fileId);
+
+                success = UnloadFile(datasetId, fileId);
+            }
+
+            if (success)
+            {
+                string fileDir = uploadedFilesDirectory;
+                string path = fileDir + "\\" + selectFile.Path + "\\" + selectFile.FileName;
+                File.Delete(path);
+            }
+            _fileRepository.Remove(selectFile);
+            _dataServiceUnit.Save();
+        }
+
+        public bool UnloadFile(int datasetId, int fileId)
+        {
+            bool successUnloadDataset = true;
+            //bool success = true;
+            try
+            {
+                // 1- Delete related observations 
+                _observationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == fileId);
+                // 2- Delete dataset from MongoDB
+                _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+
+                Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+            }
+
+            // in case an error hapens it returns false for success and therefore the main file would not be deleted. (try method)
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                successUnloadDataset = false;
+            }
+
+            //3- Delete actual file (but this is going to happen in fileService) 
+            _dataServiceUnit.Save();
+            return successUnloadDataset;
         }
 
         public DataFile addOrUpdateFile(int projectId, FileInfo fi)

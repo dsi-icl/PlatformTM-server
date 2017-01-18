@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
@@ -95,8 +96,33 @@ namespace eTRIKS.Commons.Service.Services
             var exportData = _exportService.GetDatasetContent(projectId, dataset);
 
             var dt = _exportService.GetDatasetTable(exportData,dataset);
+            dt.TableName = dataset.Name;
 
             return dt;
+            
         }
+
+        public string downloadDatasets(DataTable dtTable)
+        {
+            StringBuilder result = new StringBuilder();
+            if (dtTable.Columns.Count != 0)
+            {
+                foreach (DataColumn col in dtTable.Columns)
+                {
+                    result.Append(col.ColumnName + ',');
+                }
+                result.Append("\r\n");
+                foreach (DataRow row in dtTable.Rows)
+                {
+                    foreach (DataColumn column in dtTable.Columns)
+                    {
+                        result.Append(row[column].ToString() + ',');
+                    }
+                    result.Append("\r\n");
+                }
+            }
+            return result.ToString();
+        }
+
     }
 }

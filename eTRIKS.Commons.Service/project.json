@@ -1,7 +1,7 @@
 {
   "version": "1.0.0-*",
   "dependencies": {
-    "CsvHelper": "3.0.0-beta7",
+    "CsvHelper": "2.16.3",
     "eTRIKS.Commons.Core": "1.0.0-*",
     "eTRIKS.Commons.DataAccess": "1.0.0-*",
     "Microsoft.AspNetCore.Authentication": "1.1.0",

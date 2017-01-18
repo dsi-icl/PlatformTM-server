@@ -15,6 +15,9 @@ using eTRIKS.Commons.Core.Domain.Model.Users;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using MongoDB.Bson.Serialization.Serializers;
+using Microsoft.AspNetCore.Http;
+using System.Text;
+
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -153,8 +156,8 @@ namespace eTRIKS.Commons.Service.Services
         //        //cartToUpdate.ProjectId = projectId;
         //        _combinedQueryRepository.Update(cartToUpdate);
         //    }
-
-
+        //************************************************************** To Be Completed *******************************************************
+        
         #region Observation Browser methods
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {
