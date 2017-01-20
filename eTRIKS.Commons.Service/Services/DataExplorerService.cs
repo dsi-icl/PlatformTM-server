@@ -195,7 +195,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public ObservationNode GroupObservations(int projectId, List<ObservationRequestDTO> observations)
         {
-            var obsRequest = new ObservationRequestDTO() {O3code = "grp_", IsEvent = true,IsMultipleObservations = true, ProjectId = projectId};
+            var obsRequest = new ObservationRequestDTO() {O3code = "grp_", IsEvent = true,IsClinicalObservations = true, IsMultipleObservations = true, ProjectId = projectId};
 
            
             for (int i = 0; i < observations.Count; i++)
@@ -226,6 +226,7 @@ namespace eTRIKS.Commons.Service.Services
                 O3code = obsRequest.O3code,
                 IsEvent = obsRequest.IsEvent,
                 IsMultipleObservations = obsRequest.IsMultipleObservations,
+                IsClinicalObservations = true,
 
                 GroupedObservations = observations,
                 ProjectId = projectId,
@@ -403,7 +404,7 @@ namespace eTRIKS.Commons.Service.Services
         {
             List<SdtmRow> sdtmObservations = new List<SdtmRow>();
 
-            //Retrieve rows for requested individual observations
+            //Retrieve rows for requested individual observations //i.e not ontology entry
             var observationsIDs = obsRequests.Where(r => !r.IsMultipleObservations).Select(o => o.O3id).ToList();
             sdtmObservations = _sdtmRepository.FindAll(s => observationsIDs.Contains(s.DBTopicId) && s.ProjectId == projectId ).ToList();
 
@@ -424,7 +425,11 @@ namespace eTRIKS.Commons.Service.Services
                         s => s.QualifierQualifiers[qTerm.name] == qTerm.value
                         && s.ProjectId == projectId)
                     .ToList();
-                //obsRequests.FindAll(or=>or.OntologyEntryValue==qTerm.value && qTerm?.group==or.Group).ForEach(oq=>oq.TermIds.AddRange((observations.Select(o => o.DBTopicId).Distinct())));
+
+
+                obsRequests
+                    .FindAll( or=>or.OntologyEntryValue==qTerm.value && qTerm?.group==or.Group)
+                    .ForEach(oq=>oq.TermIds.AddRange(observations.Select(o => o.DBTopicId).Distinct()));
                 sdtmObservations.AddRange(observations);
             }
 
@@ -436,13 +441,15 @@ namespace eTRIKS.Commons.Service.Services
                     var observations = or.IsOntologyEntry 
                         ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[or.OntologyEntryCategoryName] == or.OntologyEntryValue &&  s.Group == or.Group  && s.ProjectId == projectId).ToList() 
                         : _sdtmRepository.FindAll(s => or.O3id == s.DBTopicId && s.ProjectId == projectId).ToList();
-
-                    sdtmObservations.AddRange(observations);
+                    if(!sdtmObservations.Contains(observations.First()))
+                        sdtmObservations.AddRange(observations);
                     obsGrpReq.TermIds.AddRange(observations.Select(o=>o.DBTopicId).Distinct().ToList());
                 }
             }
             return sdtmObservations;
         }
+
+
         private DataTable getFindingsDataTable(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations)
         {
             #region Build Table columns
@@ -515,10 +522,10 @@ namespace eTRIKS.Commons.Service.Services
             foreach (var obsreq in reqObservations.Where(r => r.QO2 == "AEOCCUR"))
             {
                // var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId) && !s.Qualifiers.ContainsKey("AEOCCUR")).ToList();
-                var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId)).ToList();
+               var matchedEvents = events.FindAll(s => obsreq.TermIds.Contains(s.DBTopicId)).ToList();
 
                 //var matchedEvents2 = events.FindAll(s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue && !s.Qualifiers.ContainsKey("AEOCCUR")).ToList();
-                //var matchedEvents3 = events.FindAll(s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue).ToList();
+                //var matchedEvents = events.FindAll(s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue && s.Group == obsreq?.Group).ToList();
 
                 if (!matchedEvents.Any()) continue;
                 matchedEvents.FindAll(c=>!c.Qualifiers.ContainsKey("AEOCCUR")).ForEach(m => m.Qualifiers.Add("AEOCCUR", "Y"));
@@ -803,7 +810,7 @@ namespace eTRIKS.Commons.Service.Services
                     QO2_label = "OCCURENCE",
 
                     Group = gname,
-                    TermIds = PTs.Select(p => p.DBTopicId).Distinct().ToList(),
+                    //TermIds = PTs.Select(p => p.DBTopicId).Distinct().ToList(),
                     IsEvent = true,
                     IsClinicalObservations = true,
                     IsOntologyEntry = true,
@@ -842,6 +849,7 @@ namespace eTRIKS.Commons.Service.Services
                 Group = gname,
                 IsEvent = node.DefaultObservation.IsEvent,
                 IsFinding = node.DefaultObservation.IsFinding,
+                IsClinicalObservations = node.DefaultObservation.IsClinicalObservations,
                 IsOntologyEntry = node.DefaultObservation.IsOntologyEntry,
                 OntologyEntryCategoryName = oeCategory,
                 OntologyEntryValue = node.DefaultObservation.O3id.ToString(),

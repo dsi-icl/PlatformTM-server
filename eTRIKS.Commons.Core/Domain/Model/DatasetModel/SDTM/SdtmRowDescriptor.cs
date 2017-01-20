@@ -221,6 +221,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             }
             return null;
         }
+
+        public List<VariableDefinition> GetAllTimingVariables()
+        {
+            var list = new List<VariableDefinition>();
+            list.AddRange(new List<VariableDefinition>() {VisitNameVariable,VisitNumVariable,VisitPlannedStudyDay,StudyDayVariable,DateTimeVariable});
+            return list;
+        }
     }
 
 }

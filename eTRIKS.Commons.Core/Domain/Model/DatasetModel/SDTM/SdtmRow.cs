@@ -80,8 +80,25 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             Leftovers = new Dictionary<string, string>();
         }
 
+        public override bool Equals(Object o)
+        {
+            // If parameter is null return false.
+            if (o == null)
+            {
+                return false;
+            }
 
+            // If parameter cannot be cast to Point return false.
+            SdtmRow r = o as SdtmRow;
+            
 
- 
+            // Return true if the fields match:
+            return (Id == r.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }
