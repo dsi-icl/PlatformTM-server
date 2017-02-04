@@ -22,7 +22,7 @@ namespace eTRIKS.Commons.Service.Services
     public class ExportService
     {
         private readonly IRepository<HumanSubject, string> _subjectRepository;
-        private readonly IRepository<DomainTemplate, string> _domainTemplate;
+        private readonly IRepository<DatasetTemplate, string> _domainTemplate;
         private readonly IRepository<CharacteristicObject, int> _characObjRepository;
         private IServiceUoW _dataContext;
         private readonly IRepository<Core.Domain.Model.Observation, int> _observationRepository;
@@ -39,7 +39,7 @@ namespace eTRIKS.Commons.Service.Services
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _observationRepository = uoW.GetRepository<Core.Domain.Model.Observation, int>();
             _characObjRepository = uoW.GetRepository<CharacteristicObject, int>();
-            _domainTemplate = uoW.GetRepository<DomainTemplate, string>();
+            _domainTemplate = uoW.GetRepository<DatasetTemplate, string>();
             _visitRepository = uoW.GetRepository<Visit, int>();
             _subjectCharacteristicRepository = uoW.GetRepository<SubjectCharacteristic, int>();
             _studyRepository = uoW.GetRepository<Study,int>();
@@ -943,11 +943,11 @@ namespace eTRIKS.Commons.Service.Services
                 var domain = _domainTemplate.FindSingle(d => d.Code.Equals(obsGrp.Key.DomainCode),
                     new List<string>()
                     {
-                        "Variables"
+                        "Fields"
                     });
 
                 var Class = domain.Class;
-                var Domain = domain.Name;
+                var Domain = domain.Domain;
 
                 var classNode = createOrFindTreeNode(r.Children, Class.ToLower(), Class,"group",true);
                 var domainNode = createOrFindTreeNode(classNode.Children, obsGrp.Key.DomainCode.ToUpper(), Domain,"group", true);
@@ -977,7 +977,7 @@ namespace eTRIKS.Commons.Service.Services
                         float res;
                         string type;
                         type = float.TryParse(q.Value, out res) ? "numeric" : "char";
-                        var v = domain.Variables.FirstOrDefault(d => d.Name.Equals(q.Key));
+                        var v = domain.Fields.FirstOrDefault(d => d.Name.Equals(q.Key));
                         if (v == null) continue;
                             createOrFindTreeNode(resQualsNode.Children, resQualsNode.Id + q.Key, v.Label, type,false);
                     }
@@ -990,7 +990,7 @@ namespace eTRIKS.Commons.Service.Services
                         float res;
                         string type;
                         type = float.TryParse(q.Value, out res) ? "numeric" : "char";
-                        var v = domain.Variables.FirstOrDefault(d => d.Name.Equals(q.Key));
+                        var v = domain.Fields.FirstOrDefault(d => d.Name.Equals(q.Key));
                         createOrFindTreeNode(timeQualsNode.Children, timeQualsNode.Id + q.Key, v.Label,type, false);
                     }
                         

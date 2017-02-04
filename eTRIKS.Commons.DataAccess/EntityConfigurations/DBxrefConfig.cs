@@ -28,7 +28,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("DBxref_TBL");
+            builder.ToTable("DBxreferences");
             builder.Property(t => t.OID).HasColumnName("OID");
 
             // Relationships

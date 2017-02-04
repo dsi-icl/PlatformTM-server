@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Interfaces;
@@ -42,25 +43,6 @@ namespace eTRIKS.Commons.DataAccess
             _disposed = false;
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //    => optionsBuilder
-        //        .UseMySQL(@"Server=localhost;database=ef;uid=root;pwd=19931101;");
-
-        //public BioSPEAKdbContext() : base("name=eTRIKScontext_MySQL")
-        //{
-        //    //_dataContext = context;
-
-        //    Database.SetInitializer<BioSPEAKdbContext>(null);
-
-        //    DbConfiguration.SetConfiguration(new MySqlEFConfiguration());
-        //    Configuration.ProxyCreationEnabled = true;
-        //    Configuration.LazyLoadingEnabled = true;
-
-        //    _repositories = new Dictionary<Type, object>();
-
-        //    this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
-        //    _disposed = false;
-        //}
 
         public IUserRepository GetUserRepository()
         {
@@ -79,7 +61,7 @@ namespace eTRIKS.Commons.DataAccess
             // Checks if the Dictionary Key contains the Model class
             if (_repositories.Keys.Contains(typeof(TEntity)))
             {
-                // Return the repository for that Model class
+                Debug.WriteLine("Retrieving ",typeof(TEntity).Name);
                 return _repositories[typeof(TEntity)] as IRepository<TEntity, TPrimaryKey>;
             }
 
@@ -158,8 +140,9 @@ namespace eTRIKS.Commons.DataAccess
 
 
 
-            modelBuilder.AddConfiguration<DomainTemplate>(new DomainTemplateConfig());
-            modelBuilder.AddConfiguration<DomainVariableTemplate>(new DomainTemplateVariableConfig());
+            modelBuilder.AddConfiguration<DatasetTemplate>(new DomainTemplateConfig());
+            modelBuilder.AddConfiguration<DatasetTemplateField>(new DomainTemplateVariableConfig());
+            modelBuilder.AddConfiguration<TemplateFieldDB>(new TemplateFieldDBsConfig());
             modelBuilder.AddConfiguration<CVterm>(new CVtermConfig());
             modelBuilder.AddConfiguration<DB>(new DbConfig());
             modelBuilder.AddConfiguration<Dbxref>(new DBxrefConfig());

@@ -34,7 +34,7 @@ namespace eTRIKS.Commons.Service.Services
             Activity activity = _activityRepository.FindSingle(
                 d => d.Id.Equals(activityId),
                 new List<string>(){
-                        "Datasets.Domain"
+                        "Datasets.Template"
                 }
             );
 
@@ -82,7 +82,7 @@ namespace eTRIKS.Commons.Service.Services
             activityToUpdate.Name = activityDTO.Name;
             foreach (var datasetDto in activityDTO.datasets)
             {
-                if (datasetDto.isNew)
+                if (datasetDto.IsNew)
                 {
                     datasetDto.ProjectId = activityDTO.ProjectId;
                     var dataset = _datasetService.CreateDataset(datasetDto);

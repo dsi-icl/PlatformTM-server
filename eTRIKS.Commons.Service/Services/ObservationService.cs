@@ -460,6 +460,12 @@ namespace eTRIKS.Commons.Service.Services
             //addO3IdstoSDTMrows()
             if (success)
             {
+                //TODO: PROBLEM!!
+                //IN CASE OF A SECOND FILE LOADED TO A PREVIOUSLY CREATED DATASET, DATAFILE WILL BE DIFFERENT
+                //OBSERVATIONS WERE SAVED WITH THE FISRT DATASETID AND THE FIRST DATAFILE
+                //WHAT HAPPENS WHERE WE WANT TO UNLOAD A FILE THAT BROUGHT DIFFERENT O3s to the DATASET DIFFERENT
+                //FROM THE FIRST DATAFILE?
+                //I STILL NEED TO BE ABLE TO FIND O3s that were loaded from a certain DATAFILE
                 var savedObs = _ObservationRepository.FindAll(o => o.DatasetId == datasetId && o.DatafileId == dataFileId).ToList();
                 foreach (var observation in observations)
                 {

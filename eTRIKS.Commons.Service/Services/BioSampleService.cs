@@ -101,7 +101,7 @@ namespace eTRIKS.Commons.Service.Services
                         bioSample.SampleCharacteristics.Add(new SampleCharacteristic()
                         {
 
-                            DatasetVariable = dsVar,
+                           // DatasetVariable = dsVar,
                             CharacteristicObject = sco,
                             VerbatimName = sdtmEntity.TopicSynonym,
                             VerbatimValue = resqualifier.Value,
@@ -139,7 +139,7 @@ namespace eTRIKS.Commons.Service.Services
                             VerbatimName = qualifier.Key,
                             VerbatimValue = qualifier.Value,
                             DatasetDomainCode = sdtmEntity.DomainCode,
-                            DatasetVariable =dsVar,
+                            //DatasetVariable =dsVar,
                             CharacteristicObject = sco,
                         });
                     }

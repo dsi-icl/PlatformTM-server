@@ -70,9 +70,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         {
             var descriptor = new SdtmRowDescriptor();
 
-            descriptor.Class = dataset.Domain.Class;
-            descriptor.Domain = dataset.Domain.Name;
-            descriptor.DomainCode = dataset.Domain.Code;
+            descriptor.Class = dataset.Template.Class;
+            descriptor.Domain = dataset.Template.Domain;
+            descriptor.DomainCode = dataset.Template.Code;
 
             descriptor.ObsIsAFinding = descriptor.Class.ToUpper() == ("FINDINGS");
             descriptor.ObsIsAnEvent = descriptor.Class.ToUpper() == "EVENTS";
@@ -95,13 +95,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 
             descriptor.TopicCVtermVariable = dataset.Variables
                         .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "DECOD");
-            if (dataset.Domain.Class.ToLower().Equals("findings"))
+            if (dataset.Template.Class.ToLower().Equals("findings"))
                 descriptor.TopicCVtermVariable = dataset.Variables
                     .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "LOINC");
 
             descriptor.TopicSynonymVariable = dataset.Variables
                     .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "MODIFY");
-            if (dataset.Domain.Class.ToLower().Equals("findings") || dataset.Domain.Code.ToLower().Equals("bs"))
+            if (dataset.Template.Class.ToLower().Equals("findings") || dataset.Template.Code.ToLower().Equals("bs"))
                 descriptor.TopicSynonymVariable = dataset.Variables
                     .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "TEST");
 

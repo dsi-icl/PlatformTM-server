@@ -98,18 +98,21 @@ namespace eTRIKS.Commons.Service.Services
 
         public void DeleteFile(int fileId)
         {
-            // var selectFile = _fileRepository.FindSingle(f => f.Id == fileId, new List<System.Linq.Expressions.Expression<Func<DataFile, object>>>() { d=>d.Datasets });
             var selectFile = _fileRepository.FindSingle(f => f.Id == fileId, new List<string> { "Datasets" });
 
             bool success = false;
             if (selectFile.State == "LOADED")
             {
-                var datasetId = selectFile.Datasets.First().DatasetId;
-               UnloadFile(datasetId, fileId);
-
-                success = UnloadFile(datasetId, fileId);
+                //TODO: if a file is to be unloaded / removed, then all its contents in ALL related datasets are removed
+                //TODO: cannot do selective unload/remove of a file
+                //HENCE NO NEED TO SPECIFY WHICH DATASETID
+                //TODO: NO NEED TO GET datasetId and REMOVE IT FROM PARAMETERS TO UnloadFile
+                //var datasetId = selectFile.Datasets.First().DatasetId;
+                //UnloadFile(datasetId, fileId);//WHY CALL UnloadFile TWICE?
+                success = UnloadFile(fileId);
             }
 
+            //TODO:IF selectFile.State != LOADED, success is still false. Will not be able to delete file
             if (success)
             {
                 string fileDir = uploadedFilesDirectory;
@@ -120,41 +123,42 @@ namespace eTRIKS.Commons.Service.Services
             _dataServiceUnit.Save();
         }
 
-        public bool UnloadFile(int datasetId, int fileId)
+        public bool UnloadFile(int fileId)
         {
-            bool successUnloadDataset = true;
-            //bool success = true;
             try
             {
                 // 1- Delete related observations 
-                _observationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == fileId);
+                //TODO: need to account for non-observation datasets, such as samples, subjects and other assay datasets
+                _observationRepository.DeleteMany(o => o.DatafileId == fileId);
                 // 2- Delete dataset from MongoDB
-                _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+                _sdtmRepository.DeleteMany(s => s.DatafileId == fileId);
 
-                Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
+                Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATAFILE:" + fileId);
             }
 
             // in case an error hapens it returns false for success and therefore the main file would not be deleted. (try method)
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
-                successUnloadDataset = false;
+                return false;
             }
 
-            //3- Delete actual file (but this is going to happen in fileService) 
+            //SINCE UNLOAD FILE CAN BE CALLED INDEPENDENTLY OF REMOVING FILE, NEED TO SET STATUS
+            var file = _fileRepository.Get(fileId);
+            file.State = "UNLOADED";
+            _fileRepository.Update(file);
             _dataServiceUnit.Save();
-            return successUnloadDataset;
+
+            return true;
         }
 
         public DataFile addOrUpdateFile(int projectId, FileInfo fi)
         {
             //TODO: projectId
-            DataFile file;
             if (fi == null)
                 return null;
-            string filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
-            file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.ProjectId == projectId);
-            //TODO: add property isLoadedToDB to the file and only change status to modified if not loadedToDB
+            var filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
+            var file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.ProjectId == projectId);
             if (file == null)
             {
                 var project = _projectRepository.FindSingle(p => p.Id == projectId);
@@ -578,10 +582,6 @@ namespace eTRIKS.Commons.Service.Services
 
         public string GetFullPath(string projectId, string subdir)
         {
-            //string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
-            string projDir = uploadedFilesDirectory + "P-" + projectId;
-            string newDir = projDir + "/" + subdir;
-
             return Path.Combine(uploadedFilesDirectory, "P-" + projectId, subdir);
         }
     }

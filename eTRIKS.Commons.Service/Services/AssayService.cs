@@ -39,7 +39,7 @@ namespace eTRIKS.Commons.Service.Services
             var assay = _assayRepository.FindSingle(
                 d => d.Id.Equals(assayId),
                 new List<string>(){
-                        "Datasets.Domain",
+                        "Datasets.Template",
                         "TechnologyType",
                         "TechnologyPlatform",
                         "MeasurementType",
@@ -61,11 +61,11 @@ namespace eTRIKS.Commons.Service.Services
             foreach (var dst in assay.Datasets.Select(ds => _datasetService.GetActivityDatasetDTO(ds.Id)))
             {
                 //TODO: convert to enums or CVterms
-                if (dst.Class == "Sample Annotations")
+                if (dst.Class == "Assay Samples")
                     assayDTO.SamplesDataset = dst;
                 if (dst.Class == "Assay Observations")
                     assayDTO.ObservationsDataset = dst;
-                if (dst.Class == "Feature Annotations")
+                if (dst.Class == "Assay Features")
                     assayDTO.FeaturesDataset = dst;
             }
             return assayDTO;
@@ -74,19 +74,19 @@ namespace eTRIKS.Commons.Service.Services
         public AssayDTO AddAssay(AssayDTO assayDto)
         {
             var assay = new Assay();
-            var project = _projectRepository.FindSingle(d => d.Accession
-                .Equals(assayDto.ProjectAcc));
+            //var project = _projectRepository.FindSingle(d => d.Accession
+            //    .Equals(assayDto.ProjectAcc));
 
             assay.Name = assayDto.Name;
-            assay.ProjectId = project.Id;
+            assay.ProjectId = assayDto.ProjectId;
             assay.TechnologyPlatformId = assayDto.Platform;
             assay.TechnologyTypeId = assayDto.Technology;
             //assay.DesignType = getCVterm(assayDto.AssayDesignType);
             assay.MeasurementTypeId = assayDto.Type;
 
-            if (assayDto.SamplesDataset != null) assayDto.SamplesDataset.ProjectId = project.Id;
-            if (assayDto.FeaturesDataset != null) assayDto.FeaturesDataset.ProjectId = project.Id;
-            if (assayDto.ObservationsDataset != null) assayDto.ObservationsDataset.ProjectId = project.Id;
+            if (assayDto.SamplesDataset != null) assayDto.SamplesDataset.ProjectId = assayDto.ProjectId;
+            if (assayDto.FeaturesDataset != null) assayDto.FeaturesDataset.ProjectId = assayDto.ProjectId;
+            if (assayDto.ObservationsDataset != null) assayDto.ObservationsDataset.ProjectId = assayDto.ProjectId;
 
             var BSdataset = _datasetService.CreateDataset(assayDto.SamplesDataset);
             if (BSdataset != null)
@@ -122,12 +122,18 @@ namespace eTRIKS.Commons.Service.Services
             //assay.DesignType = getCVterm(assayDto.AssayDesignType);
             assayToUpdate.MeasurementTypeId = assayDTO.Type;
 
+            assayDTO.Datasets.Clear();
+            assayDTO.Datasets.Add(assayDTO.FeaturesDataset);
+            assayDTO.Datasets.Add(assayDTO.SamplesDataset);
+            assayDTO.Datasets.Add(assayDTO.ObservationsDataset);
+
+
             foreach (var datasetDto in assayDTO.Datasets)
             {
 
                 if (datasetDto == null) continue;
                 datasetDto.ProjectId = assayDTO.ProjectId;
-                if (datasetDto.isNew)
+                if (datasetDto.IsNew)
                 {
                     var dataset = _datasetService.CreateDataset(datasetDto);
                     assayToUpdate.Datasets.Add(dataset);
@@ -143,15 +149,16 @@ namespace eTRIKS.Commons.Service.Services
 
         public Hashtable GetSamplesDataPerAssay(int assayId)
         {
-            var samples = new List<Biosample>();
-            samples = _bioSampleRepository.FindAll
-                (bs => bs.AssayId.Equals(assayId), 
-                new List<string>()
-                {
-                    "Study",
-                    "Subject",
-                    //"CollectionStudyDay"
-                }).ToList();
+            //var samples = new List<Biosample>();
+            var samples = _assayRepository.FindSingle(a => a.Id == assayId, new List<string>() {"Biosamples.Study","Biosamples.Subject"}).Biosamples;
+            //samples = _bioSampleRepository.FindAll
+            //    (bs => bs.AssayId.Equals(assayId), 
+            //    new List<string>()
+            //    {
+            //        "Study",
+            //        "Subject",
+            //        //"CollectionStudyDay"
+            //    }).ToList();
 
             List<Hashtable> sample_table = new List<Hashtable>();
             HashSet<string> SCs = new HashSet<string>() { "subjectId", "studyId", "sampleId", "studyDay#" };

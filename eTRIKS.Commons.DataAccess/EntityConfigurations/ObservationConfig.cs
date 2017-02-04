@@ -15,7 +15,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.HasKey(t => t.Id);
 
             // Table & Column Mappings
-            builder.ToTable("Observation_TBL");
+            builder.ToTable("Observations");
             builder.Property(t => t.Id).HasColumnName("ObservationId");
 
             // Relationships

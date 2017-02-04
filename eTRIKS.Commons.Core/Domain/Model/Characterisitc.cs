@@ -14,9 +14,9 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string ControlledValueStr { get; set; }
         public string CVtermId { get; set; }
         public string DatasetDomainCode { get; set; }
-        public VariableReference DatasetVariable { get; set; }
-        public int? DatasetVariableId { get; set; }
-        //public Dataset Dataset { get; set; }
+        public DataFile Datafile { get; set; }
+        public int? DatafileId { get; set; }
+        public Dataset Dataset { get; set; }
         public int DatasetId { get; set; }
     }
 }

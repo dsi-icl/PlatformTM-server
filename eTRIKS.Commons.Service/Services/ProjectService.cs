@@ -162,7 +162,7 @@ namespace eTRIKS.Commons.Service.Services
             Activities = _activityRepository.FindAll(
                     d => d.ProjectId == projectId,
                     new List<string>(){
-                        "Datasets.Domain",
+                        "Datasets.Template",
                         "Project"
                     }
                 );
@@ -175,9 +175,9 @@ namespace eTRIKS.Commons.Service.Services
                 isAssay = typeof(Assay) == p.GetType(),
                 datasets = p.Datasets.Select(m => new DatasetDTO
                 {
-                    Name = m.Domain.Name,
+                    Name = m.Template.Domain,
                     Id = m.Id,
-                    DomainId = m.DomainId
+                    DomainId = m.TemplateId
                 }).ToList()
             }).ToList();
         }
