@@ -1,6 +1,4 @@
-﻿using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+﻿using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Core.JoinEntities
 {

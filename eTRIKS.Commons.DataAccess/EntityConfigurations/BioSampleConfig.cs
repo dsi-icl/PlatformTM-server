@@ -15,7 +15,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.Property(t => t.Id)
                .IsRequired();
             builder
-                .ToTable("BioSamples_TBL");
+                .ToTable("BioSamples");
             builder
                 .Property(t => t.Id)
                 .HasColumnName("BioSampleDBId");

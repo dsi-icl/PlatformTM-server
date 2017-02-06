@@ -7,6 +7,7 @@ using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
+using eTRIKS.Commons.Core.JoinEntities;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -380,23 +381,33 @@ namespace eTRIKS.Commons.Service.Services
         internal bool LoadObservations(List<SdtmRow> sdtmData, SdtmRowDescriptor sdtmRowDescriptor, bool reload)
         {
             var dsDomainCode = sdtmRowDescriptor.DomainCode;
+            var dsClass = sdtmRowDescriptor.Class;
 
             var datasetId = sdtmData.First().DatasetId;
             var dataFileId = sdtmData.First().DatafileId;
             var projectId = sdtmData.First().ProjectId;
 
             if (reload)
+            {
                 _ObservationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == dataFileId);
+                _dataContext.Save().Equals("CREATED");
+            }
 
 
             //Retrieve ObjectOfObservations previously loaded for this project
-            //var projectO3s = _ObservationRepository.FindAll(o => o.ProjectId == projectId && o.DomainCode == dsDomainCode).ToList();
+            // CURRENTLY THIS IS NOT REALLY THE OBJECTOFOBSERVATION BUT THE OBSERVATION DESCRIPTOR WHICH IS
+            //DEFINED PER DATASET/DATAFILE AND IS DELETABLE ACROSS LOADS AS LONG AS THE O3 CV IS UNIQUE ACROSS DATASETS
+            //AND NOT JUST INFLUENCED BY ONE DATASET OR THE FIRST DATASET LOADED AS IT IS NOW!!
+            var projectO3s = _ObservationRepository.FindAll(o => o.ProjectId == projectId && o.DomainCode == dsDomainCode).ToList();
            
-            //List<string> obsKeys = projectO3s.Select(currObservation => currObservation.Name + currObservation.Group + currObservation.Class).ToList();
+            List<string> O3keys = projectO3s.Select(currObservation => currObservation.Class + currObservation.DomainCode + currObservation.Group + currObservation.Name).ToList();
 
-            var observations = sdtmData.GroupBy(o => new {o3 = o.Topic, group = o.Group, subgroup = o.Subgroup, o3CVterm = o.TopicControlledTerm??o.TopicSynonym});
+            var observations = sdtmData.GroupBy(o => new {domain= o.DomainCode, o3 = o.Topic, group = o.Group, subgroup = o.Subgroup, o3CVterm = o.TopicControlledTerm??o.TopicSynonym});
             foreach (var observation in observations)
             {
+                var O3key = dsClass + observation.Key.domain + observation.Key.group + observation.Key.o3;
+                if(O3keys.Contains(O3key))
+                    continue;
                 Observation obsDescriptor = new Observation();
                 obsDescriptor.Name = observation.Key.o3;
                 obsDescriptor.Group = observation.Key.group;
@@ -406,10 +417,27 @@ namespace eTRIKS.Commons.Service.Services
                 obsDescriptor.DomainName = sdtmRowDescriptor.Domain;
                 obsDescriptor.TopicVariable = sdtmRowDescriptor.TopicVariable;
 
-                //if (sdtmRowDescriptor.ObsIsAFinding)
-                //    obsDescriptor.Qualifiers = sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList();
-                //else
-                //    obsDescriptor.Qualifiers = sdtmRowDescriptor.QualifierVariables;
+                if (sdtmRowDescriptor.ObsIsAFinding)
+                    obsDescriptor.Qualifiers.AddRange(sdtmRowDescriptor.ResultVariables.Select(
+                        qualifier => new ObservationQualifier()
+                        {
+                            Observation = obsDescriptor, Qualifier = qualifier
+                        }));
+                    //sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList())};
+                else
+                    obsDescriptor.Qualifiers.AddRange(sdtmRowDescriptor.QualifierVariables.Select(
+                         qualifier => new ObservationQualifier()
+                         {
+                             Observation = obsDescriptor,
+                             Qualifier = qualifier
+                         }));
+
+                obsDescriptor.Timings.AddRange(sdtmRowDescriptor.GetAllTimingVariables().FindAll(v=>v!=null).Select(
+                        qualifier => new ObservationTiming()
+                        {
+                            Observation = obsDescriptor,
+                            Qualifier = qualifier
+                        }));
 
                 obsDescriptor.ControlledTermStr = observation.Key.o3CVterm;
 
@@ -419,25 +447,7 @@ namespace eTRIKS.Commons.Service.Services
 
                 obsDescriptor.DefaultQualifier = sdtmRowDescriptor.GetDefaultQualifier(observation.FirstOrDefault());
 
-                //if (sdtmRowDescriptor.Class.ToLower().Equals("findings"))
-                //{
-                //    if (observation.First().ResultQualifiers[dsDomainCode + numResVar] != null && observation.First().ResultQualifiers[dsDomainCode+ numResVar] != "")
-                //    {
-                //        ob.DefaultQualifier = sdtmRowDescriptor.ResultVariables.Find(rv => rv.Name.Equals(dsDomainCode+ numResVar));
-                //    }
-                //    else if (observation.First().ResultQualifiers[dsDomainCode + charResVar] != null && observation.First().ResultQualifiers[dsDomainCode + charResVar] != "")
-                //    {
-                //        ob.DefaultQualifier = sdtmRowDescriptor.ResultVariables.Find(rv => rv.Name.Equals(dsDomainCode + charResVar));
-                //    }
-                //    else
-                //    {
-                //        ob.DefaultQualifier = sdtmRowDescriptor.ResultVariables.Find(rv => rv.Name.Equals(dsDomainCode + oriResVar));
-                //    }
-                //}
-                //if (sdtmRowDescriptor.Class.ToLower().Equals("events"))
-                //{
-                //    ob.DefaultQualifier = sdtmRowDescriptor.QualifierVariables.Find(rv => rv.Name.Equals(dsDomainCode + occurVar));
-
+               
 
                 //    //LOAD CVTERMS CORRESPONDING TO MEDdRA codes
                 //    ob = CreateObsCVterms(observation.FirstOrDefault(), sdtmRowDescriptor, out ob);
@@ -450,6 +460,12 @@ namespace eTRIKS.Commons.Service.Services
             //addO3IdstoSDTMrows()
             if (success)
             {
+                //TODO: PROBLEM!!
+                //IN CASE OF A SECOND FILE LOADED TO A PREVIOUSLY CREATED DATASET, DATAFILE WILL BE DIFFERENT
+                //OBSERVATIONS WERE SAVED WITH THE FISRT DATASETID AND THE FIRST DATAFILE
+                //WHAT HAPPENS WHERE WE WANT TO UNLOAD A FILE THAT BROUGHT DIFFERENT O3s to the DATASET DIFFERENT
+                //FROM THE FIRST DATAFILE?
+                //I STILL NEED TO BE ABLE TO FIND O3s that were loaded from a certain DATAFILE
                 var savedObs = _ObservationRepository.FindAll(o => o.DatasetId == datasetId && o.DatafileId == dataFileId).ToList();
                 foreach (var observation in observations)
                 {
@@ -463,7 +479,6 @@ namespace eTRIKS.Commons.Service.Services
                     }
                 }
             }
-            
 
             return success;
         }

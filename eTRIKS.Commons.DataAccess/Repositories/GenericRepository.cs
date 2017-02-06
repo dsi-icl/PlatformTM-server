@@ -41,24 +41,23 @@ namespace eTRIKS.Commons.DataAccess.Repositories
                                     int? pageSize = null)
         {
            
-            IQueryable<TEntity> query = Entities;
+            IQueryable<TEntity>[] query = {Entities};
 
-            if (includeProperties != null)
-                includeProperties.ForEach(i =>
-                    query = query.Include(i));
+            includeProperties?.ForEach(i =>
+                query[0] = query[0].Include(i));
 
             if (filter != null)
-                query = query.Where(filter);
+                query[0] = query[0].Where(filter);
 
             if (orderBy != null)
-                query = orderBy(query);
+                query[0] = orderBy(query[0]);
  
             if (page != null && pageSize != null)
-                query = query
+                query[0] = query[0]
                     .Skip((page.Value - 1)*pageSize.Value)
                     .Take(pageSize.Value);
 
-            return query.ToList<TEntity>();
+            return query[0].ToList<TEntity>();
         }
 
         public Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null)
@@ -136,9 +135,7 @@ namespace eTRIKS.Commons.DataAccess.Repositories
         public void DeleteMany(Expression<Func<TEntity, bool>> filter)
         {
             var entitiesToDelete = FindAll(filter);
-            
             Entities.RemoveRange(entitiesToDelete);
-
         }
 
 

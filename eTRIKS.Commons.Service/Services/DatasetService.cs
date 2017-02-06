@@ -53,7 +53,7 @@ namespace eTRIKS.Commons.Service.Services
                     "Variables.VariableDefinition",
                     "DataFiles",
                     "Activity.Project",
-                    "Domain"
+                    "Template"
                 });
             return ds;
         }
@@ -73,22 +73,22 @@ namespace eTRIKS.Commons.Service.Services
                 new List<string>()
                 {
                     "Variables.VariableDefinition",
-                    "Domain.Variables.controlledTerminology.Xref.DB",
+                    "Template.Fields.ControlledVocabulary.Xref.DB",
                     "Activity"
                 });
 
             dto.Id = ds.Id; //Set DatasetDTO id to Dataset.Id (int)
-            dto.Class = ds.Domain.Class;
-            dto.Description = ds.Domain.Description;
-            dto.Name = ds.Domain.Name;
-            dto.DomainId = ds.Domain.Id;
-            dto.Structure = ds.Domain.Structure;
-            dto.Code = ds.Domain.Code;
+            dto.Class = ds.Template.Class;
+            dto.Description = ds.Template.Description;
+            dto.Name = ds.Template.Domain;
+            dto.DomainId = ds.Template.Id;
+            dto.Structure = ds.Template.Structure;
+            dto.Code = ds.Template.Code;
             dto.ProjectId = ds.Activity.ProjectId;
 
            
-
-            foreach (DomainVariableTemplate vt in ds.Domain.Variables.OrderBy(v => v.Order))
+            //ds.Domain.Variables.Where(v=> !v.IsGeneric).
+            foreach (DatasetTemplateField vt in ds.Template.Fields.OrderBy(v => v.Order))
                 //foreach (var vt in ds.Variables)
             {
                 DatasetVariableDTO dv = new DatasetVariableDTO();
@@ -100,12 +100,12 @@ namespace eTRIKS.Commons.Service.Services
                 dv.IsCurated = true;
                 dv.RoleId = vt.RoleId;
 
-                if (vt.controlledTerminology != null)
+                if (vt.ControlledVocabulary != null)
                 {
-                    dv.DictionaryName = vt.controlledTerminology.Name;
-                    dv.DictionaryDefinition = vt.controlledTerminology.Definition;
-                    dv.DictionaryXrefURL = vt.controlledTerminology.Xref.DB.UrlPrefix +
-                                           vt.controlledTerminology.Xref.Accession;
+                    dv.DictionaryName = vt.ControlledVocabulary.Name;
+                    dv.DictionaryDefinition = vt.ControlledVocabulary.Definition;
+                    dv.DictionaryXrefURL = vt.ControlledVocabulary.Xref.DB.UrlPrefix +
+                                           vt.ControlledVocabulary.Xref.Accession;
                 }
 
                 var vr = ds.Variables.SingleOrDefault(v => v.VariableDefinition.Name.Equals(vt.Name));
@@ -118,14 +118,14 @@ namespace eTRIKS.Commons.Service.Services
                     dv.Id = vr.VariableDefinitionId;
                     dv.isSelected = true;
                 }
-                dto.variables.Add(dv);
+                dto.Variables.Add(dv);
             }
 
             
             foreach (VariableReference vr in ds.Variables)
             {
                 
-                if (!dto.variables.Exists(v => v.Accession.Equals(vr.VariableDefinition.Accession)))
+                if (!dto.Variables.Exists(v => v.Accession.Equals(vr.VariableDefinition.Accession)))
                 {
                     DatasetVariableDTO dv = new DatasetVariableDTO();
                     dv.Name = vr.VariableDefinition.Name;
@@ -143,7 +143,7 @@ namespace eTRIKS.Commons.Service.Services
                     dv.Id = vr.VariableDefinitionId;
                     dv.isSelected = true;
 
-                    dto.variables.Add(dv);
+                    dto.Variables.Add(dv);
                 }
                 
 
@@ -165,13 +165,13 @@ namespace eTRIKS.Commons.Service.Services
         {
             if (datasetDTO == null)
                 return null;
-            var dataset = new Dataset {ActivityId = datasetDTO.ActivityId, DomainId = datasetDTO.DomainId};
+            var dataset = new Dataset {ActivityId = datasetDTO.ActivityId, TemplateId = datasetDTO.DomainId};
 
 
             // Get any exisiting variable definitions for that study
             List<VariableDefinition> variableDefsOfStudy = getVariableDefinitionsOfStudy(datasetDTO.ProjectId).ToList();
 
-            foreach (var variableDto in datasetDTO.variables.Where(variableDto => variableDto.isSelected))
+            foreach (var variableDto in datasetDTO.Variables.Where(variableDto => variableDto.isSelected))
             {
                 
                 //Compare newly added Variable to previously added VarDefs using accession string 
@@ -220,7 +220,7 @@ namespace eTRIKS.Commons.Service.Services
             var datasetVarsToUpdate = new HashSet<string>(
                 datasetToUpdate.Variables.Select(c => c.VariableDefinition.Name));
 
-            foreach (var variableDto in datasetDTO.variables)
+            foreach (var variableDto in datasetDTO.Variables)
             {
                 if (variableDto.isSelected)
                 {
@@ -297,9 +297,9 @@ namespace eTRIKS.Commons.Service.Services
             //CL-Role-4 & CL-Role 5
             //Add a property in vardef and templatevar to reference a list of synonyms and a list of qualifier variables
 
-            map.Domain = ds.Domain.Name;
+            map.Domain = ds.Template.Domain;
             map.TopicColumns = new List<string>();
-            map.ObservationName = ds.Domain.Name.Substring(0, ds.Domain.Name.Length - 1);
+            map.ObservationName = ds.Template.Domain.Substring(0, ds.Template.Domain.Length - 1);
             //map.VarTypes = new List<Dictionary<string, List<DataTemplateMap.VariableMap>>>();
             map.VarTypes = new List<DataTemplateMap.VariableType>();
             var ignoredRoles = new List<string>() {"SynonymQualifier", "GroupingQualifier", "Rule"};
@@ -465,7 +465,7 @@ namespace eTRIKS.Commons.Service.Services
             DataFile standardFile = null;
             if (sdtmTable.Rows.Count != 0)
             {
-                string dsName = dataset.Activity.Name+"_" +dataset.DomainId;
+                string dsName = dataset.Activity.Name+"_" +dataset.TemplateId;
                 sdtmTable.TableName = dsName;
                 //Write new transformed to file 
                 var fileInfo = _fileService.writeDataFile(projectId, dataFile.Path, sdtmTable);
@@ -569,7 +569,7 @@ namespace eTRIKS.Commons.Service.Services
             var loaded = false;
 
             var dataFile = _dataFileRepository.Get(fileId);
-            if (dataFile.State != "New")
+            if (dataFile.State == "LOADED")
                 reload = true;
 
 
@@ -584,17 +584,17 @@ namespace eTRIKS.Commons.Service.Services
             
             try
             {
-                if (dataset.Domain.Code.Equals("DM"))
+                if (dataset.Template.Code.Equals("DM"))
                 {
                     var subjectService = new SubjectService(_dataServiceUnit);
                     loaded = subjectService.LoadSubjects(sdtmData, sdtmRowDescriptor);
                 }
-                else if (dataset.Domain.Code.Equals("BS"))
+                else if (dataset.Template.Code.Equals("BS"))
                 {
                     var sampleService = new BioSampleService(_dataServiceUnit);
                     loaded = sampleService.LoadBioSamples(sdtmData, datasetId);
                 }
-                else if (dataset.Domain.Code.Equals("CY") || dataset.Domain.Code.Equals("HD"))
+                else if (dataset.Template.Code.Equals("CY") || dataset.Template.Code.Equals("HD"))
                 {
                     var hdDataService = new HDdataService(_dataServiceUnit);
                     //loaded = await hdDataService.LoadHDdata(sdtmData, datasetId);
@@ -627,24 +627,31 @@ namespace eTRIKS.Commons.Service.Services
 
                
 
-                // if(!loaded)
-                //   removeFile()
+                 if(!loaded && dataFile.State == "SAVED")
+                    _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
 
             }
             catch(Exception e)
             {
                 Debug.WriteLine("Failed to load descriptors to SQL database", e.Message);
+                UnloadDataset(datasetId,fileId,"FAILED TO LOAD");
 
             }
 
             return loaded;
         }
 
-        public void UnloadDataset(int datasetId, int fileId)
+        public void UnloadDataset(int datasetId, int fileId, string status="UNLOADED")
         {
+            //TODO: THIS IS ESSENTIALLY UNLOADFILE
+            //WHEN WE HAVE A VIEW FOR DATASETS, THEN THIS WILL MAKE MORE SENSE
+            //IN THIS CASE, ALL FILES of the SELECTED DATASETS WILL BE UNLOADED
             _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
             Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
             _observationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == fileId);
+            var file = _dataFileRepository.Get(fileId);
+            file.State = status;
+            _dataFileRepository.Update(file);
             _dataServiceUnit.Save();
         }
 
@@ -863,10 +870,10 @@ namespace eTRIKS.Commons.Service.Services
             }
         }
 
-        private static readonly Expression<Func<DomainTemplate, DatasetDTO>> AsDatasetDto =
+        private static readonly Expression<Func<DatasetTemplate, DatasetDTO>> AsDatasetDto =
             x => new DatasetDTO
             {
-                Name = x.Name,
+                Name = x.Domain,
                 Class = x.Class,
                 Description = x.Description,
                 DomainId = x.Id,

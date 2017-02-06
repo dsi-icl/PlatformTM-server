@@ -15,7 +15,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
         public string Subgroup { get; set; }       
         //public Project Project { get; set; } //OR STUDIES 
         public int ProjectId { get; set; }
-        public DomainTemplate Domain { get; set; }
+        public DatasetTemplate Domain { get; set; }
         public string DomainId { get; set; }
     }
 }

@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 {
-    public class DomainTemplateVariableConfig : EntityTypeConfiguration<DomainVariableTemplate>
+    public class DomainTemplateVariableConfig : EntityTypeConfiguration<DatasetTemplateField>
     {
-        public override void Configure(EntityTypeBuilder<DomainVariableTemplate> builder)
+        public override void Configure(EntityTypeBuilder<DatasetTemplateField> builder)
         {
             // Primary Key
             builder.HasKey(t => t.Id);
@@ -29,12 +29,12 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.Property(t => t.Label)
                 .HasMaxLength(2000);
 
-            builder.Property(t => t.DomainId)
+            builder.Property(t => t.TemplateId)
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(t => t.VariableTypeId)
-                .HasMaxLength(200);
+            //builder.Property(t => t.VariableTypeId)
+            //    .HasMaxLength(200);
 
             builder.Property(t => t.RoleId)
                 .HasMaxLength(200);
@@ -42,24 +42,22 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.Property(t => t.UsageId)
                 .HasMaxLength(200);
 
-            builder.Property(t => t.controlledTerminologyId)
+            builder.Property(t => t.ControlledVocabularyId)
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Templates.DomainVariable_TBL");
+            builder.ToTable("DomainTemplateVariables");
             builder.Property(t => t.Id).HasColumnName("OID");
 
-            builder.Property(t => t.VariableTypeId).HasColumnName("VariableTypeId");
             builder.Property(t => t.RoleId).HasColumnName("RoleTermId");
-            //this.Property(t => t.Label).HasColumnName("Label");
             builder.Property(t => t.UsageId).HasColumnName("UsageTermId");
-            builder.Property(t => t.controlledTerminologyId).HasColumnName("DictionaryId");
+            builder.Property(t => t.ControlledVocabularyId).HasColumnName("CVTermsDictionaryId");
 
             // Relationships
-            builder.HasOne(t => t.Domain)
-                .WithMany(t => t.Variables)
+            builder.HasOne(t => t.Template)
+                .WithMany(t => t.Fields)
                 .IsRequired()
-                .HasForeignKey(d => d.DomainId);
+                .HasForeignKey(d => d.TemplateId);
 
             builder.HasOne(t => t.Role)
                 .WithMany()
@@ -69,13 +67,13 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .WithMany()
                 .HasForeignKey(t => t.UsageId);
 
-            builder.HasOne(t => t.VariableType)
-                .WithMany()
-                .HasForeignKey(t => t.VariableTypeId);
+            //builder.HasOne(t => t.VariableType)
+            //    .WithMany()
+            //    .HasForeignKey(t => t.VariableTypeId);
 
-            builder.HasOne(t => t.controlledTerminology)
+            builder.HasOne(t => t.ControlledVocabulary)
                 .WithMany()
-                .HasForeignKey(t => t.controlledTerminologyId);
+                .HasForeignKey(t => t.ControlledVocabularyId);
         }
     }
 }

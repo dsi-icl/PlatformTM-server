@@ -31,22 +31,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             ActivityDTO addedActivity =null;
             if(!activityDTO.isAssay)
                 addedActivity = _activityService.AddActivity(activityDTO);
-            //if (activityDTO.isAssay)
-                //addedActivity = _assayService.AddAssay(activityDTO);
 
             if (addedActivity != null)
-            {
-                //var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Created, addedActivity);
-                //string uri = Url.Link("GetActivityById", new { activityId = addedActivity.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetActivityById", new { activityId = addedActivity.Id }, addedActivity);
 
-            }
-            else
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+
         }
 
         [HttpPut("{activityId}")]
@@ -54,10 +44,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             try{
                 _activityService.UpdateActivity(activityDTO, activityId);
-                //var response = Request.CreateResponse<ActivityDTO>(HttpStatusCode.Accepted, activityDTO);
-                //string uri = Url.Link("GetActivityById", new { activityId = activityDTO.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetActivityById", new { activityId = activityDTO.Id }, activityDTO);
             }
             catch (Exception e)

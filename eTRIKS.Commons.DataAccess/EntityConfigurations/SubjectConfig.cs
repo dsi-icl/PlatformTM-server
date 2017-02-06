@@ -11,7 +11,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
         {
             // Primary Key
             builder.HasKey(t => t.Id);
-            builder.ToTable("Subject_TBL");
+            builder.ToTable("Subjects");
             builder.Property(t => t.Id).HasColumnName("SubjectDBId");
 
             // Relationships

@@ -900,7 +900,7 @@
           "lib/netstandard1.3/_._": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/Microsoft.CodeAnalysis.VisualBasic.dll": {}
         }
       },
       "Microsoft.CSharp/4.3.0": {
@@ -933,10 +933,47 @@
       "Microsoft.DiaSymReader.Native/1.4.0": {
         "type": "package",
         "runtimeTargets": {
-          "runtimes/win/native/_._": {
+          "runtimes/win-x64/native/Microsoft.DiaSymReader.Native.amd64.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          },
+          "runtimes/win-x86/native/Microsoft.DiaSymReader.Native.x86.dll": {
+            "assetType": "native",
+            "rid": "win-x86"
+          },
+          "runtimes/win/native/Microsoft.DiaSymReader.Native.amd64.dll": {
             "assetType": "native",
             "rid": "win"
+          },
+          "runtimes/win/native/Microsoft.DiaSymReader.Native.arm.dll": {
+            "assetType": "native",
+            "rid": "win"
+          },
+          "runtimes/win/native/Microsoft.DiaSymReader.Native.x86.dll": {
+            "assetType": "native",
+            "rid": "win"
+          },
+          "runtimes/win8-arm/native/Microsoft.DiaSymReader.Native.arm.dll": {
+            "assetType": "native",
+            "rid": "win8-arm"
           }
+        }
+      },
+      "Microsoft.DotNet.Cli.Utils/1.0.0-preview2-003121": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.DotNet.ProjectModel": "1.0.0-rc3-003121",
+          "NuGet.Frameworks": "3.5.0-beta2-1484",
+          "NuGet.Packaging": "3.5.0-beta2-1484",
+          "NuGet.ProjectModel": "3.5.0-beta2-1484",
+          "NuGet.Versioning": "3.5.0-beta2-1484",
+          "System.Diagnostics.Process": "4.1.0"
+        },
+        "compile": {
+          "lib/netstandard1.6/Microsoft.DotNet.Cli.Utils.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Microsoft.DotNet.Cli.Utils.dll": {}
         }
       },
       "Microsoft.DotNet.PlatformAbstractions/1.1.0": {
@@ -956,6 +993,29 @@
         },
         "runtime": {
           "lib/netstandard1.3/Microsoft.DotNet.PlatformAbstractions.dll": {}
+        }
+      },
+      "Microsoft.DotNet.ProjectModel/1.0.0-rc3-003121": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.CSharp": "4.0.1",
+          "Microsoft.Extensions.DependencyModel": "1.0.0",
+          "Newtonsoft.Json": "9.0.1",
+          "NuGet.Packaging": "3.5.0-beta2-1484",
+          "NuGet.RuntimeModel": "3.5.0-beta2-1484",
+          "System.Dynamic.Runtime": "4.0.11",
+          "System.Reflection.Metadata": "1.3.0",
+          "System.Runtime.Loader": "4.0.0",
+          "System.Runtime.Serialization.Primitives": "4.1.1",
+          "System.Security.Cryptography.Algorithms": "4.2.0",
+          "System.Threading.Thread": "4.0.0",
+          "System.Xml.XDocument": "4.0.11"
+        },
+        "compile": {
+          "lib/netstandard1.6/Microsoft.DotNet.ProjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.6/Microsoft.DotNet.ProjectModel.dll": {}
         }
       },
       "Microsoft.EntityFrameworkCore/1.1.0": {
@@ -978,6 +1038,21 @@
           "lib/netstandard1.3/Microsoft.EntityFrameworkCore.dll": {}
         }
       },
+      "Microsoft.EntityFrameworkCore.Design/1.1.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.AspNetCore.Hosting.Abstractions": "1.1.0",
+          "Microsoft.EntityFrameworkCore.Relational.Design": "1.1.0",
+          "NETStandard.Library": "1.6.1",
+          "System.Collections.NonGeneric": "4.3.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Design.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Design.dll": {}
+        }
+      },
       "Microsoft.EntityFrameworkCore.Relational/1.1.0": {
         "type": "package",
         "dependencies": {
@@ -992,6 +1067,32 @@
         },
         "runtime": {
           "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.dll": {}
+        }
+      },
+      "Microsoft.EntityFrameworkCore.Relational.Design/1.1.0": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.EntityFrameworkCore.Relational": "1.1.0",
+          "NETStandard.Library": "1.6.1"
+        },
+        "compile": {
+          "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.Design.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.Design.dll": {}
+        }
+      },
+      "Microsoft.EntityFrameworkCore.Tools.DotNet/1.1.0-preview4-final": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.DotNet.Cli.Utils": "1.0.0-preview2-003121",
+          "Microsoft.NETCore.App": "1.1.0"
+        },
+        "compile": {
+          "lib/netcoreapp1.0/dotnet-ef.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp1.0/dotnet-ef.dll": {}
         }
       },
       "Microsoft.Extensions.Caching.Abstractions/1.1.0": {
@@ -1400,7 +1501,7 @@
           "lib/netstandard1.0/Microsoft.Extensions.WebEncoders.dll": {}
         }
       },
-      "Microsoft.IdentityModel.Logging/1.1.0": {
+      "Microsoft.IdentityModel.Logging/1.1.2": {
         "type": "package",
         "dependencies": {
           "System.Diagnostics.Tracing": "4.3.0",
@@ -1415,12 +1516,12 @@
           "lib/netstandard1.4/Microsoft.IdentityModel.Logging.dll": {}
         }
       },
-      "Microsoft.IdentityModel.Protocols/2.1.0": {
+      "Microsoft.IdentityModel.Protocols/2.1.2": {
         "type": "package",
         "dependencies": {
           "System.Collections.Specialized": "4.3.0",
           "System.Diagnostics.Contracts": "4.3.0",
-          "System.IdentityModel.Tokens.Jwt": "5.1.0",
+          "System.IdentityModel.Tokens.Jwt": "5.1.2",
           "System.Net.Http": "4.3.0"
         },
         "compile": {
@@ -1443,10 +1544,10 @@
           "lib/netstandard1.4/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll": {}
         }
       },
-      "Microsoft.IdentityModel.Tokens/5.1.0": {
+      "Microsoft.IdentityModel.Tokens/5.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Logging": "1.1.0",
+          "Microsoft.IdentityModel.Logging": "1.1.2",
           "Newtonsoft.Json": "9.0.1",
           "System.Collections": "4.3.0",
           "System.Diagnostics.Tools": "4.3.0",
@@ -1607,7 +1708,7 @@
           "ref/netstandard1.1/Microsoft.VisualBasic.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/Microsoft.VisualBasic.dll": {}
         }
       },
       "Microsoft.Win32.Primitives/4.3.0": {
@@ -1647,7 +1748,7 @@
           }
         }
       },
-      "MongoDB.Bson/2.4.0": {
+      "MongoDB.Bson/2.4.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.0",
@@ -1663,11 +1764,11 @@
           "lib/netstandard1.5/MongoDB.Bson.dll": {}
         }
       },
-      "MongoDB.Driver/2.4.0": {
+      "MongoDB.Driver/2.4.1": {
         "type": "package",
         "dependencies": {
-          "MongoDB.Bson": "2.4.0",
-          "MongoDB.Driver.Core": "2.4.0",
+          "MongoDB.Bson": "2.4.1",
+          "MongoDB.Driver.Core": "2.4.1",
           "NETStandard.Library": "1.6.0",
           "System.Linq.Queryable": "4.0.1"
         },
@@ -1678,10 +1779,10 @@
           "lib/netstandard1.5/MongoDB.Driver.dll": {}
         }
       },
-      "MongoDB.Driver.Core/2.4.0": {
+      "MongoDB.Driver.Core/2.4.1": {
         "type": "package",
         "dependencies": {
-          "MongoDB.Bson": "2.4.0",
+          "MongoDB.Bson": "2.4.1",
           "NETStandard.Library": "1.6.0",
           "System.Collections.Specialized": "4.0.1",
           "System.Diagnostics.TraceSource": "4.0.0",
@@ -1745,11 +1846,12 @@
           "System.Xml.XDocument": "4.3.0"
         }
       },
-      "Newtonsoft.Json/9.0.1": {
+      "Newtonsoft.Json/9.0.2-beta2": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
           "System.Collections": "4.0.11",
+          "System.ComponentModel.TypeConverter": "4.1.0",
           "System.Diagnostics.Debug": "4.0.11",
           "System.Dynamic.Runtime": "4.0.11",
           "System.Globalization": "4.0.11",
@@ -1762,6 +1864,7 @@
           "System.Resources.ResourceManager": "4.0.1",
           "System.Runtime": "4.1.0",
           "System.Runtime.Extensions": "4.1.0",
+          "System.Runtime.Numerics": "4.0.1",
           "System.Runtime.Serialization.Primitives": "4.1.1",
           "System.Text.Encoding": "4.0.11",
           "System.Text.Encoding.Extensions": "4.0.11",
@@ -1772,10 +1875,217 @@
           "System.Xml.XDocument": "4.0.11"
         },
         "compile": {
-          "lib/netstandard1.0/Newtonsoft.Json.dll": {}
+          "lib/netstandard1.1/Newtonsoft.Json.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.0/Newtonsoft.Json.dll": {}
+          "lib/netstandard1.1/Newtonsoft.Json.dll": {}
+        }
+      },
+      "NuGet.Common/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "System.Diagnostics.Process": "4.1.0",
+          "System.Security.Cryptography.Algorithms": "4.2.0",
+          "System.Threading.Thread": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Common.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Common.dll": {}
+        }
+      },
+      "NuGet.Configuration/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Common": "3.5.0-beta2-1484",
+          "System.Xml.XDocument": "4.0.11"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Configuration.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Configuration.dll": {}
+        }
+      },
+      "NuGet.DependencyResolver.Core/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Frameworks": "3.5.0-beta2-1484",
+          "NuGet.LibraryModel": "3.5.0-beta2-1484",
+          "NuGet.Protocol.Core.v3": "3.5.0-beta2-1484",
+          "NuGet.Repositories": "3.5.0-beta2-1484",
+          "NuGet.RuntimeModel": "3.5.0-beta2-1484"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.DependencyResolver.Core.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.DependencyResolver.Core.dll": {}
+        }
+      },
+      "NuGet.Frameworks/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Frameworks.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Frameworks.dll": {}
+        }
+      },
+      "NuGet.LibraryModel/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Frameworks": "3.5.0-beta2-1484",
+          "NuGet.Versioning": "3.5.0-beta2-1484"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.LibraryModel.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.LibraryModel.dll": {}
+        }
+      },
+      "NuGet.Packaging/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Common": "3.5.0-beta2-1484",
+          "NuGet.Packaging.Core": "3.5.0-beta2-1484",
+          "System.IO.Compression": "4.1.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Packaging.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Packaging.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Common": "3.5.0-beta2-1484",
+          "NuGet.Packaging.Core.Types": "3.5.0-beta2-1484",
+          "System.Xml.XDocument": "4.0.11"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Packaging.Core.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Packaging.Core.dll": {}
+        }
+      },
+      "NuGet.Packaging.Core.Types/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Frameworks": "3.5.0-beta2-1484",
+          "NuGet.Versioning": "3.5.0-beta2-1484"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Packaging.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Packaging.Core.Types.dll": {}
+        }
+      },
+      "NuGet.ProjectModel/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.DependencyResolver.Core": "3.5.0-beta2-1484",
+          "System.Dynamic.Runtime": "4.0.11",
+          "System.Threading.Thread": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.ProjectModel.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.ProjectModel.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.Types/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Common": "3.5.0-beta2-1484",
+          "NuGet.Configuration": "3.5.0-beta2-1484",
+          "NuGet.Packaging": "3.5.0-beta2-1484",
+          "System.Net.Http": "4.1.0"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Protocol.Core.Types.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Protocol.Core.Types.dll": {}
+        }
+      },
+      "NuGet.Protocol.Core.v3/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Common": "3.5.0-beta2-1484",
+          "NuGet.Packaging": "3.5.0-beta2-1484",
+          "NuGet.Protocol.Core.Types": "3.5.0-beta2-1484",
+          "System.Dynamic.Runtime": "4.0.11"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Protocol.Core.v3.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Protocol.Core.v3.dll": {}
+        }
+      },
+      "NuGet.Repositories/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "NuGet.Packaging": "3.5.0-beta2-1484"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.Repositories.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.Repositories.dll": {}
+        }
+      },
+      "NuGet.RuntimeModel/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0",
+          "Newtonsoft.Json": "6.0.4",
+          "NuGet.Frameworks": "3.5.0-beta2-1484",
+          "NuGet.Versioning": "3.5.0-beta2-1484",
+          "System.Dynamic.Runtime": "4.0.11",
+          "System.ObjectModel": "4.0.12"
+        },
+        "compile": {
+          "lib/netstandard1.3/NuGet.RuntimeModel.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.3/NuGet.RuntimeModel.dll": {}
+        }
+      },
+      "NuGet.Versioning/3.5.0-beta2-1484": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.0"
+        },
+        "compile": {
+          "lib/netstandard1.0/NuGet.Versioning.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.0/NuGet.Versioning.dll": {}
         }
       },
       "Remotion.Linq/2.1.1": {
@@ -1984,7 +2294,7 @@
           }
         }
       },
-      "SapientGuardian.EntityFrameworkCore.MySql/7.1.14": {
+      "SapientGuardian.EntityFrameworkCore.MySql/7.1.18": {
         "type": "package",
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "1.0.0",
@@ -2508,10 +2818,10 @@
           }
         }
       },
-      "System.IdentityModel.Tokens.Jwt/5.1.0": {
+      "System.IdentityModel.Tokens.Jwt/5.1.2": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.Tokens": "5.1.0"
+          "Microsoft.IdentityModel.Tokens": "5.1.2"
         },
         "compile": {
           "lib/netstandard1.4/System.IdentityModel.Tokens.Jwt.dll": {}
@@ -2692,7 +3002,11 @@
           "ref/netstandard1.3/System.IO.MemoryMappedFiles.dll": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard1.3/_._": {
+          "runtimes/unix/lib/netstandard1.3/System.IO.MemoryMappedFiles.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/netstandard1.3/System.IO.MemoryMappedFiles.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2715,7 +3029,7 @@
           "ref/netstandard1.3/System.IO.UnmanagedMemoryStream.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.IO.UnmanagedMemoryStream.dll": {}
         }
       },
       "System.Linq/4.3.0": {
@@ -2780,7 +3094,7 @@
           "ref/netstandard1.1/System.Linq.Parallel.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.Linq.Parallel.dll": {}
         }
       },
       "System.Linq.Queryable/4.3.0": {
@@ -2911,7 +3225,11 @@
           "ref/netstandard1.3/System.Net.Requests.dll": {}
         },
         "runtimeTargets": {
-          "runtimes/win/lib/netstandard1.3/_._": {
+          "runtimes/unix/lib/netstandard1.3/System.Net.Requests.dll": {
+            "assetType": "runtime",
+            "rid": "unix"
+          },
+          "runtimes/win/lib/netstandard1.3/System.Net.Requests.dll": {
             "assetType": "runtime",
             "rid": "win"
           }
@@ -2989,7 +3307,7 @@
           "ref/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.Net.WebHeaderCollection.dll": {}
         }
       },
       "System.Net.WebSockets/4.3.0": {
@@ -3069,7 +3387,7 @@
           "ref/netstandard1.3/System.Reflection.DispatchProxy.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.3/_._": {}
+          "lib/netstandard1.3/System.Reflection.DispatchProxy.dll": {}
         }
       },
       "System.Reflection.Emit/4.3.0": {
@@ -3807,7 +4125,7 @@
           "lib/netstandard1.1/System.Threading.Tasks.Dataflow.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.1/_._": {}
+          "lib/netstandard1.1/System.Threading.Tasks.Dataflow.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.3.0": {
@@ -4014,12 +4332,14 @@
         "dependencies": {
           "Microsoft.AspNetCore.WebUtilities": "1.1.0",
           "Microsoft.EntityFrameworkCore": "1.1.0",
+          "Microsoft.EntityFrameworkCore.Design": "1.1.0",
           "Microsoft.EntityFrameworkCore.Relational": "1.1.0",
-          "Microsoft.IdentityModel.Protocols": "2.1.0",
+          "Microsoft.EntityFrameworkCore.Tools.DotNet": "1.1.0-preview4-final",
+          "Microsoft.IdentityModel.Protocols": "2.1.2",
           "Microsoft.NETCore.App": "1.1.0",
-          "MongoDB.Driver": "2.4.0",
-          "Newtonsoft.Json": "9.0.1",
-          "SapientGuardian.EntityFrameworkCore.MySql": "7.1.14",
+          "MongoDB.Driver": "2.4.1",
+          "Newtonsoft.Json": "9.0.2-beta2",
+          "SapientGuardian.EntityFrameworkCore.MySql": "7.1.18",
           "System.Collections.Specialized": "4.3.0",
           "System.Runtime.InteropServices": "4.3.0",
           "eTRIKS.Commons.Core": "1.0.0"
@@ -4699,7 +5019,7 @@
       ]
     },
     "Microsoft.CodeAnalysis.Analyzers/1.1.0": {
-      "sha512": "4OYDW2mDZKl2e41Pbq31AXO72llMBvuVNP52JVtfEqxgLq32UeNDDRyaTIX/KQjdpeCcK4+aLkSDgHjik41oSg==",
+      "sha512": "HS3iRWZKcUw/8eZ/08GXKY2Bn7xNzQPzf8gRPHGSowX7u7XXu9i9YEaBeBNKUXWfI7qjvT2zXtLUvbN0hds8vg==",
       "type": "package",
       "path": "Microsoft.CodeAnalysis.Analyzers/1.1.0",
       "files": [
@@ -4715,7 +5035,7 @@
       ]
     },
     "Microsoft.CodeAnalysis.Common/1.3.0": {
-      "sha512": "wkf/x4u9KqfU46qho2hHaHHvzynnoLOOlwdveuAhExWxBDTHBcOhMPfrmkRvTNDcdyKgcoKJ4HVsLx1snapgCQ==",
+      "sha512": "V09G35cs0CT1C4Dr1IEOh8IGfnWALEVAOO5JXsqagxXwmYR012TlorQ+vx2eXxfZRKs3gAS/r92gN9kRBLba5A==",
       "type": "package",
       "path": "Microsoft.CodeAnalysis.Common/1.3.0",
       "files": [
@@ -4731,7 +5051,7 @@
       ]
     },
     "Microsoft.CodeAnalysis.CSharp/1.3.0": {
-      "sha512": "DVtifwh5pWqQVD3UcsIgOOPKRhBzqIfaWWHk6w9VxWe7wY79RGJXX7Hs84w1PJZ18YsQc9Mn9Rulqu34sIS3XA==",
+      "sha512": "BgWDIAbSFsHuGeLSn/rljLi51nXqkSo4DZ0qEIrHyPVasrhxEVq7aV8KKZ3HEfSFB+GIhBmOogE+mlOLYg19eg==",
       "type": "package",
       "path": "Microsoft.CodeAnalysis.CSharp/1.3.0",
       "files": [
@@ -4747,7 +5067,7 @@
       ]
     },
     "Microsoft.CodeAnalysis.VisualBasic/1.3.0": {
-      "sha512": "0ikVsrC2rDyzrr/py3NUv+7pIBsXcN0sgK7qj2xNOWqVpuu+cs0XEjgO2F8IlTDc3yDHG54P0fIgS4DVUIl/GQ==",
+      "sha512": "Sf3k8PkTkWqBmXnnblJbvb7ewO6mJzX6WO2t7m04BmOY5qBq6yhhyXnn/BMM+QCec3Arw3X35Zd8f9eBql0qgg==",
       "type": "package",
       "path": "Microsoft.CodeAnalysis.VisualBasic/1.3.0",
       "files": [
@@ -4835,6 +5155,17 @@
         "runtimes/win8-arm/native/Microsoft.DiaSymReader.Native.arm.dll"
       ]
     },
+    "Microsoft.DotNet.Cli.Utils/1.0.0-preview2-003121": {
+      "sha512": "FLXqhQjkjj83Sh0TRlLEyMIMtAhDRJuPRWnDONtnCv5bozk1jPzflLEXYbk2xsnsOMpnYrUvKQbwUKUWyaXuFQ==",
+      "type": "package",
+      "path": "Microsoft.DotNet.Cli.Utils/1.0.0-preview2-003121",
+      "files": [
+        "Microsoft.DotNet.Cli.Utils.1.0.0-preview2-003121.nupkg.sha512",
+        "Microsoft.DotNet.Cli.Utils.nuspec",
+        "lib/net451/Microsoft.DotNet.Cli.Utils.dll",
+        "lib/netstandard1.6/Microsoft.DotNet.Cli.Utils.dll"
+      ]
+    },
     "Microsoft.DotNet.PlatformAbstractions/1.1.0": {
       "sha512": "Bl6KYfbFSIW3QIRHAp931iR5h01qHjKghdpAtncwbzNUs0+IUZ+XfwkIU0sQsR33ufGvi3u4dZMIYYFysjpHAA==",
       "type": "package",
@@ -4844,6 +5175,17 @@
         "Microsoft.DotNet.PlatformAbstractions.nuspec",
         "lib/net451/Microsoft.DotNet.PlatformAbstractions.dll",
         "lib/netstandard1.3/Microsoft.DotNet.PlatformAbstractions.dll"
+      ]
+    },
+    "Microsoft.DotNet.ProjectModel/1.0.0-rc3-003121": {
+      "sha512": "wnWw5KsKinG2wWxdoQIJXZlMFvPNhL7WmIyW9q6xrZFUi/uld5PC3ksq2QDZepF148FUjCIyTP+TnRwU3RJqUg==",
+      "type": "package",
+      "path": "Microsoft.DotNet.ProjectModel/1.0.0-rc3-003121",
+      "files": [
+        "Microsoft.DotNet.ProjectModel.1.0.0-rc3-003121.nupkg.sha512",
+        "Microsoft.DotNet.ProjectModel.nuspec",
+        "lib/net451/Microsoft.DotNet.ProjectModel.dll",
+        "lib/netstandard1.6/Microsoft.DotNet.ProjectModel.dll"
       ]
     },
     "Microsoft.EntityFrameworkCore/1.1.0": {
@@ -4859,6 +5201,19 @@
         "lib/netstandard1.3/Microsoft.EntityFrameworkCore.xml"
       ]
     },
+    "Microsoft.EntityFrameworkCore.Design/1.1.0": {
+      "sha512": "7hWqxlNYUocjRqljw6yi3bQpEjMyzNSBX+LqsUuo9cFqTu3uv2YVRyRobBmfvnXVNfRxB6EysMmTmhxApPhiNw==",
+      "type": "package",
+      "path": "Microsoft.EntityFrameworkCore.Design/1.1.0",
+      "files": [
+        "Microsoft.EntityFrameworkCore.Design.1.1.0.nupkg.sha512",
+        "Microsoft.EntityFrameworkCore.Design.nuspec",
+        "lib/net451/Microsoft.EntityFrameworkCore.Design.dll",
+        "lib/net451/Microsoft.EntityFrameworkCore.Design.xml",
+        "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Design.dll",
+        "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Design.xml"
+      ]
+    },
     "Microsoft.EntityFrameworkCore.Relational/1.1.0": {
       "sha512": "5LkSh1GHK/ZbI/2N6YxyofFKaAVe5/RBN38G6UQzOQVgfJxzucpJVyZt1mGHBkJ4yTlr4WQS9Wr3Ppa5X0opbw==",
       "type": "package",
@@ -4870,6 +5225,33 @@
         "lib/net451/Microsoft.EntityFrameworkCore.Relational.xml",
         "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.dll",
         "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.xml"
+      ]
+    },
+    "Microsoft.EntityFrameworkCore.Relational.Design/1.1.0": {
+      "sha512": "fF0sVEUkoGeJutGIzwnYsJJ9o2hxEGJRpSaCxPq63rhSwn0hBmCwf9ET4QqYqO9Pc6+ODXenAQa095CWzuM4Kg==",
+      "type": "package",
+      "path": "Microsoft.EntityFrameworkCore.Relational.Design/1.1.0",
+      "files": [
+        "Microsoft.EntityFrameworkCore.Relational.Design.1.1.0.nupkg.sha512",
+        "Microsoft.EntityFrameworkCore.Relational.Design.nuspec",
+        "lib/net451/Microsoft.EntityFrameworkCore.Relational.Design.dll",
+        "lib/net451/Microsoft.EntityFrameworkCore.Relational.Design.xml",
+        "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.Design.dll",
+        "lib/netstandard1.3/Microsoft.EntityFrameworkCore.Relational.Design.xml"
+      ]
+    },
+    "Microsoft.EntityFrameworkCore.Tools.DotNet/1.1.0-preview4-final": {
+      "sha512": "xA7TEhfWAZNdjkwSY+wIV/hEwxbPpjFabqXmu+TXlX6E1ORi/C399THdbj9Eh4VV/QagXwD0kbgR4ByGNHI5ww==",
+      "type": "package",
+      "path": "Microsoft.EntityFrameworkCore.Tools.DotNet/1.1.0-preview4-final",
+      "files": [
+        "Microsoft.EntityFrameworkCore.Tools.DotNet.1.1.0-preview4-final.nupkg.sha512",
+        "Microsoft.EntityFrameworkCore.Tools.DotNet.nuspec",
+        "lib/netcoreapp1.0/dotnet-ef.dll",
+        "lib/netcoreapp1.0/dotnet-ef.runtimeconfig.json",
+        "tools/net451/ef.exe",
+        "tools/net451/ef.x86.exe",
+        "tools/netcoreapp1.0/ef.dll"
       ]
     },
     "Microsoft.Extensions.Caching.Abstractions/1.1.0": {
@@ -5214,23 +5596,23 @@
         "lib/netstandard1.0/Microsoft.Extensions.WebEncoders.xml"
       ]
     },
-    "Microsoft.IdentityModel.Logging/1.1.0": {
-      "sha512": "Dv3G9GIdKyCc4xJjZECQosRJ9//4q/yXmb0vOUOjN1XpkCcHEt5UJ5S4zm8yJR+5tLODA159G2QtVNtK1RsAXw==",
+    "Microsoft.IdentityModel.Logging/1.1.2": {
+      "sha512": "QPMFfRVnRkCzGpEQz/YEPsbwUjAp5R1W2dpaXHlJJNA7fp9gV4m4TDKvvXhQnqdEL0a0luNrYFZrbz7NRI1rXQ==",
       "type": "package",
-      "path": "Microsoft.IdentityModel.Logging/1.1.0",
+      "path": "Microsoft.IdentityModel.Logging/1.1.2",
       "files": [
-        "Microsoft.IdentityModel.Logging.1.1.0.nupkg.sha512",
+        "Microsoft.IdentityModel.Logging.1.1.2.nupkg.sha512",
         "Microsoft.IdentityModel.Logging.nuspec",
         "lib/net451/Microsoft.IdentityModel.Logging.dll",
         "lib/netstandard1.4/Microsoft.IdentityModel.Logging.dll"
       ]
     },
-    "Microsoft.IdentityModel.Protocols/2.1.0": {
-      "sha512": "yi7uK5JL5JL66Srnj96vMge7ZMCUM2rTVC6P43cORSCaY+3/motXH+3/8o/T/Xpirv7gAOkRPxGwgARcsuRWPw==",
+    "Microsoft.IdentityModel.Protocols/2.1.2": {
+      "sha512": "DYjTihC3VrzhXiv2cdoAxBx2RhFphad5BXfwmebdt3aNqrUpCOfsfYN7Ivequ05MiNBfgjBfWf8pd0+6S8jSCA==",
       "type": "package",
-      "path": "Microsoft.IdentityModel.Protocols/2.1.0",
+      "path": "Microsoft.IdentityModel.Protocols/2.1.2",
       "files": [
-        "Microsoft.IdentityModel.Protocols.2.1.0.nupkg.sha512",
+        "Microsoft.IdentityModel.Protocols.2.1.2.nupkg.sha512",
         "Microsoft.IdentityModel.Protocols.nuspec",
         "lib/net451/Microsoft.IdentityModel.Protocols.dll",
         "lib/net451/Microsoft.IdentityModel.Protocols.xml",
@@ -5251,12 +5633,12 @@
         "lib/netstandard1.4/Microsoft.IdentityModel.Protocols.OpenIdConnect.xml"
       ]
     },
-    "Microsoft.IdentityModel.Tokens/5.1.0": {
-      "sha512": "Hg1+IbP0F9oQ8qIxQobKoOczrwufYMNHrSXj+xF1+4VCpvymhyvpVcgLqi5GOie1qcQYp/yBy04dpBImemVXKg==",
+    "Microsoft.IdentityModel.Tokens/5.1.2": {
+      "sha512": "m7UP4iY/dWfVwDNNSVGvZV6r4PwflaK++sYQsTTGAMILYb5IJ4Z4rKJRCA0uKjo6jTcdWlQxyPsxoEVwjqPKqQ==",
       "type": "package",
-      "path": "Microsoft.IdentityModel.Tokens/5.1.0",
+      "path": "Microsoft.IdentityModel.Tokens/5.1.2",
       "files": [
-        "Microsoft.IdentityModel.Tokens.5.1.0.nupkg.sha512",
+        "Microsoft.IdentityModel.Tokens.5.1.2.nupkg.sha512",
         "Microsoft.IdentityModel.Tokens.nuspec",
         "lib/net451/Microsoft.IdentityModel.Tokens.dll",
         "lib/net451/Microsoft.IdentityModel.Tokens.xml",
@@ -5374,7 +5756,7 @@
       ]
     },
     "Microsoft.NETCore.Windows.ApiSets/1.0.1": {
-      "sha512": "EPpLaZI1WmykQhewCvPfTJ3MF9rcg66p2LL7BS9j1euuylTfH6JPrdR9cDK3hQ+FHZ9sGmv5qE+KBBsxPoO3tA==",
+      "sha512": "SaToCvvsGMxTgtLv/BrFQ5IFMPRE1zpWbnqbpwykJa8W5XiX82CXI6K2o7yf5xS7EP6t/JzFLV0SIDuWpvBZVw==",
       "type": "package",
       "path": "Microsoft.NETCore.Windows.ApiSets/1.0.1",
       "files": [
@@ -5497,13 +5879,13 @@
         "runtimes/win/lib/netstandard1.3/Microsoft.Win32.Registry.dll"
       ]
     },
-    "MongoDB.Bson/2.4.0": {
-      "sha512": "qxDV2pyW6VwTf+YRQ12NarFkkX1tuD4paaNJ4zEeqX52h/n596lpSsaazJOI2Wi69xz8KLBRAeXKVw9q2sIjuQ==",
+    "MongoDB.Bson/2.4.1": {
+      "sha512": "D6GBX2shpGGlQbIw8GIPYqvBsHvdtyFl/Gg16WmLUVXAUJnPYTivEsOoThs7vx0Uco425B/rr9pP7RHHz5xNQg==",
       "type": "package",
-      "path": "MongoDB.Bson/2.4.0",
+      "path": "MongoDB.Bson/2.4.1",
       "files": [
         "License.rtf",
-        "MongoDB.Bson.2.4.0.nupkg.sha512",
+        "MongoDB.Bson.2.4.1.nupkg.sha512",
         "MongoDB.Bson.nuspec",
         "lib/net45/MongoDB.Bson.XML",
         "lib/net45/MongoDB.Bson.dll",
@@ -5511,13 +5893,13 @@
         "lib/netstandard1.5/MongoDB.Bson.xml"
       ]
     },
-    "MongoDB.Driver/2.4.0": {
-      "sha512": "k4fWKaw3v1ohbRqH7RPovx6KxnzCFv2W8tqnb/e4KL62ciOtUZtwvaGNExVD5HNpUSz+MQF6v/d0s18vnlDJ/w==",
+    "MongoDB.Driver/2.4.1": {
+      "sha512": "xsp1BIr9WvvaGDIQFCQvty0ZAUl4WBj3DgvToleuljeYFa+W2d6nIMgAEKsUTuu2nC+3pNtVFbrKsryNU46+ag==",
       "type": "package",
-      "path": "MongoDB.Driver/2.4.0",
+      "path": "MongoDB.Driver/2.4.1",
       "files": [
         "License.rtf",
-        "MongoDB.Driver.2.4.0.nupkg.sha512",
+        "MongoDB.Driver.2.4.1.nupkg.sha512",
         "MongoDB.Driver.nuspec",
         "lib/net45/MongoDB.Driver.XML",
         "lib/net45/MongoDB.Driver.dll",
@@ -5525,13 +5907,13 @@
         "lib/netstandard1.5/MongoDB.Driver.xml"
       ]
     },
-    "MongoDB.Driver.Core/2.4.0": {
-      "sha512": "sYO15KAnnhaGgJv6wKUPH8A90lfUglnF/s457T9CClK0FogDjO56qI+vGH0bvqRnZvRQoznkPcci6/UYNKgWXA==",
+    "MongoDB.Driver.Core/2.4.1": {
+      "sha512": "iJ020RGVzCm6h72qKF155XRQhx/D5xKOh9Z5MBTpFlr2ndGTSpskycPPCeNrjl/TSr1RBNg2+K03kzFD5xCu/Q==",
       "type": "package",
-      "path": "MongoDB.Driver.Core/2.4.0",
+      "path": "MongoDB.Driver.Core/2.4.1",
       "files": [
         "License.rtf",
-        "MongoDB.Driver.Core.2.4.0.nupkg.sha512",
+        "MongoDB.Driver.Core.2.4.1.nupkg.sha512",
         "MongoDB.Driver.Core.nuspec",
         "lib/net45/MongoDB.Driver.Core.XML",
         "lib/net45/MongoDB.Driver.Core.dll",
@@ -5550,12 +5932,12 @@
         "dotnet_library_license.txt"
       ]
     },
-    "Newtonsoft.Json/9.0.1": {
-      "sha512": "U82mHQSKaIk+lpSVCbWYKNavmNH1i5xrExDEquU1i6I5pV6UMOqRnJRSlKO3cMPfcpp0RgDY+8jUXHdQ4IfXvw==",
+    "Newtonsoft.Json/9.0.2-beta2": {
+      "sha512": "g29gt1Ux5izsximmPpsNf0NAcO/Pl8FA0uRzTxINPINwXJ8+QjzdGLIa2gf0/tGNclxHj5QGek1/tu6Ghc9Gcg==",
       "type": "package",
-      "path": "Newtonsoft.Json/9.0.1",
+      "path": "Newtonsoft.Json/9.0.2-beta2",
       "files": [
-        "Newtonsoft.Json.9.0.1.nupkg.sha512",
+        "Newtonsoft.Json.9.0.2-beta2.nupkg.sha512",
         "Newtonsoft.Json.nuspec",
         "lib/net20/Newtonsoft.Json.dll",
         "lib/net20/Newtonsoft.Json.xml",
@@ -5567,11 +5949,197 @@
         "lib/net45/Newtonsoft.Json.xml",
         "lib/netstandard1.0/Newtonsoft.Json.dll",
         "lib/netstandard1.0/Newtonsoft.Json.xml",
+        "lib/netstandard1.1/Newtonsoft.Json.dll",
+        "lib/netstandard1.1/Newtonsoft.Json.xml",
         "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
         "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.xml",
         "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll",
         "lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.xml",
         "tools/install.ps1"
+      ]
+    },
+    "NuGet.Common/3.5.0-beta2-1484": {
+      "sha512": "rLBmcZOPVF7Mne/LumDNACZZyI5B67hjylt+Z/WSEUQ/IXE9nLv8IVL0+T9xljIaSSQCjO8cOtmJ6ztqrsQKcQ==",
+      "type": "package",
+      "path": "NuGet.Common/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Common.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Common.nuspec",
+        "lib/net45/NuGet.Common.dll",
+        "lib/net45/NuGet.Common.xml",
+        "lib/netstandard1.3/NuGet.Common.dll",
+        "lib/netstandard1.3/NuGet.Common.xml"
+      ]
+    },
+    "NuGet.Configuration/3.5.0-beta2-1484": {
+      "sha512": "ee2jhTjPMztWmUIuaM1pdVRytXO7n8V/ZlENzJ/uTsZcnAbPZZLasAUoKJf7kKacBNTfSHd1MmWII/YweHWPGQ==",
+      "type": "package",
+      "path": "NuGet.Configuration/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Configuration.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Configuration.nuspec",
+        "lib/net45/NuGet.Configuration.dll",
+        "lib/net45/NuGet.Configuration.xml",
+        "lib/netstandard1.3/NuGet.Configuration.dll",
+        "lib/netstandard1.3/NuGet.Configuration.xml"
+      ]
+    },
+    "NuGet.DependencyResolver.Core/3.5.0-beta2-1484": {
+      "sha512": "C33r3vl2eMbo3YFi7mKMnyFBSVzXxaQA045913UpQQi6oIFkNn8m9Ozztbfv7wQXQGlG+ftopObFE/Ig5I2e8Q==",
+      "type": "package",
+      "path": "NuGet.DependencyResolver.Core/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.DependencyResolver.Core.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.DependencyResolver.Core.nuspec",
+        "lib/net45/NuGet.DependencyResolver.Core.dll",
+        "lib/net45/NuGet.DependencyResolver.Core.xml",
+        "lib/netstandard1.3/NuGet.DependencyResolver.Core.dll",
+        "lib/netstandard1.3/NuGet.DependencyResolver.Core.xml"
+      ]
+    },
+    "NuGet.Frameworks/3.5.0-beta2-1484": {
+      "sha512": "AZoX0c05qgSfx0IOGTbLXa2fD7eM2WUqKP3osMMvSxK+tOGmctHuFlvjXxMHBv9yg0/13KdH0osV/zI7+SjzOA==",
+      "type": "package",
+      "path": "NuGet.Frameworks/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Frameworks.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Frameworks.nuspec",
+        "lib/net40-client/NuGet.Frameworks.dll",
+        "lib/net40-client/NuGet.Frameworks.xml",
+        "lib/net45/NuGet.Frameworks.dll",
+        "lib/net45/NuGet.Frameworks.xml",
+        "lib/netstandard1.3/NuGet.Frameworks.dll",
+        "lib/netstandard1.3/NuGet.Frameworks.xml"
+      ]
+    },
+    "NuGet.LibraryModel/3.5.0-beta2-1484": {
+      "sha512": "DliyPvB2O5sLAjhlBceACSm6fzzPDoWRdzbs/7Z89TWqp2JRQ98I5ds5HzeMJjfqO6t1BYoCVDV0h1ymoTuyVQ==",
+      "type": "package",
+      "path": "NuGet.LibraryModel/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.LibraryModel.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.LibraryModel.nuspec",
+        "lib/net45/NuGet.LibraryModel.dll",
+        "lib/net45/NuGet.LibraryModel.xml",
+        "lib/netstandard1.3/NuGet.LibraryModel.dll",
+        "lib/netstandard1.3/NuGet.LibraryModel.xml"
+      ]
+    },
+    "NuGet.Packaging/3.5.0-beta2-1484": {
+      "sha512": "/+7d3vvCel4KhJo6AyOneg07fbAkUsy/ORgIaxW3nNdJubCXSrAdg1wfQpwzBygmErjrPcdYzzk2y2Sc6m7hwQ==",
+      "type": "package",
+      "path": "NuGet.Packaging/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Packaging.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Packaging.nuspec",
+        "lib/net45/NuGet.Packaging.dll",
+        "lib/net45/NuGet.Packaging.xml",
+        "lib/netstandard1.3/NuGet.Packaging.dll",
+        "lib/netstandard1.3/NuGet.Packaging.xml"
+      ]
+    },
+    "NuGet.Packaging.Core/3.5.0-beta2-1484": {
+      "sha512": "Lsz2lgYH0mdOvuL8C3G4XLm9EaAheBOqrgLgnBNxCeLGLU+n+Zu8Lt6K1bpzgkeKyTyAhJdWbv/3lS4w7s04gw==",
+      "type": "package",
+      "path": "NuGet.Packaging.Core/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Packaging.Core.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Packaging.Core.nuspec",
+        "lib/net45/NuGet.Packaging.Core.dll",
+        "lib/net45/NuGet.Packaging.Core.xml",
+        "lib/netstandard1.3/NuGet.Packaging.Core.dll",
+        "lib/netstandard1.3/NuGet.Packaging.Core.xml"
+      ]
+    },
+    "NuGet.Packaging.Core.Types/3.5.0-beta2-1484": {
+      "sha512": "4mEXZBoe/RKTDVQGwdrl/f5gqolU2d1JWjpbGdQv5EG/xQCC8IQ8FTNYzk0+ydV/vuRM1yaNe+6UQ90nGE+1kQ==",
+      "type": "package",
+      "path": "NuGet.Packaging.Core.Types/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Packaging.Core.Types.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Packaging.Core.Types.nuspec",
+        "lib/net45/NuGet.Packaging.Core.Types.dll",
+        "lib/net45/NuGet.Packaging.Core.Types.xml",
+        "lib/netstandard1.3/NuGet.Packaging.Core.Types.dll",
+        "lib/netstandard1.3/NuGet.Packaging.Core.Types.xml"
+      ]
+    },
+    "NuGet.ProjectModel/3.5.0-beta2-1484": {
+      "sha512": "7SFxD1wBRusat8rJm/hICDues0Fm9ECNJLaxbzq6xdPBBN3NljGMp3V3ZeyEose6ItetqPBY9+ZcKhiPIsmx6A==",
+      "type": "package",
+      "path": "NuGet.ProjectModel/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.ProjectModel.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.ProjectModel.nuspec",
+        "lib/net45/NuGet.ProjectModel.dll",
+        "lib/net45/NuGet.ProjectModel.xml",
+        "lib/netstandard1.3/NuGet.ProjectModel.dll",
+        "lib/netstandard1.3/NuGet.ProjectModel.xml"
+      ]
+    },
+    "NuGet.Protocol.Core.Types/3.5.0-beta2-1484": {
+      "sha512": "y+HMFeV4/vqryIhRQATC1HZvE9QOGgOwesCUWlVAY24yi4HcTTVWWSv0WVX8OzJj+uobYWVfICFyC28JnuMEoA==",
+      "type": "package",
+      "path": "NuGet.Protocol.Core.Types/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Protocol.Core.Types.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Protocol.Core.Types.nuspec",
+        "lib/net45/NuGet.Protocol.Core.Types.dll",
+        "lib/net45/NuGet.Protocol.Core.Types.xml",
+        "lib/netstandard1.3/NuGet.Protocol.Core.Types.dll",
+        "lib/netstandard1.3/NuGet.Protocol.Core.Types.xml"
+      ]
+    },
+    "NuGet.Protocol.Core.v3/3.5.0-beta2-1484": {
+      "sha512": "DsLSsObYuTF9CJ22/ti5femoz1H5zZiQ5SjnZjhoNrz26Af0M9y3fcLvJGTFO7xPDU6QC1G9lZ0fNW7ucH/GpQ==",
+      "type": "package",
+      "path": "NuGet.Protocol.Core.v3/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Protocol.Core.v3.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Protocol.Core.v3.nuspec",
+        "lib/net45/NuGet.Protocol.Core.v3.dll",
+        "lib/net45/NuGet.Protocol.Core.v3.xml",
+        "lib/netstandard1.3/NuGet.Protocol.Core.v3.dll",
+        "lib/netstandard1.3/NuGet.Protocol.Core.v3.xml"
+      ]
+    },
+    "NuGet.Repositories/3.5.0-beta2-1484": {
+      "sha512": "+3ozgJleYPKL2VG44XRzVyFGu8dLOIJ2Kohg2VY87DzTJEnH3kLOMhudZERowNxxzfJpwiSDUXNsDNiWH4EujA==",
+      "type": "package",
+      "path": "NuGet.Repositories/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Repositories.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Repositories.nuspec",
+        "lib/net45/NuGet.Repositories.dll",
+        "lib/net45/NuGet.Repositories.xml",
+        "lib/netstandard1.3/NuGet.Repositories.dll",
+        "lib/netstandard1.3/NuGet.Repositories.xml"
+      ]
+    },
+    "NuGet.RuntimeModel/3.5.0-beta2-1484": {
+      "sha512": "vg29WbKcExD9AJrKMr7NB9pnp+0MTAcDHB6gFHCqRynSo6jgjC8q+ZPAlxC115rQiO8fqzOEP59Q8hx20anUtA==",
+      "type": "package",
+      "path": "NuGet.RuntimeModel/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.RuntimeModel.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.RuntimeModel.nuspec",
+        "lib/net45/NuGet.RuntimeModel.dll",
+        "lib/net45/NuGet.RuntimeModel.xml",
+        "lib/netstandard1.3/NuGet.RuntimeModel.dll",
+        "lib/netstandard1.3/NuGet.RuntimeModel.xml"
+      ]
+    },
+    "NuGet.Versioning/3.5.0-beta2-1484": {
+      "sha512": "Stok+SI5lWxOkTgZZM7jT4xuAZogm5+j85mKJeHSXb8o0OAbB+qDX9jkdM2wIEnjoR8R29J0nQYwk2Kl2lWFpA==",
+      "type": "package",
+      "path": "NuGet.Versioning/3.5.0-beta2-1484",
+      "files": [
+        "NuGet.Versioning.3.5.0-beta2-1484.nupkg.sha512",
+        "NuGet.Versioning.nuspec",
+        "lib/net45/NuGet.Versioning.dll",
+        "lib/net45/NuGet.Versioning.xml",
+        "lib/netstandard1.0/NuGet.Versioning.dll",
+        "lib/netstandard1.0/NuGet.Versioning.xml"
       ]
     },
     "Remotion.Linq/2.1.1": {
@@ -5797,12 +6365,12 @@
         "runtimes/ubuntu.16.10-x64/native/System.Security.Cryptography.Native.OpenSsl.so"
       ]
     },
-    "SapientGuardian.EntityFrameworkCore.MySql/7.1.14": {
-      "sha512": "EEOMT28qjJQyO5caREwJPWfAd3Jm9l9pUCVccq1n/OC1jo8NVN+LGpzcKsJiUT1vKavasmgZhCE3vz7UD2cIcA==",
+    "SapientGuardian.EntityFrameworkCore.MySql/7.1.18": {
+      "sha512": "4zdzy4d5rqJh3woCpMHihb71dgJNKA3W/2084Ga6rwDZ+6EVkk+1C3srdsE7butC/PwQ426/8Wxnhbmjnbpfwg==",
       "type": "package",
-      "path": "SapientGuardian.EntityFrameworkCore.MySql/7.1.14",
+      "path": "SapientGuardian.EntityFrameworkCore.MySql/7.1.18",
       "files": [
-        "SapientGuardian.EntityFrameworkCore.MySql.7.1.14.nupkg.sha512",
+        "SapientGuardian.EntityFrameworkCore.MySql.7.1.18.nupkg.sha512",
         "SapientGuardian.EntityFrameworkCore.MySql.nuspec",
         "lib/netstandard1.3/SapientGuardian.EntityFrameworkCore.MySql.dll"
       ]
@@ -6555,7 +7123,7 @@
       ]
     },
     "System.Diagnostics.FileVersionInfo/4.0.0": {
-      "sha512": "q905Bum3/muvhKKf6cnBW08h9lybx74n5pG8hf2BDju3M6ns8vd8XGN3U7vNmSqVExoMQmkN01k1dvfVTvcmXQ==",
+      "sha512": "qjF74OTAU+mRhLaL4YSfiWy3vj6T3AOz8AW37l5zCwfbBfj0k7E94XnEsRaf2TnhE/7QaV6Hvqakoy2LoV8MVg==",
       "type": "package",
       "path": "System.Diagnostics.FileVersionInfo/4.0.0",
       "files": [
@@ -7079,12 +7647,12 @@
         "runtimes/win/lib/netstandard1.3/System.Globalization.Extensions.dll"
       ]
     },
-    "System.IdentityModel.Tokens.Jwt/5.1.0": {
-      "sha512": "oMcOZ0/7seZYkv8yRPBlfHyc7K/33TS0hVtshvOAiH9rHWqCb3htq4mEbOtqMTo45pzblcm10ArpERlZrSS69A==",
+    "System.IdentityModel.Tokens.Jwt/5.1.2": {
+      "sha512": "wneX9Rv1p8zXNQ8v3mzKPlja3dP0dQY0Ea/0KUtCtlyqB9WtYoEWxTidqgq5iBHGvG5p/yuFKfedgvt2y68HpA==",
       "type": "package",
-      "path": "System.IdentityModel.Tokens.Jwt/5.1.0",
+      "path": "System.IdentityModel.Tokens.Jwt/5.1.2",
       "files": [
-        "System.IdentityModel.Tokens.Jwt.5.1.0.nupkg.sha512",
+        "System.IdentityModel.Tokens.Jwt.5.1.2.nupkg.sha512",
         "System.IdentityModel.Tokens.Jwt.nuspec",
         "lib/net451/System.IdentityModel.Tokens.Jwt.dll",
         "lib/net451/System.IdentityModel.Tokens.Jwt.xml",
@@ -9719,7 +10287,7 @@
       ]
     },
     "System.Text.Encoding.CodePages/4.0.1": {
-      "sha512": "4IhkWnBT2u8U1A8skz/dvgFoBP/OxGvz1VJPYWHmwJWnwQIKratVvhsTxeguRo0h9iLt1glYRGE/gxnwhygf0w==",
+      "sha512": "h4z6rrA/hxWf4655D18IIZ0eaLRa3tQC/j+e26W+VinIHY0l07iEXaAvO0YSYq3MvCjMYy8Zs5AdC1sxNQOB7Q==",
       "type": "package",
       "path": "System.Text.Encoding.CodePages/4.0.1",
       "files": [
@@ -10434,7 +11002,7 @@
       ]
     },
     "System.Xml.XmlDocument/4.0.1": {
-      "sha512": "QmRIaFJj4k6vNs4wZ/vJ62SYYcLFSBxnOlcS0dQzBZhym8pIgcJJz3Icqa8+mDd9zjA8cyQXzLUGLDg6H5E1KQ==",
+      "sha512": "2eZu6IP+etFVBBFUFzw2w6J21DqIN5eL9Y8r8JfJWUmV28Z5P0SNU01oCisVHQgHsDhHPnmq2s1hJrJCFZWloQ==",
       "type": "package",
       "path": "System.Xml.XmlDocument/4.0.1",
       "files": [
@@ -10471,7 +11039,7 @@
       ]
     },
     "System.Xml.XPath/4.0.1": {
-      "sha512": "sAXwoytcl9esdwvz7kin76Tt0MbeF/NmnSLTR+XI+wiO+LMQtkzz6W5F30W52i/afdg4jz3pS59DMOvpMlN/Zg==",
+      "sha512": "UWd1H+1IJ9Wlq5nognZ/XJdyj8qPE4XufBUkAW59ijsCPjZkZe0MUzKKJFBr+ZWBe5Wq1u1d5f2CYgE93uH7DA==",
       "type": "package",
       "path": "System.Xml.XPath/4.0.1",
       "files": [
@@ -10508,7 +11076,7 @@
       ]
     },
     "System.Xml.XPath.XDocument/4.0.1": {
-      "sha512": "pxBU5hQyoNPTNw0jKF+3E+k/ylnjefoRy70k+U/A5Xf1Dao/gDyeYrAdw/mm0TQCyE0QB08uT5+AWlkxNOQiSQ==",
+      "sha512": "FLhdYJx4331oGovQypQ8JIw2kEmNzCsjVOVYY/16kZTUoquZG85oVn7yUhBE2OZt1yGPSXAL0HTEfzjlbNpM7Q==",
       "type": "package",
       "path": "System.Xml.XPath.XDocument/4.0.1",
       "files": [
@@ -10569,6 +11137,8 @@
       "Microsoft.AspNetCore.Routing >= 1.1.0",
       "Microsoft.AspNetCore.Server.IISIntegration >= 1.1.0",
       "Microsoft.AspNetCore.Server.Kestrel >= 1.1.0",
+      "Microsoft.EntityFrameworkCore.Design >= 1.1.0",
+      "Microsoft.EntityFrameworkCore.Tools.DotNet >= 1.1.0-preview4-final",
       "Microsoft.Extensions.Configuration.EnvironmentVariables >= 1.1.0",
       "Microsoft.Extensions.Configuration.FileExtensions >= 1.1.0",
       "Microsoft.Extensions.Configuration.Json >= 1.1.0",
@@ -10600,12 +11170,26 @@
         "runtime": {
           "lib/netcoreapp1.0/dotnet-publish-iis.dll": {}
         }
+      },
+      "Microsoft.EntityFrameworkCore.Tools.DotNet/1.1.0-preview4-final": {
+        "type": "package",
+        "dependencies": {
+          "Microsoft.DotNet.Cli.Utils": "1.0.0-preview2-003121",
+          "Microsoft.NETCore.App": "1.1.0"
+        },
+        "compile": {
+          "lib/netcoreapp1.0/dotnet-ef.dll": {}
+        },
+        "runtime": {
+          "lib/netcoreapp1.0/dotnet-ef.dll": {}
+        }
       }
     }
   },
   "projectFileToolGroups": {
     ".NETCoreApp,Version=v1.0": [
-      "Microsoft.AspNetCore.Server.IISIntegration.Tools >= 1.1.0-preview4-final"
+      "Microsoft.AspNetCore.Server.IISIntegration.Tools >= 1.1.0-preview4-final",
+      "Microsoft.EntityFrameworkCore.Tools.DotNet >= 1.1.0-preview4-final"
     ]
   }
 }

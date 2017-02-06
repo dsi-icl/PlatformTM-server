@@ -42,27 +42,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         //TEMP properties for CVterms until we have real OEs
         public bool IsOntologyEntry { get; set; }
         public string TermCategory { get; set; } //AEDECOD //AESOC AEHLG
-        //public int TermCateogryId { get; set; } //id of 
         
-        //public List<string> FilterExactValues { get; set; } //the set of values selected by the user
-        //public float FilterRangeFrom { get; set; } //the from value selected by user
-        //public float FilterRangeTo { get; set; } //the to value selected by user
-        //public bool IsFiltered { get; set; }
-
-        //public string FilterText
-        //{
-        //    get
-        //    {
-        //        if (!IsFiltered)
-        //            return "";
-        //        if (DataType == "string")
-        //            return string.Join(",",FilterExactValues);
-        //        if (FilterRangeFrom != 0 && FilterRangeTo != 0)
-        //            return FilterRangeFrom + " -> " + FilterRangeTo;
-        //        return "";
-        //    }
-        //    //set { _id = value; }
-        //}
         public string ObservationObjectShortName { get; set; }
         public string Group { get; set; }
     }

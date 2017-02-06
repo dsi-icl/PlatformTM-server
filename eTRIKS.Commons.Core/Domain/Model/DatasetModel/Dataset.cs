@@ -9,9 +9,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
     {
         //public string DataFile { get; set; }
         public int ActivityId { get; set; }
-        public string DomainId { get; set; }
+        public string TemplateId { get; set; }
         public Activity Activity { get; private set; }
-        public DomainTemplate Domain { get; set; }
+        public DatasetTemplate Template { get; set; }
         public ICollection<VariableReference> Variables { get;  set; }
 
 
