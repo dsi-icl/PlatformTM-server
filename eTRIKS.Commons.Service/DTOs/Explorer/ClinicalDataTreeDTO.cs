@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace eTRIKS.Commons.Service.DTOs
+namespace eTRIKS.Commons.Service.DTOs.Explorer
 {
     public class ClinicalDataTreeDTO
     {

@@ -69,11 +69,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
         }
 
-        [HttpGet("{assayId}/samples")]
-        public Hashtable GetAssaySamples(int assayId)
-        {
-            return _assayService.GetSamplesDataPerAssay(assayId);
-        }
+        //[HttpGet("{assayId}/samples")]
+        //public Hashtable GetAssaySamples(int assayId)
+        //{
+        //    return _assayService.GetSamplesDataPerAssay(assayId);
+        //}
+
+
         //[HttpGet]
         //[Route("api/assays/temp/{assayId}/loadPA/{fileId}")]
         //public IActionResult AddPA(int assayId, int fileId)

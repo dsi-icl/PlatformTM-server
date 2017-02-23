@@ -29,13 +29,77 @@ namespace eTRIKS.Commons.Service.Services
             _exportService = exportService;
         }
 
+        /// <summary>
+        /// Generates Datasets to save and download from the user saved query.
+        /// All subject and clinical observations requested in the query are exported to one dataset (pheno)
+        /// If the query contains queries for assay data, two datasets are created for each requested assay panel
+        /// A sample metadata dataset including subject to sample mapping as well as any other sample characteristics
+        /// requested in the query, and an "assay data" dataset containing the observed measurements.
+        /// </summary>
+        /// <param name="queryIdStr"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public List<UserDataset> CreateCheckoutDatasets(string queryIdStr, string userId)
         {
+
             Guid queryId;
             if (!Guid.TryParse(queryIdStr, out queryId))
                 return null;
             var query = _combinedQueryRepository.Get(queryId);
 
+            var checkoutDatasets = new List<UserDataset>();
+
+            //Create Pheno dataset for all selected clinical and subject observations
+            var phenoDataset = CreateSubjectClinicalDataset(query, userId);
+            checkoutDatasets.Add(phenoDataset);
+
+            //Creates a subject-to-sample mapping dataset for each selected assay
+            checkoutDatasets.AddRange(query.AssayPanels.Select(CreateAssaySampleDataset));
+            
+            //Creates assay data dataset for each selected assay
+            checkoutDatasets.AddRange(query.AssayPanels.Select(CreateAssayPanelDataset));
+
+            return checkoutDatasets;
+        }
+
+        public DataTable ExportDataset(string datasetId)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            var projectId = dataset.ProjectId;
+
+            var exportData = _exportService.GetDatasetContent(projectId, dataset);
+
+            var dt = _exportService.GetDatasetTable(exportData,dataset);
+            dt.TableName = dataset.Name;
+
+            return dt;
+            
+        }
+
+        public string downloadDatasets(DataTable dtTable)
+        {
+            StringBuilder result = new StringBuilder();
+            if (dtTable.Columns.Count != 0)
+            {
+                foreach (DataColumn col in dtTable.Columns)
+                {
+                    result.Append(col.ColumnName + ',');
+                }
+                result.Append("\r\n");
+                foreach (DataRow row in dtTable.Rows)
+                {
+                    foreach (DataColumn column in dtTable.Columns)
+                    {
+                        result.Append(row[column].ToString() + ',');
+                    }
+                    result.Append("\r\n");
+                }
+            }
+            return result.ToString();
+        }
+
+        private UserDataset CreateSubjectClinicalDataset(CombinedQuery query, string userId)
+        {
             var phenoDataset = new UserDataset();
             phenoDataset.Id = Guid.NewGuid();
             phenoDataset.OwnerId = userId;
@@ -76,53 +140,26 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeader = qObj.ObservationName
             }));
 
+            //ADD GROUPED CLINICAL OBSERVATIONS
             phenoDataset.Fields.AddRange(query.GroupedObservations.Select(gObs => new DatasetField()
             {
                 QueryObject = gObs,
                 QueryObjectType = nameof(SdtmRow),
                 ColumnHeader = gObs.ObservationName
             }));
+
             _userDatasetRepository.Insert(phenoDataset);
             _dataContext.Save();
-
-            return new List<UserDataset>() {phenoDataset};
+            return phenoDataset;
         }
-
-        public DataTable ExportDataset(string datasetId)
+        private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery)
         {
-            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            var projectId = dataset.ProjectId;
-
-            var exportData = _exportService.GetDatasetContent(projectId, dataset);
-
-            var dt = _exportService.GetDatasetTable(exportData,dataset);
-            dt.TableName = dataset.Name;
-
-            return dt;
-            
+            return null;
         }
 
-        public string downloadDatasets(DataTable dtTable)
+        private UserDataset CreateAssaySampleDataset(AssayPanelQuery assayPanelQuery)
         {
-            StringBuilder result = new StringBuilder();
-            if (dtTable.Columns.Count != 0)
-            {
-                foreach (DataColumn col in dtTable.Columns)
-                {
-                    result.Append(col.ColumnName + ',');
-                }
-                result.Append("\r\n");
-                foreach (DataRow row in dtTable.Rows)
-                {
-                    foreach (DataColumn column in dtTable.Columns)
-                    {
-                        result.Append(row[column].ToString() + ',');
-                    }
-                    result.Append("\r\n");
-                }
-            }
-            return result.ToString();
+            return null;
         }
-
     }
 }

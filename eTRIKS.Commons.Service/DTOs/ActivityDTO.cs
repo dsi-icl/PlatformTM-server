@@ -25,12 +25,4 @@ namespace eTRIKS.Commons.Service.DTOs
             datasets = new List<DatasetDTO>();
         }
     }
-
-    public class DatasetBriefDTO
-    {
-        public string Name { get; set; }
-        public int Id { get; set; }
-        public string DomainId {get; set; }
-        
-    }
 }

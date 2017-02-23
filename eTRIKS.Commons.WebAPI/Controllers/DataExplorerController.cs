@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using eTRIKS.Commons.WebAPI.Extensions;
@@ -107,5 +108,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _explorerService.GetProjectAssays(projectId);
         }
 
+        [HttpPost("projects/{projectId}/assays/{assayId}/samples/search")]
+        public DataTable GetAssaySamples(int projectId, int assayId, [FromBody] List<ObservationRequestDTO> characteristics)
+        {
+            return _explorerService.GetSampleDataForAssay(assayId, characteristics);
+        }
     }
 }
