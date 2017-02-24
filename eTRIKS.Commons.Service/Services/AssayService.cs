@@ -147,38 +147,7 @@ namespace eTRIKS.Commons.Service.Services
 
         
 
-        public Hashtable GetSamplesDataPerAssay(int assayId)
-        {
-            //var samples = new List<Biosample>();
-            var samples = _assayRepository.FindSingle(a => a.Id == assayId, new List<string>() {"Biosamples.Study","Biosamples.Subject"}).Biosamples;
-            //samples = _bioSampleRepository.FindAll
-            //    (bs => bs.AssayId.Equals(assayId), 
-            //    new List<string>()
-            //    {
-            //        "Study",
-            //        "Subject",
-            //        //"CollectionStudyDay"
-            //    }).ToList();
-
-            List<Hashtable> sample_table = new List<Hashtable>();
-            HashSet<string> SCs = new HashSet<string>() { "subjectId", "studyId", "sampleId", "studyDay#" };
-
-            foreach (Biosample sample in samples)
-            {
-                Hashtable ht = new Hashtable();
-                ht.Add("subjectId", sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing");
-                ht.Add("studyId", sample.Study.Name);
-                ht.Add("sampleId", sample.BiosampleStudyId);
-                //ht.Add("studyDay#", sample.CollectionStudyDay?.Number);
-                sample_table.Add(ht);
-            }
-            Hashtable returnObject = new Hashtable();
-            returnObject.Add("header", SCs);
-            returnObject.Add("data", sample_table);
-
-            return returnObject;
-
-        }
+        
 
         //public void addPA(int assayId, int fileId)
         //{
@@ -242,6 +211,10 @@ namespace eTRIKS.Commons.Service.Services
         //    cvTerm.IsUserSpecified = false;
         //    _templateService.addCVTerm(cvTerm);
 
+        //}
+        //public Hashtable GetSamplesDataPerAssay(int assayId)
+        //{
+        //    throw new NotImplementedException();
         //}
     }
 }

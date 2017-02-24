@@ -6,17 +6,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
-using System.Linq.Expressions;
-using System.Xml.Linq;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.Users;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using MongoDB.Bson.Serialization.Serializers;
-using Microsoft.AspNetCore.Http;
-using System.Text;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 
 
 namespace eTRIKS.Commons.Service.Services
@@ -31,8 +27,6 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<User, Guid> _userRepository;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
-
-
         private readonly IServiceUoW _dataContext;
         public DataExplorerService(IServiceUoW uoW)
         {
@@ -60,7 +54,6 @@ namespace eTRIKS.Commons.Service.Services
 
             foreach (var request in requests)
             {
-                
                 if (!request.IsMultipleObservations)
                 {
                     var oq = new ObservationQuery()
@@ -395,6 +388,50 @@ namespace eTRIKS.Commons.Service.Services
             returnObject.Add("data", subject_table);
 
             return returnObject;
+        }
+        public DataTable GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
+        {
+            //var samples = new List<Biosample>();
+            var samples = _assayRepository.FindSingle(a => a.Id == assayId, new List<string>() { "Biosamples.Study", "Biosamples.Subject" }).Biosamples;
+            //samples = _bioSampleRepository.FindAll
+            //    (bs => bs.AssayId.Equals(assayId), 
+            //    new List<string>()
+            //    {
+            //        "Study",
+            //        "Subject",
+            //        //"CollectionStudyDay"
+            //    }).ToList();
+
+            var sampleTable = new DataTable();
+            sampleTable.Columns.Add("subjectId");
+            sampleTable.Columns.Add("studyId");
+            sampleTable.Columns.Add("sampleId");
+
+            if (reqSampleChars != null)
+            {
+                foreach (var column in reqSampleChars)
+                    sampleTable.Columns.Add(column.Name.ToLower());
+            }
+                
+            foreach (var sample in samples)
+            {
+                var row = sampleTable.NewRow();
+                row["subjectId"] = sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing";
+                row["studyId"] = sample.Study.Name;
+                row["sampleId"] = sample.BiosampleStudyId;
+
+                if (reqSampleChars != null)
+                    foreach (var requestDto in reqSampleChars)
+                    {
+                        var charVal = sample.SampleCharacteristics.SingleOrDefault(sc => sc.CharacteristicObjectId.Equals(requestDto.O3id));
+                        if (charVal == null) continue;
+                        row[requestDto.Name] =  charVal.VerbatimValue;
+                    }
+                sampleTable.Rows.Add(row);
+            }
+            
+            return sampleTable;
+
         }
         #endregion
 
@@ -881,6 +918,7 @@ namespace eTRIKS.Commons.Service.Services
 
             if (assays.Count == 0)
                 return null;
+
             return assays.Select(p => new AssayDTO()
             {
                 Id = p.Id,

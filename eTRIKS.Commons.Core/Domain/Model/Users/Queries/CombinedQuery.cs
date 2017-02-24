@@ -11,13 +11,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
       
         public List<ObservationQuery> SubjectCharacteristics { get; set; }
         public List<ObservationQuery> ClinicalObservations { get; set; }
-       // public List<ObservationQuery> AssayParameters { get; set; }
+        public List<GroupedObservationsQuery> GroupedObservations { get; set; }
         public List<ObservationQuery> DesignElements { get; set; }
+        public List<AssayPanelQuery> AssayPanels { get; set; }
 
         public Guid UserId { get; set; }
         public int ProjectId { get; set; }
         public string Name { get; set; }
-        public List<GroupedObservationsQuery> GroupedObservations { get; set; }
 
         public CombinedQuery()
         {
@@ -25,6 +25,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
             ClinicalObservations = new List<ObservationQuery>();
             DesignElements = new List<ObservationQuery>();
             GroupedObservations = new List<GroupedObservationsQuery>();
+            AssayPanels = new List<AssayPanelQuery>();
         }
     }
 }

@@ -48,6 +48,7 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
+        #region OLD METHODS
         public List<TreeNodeDTO> GetAvailableFields(int projectId)
         {
 
@@ -283,6 +284,8 @@ namespace eTRIKS.Commons.Service.Services
         //    return dataTree;
         //}
 
+        #endregion
+
         #region Checkout Methods
         public DataExportObject GetDatasetContent(int projectId, UserDataset userDataset)
         {
@@ -294,35 +297,27 @@ namespace eTRIKS.Commons.Service.Services
                     new List<string>() {"StudyArm", "Study"}).ToList()
             };
 
- 
-
+            //QUERY FOR CLINICAL OBSERVATIONS
             var observationQueries = userDataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).Select(f=>f.QueryObject).ToList();
             exportData.Observations = getObservations(observationQueries);
+
+            //if sapleF
+            
 
             foreach (var selField in userDataset.Fields)
             {
                 switch (selField.QueryObjectType)
                 {
-                    //case nameof(SdtmRow):
-                        //var fieldObservations = getObservations(selField.QueryObject,  retrievedObservations);
-                        //var  sameO3observations = exportData.Observations.FindAll(o => fieldObservations.Exists(f => f.Id == o.Id));
-                        //if (sameO3observations.Any())
-                        //{
-                        //     var joinedObservations = sameO3observations.Intersect(fieldObservations).ToList();
-                        //    exportData.Observations.RemoveAll(o => fieldObservations.Exists(f => f.Id == o.Id));
-                        //    exportData.Observations.AddRange(joinedObservations);
-                        //}else
-                        
-                        //exportData.Observations.AddRange(fieldObservations);
-                    //    exportData.IsSubjectIncluded = true;
-                     //   break;
                     case nameof(SubjectCharacteristic):
                         //TODO:Need to do a separate query for dates
                         var obsQuery = selField.QueryObject;
+
+                        //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
                         var characteristics = _subjectCharacteristicRepository.FindAll(
                            sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicObjectId,
                            new List<string>() { "Subject" }).ToList();
 
+                        //APPLY FILTERING IF FILTER PRESENT
                         if (characteristics.Any() && obsQuery.IsFiltered)
                         {
                             characteristics = (obsQuery.DataType == "string")
@@ -331,6 +326,8 @@ namespace eTRIKS.Commons.Service.Services
                                                             int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
                                                             int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
                         }
+
+                        //ADD TO EXPORT DATA 
                         exportData.SubjChars.AddRange(characteristics);
                         exportData.IsSubjectIncluded = true;
                         break;
@@ -352,6 +349,8 @@ namespace eTRIKS.Commons.Service.Services
                     //    exportData.SubjChars.AddRange(characteristics);
                     //    exportData.IsSubjectIncluded = true;
                     //    break;
+
+                  
                     case nameof(Arm):
                         if (selField.QueryObject.IsFiltered)
                             exportData.Arms = _armRepository.FindAll(
@@ -562,12 +561,15 @@ namespace eTRIKS.Commons.Service.Services
                 var subjectCharacteristics = exportData.SubjChars.FindAll(sc => sc.SubjectId == subject.Id).ToList();
                 //var uniqSubjectId = subjectObservations.FirstOrDefault().USubjId;
 
+
+
+
                 var firstRow = true;
                 while (subjectObservations.Any() || firstRow )
                 {
                     var row = datatable.NewRow();
                     firstRow = false;
-
+                    
                     #region Design Elements
                     row["subjectid"] = uniqSubjectId;
                     row["studyid"] = subject.Study.Name;
