@@ -22,6 +22,6 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel
         public string Path { get; set; }
         public bool IsDirectory { get; set; }
 
-        public bool LoadedToDB { get; set; }
+        public bool IsLoadedToDB { get; set; }
     }
 }
