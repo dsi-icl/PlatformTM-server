@@ -48,11 +48,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public VariableDefinition EndStudyDayVariable { get; set; } //--ENDY
 
         //SUBJECT SPECIFIC VARIABLES
-        public VariableDefinition ArmVariable { get; set; }
-        public VariableDefinition ArmCodeVariable { get; set; }
-        public VariableDefinition RefStartDate { get; set; }
-        public VariableDefinition RefEndDate { get; set; }
-        public VariableDefinition SiteIdVariable { get; set; }
+        //public VariableDefinition ArmVariable { get; set; }
+        //public VariableDefinition ArmCodeVariable { get; set; }
+        //public VariableDefinition RefStartDate { get; set; }
+        //public VariableDefinition RefEndDate { get; set; }
+        //public VariableDefinition SiteIdVariable { get; set; }
 
         public bool ObsIsAFinding { get; set; } = false;
         public bool ObsIsAnEvent { get; set; } = false;
@@ -64,7 +64,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 
 
 
-        public Dictionary<string, VariableDefinition> name2variable { get; set; }
+        //public Dictionary<string, VariableDefinition> name2variable { get; set; }
 
         public static SdtmRowDescriptor GetSdtmRowDescriptor(Dataset dataset)
         {
@@ -178,17 +178,17 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == descriptor.DomainCode + "ENDY")?.VariableDefinition;
 
 
-            //DEMOGRAPHICS SPECIFIC VARIABLES
-            //ARM
-            descriptor.ArmVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARM")?.VariableDefinition;
-            //ARMCODE
-            descriptor.ArmCodeVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARMCD")?.VariableDefinition;
-            //Subject Reference Start Date
-            descriptor.RefStartDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFSTDTC")?.VariableDefinition;
-            //Reference End Date
-            descriptor.RefEndDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFENDTC")?.VariableDefinition;
-            //SITE ID
-            descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
+            ////DEMOGRAPHICS SPECIFIC VARIABLES
+            ////ARM
+            //descriptor.ArmVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARM")?.VariableDefinition;
+            ////ARMCODE
+            //descriptor.ArmCodeVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARMCD")?.VariableDefinition;
+            ////Subject Reference Start Date
+            //descriptor.RefStartDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFSTDTC")?.VariableDefinition;
+            ////Reference End Date
+            //descriptor.RefEndDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFENDTC")?.VariableDefinition;
+            ////SITE ID
+            //descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
 
             return descriptor;
         }
