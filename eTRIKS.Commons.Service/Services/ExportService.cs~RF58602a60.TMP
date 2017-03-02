@@ -14,7 +14,6 @@ using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using MongoDB.Bson;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
@@ -33,16 +32,8 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Arm, string> _armRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
 
-        // Vahid  added start ******************************************************************************************************************
-        private readonly IRepository<Biosample, int> _bioSampleRepository;
-        private DataExplorerService _explorerService;  // TO FIND ASSAY
-        private readonly IRepository<Assay, int> _assayRepository;  // TO FIND BIOSAMPLES 
-        // also added @DataExplorerService explorerService@ to  public ExportService(IServiceUoW uoW, DataExplorerService explorerService)
-        // Vahid  added finish ******************************************************************************************************************
 
-
-
-        public ExportService(IServiceUoW uoW, DataExplorerService explorerService)
+        public ExportService(IServiceUoW uoW)
         {
             _dataContext = uoW;
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
@@ -55,15 +46,8 @@ namespace eTRIKS.Commons.Service.Services
             _armRepository = uoW.GetRepository<Arm, string>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
 
-            // Vahid  added start ******************************************************************************************************************
-            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
-            _explorerService = explorerService;
-            _assayRepository = uoW.GetRepository<Assay, int>();
-            // Vahid  added finish ******************************************************************************************************************
-
         }
 
-        #region OLD METHODS
         public List<TreeNodeDTO> GetAvailableFields(int projectId)
         {
 
@@ -299,8 +283,6 @@ namespace eTRIKS.Commons.Service.Services
         //    return dataTree;
         //}
 
-        #endregion
-
         #region Checkout Methods
         public DataExportObject GetDatasetContent(int projectId, UserDataset userDataset)
         {
@@ -312,27 +294,35 @@ namespace eTRIKS.Commons.Service.Services
                     new List<string>() {"StudyArm", "Study"}).ToList()
             };
 
-            //QUERY FOR CLINICAL OBSERVATIONS
+ 
+
             var observationQueries = userDataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).Select(f=>f.QueryObject).ToList();
             exportData.Observations = getObservations(observationQueries);
-
-            //if sapleF
-            
 
             foreach (var selField in userDataset.Fields)
             {
                 switch (selField.QueryObjectType)
                 {
+                    //case nameof(SdtmRow):
+                        //var fieldObservations = getObservations(selField.QueryObject,  retrievedObservations);
+                        //var  sameO3observations = exportData.Observations.FindAll(o => fieldObservations.Exists(f => f.Id == o.Id));
+                        //if (sameO3observations.Any())
+                        //{
+                        //     var joinedObservations = sameO3observations.Intersect(fieldObservations).ToList();
+                        //    exportData.Observations.RemoveAll(o => fieldObservations.Exists(f => f.Id == o.Id));
+                        //    exportData.Observations.AddRange(joinedObservations);
+                        //}else
+                        
+                        //exportData.Observations.AddRange(fieldObservations);
+                    //    exportData.IsSubjectIncluded = true;
+                     //   break;
                     case nameof(SubjectCharacteristic):
                         //TODO:Need to do a separate query for dates
                         var obsQuery = selField.QueryObject;
-
-                        //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
                         var characteristics = _subjectCharacteristicRepository.FindAll(
                            sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicObjectId,
                            new List<string>() { "Subject" }).ToList();
 
-                        //APPLY FILTERING IF FILTER PRESENT
                         if (characteristics.Any() && obsQuery.IsFiltered)
                         {
                             characteristics = (obsQuery.DataType == "string")
@@ -341,8 +331,6 @@ namespace eTRIKS.Commons.Service.Services
                                                             int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
                                                             int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
                         }
-
-                        //ADD TO EXPORT DATA 
                         exportData.SubjChars.AddRange(characteristics);
                         exportData.IsSubjectIncluded = true;
                         break;
@@ -364,45 +352,6 @@ namespace eTRIKS.Commons.Service.Services
                     //    exportData.SubjChars.AddRange(characteristics);
                     //    exportData.IsSubjectIncluded = true;
                     //    break;
-
-
-
-
-                     //  added start ******************************************************************************************************************
-                        case nameof(SampleCharacteristic):
-                        // you need to get all the samples for the assay and added to exportData object then access it from exportr servoive after looping over subjects to write the samples for each subject. 
-                        //For now it has only two raw which are subjectID and sample id but then this need to be expanded if sample characteristics are included 
-
-                        /*
-                                                //added the property of  AssayPanels in DatasetField.cs   *********          Ibrahim said it is not necessery to use assayPanel in this method to access assayId insetad we use queryObject
-                                                var AssayPanelQuery = selField.AssayPanels;
-                                                var samples1 = _bioSampleRepository.FindAll(bs =>bs.Subject.Study.ProjectId == projectId && bs.AssayId == AssayPanelQuery.AssayId, new List<string>() { "Subject" }).ToList();
-                         */
-
-                        //  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ What does the following actually do????? "Biosamples.Study", "Biosamples.Subject"
-                        var observationQuery = selField.QueryObject;
-                        observationQuery.TermId = 89;
-
-                        var samples = _bioSampleRepository.FindAll(bs => bs.Subject.Study.ProjectId == projectId && bs.AssayId == observationQuery.TermId, new List<string>() { "Biosamples.SampleCharacteristics", "Biosamples.Subject" }).ToList();
-                       
-                        // If filter is used for samples then samples should be chosen accordingly
-                       if (samples.Any() && observationQuery.IsFiltered)
-                        {
-
-                            //samples = (observationQuery.DataType == "string")
-                            //    ? samples.FindAll(bs => observationQuery.FilterExactValues.Contains(bs.VerbatimValue))
-                            //    : samples.FindAll(bs => int.Parse(bs.VerbatimValue) >= observationQuery.FilterRangeFrom && int.Parse(bs.VerbatimValue) <= observationQuery.FilterRangeTo);
-                        }
-
-                        exportData.Samples.AddRange(samples);
-                      
-                        //added the bool of  IsSampleIncluded in DataExportObject.cs ********* 
-                        exportData.IsSampleIncluded = true;
-
-                        break;
-
-                    // added finish ******************************************************************************************************************
-                    
                     case nameof(Arm):
                         if (selField.QueryObject.IsFiltered)
                             exportData.Arms = _armRepository.FindAll(
@@ -606,51 +555,19 @@ namespace eTRIKS.Commons.Service.Services
 
             var fieldsByO3Id = dataset.Fields.FindAll(f=> f.QueryObjectType == nameof(SdtmRow)).GroupBy(f => f.QueryObject.QueryObjectName).ToList();
             var subjCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SubjectCharacteristic)).ToList();
-            
             foreach (var subject in exportData.Subjects)
             {
-
-                // added start ******************************************************************************************************************
-                if (exportData.IsSampleIncluded = true)
-                {
-                    datatable.Columns.Add("subjectid");
-                    datatable.Columns.Add("sampleid");
-
-                    foreach (var sample in exportData.Samples)
-                    {
-                        var row = datatable.NewRow();
-                       
-                        row["studyid"] = subject.Study.Name;
-                        row["subjectid"] = subject.UniqueSubjectId;
-                        row["sampleid"] = sample.BiosampleStudyId;
-
-                        if (sample.SampleCharacteristics != null)
-                        foreach (var characteristic in sample.SampleCharacteristics)
-                            { 
-                                var sampleCharVal = sample.SampleCharacteristics.SingleOrDefault(sc => sc.CharacteristicObjectId.Equals(characteristic.CharacteristicObjectId));
-                                if (sampleCharVal != null)
-                                row[characteristic.CharacteristicObject] = sampleCharVal.VerbatimValue;
-                             }
-
-                        datatable.Rows.Add(row);
-                    }
-                }
-                // added finish******************************************************************************************************************
-
                 var uniqSubjectId = subject.UniqueSubjectId;
                 var subjectObservations = exportData.Observations.FindAll(o => o.USubjId == uniqSubjectId).ToList();
                 var subjectCharacteristics = exportData.SubjChars.FindAll(sc => sc.SubjectId == subject.Id).ToList();
                 //var uniqSubjectId = subjectObservations.FirstOrDefault().USubjId;
-
-
-
 
                 var firstRow = true;
                 while (subjectObservations.Any() || firstRow )
                 {
                     var row = datatable.NewRow();
                     firstRow = false;
-                    
+
                     #region Design Elements
                     row["subjectid"] = uniqSubjectId;
                     row["studyid"] = subject.Study.Name;
@@ -737,13 +654,6 @@ namespace eTRIKS.Commons.Service.Services
             //var projections = new List<string>();
             datatable.Columns.Add("SUBJECTID");
             datatable.Columns.Add("STUDY");
-
-            // Vahid  added start ******************************************************************************************************************
-            // to be editted accordingly 
-            //  datatable.Columns.Add("SAMPLEID");
-            // Vahid  added finish *****************************************************************************************************************
-
-
 
             foreach (var field in userDataset.Fields)
             {

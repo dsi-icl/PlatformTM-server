@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
@@ -75,13 +76,14 @@ namespace eTRIKS.Commons.Service.Services
                         FilterRangeTo = request.FilterRangeTo,
                         IsFiltered = request.IsFiltered
                     };
+
                     if (request.IsSubjectCharacteristics)
                         cQuery.SubjectCharacteristics.Add(oq);
                     if (request.IsClinicalObservations)
                         cQuery.ClinicalObservations.Add(oq);
                     if (request.IsDesignElement)
                         cQuery.DesignElements.Add(oq);
-                }
+                    }
                 else
                 {
                     var goq = new GroupedObservationsQuery()
@@ -115,6 +117,39 @@ namespace eTRIKS.Commons.Service.Services
                     cQuery.GroupedObservations.Add(goq);
                 }
             }
+
+           //Added strat********************************************************************************************************************************************************
+            foreach (var assayRequest in cdto.AssayPanels)
+            { 
+                var apq = new AssayPanelQuery();
+                apq.AssayId = assayRequest.AssayId;
+
+                foreach (var ap in assayRequest.SampleQuery)
+                {
+                  var oq = new ObservationQuery()
+                    {
+                        TermName = ap.O3,
+                        TermId = ap.O3id,
+                        PropertyName = ap.QO2,
+                        PropertyId = ap.QO2id,
+                        ProjectId = ap.ProjectId,
+
+                        Group = ap.Group,
+                        IsOntologyEntry = ap.IsOntologyEntry,
+                        TermCategory = ap.OntologyEntryCategoryName,
+
+                        ObservationObjectShortName = ap.O3code,
+                        DataType = ap.DataType,
+                        FilterExactValues = ap.FilterExactValues,
+                        FilterRangeFrom = ap.FilterRangeFrom,
+                        FilterRangeTo = ap.FilterRangeTo,
+                        IsFiltered = ap.IsFiltered
+                    };
+                    apq.SampleQuery.Add(oq);
+                }
+                cQuery.AssayPanels.Add(apq);
+            } 
+          //Added Finish******************************************************************************************************************************************************
             return _combinedQueryRepository.Insert(cQuery);
         }
 

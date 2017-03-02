@@ -33,7 +33,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("{fileId}/remove")]
+        [Route("remove/{fileId}")]
         public void DeleteFile(int fileId)
         {
             _fileService.DeleteFile(fileId);

@@ -13,7 +13,7 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public string Type { get; set; }
         public string Design { get; set; }
         public string Name { get; set; }
-        public AssayPanelQuery AssayPanelQuery { get; set; }
+        public AssayPanelQueryDTO AssayPanelQuery { get; set; }
         
     }
 }
