@@ -15,7 +15,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
         private readonly IRepository<Study, int> _studyRepository;
-        private readonly IRepository<CharacteristicObject, int> _characteristicObjRepository;
+        private readonly IRepository<CharacteristicFeature, int> _characteristicObjRepository;
 
         private readonly IServiceUoW _dataContext;
 
@@ -25,24 +25,17 @@ namespace eTRIKS.Commons.Service.Services
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _studyRepository = uoW.GetRepository<Study, int>();
-            _characteristicObjRepository = uoW.GetRepository<CharacteristicObject, int>();
+            _characteristicObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
         }
 
         public bool LoadBioSamples(List<SdtmRow> sampleData, int datasetId)
         {
-            var dataset = _datasetRepository.FindSingle(d => d.Id.Equals(datasetId),
-                new List<string>()
-                {
-                    "Variables.VariableDefinition"
-                });
+            var dataset = _datasetRepository.FindSingle(d => d.Id.Equals(datasetId),new List<string>(){"Variables.VariableDefinition"});
             var studyMap = new Dictionary<string, int>();
-
-            var scos = new Dictionary<string, CharacteristicObject>();
             var scoList = _characteristicObjRepository.FindAll(s => s.ProjectId.Equals(dataset.Activity.ProjectId)).ToList();
-            foreach (var co in scoList)
-            {
-                scos.Add(co.ShortName, co);
-            }
+
+            var scos = scoList.ToDictionary(co => co.ShortName);
+
             foreach (SdtmRow sdtmEntity in sampleData)
             {
                 Study study;
@@ -80,14 +73,14 @@ namespace eTRIKS.Commons.Service.Services
 
                     if (dsVar != null)
                     {
-                        CharacteristicObject sco;
+                        CharacteristicFeature sco;
                         scos.TryGetValue(sdtmEntity.Topic, out sco);
                         if (sco == null)
                         {
                             /**
                              * CREATING NEW CHARACTERISTIC OBJECT
                              */
-                            sco = new CharacteristicObject()
+                            sco = new CharacteristicFeature()
                             {
                                 ShortName = sdtmEntity.Topic,//characteristicVar.VariableDefinition.Name,
                                 FullName = sdtmEntity.TopicSynonym,//characteristicVar.VariableDefinition.Label,
@@ -102,10 +95,10 @@ namespace eTRIKS.Commons.Service.Services
                         {
 
                            // DatasetVariable = dsVar,
-                            CharacteristicObject = sco,
+                            CharacteristicFeature = sco,
                             VerbatimName = sdtmEntity.TopicSynonym,
                             VerbatimValue = resqualifier.Value,
-                            DatasetDomainCode = sdtmEntity.DomainCode
+                            //DatasetDomainCode = sdtmEntity.DomainCode
                         });
                     }
                 }
@@ -116,14 +109,14 @@ namespace eTRIKS.Commons.Service.Services
                     var dsVar = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name.Equals(qualifier.Key));
                     if (dsVar != null)
                     {
-                        CharacteristicObject sco;
+                        CharacteristicFeature sco;
                         scos.TryGetValue(qualifier.Key, out sco);
                         if (sco == null)
                         {
                             /**
                              * CREATING NEW CHARACTERISTIC OBJECT
                              */
-                            sco = new CharacteristicObject()
+                            sco = new CharacteristicFeature()
                             {
                                 ShortName = dsVar.VariableDefinition.Name,
                                 FullName = dsVar.VariableDefinition.Label,
@@ -138,9 +131,9 @@ namespace eTRIKS.Commons.Service.Services
 
                             VerbatimName = qualifier.Key,
                             VerbatimValue = qualifier.Value,
-                            DatasetDomainCode = sdtmEntity.DomainCode,
+                            //DatasetDomainCode = sdtmEntity.DomainCode,
                             //DatasetVariable =dsVar,
-                            CharacteristicObject = sco,
+                            CharacteristicFeature = sco,
                         });
                     }
                 }

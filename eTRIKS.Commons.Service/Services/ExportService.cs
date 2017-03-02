@@ -24,7 +24,7 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<DatasetTemplate, string> _domainTemplate;
-        private readonly IRepository<CharacteristicObject, int> _characObjRepository;
+        private readonly IRepository<CharacteristicFeature, int> _characObjRepository;
         private IServiceUoW _dataContext;
         private readonly IRepository<Core.Domain.Model.Observation, int> _observationRepository;
         private readonly IRepository<Visit, int> _visitRepository;
@@ -47,7 +47,7 @@ namespace eTRIKS.Commons.Service.Services
             _dataContext = uoW;
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _observationRepository = uoW.GetRepository<Core.Domain.Model.Observation, int>();
-            _characObjRepository = uoW.GetRepository<CharacteristicObject, int>();
+            _characObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
             _domainTemplate = uoW.GetRepository<DatasetTemplate, string>();
             _visitRepository = uoW.GetRepository<Visit, int>();
             _subjectCharacteristicRepository = uoW.GetRepository<SubjectCharacteristic, int>();
@@ -211,7 +211,7 @@ namespace eTRIKS.Commons.Service.Services
             //Will get values for subj charaterisitcs from SQL
             else if (field.Entity == typeof(SubjectCharacteristic).FullName)
             {
-                var subjectObservations = _subjectCharacteristicRepository.FindAll(sc => sc.CharacteristicObjectId == field.EntityId);
+                var subjectObservations = _subjectCharacteristicRepository.FindAll(sc => sc.CharacteristicFeatureId == field.EntityId);
 
                 var vals = subjectObservations.Select(s => s.VerbatimValue).Distinct().ToList();
                 filter.Field = field;
@@ -329,7 +329,7 @@ namespace eTRIKS.Commons.Service.Services
 
                         //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
                         var characteristics = _subjectCharacteristicRepository.FindAll(
-                           sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicObjectId,
+                           sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicFeatureId,
                            new List<string>() { "Subject" }).ToList();
 
                         //APPLY FILTERING IF FILTER PRESENT
@@ -350,7 +350,7 @@ namespace eTRIKS.Commons.Service.Services
                     //    //TODO:Need to do a separate query for dates
                     //    var obsQuery = selField.QueryObject;
                     //    var characteristics = _subjectCharacteristicRepository.FindAll(
-                    //       sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicObjectId,
+                    //       sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicFeatureId,
                     //       new List<string>() { "Subject" }).ToList();
 
                     //    if (characteristics.Any() && obsQuery.IsFiltered)
@@ -662,7 +662,7 @@ namespace eTRIKS.Commons.Service.Services
                     foreach (var subjCharField in subjCharacsFields)
                     {
                         var charVal = subjectCharacteristics.SingleOrDefault(
-                                        sc => sc.CharacteristicObjectId.Equals(subjCharField.QueryObject.TermId));
+                                        sc => sc.CharacteristicFeatureId.Equals(subjCharField.QueryObject.TermId));
                         if (charVal != null)
                             row[subjCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
 
@@ -834,7 +834,7 @@ namespace eTRIKS.Commons.Service.Services
                 //else if (selField.Entity == typeof(SubjectCharacteristic).FullName)
                 //{
                 //    var characteristics = _subjectCharacteristicRepository.FindAll(
-                //        sc => sc.Subject.Study.ProjectId == projectId && selField.EntityId == sc.CharacteristicObjectId,
+                //        sc => sc.Subject.Study.ProjectId == projectId && selField.EntityId == sc.CharacteristicFeatureId,
                 //        new List<string>() { "Subject" }).ToList();
                 //    //APPLY filter here?
                 //    exportData.SubjChars.AddRange(characteristics);
@@ -904,7 +904,7 @@ namespace eTRIKS.Commons.Service.Services
                         if (exportData.SubjChars == null)
                             fillSubjCharData(exportData, filter.DataField, projectId);
                         exportData.SubjChars = exportData.SubjChars.FindAll(
-                        sc => sc.CharacteristicObjectId == filter.DataField.EntityId &&
+                        sc => sc.CharacteristicFeatureId == filter.DataField.EntityId &&
                         ((DataFilterExact)filter).Values.Contains(sc.VerbatimValue));
 
                         exportData.Observations =
@@ -1010,7 +1010,7 @@ namespace eTRIKS.Commons.Service.Services
         private void fillSubjCharData(DataExportObject exportData, DataField field, int projectId)
         {
             var characteristics = _subjectCharacteristicRepository.FindAll(
-                        sc => sc.Subject.Study.ProjectId == projectId && field.EntityId == sc.CharacteristicObjectId,
+                        sc => sc.Subject.Study.ProjectId == projectId && field.EntityId == sc.CharacteristicFeatureId,
                         new List<string>() { "Subject" }).ToList();
             //APPLY filter here?
             //exportData = exportData;

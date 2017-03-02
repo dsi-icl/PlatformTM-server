@@ -79,7 +79,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         */
          
         [HttpPost("projects/{projectId}/subjects/search")]
-        public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
+        public  DataTable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {
             return  _explorerService.GetSubjectData(projectId, requestedSCs);
         }
@@ -103,7 +103,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("projects/{projectId}/assays/browse")]
-        public List<AssayDTO> GetAssays(int projectId)
+        public List<AssayBrowserDTO> GetAssays(int projectId)
         {
             return _explorerService.GetProjectAssays(projectId);
         }

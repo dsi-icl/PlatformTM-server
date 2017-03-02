@@ -13,6 +13,7 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.JoinEntities;
+using eTRIKS.Commons.Service.Services.Loading.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -569,7 +570,7 @@ namespace eTRIKS.Commons.Service.Services
             var loaded = false;
 
             var dataFile = _dataFileRepository.Get(fileId);
-            if (dataFile.State == "LOADED")
+            if (dataFile.IsLoadedToDB)
                 reload = true;
 
 
@@ -586,13 +587,15 @@ namespace eTRIKS.Commons.Service.Services
             {
                 if (dataset.Template.Code.Equals("DM"))
                 {
-                    var subjectService = new SubjectService(_dataServiceUnit);
-                    loaded = subjectService.LoadSubjects(sdtmData, sdtmRowDescriptor);
+                    var sdtmSubjectDescriptor = SdtmSubjectDescriptor.GetSdtmSubjectDescriptor(dataset);
+                    var subjectLoader = new SubjectLoader(_dataServiceUnit);
+                    loaded = subjectLoader.LoadSubjects(sdtmData, sdtmSubjectDescriptor);
                 }
                 else if (dataset.Template.Code.Equals("BS"))
                 {
-                    var sampleService = new BioSampleService(_dataServiceUnit);
-                    loaded = sampleService.LoadBioSamples(sdtmData, datasetId);
+                    var sdtmSampleDescriptor = SdtmSampleDescriptor.GetSdtmSampleDescriptor(dataset);
+                    var sampleLoader = new BioSampleLoader(_dataServiceUnit);
+                    loaded = sampleLoader.LoadBioSamples(sdtmData, sdtmSampleDescriptor, reload);
                 }
                 else if (dataset.Template.Code.Equals("CY") || dataset.Template.Code.Equals("HD"))
                 {
@@ -613,6 +616,7 @@ namespace eTRIKS.Commons.Service.Services
                 if (loaded)
                 {
                     dataFile.State = "LOADED";
+                    dataFile.IsLoadedToDB = true;
                     _dataFileRepository.Update(dataFile);
                     if (!dataset.DataFiles.Select(d=>d.Datafile).Any(d => d.Id.Equals(fileId)))
                     {

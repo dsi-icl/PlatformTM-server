@@ -86,7 +86,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string GetSubjCharacterisiticForSubject(string subjectId, int characteristicId)
         {
             return
-                SubjChars.Find(sc => sc.SubjectId == subjectId && sc.CharacteristicObjectId == characteristicId)?
+                SubjChars.Find(sc => sc.SubjectId == subjectId && sc.CharacteristicFeatureId == characteristicId)?
                     .VerbatimValue;
         }
 

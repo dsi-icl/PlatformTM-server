@@ -18,5 +18,7 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
        }
 //********************************************************************************************************************************************************
 
+      public List<AssayPanelQuery> AssayPanelQueries { get; set; }
+
     }
 }
