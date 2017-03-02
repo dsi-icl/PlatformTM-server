@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
@@ -55,6 +54,7 @@ namespace eTRIKS.Commons.Service.Services
 
             //Creates a subject-to-sample mapping dataset for each selected assay
             checkoutDatasets.AddRange(query.AssayPanels.Select(CreateAssaySampleDataset));
+
             
             //Creates assay data dataset for each selected assay
             checkoutDatasets.AddRange(query.AssayPanels.Select(CreateAssayPanelDataset));
@@ -152,7 +152,8 @@ namespace eTRIKS.Commons.Service.Services
             _dataContext.Save();
             return phenoDataset;
         }
-        private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery)
+
+        private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery, int projectId )
         {
             return null;
         }

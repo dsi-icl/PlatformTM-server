@@ -1009,7 +1009,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Characteristics_CharacteristicObjectId",
                 table: "Characteristics",
-                column: "CharacteristicObjectId");
+                column: "CharacteristicFeatureId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Characteristics_DatafileId",

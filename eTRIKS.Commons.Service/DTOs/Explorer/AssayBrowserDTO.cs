@@ -13,6 +13,9 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public string Type { get; set; }
         public string Design { get; set; }
         public string Name { get; set; }
+
+        public List<ObservationRequestDTO> SampleCharacteristics { get; set; }
+        public List<ObservationRequestDTO> FeatureAnnotations { get; set; }
         public AssayPanelQuery AssayPanelQuery { get; set; }
         
     }

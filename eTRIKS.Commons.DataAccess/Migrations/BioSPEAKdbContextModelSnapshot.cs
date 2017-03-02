@@ -99,6 +99,14 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<string>("BiosampleStudyId");
 
+                    b.Property<DateTime>("CollectionDateTime");
+
+                    b.Property<int?>("CollectionStudyDayId");
+
+                    b.Property<int?>("CollectionStudyTimePointId");
+
+                    b.Property<int?>("DataFileId");
+
                     b.Property<int>("DatasetId");
 
                     b.Property<bool?>("IsBaseline");
@@ -112,6 +120,12 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AssayId");
+
+                    b.HasIndex("CollectionStudyDayId");
+
+                    b.HasIndex("CollectionStudyTimePointId");
+
+                    b.HasIndex("DataFileId");
 
                     b.HasIndex("DatasetId");
 
@@ -132,13 +146,11 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<string>("CVtermId");
 
-                    b.Property<int>("CharacteristicObjectId");
+                    b.Property<int>("CharacteristicFeatureId");
 
                     b.Property<string>("ControlledValueStr");
 
                     b.Property<int?>("DatafileId");
-
-                    b.Property<string>("DatasetDomainCode");
 
                     b.Property<int>("DatasetId");
 
@@ -155,7 +167,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.HasIndex("CVtermId");
 
-                    b.HasIndex("CharacteristicObjectId");
+                    b.HasIndex("CharacteristicFeatureId");
 
                     b.HasIndex("DatafileId")
                         .IsUnique();
@@ -168,11 +180,13 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                     b.HasDiscriminator<string>("Discriminator");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicObject", b =>
+            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnName("CharacteristicObjId");
+
+                    b.Property<int?>("ActivityId");
 
                     b.Property<string>("CVtermId");
 
@@ -187,6 +201,8 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                     b.Property<string>("ShortName");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
 
                     b.HasIndex("CVtermId");
 
@@ -325,7 +341,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<string>("LastModified");
 
-                    b.Property<bool>("LoadedToDB");
+                    b.Property<bool>("IsLoadedToDB");
 
                     b.Property<string>("Path");
 
@@ -679,10 +695,8 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<bool>("AllowMultipleValues");
 
-                    b.Property<string>("AllowableQualifiersId");
-
                     b.Property<string>("ControlledVocabularyId")
-                        .HasColumnName("DictionaryId")
+                        .HasColumnName("CVTermsDictionaryId")
                         .HasMaxLength(200);
 
                     b.Property<string>("DataType")
@@ -701,6 +715,8 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<int>("Order");
 
+                    b.Property<string>("QualifiersDictionaryId");
+
                     b.Property<string>("RoleId")
                         .HasColumnName("RoleTermId")
                         .HasMaxLength(200);
@@ -717,9 +733,9 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AllowableQualifiersId");
-
                     b.HasIndex("ControlledVocabularyId");
+
+                    b.HasIndex("QualifiersDictionaryId");
 
                     b.HasIndex("RoleId");
 
@@ -882,6 +898,8 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<string>("DesignTypeId");
 
+                    b.Property<bool>("HasTemporalData");
+
                     b.Property<string>("MeasurementTypeId");
 
                     b.Property<string>("PlatformAnnotationId");
@@ -984,6 +1002,18 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                         .HasForeignKey("AssayId")
                         .OnDelete(DeleteBehavior.Cascade);
 
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", "CollectionStudyDay")
+                        .WithMany()
+                        .HasForeignKey("CollectionStudyDayId");
+
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", "CollectionStudyTimePoint")
+                        .WithMany()
+                        .HasForeignKey("CollectionStudyTimePointId");
+
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "DataFile")
+                        .WithMany()
+                        .HasForeignKey("DataFileId");
+
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithMany()
                         .HasForeignKey("DatasetId")
@@ -1009,9 +1039,9 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("CVtermId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.CharacteristicObject", "CharacteristicObject")
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", "CharacteristicFeature")
                         .WithMany()
-                        .HasForeignKey("CharacteristicObjectId")
+                        .HasForeignKey("CharacteristicFeatureId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
@@ -1026,8 +1056,12 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicObject", b =>
+            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", b =>
                 {
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Activity", "Activity")
+                        .WithMany()
+                        .HasForeignKey("ActivityId");
+
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
                         .WithMany()
                         .HasForeignKey("CVtermId");
@@ -1200,13 +1234,13 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
             modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplateField", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "AllowableQualifiers")
-                        .WithMany()
-                        .HasForeignKey("AllowableQualifiersId");
-
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "ControlledVocabulary")
                         .WithMany()
                         .HasForeignKey("ControlledVocabularyId");
+
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "QualifiersDictionary")
+                        .WithMany()
+                        .HasForeignKey("QualifiersDictionaryId");
 
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "Role")
                         .WithMany()

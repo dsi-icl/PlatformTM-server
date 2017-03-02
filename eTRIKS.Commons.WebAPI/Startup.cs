@@ -12,6 +12,7 @@ using MySQL.Data.Entity.Extensions;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Service.Configuration;
+using eTRIKS.Commons.Service.Services.Loading.SDTM;
 using eTRIKS.Commons.WebAPI.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -93,12 +94,14 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<ProjectService>();
             services.AddScoped<SDTMreader>();
             services.AddScoped<StudyService>();
-            services.AddScoped<SubjectService>();
+            
             services.AddScoped<TemplateService>();
             services.AddScoped<UserDatasetService>();
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
 
+            services.AddScoped<SubjectLoader>();
+            services.AddScoped<BioSampleLoader>();
 
             services.AddAuthorization(auth =>
             {

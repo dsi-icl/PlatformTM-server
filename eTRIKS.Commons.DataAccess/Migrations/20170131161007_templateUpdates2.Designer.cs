@@ -133,7 +133,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<string>("CVtermId");
 
-                    b.Property<int>("CharacteristicObjectId");
+                    b.Property<int>("CharacteristicFeatureId");
 
                     b.Property<string>("ControlledValueStr");
 
@@ -156,7 +156,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.HasIndex("CVtermId");
 
-                    b.HasIndex("CharacteristicObjectId");
+                    b.HasIndex("CharacteristicFeatureId");
 
                     b.HasIndex("DatafileId")
                         .IsUnique();
@@ -169,7 +169,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                     b.HasDiscriminator<string>("Discriminator");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicObject", b =>
+            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -326,7 +326,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.Property<string>("LastModified");
 
-                    b.Property<bool>("LoadedToDB");
+                    b.Property<bool>("IsLoadedToDB");
 
                     b.Property<string>("Path");
 
@@ -1010,9 +1010,9 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                         .WithMany()
                         .HasForeignKey("CVtermId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.CharacteristicObject", "CharacteristicObject")
+                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", "CharacteristicFeature")
                         .WithMany()
-                        .HasForeignKey("CharacteristicObjectId")
+                        .HasForeignKey("CharacteristicFeatureId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
@@ -1027,7 +1027,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicObject", b =>
+            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", b =>
                 {
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
                         .WithMany()

@@ -103,7 +103,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             //_fileService.GetFullPath(projectId.ToString(), subdir?.Replace('_', '\\'));
             //    _fileService.GetProjectPath()
 
-            return _fileService.getUploadedFiles(projectId, relativePath);
+            return _fileService.GetUploadedFiles(projectId, relativePath);
         }
   
     }

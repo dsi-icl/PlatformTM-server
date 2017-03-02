@@ -45,29 +45,22 @@ namespace eTRIKS.Commons.Service.Services
             // _datasetService = datasetService;
             //  _datasetService = new DatasetService(uoW);
         }
-        public List<FileDTO> getUploadedFiles(int projectId,string path)
+        public List<FileDTO> GetUploadedFiles(int projectId,string path)
         {
-            List<FileDTO> fileDTOs = new List<FileDTO>();
-            
-
-
             var files = _fileRepository.FindAll(f => f.ProjectId == projectId && f.Path.Equals(path));
-            //DirectoryInfo f = new DirectoryInfo(path);
-            foreach (var file in files)
+            return files.Select(file => new FileDTO
             {
-                FileDTO fileDTO = new FileDTO();
-                fileDTO.FileName = file.FileName;
-                fileDTO.dateAdded = file.DateAdded;//.LastWriteTime.ToLongDateString();
-                fileDTO.dateLastModified = file.LastModified ?? file.DateAdded;
-                fileDTO.icon = "";
-                fileDTO.IsDirectory = file.IsDirectory;
-                fileDTO.selected = false;
-                fileDTOs.Add(fileDTO);
-                fileDTO.state = file.State;
-                fileDTO.DataFileId = file.Id;
-                fileDTO.path = file.Path;
-            }
-            return fileDTOs;
+                FileName = file.FileName,
+                dateAdded = file.DateAdded,
+                dateLastModified = file.LastModified ?? file.DateAdded,
+                icon = "",
+                IsDirectory = file.IsDirectory,
+                IsLoaded = file.IsLoadedToDB,
+                selected = false,
+                state = file.State,
+                DataFileId = file.Id,
+                path = file.Path
+            }).ToList();
         }
 
         public DirectoryInfo addDirectory(int projectId, string newDir)
@@ -176,7 +169,7 @@ namespace eTRIKS.Commons.Service.Services
             else
             {
                 file.LastModified = fi.LastWriteTime.ToString("d") + " " + fi.LastWriteTime.ToString("t");
-                if (file.LoadedToDB)
+                if (file.IsLoadedToDB)
                     file.State = "UPDATED";
                 _fileRepository.Update(file);
 
