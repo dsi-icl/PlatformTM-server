@@ -12,7 +12,7 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public string VerbatimValue { get; set; }
        
         public string ControlledValueStr { get; set; } //temporary
-        public string VerbatimName { get; set; }//will use to refer to characteristicObject Verbatim name 
+        public string VerbatimName { get; set; }//will use to refer to CharacteristicFeature Verbatim name 
 
         //public string Datatype { get; set; }
 

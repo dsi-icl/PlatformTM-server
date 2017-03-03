@@ -6,10 +6,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
     public class Query
     {
         public string QueryObjectName { get; set; }
-        public string EntityName { get; set; } //Subject // Observation // Sample // Feature?
+        //public string EntityName { get; set; } //Subject // Observation // Sample // Feature?
         
-        public string PropertyName { get; set; } //SubjectCharacteristics //SampleCharacteristics //Arm //StudyDay //Study
-        public string PropertyValue { get; set; } //QueryValue
+       // public string PropertyName { get; set; } //SubjectCharacteristics //SampleCharacteristics //Arm //StudyDay //Study
+       // public string PropertyValue { get; set; } //QueryValue
         public string DataType { get; set; }
         public int ProjectId { get; set; }
         public List<string> FilterExactValues { get; set; } //the set of values selected by the user

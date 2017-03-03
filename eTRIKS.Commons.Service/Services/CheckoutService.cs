@@ -79,7 +79,14 @@ namespace eTRIKS.Commons.Service.Services
 
             var exportData = _exportService.GetDatasetContent(projectId, dataset);
 
+            //write a seperate method like bellow
+        //  if  (exportData.IsSampleIncluded )
+            //   var dt = _exportService.GetSampleTable(exportData, dataset);
+
             var dt = _exportService.GetDatasetTable(exportData, dataset);
+
+
+
             dt.TableName = dataset.Name;
 
             return dt;
@@ -202,7 +209,7 @@ namespace eTRIKS.Commons.Service.Services
             //ADD  Range.  need to add sample ID and Assay Id in ObservationQuery 
             assaySampleDataset.Fields.AddRange(assayPanelQuery.SampleQuery.Select(qObj => new DatasetField()
             {
-                QueryObjectType = nameof(Biosample),
+                QueryObjectType = nameof(SampleCharacteristic),
                 //   AssayPanels = assayPanelQuery,
                 QueryObject = qObj,
                 ColumnHeader = qObj.ObservationName

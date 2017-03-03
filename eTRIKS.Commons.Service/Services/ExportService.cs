@@ -381,7 +381,7 @@ namespace eTRIKS.Commons.Service.Services
 
                         //  QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ What does the following actually do????? "Biosamples.Study", "Biosamples.Subject"
                         var observationQuery = selField.QueryObject;
-                        observationQuery.TermId = 89;
+                        observationQuery.TermId = 111;
 
                         var samples = _bioSampleRepository.FindAll(bs => bs.Subject.Study.ProjectId == projectId && bs.AssayId == observationQuery.TermId, new List<string>() { "Biosamples.SampleCharacteristics", "Biosamples.Subject" }).ToList();
                        
@@ -587,6 +587,47 @@ namespace eTRIKS.Commons.Service.Services
             return filteredObservations;
         }
 
+
+
+        // added start ******************************************************************************************************************
+       // you need BsonTypeMapperOptions seperate two methods BsonTypeMapperOptions not get confused 
+        //public DataTable GetSampleTable(DataExportObject exportData, UserDataset dataset)
+        //{
+        //    return null;
+            
+        //    //if (exportData.IsSampleIncluded)
+        //    //{
+        //    //    datatable.Columns.Add("subjectid");
+        //    //    datatable.Columns.Add("sampleid");
+        //    //    var sampleCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SampleCharacteristic)).ToList();
+
+        //    //    foreach (var sample in exportData.Samples)
+        //    //    {
+        //    //        var row = datatable.NewRow();
+
+        //    //        row["studyid"] = subject.Study.Name;
+        //    //        row["subjectid"] = subject.UniqueSubjectId;
+        //    //        row["sampleid"] = sample.BiosampleStudyId;
+
+        //    //        foreach (var sampleCharField in sampleCharacsFields)
+        //    //        {
+        //    //            var charVal = sample.SampleCharacteristics.SingleOrDefault(
+        //    //                            sc => sc.CharacteristicFeatureId.Equals(sampleCharField.QueryObject.TermId));
+        //    //            if (charVal != null)
+        //    //                row[sampleCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
+
+        //    //        }
+
+        //    //        datatable.Rows.Add(row);
+        //    //    }
+        //    //}
+
+
+        //}
+        // added start ******************************************************************************************************************
+
+
+
         public DataTable GetDatasetTable(DataExportObject exportData, UserDataset dataset)
         {
             #region Create Table Columns
@@ -601,6 +642,8 @@ namespace eTRIKS.Commons.Service.Services
 
             #endregion
 
+            /////TEMP////
+            exportData.IsSampleIncluded = true;
 
             //var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
 
@@ -611,10 +654,11 @@ namespace eTRIKS.Commons.Service.Services
             {
 
                 // added start ******************************************************************************************************************
-                if (exportData.IsSampleIncluded = true)
+                if (exportData.IsSampleIncluded)
                 {
                     datatable.Columns.Add("subjectid");
                     datatable.Columns.Add("sampleid");
+                    var sampleCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SampleCharacteristic)).ToList();
 
                     foreach (var sample in exportData.Samples)
                     {
@@ -624,13 +668,14 @@ namespace eTRIKS.Commons.Service.Services
                         row["subjectid"] = subject.UniqueSubjectId;
                         row["sampleid"] = sample.BiosampleStudyId;
 
-                        if (sample.SampleCharacteristics != null)
-                        foreach (var characteristic in sample.SampleCharacteristics)
-                            { 
-                                var sampleCharVal = sample.SampleCharacteristics.SingleOrDefault(sc => sc.CharacteristicObjectId.Equals(characteristic.CharacteristicObjectId));
-                                if (sampleCharVal != null)
-                                row[characteristic.CharacteristicObject] = sampleCharVal.VerbatimValue;
-                             }
+                        foreach (var sampleCharField in sampleCharacsFields)
+                        {
+                            var charVal = sample.SampleCharacteristics.SingleOrDefault(
+                                            sc => sc.CharacteristicFeatureId.Equals(sampleCharField.QueryObject.TermId));
+                            if (charVal != null)
+                                row[sampleCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
+
+                        }
 
                         datatable.Rows.Add(row);
                     }
@@ -645,7 +690,7 @@ namespace eTRIKS.Commons.Service.Services
 
 
 
-                var firstRow = true;
+                var firstRow = false;
                 while (subjectObservations.Any() || firstRow )
                 {
                     var row = datatable.NewRow();

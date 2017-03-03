@@ -59,6 +59,16 @@ namespace eTRIKS.Commons.Service.Services
             cQuery.ProjectId = projectId;
             cQuery.Id = Guid.NewGuid();
 
+
+           ///////////////////////////// Temporary///////////////////////////////////////////////////////
+            //var asp = new AssayPanelQueryDTO();
+            //asp.AssayId = 111;
+            //cdto.AssayPanels.Add(asp);
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
             var requests = cdto.ObsRequests;
 
             foreach (var request in requests)
