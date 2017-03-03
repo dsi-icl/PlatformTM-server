@@ -49,6 +49,7 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public float FilterRangeTo { get; set; } //the to value selected by user
         public bool IsFiltered { get; set; }
         public string Group { get; set; }
+        public int ActivityId { get; set; }
 
         public ObservationRequestDTO()
         {

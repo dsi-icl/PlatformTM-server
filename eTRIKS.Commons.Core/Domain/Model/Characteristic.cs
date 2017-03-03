@@ -4,7 +4,7 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 
 namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public abstract class Characterisitc : Identifiable<int>
+    public abstract class Characteristic : Identifiable<int>
     {
         public CharacteristicFeature CharacteristicFeature { get; set; }
         public int CharacteristicFeatureId { get; set; }

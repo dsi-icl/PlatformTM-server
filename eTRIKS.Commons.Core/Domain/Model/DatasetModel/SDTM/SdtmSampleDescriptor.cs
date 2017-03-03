@@ -104,11 +104,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 
         public VariableDefinition GetValueVariable(SdtmRow sdtmRow)
         {
-            if (sdtmRow.ResultQualifiers.ContainsKey(CharacteristicNumValueVariable.Name) && sdtmRow.ResultQualifiers[CharacteristicNumValueVariable.Name] != "")
+            if (CharacteristicNumValueVariable != null && sdtmRow.ResultQualifiers.ContainsKey(CharacteristicNumValueVariable.Name) && sdtmRow.ResultQualifiers[CharacteristicNumValueVariable.Name] != "")
             {
                 return CharacteristicNumValueVariable;
             }
-            if (sdtmRow.ResultQualifiers.ContainsKey(CharacteristicCharValueVariable.Name) && sdtmRow.ResultQualifiers[CharacteristicCharValueVariable.Name] != "")
+            if (CharacteristicCharValueVariable !=null && sdtmRow.ResultQualifiers.ContainsKey(CharacteristicCharValueVariable.Name) && sdtmRow.ResultQualifiers[CharacteristicCharValueVariable.Name] != "")
             {
                 return CharacteristicCharValueVariable;
             }

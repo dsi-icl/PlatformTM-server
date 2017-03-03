@@ -134,7 +134,7 @@ namespace eTRIKS.Commons.DataAccess
             modelBuilder.AddConfiguration<Assay>(new AssayConfig());
 
             modelBuilder.AddConfiguration<Biosample>(new BioSampleConfig());
-            modelBuilder.AddConfiguration<Characterisitc>(new CharacterisitcConfig());
+            modelBuilder.AddConfiguration<Characteristic>(new CharacteristicConfig());
             modelBuilder.AddConfiguration<CharacteristicFeature>(new CharacteristicObjectConfig());
             modelBuilder.AddConfiguration<UserClaim>(new ClaimConfig());
 
