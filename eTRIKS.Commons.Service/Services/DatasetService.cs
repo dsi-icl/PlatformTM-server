@@ -618,11 +618,9 @@ namespace eTRIKS.Commons.Service.Services
                     dataFile.State = "LOADED";
                     dataFile.IsLoadedToDB = true;
                     _dataFileRepository.Update(dataFile);
-                    if (!dataset.DataFiles.Select(d=>d.Datafile).Any(d => d.Id.Equals(fileId)))
+                    if(!dataset.DataFiles.Select(d=>d.DatafileId).Contains(fileId))
                     {
                         //Adding a new datafile to this dataset
-                        //var datafile = _dataFileRepository.Get(fileId);
-                        //dataset.DataFiles.Add(datafile);
                         dataset.DataFiles.Add(new DatasetDatafile() { DatasetId = datasetId, DatafileId = dataFile.Id });
                         _datasetRepository.Update(dataset);
                     }
@@ -635,7 +633,8 @@ namespace eTRIKS.Commons.Service.Services
                     _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
 
             }
-            catch(Exception e)
+
+            catch (Exception e)
             {
                 Debug.WriteLine("Failed to load descriptors to SQL database", e.Message);
                 UnloadDataset(datasetId,fileId,"FAILED TO LOAD");

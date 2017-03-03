@@ -21,7 +21,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             //.HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Timepoints");
+            builder.ToTable("TimePoints");
             builder
              .HasDiscriminator<string>("Discriminator")
             .HasValue<AbsoluteTimePoint>("AbsoluteTimePoint")

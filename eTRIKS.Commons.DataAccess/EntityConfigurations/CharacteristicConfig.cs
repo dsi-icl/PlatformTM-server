@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 {
-    internal class CharacterisitcConfig : EntityTypeConfiguration<Characterisitc>
+    internal class CharacteristicConfig : EntityTypeConfiguration<Characteristic>
     {
 
-        public override void Configure(EntityTypeBuilder<Characterisitc> builder)
+        public override void Configure(EntityTypeBuilder<Characteristic> builder)
         {
             // Primary Key
             builder.HasKey(t => t.Id);
 
             builder.ToTable("Characteristics");
-            builder.Property(t => t.Id).HasColumnName("CharacterisitcId");
+            builder.Property(t => t.Id).HasColumnName("CharacteristicId");
             builder.Property(t => t.VerbatimName).HasColumnName("CharacObjName");
 
             builder.Property(t => t.VerbatimName)
@@ -23,12 +23,12 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.HasOne(p => p.Dataset)
                 .WithOne()
                 .HasConstraintName("FK_Characteristic_Dataset")
-                .HasForeignKey<Characterisitc>(k => k.DatasetId);
+                .HasForeignKey<Characteristic>(k => k.DatasetId);
 
             builder.HasOne(p => p.Datafile)
                 .WithOne()
                 .HasConstraintName("FK_Characteristic_DataFile")
-                .HasForeignKey<Characterisitc>(k => k.DatafileId);
+                .HasForeignKey<Characteristic>(k => k.DatafileId);
 
             builder
             .HasDiscriminator<string>("Discriminator")

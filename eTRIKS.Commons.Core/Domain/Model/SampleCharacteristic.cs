@@ -1,6 +1,6 @@
 ﻿namespace eTRIKS.Commons.Core.Domain.Model
 {
-    public class SampleCharacteristic : Characterisitc
+    public class SampleCharacteristic : Characteristic
     {
         //public string Method { get; set; }
         //public string Provider { get; set; }

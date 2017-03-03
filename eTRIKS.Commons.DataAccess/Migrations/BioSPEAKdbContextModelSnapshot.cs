@@ -138,7 +138,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                     b.ToTable("BioSamples");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Characterisitc", b =>
+            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Characteristic", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -923,7 +923,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
             modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.SampleCharacteristic", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Characterisitc");
+                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Characteristic");
 
                     b.Property<int>("SampleId");
 
@@ -936,7 +936,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
             modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.SubjectCharacteristic", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Characterisitc");
+                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Characteristic");
 
                     b.Property<string>("SubjectId");
 
@@ -1033,7 +1033,7 @@ namespace eTRIKS.Commons.DataAccess.Migrations
                         .HasForeignKey("VisitId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Characterisitc", b =>
+            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Characteristic", b =>
                 {
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledValue")
                         .WithMany()
@@ -1046,12 +1046,12 @@ namespace eTRIKS.Commons.DataAccess.Migrations
 
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Characterisitc", "DatafileId")
+                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Characteristic", "DatafileId")
                         .HasConstraintName("FK_Characteristic_DataFile");
 
                     b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Characterisitc", "DatasetId")
+                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Characteristic", "DatasetId")
                         .HasConstraintName("FK_Characteristic_Dataset")
                         .OnDelete(DeleteBehavior.Cascade);
                 });

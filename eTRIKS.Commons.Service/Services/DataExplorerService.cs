@@ -371,7 +371,8 @@ namespace eTRIKS.Commons.Service.Services
                     QueryFor = nameof(Biosample),
                     QueryBy = nameof(Biosample.SampleCharacteristics),
                     QueryWhereProperty = nameof(SampleCharacteristic.CharacteristicFeatureId),
-                    QuerySelectProperty = nameof(SampleCharacteristic.VerbatimValue)
+                    QuerySelectProperty = nameof(SampleCharacteristic.VerbatimValue),
+                    ActivityId = assay.Id
                 }).ToList();
 
                 assayDTO.SampleCharacteristics.Add(new ObservationRequestDTO()
@@ -472,7 +473,9 @@ namespace eTRIKS.Commons.Service.Services
         public DataTable GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
         {
             //var samples = new List<Biosample>();
-            var samples = _assayRepository.FindSingle(a => a.Id == assayId, new List<string>() { "Biosamples.Study", "Biosamples.Subject" }).Biosamples;
+            var samples = _assayRepository.FindSingle(
+                a => a.Id == assayId, 
+                new List<string>() { "Biosamples.Study", "Biosamples.Subject", "Biosamples.SampleCharacteristics" })?.Biosamples;
             //samples = _bioSampleRepository.FindAll
             //    (bs => bs.AssayId.Equals(assayId), 
             //    new List<string>()

@@ -14,7 +14,6 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<Study, int> _studyRepository;
-        private readonly IRepository<Dataset, int> _datasetRepository;
 
         private readonly IRepository<CharacteristicFeature, int> _characteristicObjRepository;
 
@@ -27,7 +26,6 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             _dataContext = uoW;
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
-            _datasetRepository = uoW.GetRepository<Dataset, int>();
             _studyRepository = uoW.GetRepository<Study, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
 
@@ -49,22 +47,20 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 return false;
 
             var assay = _assayRepository.Get(assayId);
-            //var dataset = _datasetRepository.FindSingle(d => d.Id == datasetId);
-
             if (reload)
             {
                 _bioSampleRepository.DeleteMany(o => o.DatasetId == datasetId && o.DataFileId == datafileId);
                 _dataContext.Save().Equals("CREATED");
             }
 
-            //TODO: CHECK if dataset is LOADED and set it to DELETE and RELOAD if so
-
             var studyMap = new Dictionary<string, int>();
+
+            //RETRIEVE PREVIOUSLY LOADED CHARACTERISTIC FEATURES FOR THIS ASSAY THAT MIGHT HAVE BEEN LOADED BEFORE FOR OTHER STUDIES
             var featureList = _characteristicObjRepository.FindAll(s => s.ProjectId == projectId && s.ActivityId == assayId).ToList();
             _featureMap = featureList.ToDictionary(co => co.ShortName);
 
             var subjects = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).ToList();
-
+            var sampleDayMap = new Dictionary<string, int>();
 
             foreach (var sdtmRow in sampleData)
             {
@@ -85,23 +81,28 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 {
                     BiosampleStudyId = sdtmRow.SampleId,
                     AssayId = sdtmRow.ActivityId,
-                    SubjectId = subjects.Find(s=>s.UniqueSubjectId == sdtmRow.USubjId).Id ,
+                    SubjectId = subjects.Find(s=>s.UniqueSubjectId == sdtmRow.USubjId)?.Id ,
                     StudyId = studyid,
                     CollectionStudyDay = sdtmRow.CollectionStudyDay,
                     DatasetId = sdtmRow.DatasetId,
-                    IsBaseline = sdtmRow.BaseLineFlag
+                    DataFileId = sdtmRow.DatafileId,
+                    IsBaseline = sdtmRow.Qualifiers.ContainsKey(descriptor.IsBaseLineVariable.Name) && sdtmRow.Qualifiers[descriptor.IsBaseLineVariable.Name] == "Y"
                 };
 
                 //CHECK IF ASSAY HAS TEMOPORALDATA
-                var sampleDayMap = new Dictionary<string, int>();
-                if (bioSample.CollectionStudyDay?.Number != null)
+               
+                if (bioSample.CollectionStudyDay?.Number != null && !assay.HasTemporalData)
                 {
-                    if (sampleDayMap.ContainsKey(bioSample.BiosampleStudyId)
-                        && sampleDayMap[bioSample.BiosampleStudyId] != bioSample.CollectionStudyDay.Number.Value
+                    
+                    if (sampleDayMap.ContainsKey(bioSample.SubjectId)
+                        && sampleDayMap[bioSample.SubjectId] != bioSample.CollectionStudyDay.Number.Value
                         && !assay.HasTemporalData)
                         assay.HasTemporalData = true;
                     else
-                        sampleDayMap.Add(bioSample.BiosampleStudyId, bioSample.CollectionStudyDay.Number.Value);
+                    {
+                        if(!sampleDayMap.ContainsKey(bioSample.SubjectId)) 
+                            sampleDayMap.Add(bioSample.SubjectId, bioSample.CollectionStudyDay.Number.Value);
+                    }
                 }
 
                 //ADD CHARACTERISTIC FEATURE IN BSTEST
@@ -109,7 +110,9 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 var characValueVariable = descriptor.GetValueVariable(sdtmRow);
                 if (sdtmRow.ResultQualifiers.TryGetValue(characValueVariable.Name, out charValue))
                 {
-                    var charFeature = getCharacteristicFeature(sdtmRow.Topic,sdtmRow.TopicSynonym,characValueVariable.DataType, projectId);
+                    var charFeature = getCharacteristicFeature(sdtmRow.Topic,sdtmRow.TopicSynonym,characValueVariable.DataType);
+                    charFeature.ActivityId = assayId;
+                    charFeature.ProjectId = projectId;
 
                     bioSample.SampleCharacteristics.Add(new SampleCharacteristic()
                     {
@@ -123,15 +126,17 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
 
                 //ADDING SPECIMEN TYPE TO CHARACTERISTICS
                 string st;
-                if (sdtmRow.Qualifiers.TryGetValue(descriptor.SpecimenTypeVariable.Name, out st))
+                if (descriptor.SpecimenTypeVariable != null && sdtmRow.Qualifiers.TryGetValue(descriptor.SpecimenTypeVariable.Name, out st))
                 {
                     var feature = getCharacteristicFeature(descriptor.SpecimenTypeVariable.Name, descriptor.SpecimenTypeVariable.Label,
-                        descriptor.SpecimenTypeVariable.DataType, projectId);
+                        descriptor.SpecimenTypeVariable.DataType);
+                    feature.ActivityId = assayId;
+                    feature.ProjectId = projectId;
 
                     bioSample.SampleCharacteristics.Add(new SampleCharacteristic()
                     {
                         CharacteristicFeature = feature,
-                        VerbatimName = descriptor.SpecimenTypeVariable.Name,
+                        VerbatimName = descriptor.SpecimenTypeVariable?.Name,
                         VerbatimValue = st,
                         DatafileId = datafileId,
                         DatasetId = datasetId
@@ -139,10 +144,12 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 }
 
                 //ADD ANATOMIC REGION TO CHARACTERISTICS
-                if (sdtmRow.QualifierQualifiers.TryGetValue(descriptor.AnatomicRegionVariable.Name, out st))
+                if (descriptor.AnatomicRegionVariable != null && sdtmRow.QualifierQualifiers.TryGetValue(descriptor.AnatomicRegionVariable.Name, out st))
                 {
                     var feature = getCharacteristicFeature(descriptor.AnatomicRegionVariable.Name, descriptor.AnatomicRegionVariable.Label,
-                        descriptor.AnatomicRegionVariable.DataType, projectId);
+                        descriptor.AnatomicRegionVariable.DataType);
+                    feature.ActivityId = assayId;
+                    feature.ProjectId = projectId;
 
                     bioSample.SampleCharacteristics.Add(new SampleCharacteristic()
                     {
@@ -155,13 +162,14 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 }
 
                 _bioSampleRepository.Insert(bioSample);
+                _assayRepository.Update(assay);
 
 
             }
             return _dataContext.Save().Equals("CREATED");
         }
 
-        private CharacteristicFeature getCharacteristicFeature(string sname, string fname, string dataType,int projectId)
+        private CharacteristicFeature getCharacteristicFeature(string sname, string fname, string dataType)
         {
             // FETCH PREVIOUSLY LOADED CHARACTERISTIC FEATURE
             CharacteristicFeature feature;
@@ -176,7 +184,6 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                     ShortName = sname,
                     FullName = fname,
                     Domain = "BS",
-                    ProjectId = projectId,
                     DataType = dataType
                 };
                 _featureMap.Add(sname, feature);

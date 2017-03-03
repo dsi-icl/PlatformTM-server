@@ -199,9 +199,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             const string charResVar = "STRESC";
             const string oriResVar = "ORRES";
             const string occurVar = "SEV";
-            string s;
             if (ObsIsAFinding)
             {
+                string s;
                 if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+numResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + numResVar] != "")
                 {
                     return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + numResVar));
