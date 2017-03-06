@@ -164,7 +164,7 @@ namespace eTRIKS.Commons.Service.Services
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {
             var subjChars = new List<ObservationRequestDTO>();
-            var SCs = _characObjRepository.FindAll(sco => sco.ProjectId == projectId).ToList();
+            var SCs = _characObjRepository.FindAll(sco => sco.ProjectId == projectId && sco.Domain == "DM").ToList();
 
             subjChars = SCs.Select(sc => new ObservationRequestDTO()
             {
@@ -349,6 +349,7 @@ namespace eTRIKS.Commons.Service.Services
             var projectAssays = new List<AssayBrowserDTO>();
             foreach (var assay in assays)
             {
+                //Get Assay Info
                 var assayDTO = new AssayBrowserDTO()
                 {
                     Id = assay.Id,
@@ -358,6 +359,7 @@ namespace eTRIKS.Commons.Service.Services
                     Name = assay.Name
                 };
 
+                //ADD Subject Characteristic Features queries
                 var SCs = _characObjRepository.FindAll(sco => sco.ActivityId == assay.Id).ToList();
 
                 assayDTO.SampleCharacteristics = SCs.Select(sc => new ObservationRequestDTO()
@@ -375,6 +377,7 @@ namespace eTRIKS.Commons.Service.Services
                     ActivityId = assay.Id
                 }).ToList();
 
+                //Add Sample Collection Day property as a query
                 assayDTO.SampleCharacteristics.Add(new ObservationRequestDTO()
                 {
                     O3 = "Collection Day",
@@ -385,8 +388,9 @@ namespace eTRIKS.Commons.Service.Services
                     QuerySelectProperty = nameof(RelativeTimePoint.Number),
                     DataType = nameof(Int32),
                     IsSampleCharacteristic = true,
-                    ProjectId = projectId
-                    
+                    ProjectId = projectId,
+                    ActivityId = assay.Id
+
                 });
                 projectAssays.Add(assayDTO);
             }
@@ -472,18 +476,12 @@ namespace eTRIKS.Commons.Service.Services
         }
         public DataTable GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
         {
-            //var samples = new List<Biosample>();
-            var samples = _assayRepository.FindSingle(
-                a => a.Id == assayId, 
-                new List<string>() { "Biosamples.Study", "Biosamples.Subject", "Biosamples.SampleCharacteristics" })?.Biosamples;
-            //samples = _bioSampleRepository.FindAll
-            //    (bs => bs.AssayId.Equals(assayId), 
-            //    new List<string>()
-            //    {
-            //        "Study",
-            //        "Subject",
-            //        //"CollectionStudyDay"
-            //    }).ToList();
+            var samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
+                new List<string>() {
+                    "Study",
+                    "Subject",
+                    "CollectionStudyDay",
+                    "SampleCharacteristics" }).ToList();
 
             var sampleTable = new DataTable();
             sampleTable.Columns.Add("subjectId");

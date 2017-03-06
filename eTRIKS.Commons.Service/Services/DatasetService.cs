@@ -589,7 +589,7 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     var sdtmSubjectDescriptor = SdtmSubjectDescriptor.GetSdtmSubjectDescriptor(dataset);
                     var subjectLoader = new SubjectLoader(_dataServiceUnit);
-                    loaded = subjectLoader.LoadSubjects(sdtmData, sdtmSubjectDescriptor);
+                    loaded = subjectLoader.LoadSubjects(sdtmData, sdtmSubjectDescriptor, reload);
                 }
                 else if (dataset.Template.Code.Equals("BS"))
                 {
@@ -637,7 +637,7 @@ namespace eTRIKS.Commons.Service.Services
             catch (Exception e)
             {
                 Debug.WriteLine("Failed to load descriptors to SQL database", e.Message);
-                UnloadDataset(datasetId,fileId,"FAILED TO LOAD");
+                UnloadDataset(datasetId,fileId,"LOADING FAILED");
 
             }
 

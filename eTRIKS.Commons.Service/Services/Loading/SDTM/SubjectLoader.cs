@@ -27,23 +27,42 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             _characteristicObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
         }
 
-        public bool LoadSubjects(List<SdtmRow> subjectData, SdtmSubjectDescriptor descriptor)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="subjectData"></param>
+        /// <param name="descriptor"></param>
+        /// <returns></returns>
+        public bool LoadSubjects(List<SdtmRow> subjectData, SdtmSubjectDescriptor descriptor, bool reload)
         {
             if (subjectData.Count == 0)
                 return false;
 
             var projectId = subjectData.First().ProjectId;
             var projectAccession = subjectData.First().ProjectAccession;
+            var activityId = subjectData.First().ActivityId;
+            var datafileId = subjectData.First().DatafileId;
+            var datasetId = subjectData.First().DatasetId;
+
+            if (reload)
+            {
+                _subjectRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == datafileId);
+                _dataContext.Save().Equals("CREATED");
+            }
 
             //Project related subject characteristics
             var scoList = _characteristicObjRepository.FindAll(s => s.ProjectId == projectId).ToList();
             var scos = scoList.ToDictionary(co => co.ShortName);
             //Project related studies
-            var studies = _studtRepository.FindAll(s => s.ProjectId == projectId, new List<string> { "Arms" }).ToList();
+            var studies = _studtRepository.FindAll(s => s.ProjectId == projectId, new List<string> { "Arms.Arm" }).ToList();
             var studyMap = studies.ToDictionary(study => study.Name);
             //Project related arms
-            var arms = studies.SelectMany(s => s.Arms.Select(a => a.Arm));
+            var arms = studies.SelectMany(s => s.Arms.Select(a => a.Arm)).Distinct();
             var armMap = arms.ToDictionary(arm => arm.Name);
+
+            //Previously loaded subjects for this project that might be update by this load
+            //TODO: should I add datafileId to subject as well? to be able to delete subjects for this datafile
+            var subjects = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).ToList();
 
             foreach (var sdtmSubject in subjectData)
             {
@@ -71,21 +90,34 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                     armMap.Add(arm.Name, arm);
                 }
 
+                var subjNewFlag = false;
                 /**
                   * ADDING SUBJECTS
                   */
-                var subject = new HumanSubject
+                var subject = subjects.Find(s => s.UniqueSubjectId == sdtmSubject.USubjId);
+                if (subject == null)
                 {
-                    Id = "P-" + projectId + "-" + sdtmSubject.USubjId,
-                    UniqueSubjectId = sdtmSubject.USubjId,
-                    SubjectStudyId = sdtmSubject.SubjectId,
-                    Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name], //Will put in characteristics for now
-                    ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
-                    DatasetId = sdtmSubject.DatasetId,
+                    subject = new HumanSubject
+                    {
+                        Id = "P-" + projectId + "-" + sdtmSubject.USubjId,
+                        UniqueSubjectId = sdtmSubject.USubjId,
+                        SubjectStudyId = sdtmSubject.SubjectId,
+                        Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name], //Will put in characteristics for now
+                        ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
+                        DatasetId = sdtmSubject.DatasetId,
+                        DatafileId = sdtmSubject.DatafileId,
+                        Study = study,
+                        StudyArm = arm
+                    };
+                    subjNewFlag = true;
+                }
+                else
+                {
+                    subjNewFlag = false;
+                    subject.DatasetId = datasetId;
+                }
 
-                    Study = study,
-                    StudyArm = arm
-                };
+                //SET/UPDATE SUBJECT CHARACTERISTICS
 
                 if (descriptor.RefStartDate != null && sdtmSubject.Qualifiers[descriptor?.RefStartDate?.Name] != null)
                 {
@@ -101,6 +133,12 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                         subject.SubjectEndDate = endDate;
                 }
 
+                //THIS METHOD WILL DELETE ALL SUBJECT CHARACTERISTICS PREVIOUSLY LOADED 
+                //FOR THIS SUBJECT FOR THE SAME DATAFILE
+                //((List<SubjectCharacteristic>)subject.SubjectCharacteristics)
+                //    .RemoveAll(sc=>sc.DatafileId == datafileId && sc.DatasetId == datasetId);
+                //_subjectRepository.Update(subject);
+                //_dataContext.Save();
 
                 /**
                  * ADDING SUBJECT CHARACTERISTICS
@@ -124,7 +162,8 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                                 FullName = dsVar.Label,
                                 Domain = "DM",
                                 ProjectId = projectId,
-                                DataType = dsVar.DataType
+                                DataType = dsVar.DataType,
+                                ActivityId = activityId
                             };
                             scos.Add(dsVar.Name, sco);
                         }
@@ -134,18 +173,20 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                         */
                         subject.SubjectCharacteristics.Add(new SubjectCharacteristic()
                         {
-                            //DatasetVariable = dsVar,
                             CharacteristicFeature = sco,
                             VerbatimValue = qualifier.Value,
                             VerbatimName = sco.ShortName,
-                            //DatasetDomainCode = sdtmSubject.DomainCode,
-                            Subject = subject
+                            Subject = subject,
+                            DatasetId = datasetId,
+                            DatafileId = datafileId
                         });
                     }
                     else
                         throw new Exception("Qualifier not in dataset template");
                 }
-                _subjectRepository.Insert(subject);
+                if (subjNewFlag)
+                    _subjectRepository.Insert(subject);
+                else _subjectRepository.Update(subject);
             }
             return _dataContext.Save().Equals("CREATED");
         }

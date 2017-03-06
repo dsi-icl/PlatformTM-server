@@ -26,7 +26,10 @@ namespace eTRIKS.Commons.Core.Domain.Model
         public Dataset Dataset { get; set; }
         public int DatasetId { get; set; }
 
-        public ICollection<SubjectCharacteristic> SubjectCharacteristics { get; set; }
+        public IList<SubjectCharacteristic> SubjectCharacteristics { get; set; }
+
+        public DataFile SourceDataFile { get; set; }
+        public int? DatafileId { get; set; }
 
         public HumanSubject()
         {

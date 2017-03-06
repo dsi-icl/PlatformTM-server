@@ -28,6 +28,11 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                .WithOne()
                .IsRequired()
                .HasForeignKey<HumanSubject>(t => t.DatasetId);
+
+            builder.HasOne(t => t.SourceDataFile)
+               .WithOne()
+               .IsRequired()
+               .HasForeignKey<HumanSubject>(t => t.DatafileId);
         }
     }
 }
