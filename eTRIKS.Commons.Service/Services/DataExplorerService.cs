@@ -60,15 +60,15 @@ namespace eTRIKS.Commons.Service.Services
             cQuery.Id = Guid.NewGuid();
 
 
-           ///////////////////////////// Temporary///////////////////////////////////////////////////////
-            //var asp = new AssayPanelQueryDTO();
-            //asp.AssayId = 111;
-            //cdto.AssayPanels.Add(asp);
+            ///////////////////////////// Temporary to populate Assaypanel (not active yet)///////////////////////////////////////////////////////
+            var asp = new AssayPanelQueryDTO();
+            asp.AssayId = 111;
+            //asp.SampleQuery = cdto.ObsRequests;
+            cdto.AssayPanels.Add(asp);
+            // how too populate SampleQuery
+
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
+            
             var requests = cdto.ObsRequests;
 
             foreach (var request in requests)
@@ -135,12 +135,12 @@ namespace eTRIKS.Commons.Service.Services
                     cQuery.GroupedObservations.Add(goq);
                 }
             }
-
-           //Added strat********************************************************************************************************************************************************
-            foreach (var assayRequest in cdto.AssayPanels)
+            
+            var assaypanels = cdto.AssayPanels; 
+            foreach (var assayRequest in assaypanels)
             { 
-                var apq = new AssayPanelQuery();
-                apq.AssayId = assayRequest.AssayId;
+                var assayPanelQuery = new AssayPanelQuery(); 
+                assayPanelQuery.AssayId = assayRequest.AssayId;
 
                 foreach (var ap in assayRequest.SampleQuery)
                 {
@@ -163,11 +163,11 @@ namespace eTRIKS.Commons.Service.Services
                         FilterRangeTo = ap.FilterRangeTo,
                         IsFiltered = ap.IsFiltered
                     };
-                    apq.SampleQuery.Add(oq);
+                    assayPanelQuery.SampleQuery.Add(oq);
                 }
-                cQuery.AssayPanels.Add(apq);
+                cQuery.AssayPanels.Add(assayPanelQuery);
             } 
-          //Added Finish******************************************************************************************************************************************************
+        
             return _combinedQueryRepository.Insert(cQuery);
         }
 
@@ -186,7 +186,7 @@ namespace eTRIKS.Commons.Service.Services
             return query.UserId == Guid.Parse(userId) ? query : null;
         }
 
-        //************************************************************** To Be Completed *******************************************************
+        #region //************************************************************** To Be Completed *******************************************************
 
         //public void UpdateQueries(CombinedQueryDTO cdto, string userId, int projectId)
         //  //  public List<CombinedQuery> UpdateCart(CombinedQueryDTO cdto, int projectId, string userId)
@@ -203,7 +203,7 @@ namespace eTRIKS.Commons.Service.Services
         //        _combinedQueryRepository.Update(cartToUpdate);
         //    }
         //************************************************************** To Be Completed *******************************************************
-
+        #endregion
         #region Observation Browser methods
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {

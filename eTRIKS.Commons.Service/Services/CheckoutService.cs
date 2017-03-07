@@ -52,7 +52,7 @@ namespace eTRIKS.Commons.Service.Services
             var phenoDataset = CreateSubjectClinicalDataset(query, userId);
             checkoutDatasets.Add(phenoDataset);
 
-            //Creates a subject-to-sample mapping dataset for each selected assay
+            //Creates a subject-to-sample mapping dataset for each  assay
            var projectId = query.ProjectId;
 
             foreach (var AssayPanel in query.AssayPanels)
@@ -62,12 +62,13 @@ namespace eTRIKS.Commons.Service.Services
             }
 
             
-            //Creates assay data dataset for each selected assay
-           foreach (var AssayPanel in query.AssayPanels)
-            {
-                var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, userId, projectId);
-                checkoutDatasets.Add(assayPanelDataset);
-            }
+            // TODO Creates assay data dataset for each assay using following
+
+           //foreach (var AssayPanel in query.AssayPanels)
+           // {
+           //     var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, userId, projectId);
+           //     checkoutDatasets.Add(assayPanelDataset);
+           // }
 
             return checkoutDatasets;
         }
@@ -76,21 +77,20 @@ namespace eTRIKS.Commons.Service.Services
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             var projectId = dataset.ProjectId;
-
             var exportData = _exportService.GetDatasetContent(projectId, dataset);
+            var dt = new DataTable();
 
-            //write a seperate method like bellow
-        //  if  (exportData.IsSampleIncluded )
-            //   var dt = _exportService.GetSampleTable(exportData, dataset);
-
-            var dt = _exportService.GetDatasetTable(exportData, dataset);
-
-
+            if (dataset.Type == "PHENO")
+            {
+                dt = _exportService.GetDatasetTable(exportData, dataset);
+            }
+            if (dataset.Type == "AssaySamples")
+            {
+                dt = _exportService.GetSampleTable(exportData, dataset);
+            }
 
             dt.TableName = dataset.Name;
-
             return dt;
-
         }
 
         public string downloadDatasets(DataTable dtTable)
@@ -147,7 +147,7 @@ namespace eTRIKS.Commons.Service.Services
                 QueryObject = qObj,
                 QueryObjectType = nameof(SubjectCharacteristic),
                 ColumnHeader = qObj.ObservationName
-            }));
+            })); 
 
             //ADD CLINICAL OBSERVATIONS
             phenoDataset.Fields.AddRange(query.ClinicalObservations.Select(qObj => new DatasetField()
@@ -170,7 +170,7 @@ namespace eTRIKS.Commons.Service.Services
             return phenoDataset;
         }
 
-        // changed the following to list to overcome error 
+ 
        private UserDataset CreateAssaySampleDataset(AssayPanelQuery assayPanelQuery, string userId, int projectId)
         {
             // This is for the subject to sample mapping
@@ -189,16 +189,8 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeader = "subjectid",
                 ColumnHeaderIsEditable = false
             });
-
-            // 2. ADD study Id Field
-            assaySampleDataset.Fields.Add(new DatasetField()
-            {
-                FieldName = "Study[StudyId]",
-                ColumnHeader = "studyid",
-                ColumnHeaderIsEditable = false
-            });
-
-            // 3. ADD sample Id Field
+            
+            // 2.ADD sample Id Field
             assaySampleDataset.Fields.Add(new DatasetField()
             {
                 FieldName = "Sample[SampleId]",
@@ -206,7 +198,7 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeaderIsEditable = false
             });
 
-            //ADD  Range.  need to add sample ID and Assay Id in ObservationQuery 
+            // 3. ADD  Sample characteristics
             assaySampleDataset.Fields.AddRange(assayPanelQuery.SampleQuery.Select(qObj => new DatasetField()
             {
                 QueryObjectType = nameof(SampleCharacteristic),
@@ -215,12 +207,13 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeader = qObj.ObservationName
             }));
 
+
             _userDatasetRepository.Insert(assaySampleDataset);
             _dataContext.Save();
             return assaySampleDataset;
 
         }
-
+        // Following is not completed 
         private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery, string userId, int projectId)
         {
             // TODO for HD datasets
@@ -228,10 +221,9 @@ namespace eTRIKS.Commons.Service.Services
             assayPanelDataset.Id = Guid.NewGuid();
             assayPanelDataset.OwnerId = userId;
             assayPanelDataset.ProjectId = projectId;
-            assayPanelDataset.Type = "AssaySamples";
+            assayPanelDataset.Type = "AssayPanel";
             assayPanelDataset.Name = "HDSamples";
-            //CREATE DATAFIELDS
-
+          
             // 1. ADD SubjectId
             assayPanelDataset.Fields.Add(new DatasetField()
             {
@@ -239,33 +231,21 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeader = "subjectid",
                 ColumnHeaderIsEditable = false
             });
-
-            // 2. ADD study Id
-            assayPanelDataset.Fields.Add(new DatasetField()
-            {
-                FieldName = "Study[StudyId]",
-                ColumnHeader = "studyid",
-                ColumnHeaderIsEditable = false
-            });
-
-            // 3. ADD sample Id
+            // 2. ADD sample Id
             assayPanelDataset.Fields.Add(new DatasetField()
             {
                 FieldName = "Sample[SampleId]",
                 ColumnHeader = "sampleid",
                 ColumnHeaderIsEditable = false
             });
-
-            //ADD  Range.  need to add sample ID and Assay Id in ObservationQuery 
-            //assayPanelDataset.Fields.AddRange(assayPanelQuery.SampleQuery.Select(qObj => new DatasetField()
-            //{
-            //    QueryObjectType = nameof(Biosample),
-            //    //   AssayPanels = assayPanelQuery,
-            //    QueryObject = qObj,
-            //    ColumnHeader = qObj.ObservationName
-            //}));
-
-
+            //ADD Range.  
+            assayPanelDataset.Fields.AddRange(assayPanelQuery.SampleQuery.Select(qObj => new DatasetField()
+            {
+                QueryObjectType = nameof(Biosample),
+                //   AssayPanels = assayPanelQuery,
+                QueryObject = qObj,
+                ColumnHeader = qObj.ObservationName
+            }));
             _userDatasetRepository.Insert(assayPanelDataset);
             _dataContext.Save();
             return assayPanelDataset;

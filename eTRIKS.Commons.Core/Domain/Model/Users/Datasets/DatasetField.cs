@@ -20,6 +20,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
                 {
                     if (QueryObjectType == nameof(SubjectCharacteristic))
                         return "SubjectCharacteristics" + QueryObject.QueryObjectName + "";
+                    //********************************************************************************************************************************************************
+
+                    if (QueryObjectType == nameof(SampleCharacteristic))
+                        return "SampleCharacteristics" + QueryObject.QueryObjectName + "";
+                    //********************************************************************************************************************************************************
+
+
                     return QueryObject.TermName + (QueryObject.PropertyLabel != null ? "" + QueryObject.PropertyLabel + "" : "");
                 }
                     
