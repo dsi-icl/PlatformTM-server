@@ -24,7 +24,9 @@ namespace eTRIKS.Commons.Service.DTOs
         public List<Biosample> Samples { get; set; }
         public List<SampleCharacteristic> SampleCharacteristics { get; set; }
         public bool IsSubjectIncluded { get; set; }
-
+        //************************************************************* This is added to create a bool whether the export data has samples init or not ! used in Export service
+        public bool IsSampleIncluded { get; set; }
+        //*************************************************************************************************
         public DataExportObject()
         {
             Observations = new List<SdtmRow>();

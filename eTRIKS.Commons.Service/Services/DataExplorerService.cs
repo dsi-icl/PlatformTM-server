@@ -59,6 +59,16 @@ namespace eTRIKS.Commons.Service.Services
             cQuery.ProjectId = projectId;
             cQuery.Id = Guid.NewGuid();
 
+
+            ///////////////////////////// Temporary to populate Assaypanel (not active yet)///////////////////////////////////////////////////////
+            var asp = new AssayPanelQueryDTO();
+            asp.AssayId = 111;
+            //asp.SampleQuery = cdto.ObsRequests;
+            cdto.AssayPanels.Add(asp);
+            // how too populate SampleQuery
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            
             var requests = cdto.ObsRequests;
 
             foreach (var request in requests)
@@ -84,13 +94,14 @@ namespace eTRIKS.Commons.Service.Services
                         FilterRangeTo = request.FilterRangeTo,
                         IsFiltered = request.IsFiltered
                     };
+
                     if (request.IsSubjectCharacteristics)
                         cQuery.SubjectCharacteristics.Add(oq);
                     if (request.IsClinicalObservations)
                         cQuery.ClinicalObservations.Add(oq);
                     if (request.IsDesignElement)
                         cQuery.DesignElements.Add(oq);
-                }
+                    }
                 else
                 {
                     var goq = new GroupedObservationsQuery()
@@ -124,6 +135,39 @@ namespace eTRIKS.Commons.Service.Services
                     cQuery.GroupedObservations.Add(goq);
                 }
             }
+            
+            var assaypanels = cdto.AssayPanels; 
+            foreach (var assayRequest in assaypanels)
+            { 
+                var assayPanelQuery = new AssayPanelQuery(); 
+                assayPanelQuery.AssayId = assayRequest.AssayId;
+
+                foreach (var ap in assayRequest.SampleQuery)
+                {
+                  var oq = new ObservationQuery()
+                    {
+                        TermName = ap.O3,
+                        TermId = ap.O3id,
+                        PropertyName = ap.QO2,
+                        PropertyId = ap.QO2id,
+                        ProjectId = ap.ProjectId,
+
+                        Group = ap.Group,
+                        IsOntologyEntry = ap.IsOntologyEntry,
+                        TermCategory = ap.OntologyEntryCategoryName,
+
+                        ObservationObjectShortName = ap.O3code,
+                        DataType = ap.DataType,
+                        FilterExactValues = ap.FilterExactValues,
+                        FilterRangeFrom = ap.FilterRangeFrom,
+                        FilterRangeTo = ap.FilterRangeTo,
+                        IsFiltered = ap.IsFiltered
+                    };
+                    assayPanelQuery.SampleQuery.Add(oq);
+                }
+                cQuery.AssayPanels.Add(assayPanelQuery);
+            } 
+        
             return _combinedQueryRepository.Insert(cQuery);
         }
 
@@ -142,7 +186,7 @@ namespace eTRIKS.Commons.Service.Services
             return query.UserId == Guid.Parse(userId) ? query : null;
         }
 
-        //************************************************************** To Be Completed *******************************************************
+        #region //************************************************************** To Be Completed *******************************************************
 
         //public void UpdateQueries(CombinedQueryDTO cdto, string userId, int projectId)
         //  //  public List<CombinedQuery> UpdateCart(CombinedQueryDTO cdto, int projectId, string userId)
@@ -159,7 +203,7 @@ namespace eTRIKS.Commons.Service.Services
         //        _combinedQueryRepository.Update(cartToUpdate);
         //    }
         //************************************************************** To Be Completed *******************************************************
-
+        #endregion
         #region Observation Browser methods
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {

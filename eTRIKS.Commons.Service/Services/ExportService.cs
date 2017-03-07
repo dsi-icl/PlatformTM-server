@@ -14,6 +14,7 @@ using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
+using MongoDB.Bson;
 using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 
@@ -32,8 +33,16 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Arm, string> _armRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
 
+        // Vahid  added start ******************************************************************************************************************
+        private readonly IRepository<Biosample, int> _bioSampleRepository;
+        private DataExplorerService _explorerService;  // TO FIND ASSAY
+        private readonly IRepository<Assay, int> _assayRepository;  // TO FIND BIOSAMPLES 
+        // also added @DataExplorerService explorerService@ to  public ExportService(IServiceUoW uoW, DataExplorerService explorerService)
+        // Vahid  added finish ******************************************************************************************************************
 
-        public ExportService(IServiceUoW uoW)
+
+
+        public ExportService(IServiceUoW uoW, DataExplorerService explorerService)
         {
             _dataContext = uoW;
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
@@ -46,368 +55,15 @@ namespace eTRIKS.Commons.Service.Services
             _armRepository = uoW.GetRepository<Arm, string>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
 
+            // Vahid  added start ******************************************************************************************************************
+            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
+            _explorerService = explorerService;
+            _assayRepository = uoW.GetRepository<Assay, int>();
+            // Vahid  added finish ******************************************************************************************************************
+
         }
-
-        #region Checkout Methods
-        public DataExportObject GetDatasetContent(int projectId, UserDataset userDataset)
-        {
-
-            var exportData = new DataExportObject
-            {
-                Subjects = _subjectRepository.FindAll(
-                    s => s.Study.ProjectId == projectId,
-                    new List<string>() {"StudyArm", "Study"}).ToList()
-            };
-
-            //QUERY FOR CLINICAL OBSERVATIONS
-            var observationQueries = userDataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).Select(f=>f.QueryObject).ToList();
-            exportData.Observations = getObservations(observationQueries);
-
-            //if sapleF
-            
-
-            foreach (var selField in userDataset.Fields)
-            {
-                switch (selField.QueryObjectType)
-                {
-                    case nameof(SubjectCharacteristic):
-                        //TODO:Need to do a separate query for dates
-                        var obsQuery = selField.QueryObject;
-
-                        //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
-                        var characteristics = _subjectCharacteristicRepository.FindAll(
-                           sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicFeatureId,
-                           new List<string>() { "Subject" }).ToList();
-
-                        //APPLY FILTERING IF FILTER PRESENT
-                        if (characteristics.Any() && obsQuery.IsFiltered)
-                        {
-                            characteristics = (obsQuery.DataType == "string")
-                                ? characteristics.FindAll(sc => obsQuery.FilterExactValues.Contains(sc.VerbatimValue))
-                                : characteristics.FindAll(sc =>
-                                                            int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
-                                                            int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
-                        }
-
-                        //ADD TO EXPORT DATA 
-                        exportData.SubjChars.AddRange(characteristics);
-                        exportData.IsSubjectIncluded = true;
-                        break;
-                    //case nameof(SampleCharacteristic):
-                    //    //TODO:Need to do a separate query for dates
-                    //    var obsQuery = selField.QueryObject;
-                    //    var characteristics = _subjectCharacteristicRepository.FindAll(
-                    //       sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicFeatureId,
-                    //       new List<string>() { "Subject" }).ToList();
-
-                    //    if (characteristics.Any() && obsQuery.IsFiltered)
-                    //    {
-                    //        characteristics = (obsQuery.DataType == "string")
-                    //            ? characteristics.FindAll(sc => obsQuery.FilterExactValues.Contains(sc.VerbatimValue))
-                    //            : characteristics.FindAll(sc =>
-                    //                                        int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
-                    //                                        int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
-                    //    }
-                    //    exportData.SubjChars.AddRange(characteristics);
-                    //    exportData.IsSubjectIncluded = true;
-                    //    break;
-
-                  
-                    case nameof(Arm):
-                        if (selField.QueryObject.IsFiltered)
-                            exportData.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)
-                                && selField.QueryObject.FilterExactValues.Contains(a.Name)).ToList();
-                        else
-                            exportData.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s=>s.Study.ProjectId).Contains(projectId)).ToList();
-                        break;
-                    case nameof(Study):
-                        var studies = _studyRepository.FindAll(
-                            s => s.ProjectId == projectId
-                            && (selField.QueryObject.IsFiltered && selField.QueryObject.DataType.Equals("string"))
-                                ? selField.QueryObject.FilterExactValues.Contains(s.Name)
-                                : s.ProjectId == projectId,
-                            new List<string>() { "Subjects" }).ToList();
-                        exportData.Studies = studies;
-                        break;
-                    case nameof(Visit):
-                        var visits = _visitRepository.FindAll(
-                            v => v.Study.ProjectId == projectId
-                            //apply filter if present
-                            ).ToList();
-                        exportData.Visits = visits;
-                        break;
-                }
-            }
-
-            exportData.FilterAndJoin();
-
-            return exportData;
-        }
-
-        public DataTable GetDatasetTable(DataExportObject exportData, UserDataset dataset)
-        {
-            #region Create Table Columns
-            var datatable = new DataTable();
-
-            //datatable.Columns.Add("subjectid");
-            datatable.Columns.Add("studyid");
-            foreach (var field in dataset.Fields)
-            {
-                datatable.Columns.Add(field.ColumnHeader.ToLower());
-            }
-
-            #endregion
-
-
-            //var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
-
-            var fieldsByO3Id = dataset.Fields.FindAll(f=> f.QueryObjectType == nameof(SdtmRow)).GroupBy(f => f.QueryObject.QueryObjectName).ToList();
-            var subjCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SubjectCharacteristic)).ToList();
-            foreach (var subject in exportData.Subjects)
-            {
-                var uniqSubjectId = subject.UniqueSubjectId;
-                //THIS IS USING SDTM SUBMITTED USUBJID TO LINK SDTM RECORDS WITH THE SUBJECTS IN MYSQL DB
-                var subjectObservations = exportData.Observations.FindAll(o => o.USubjId == uniqSubjectId).ToList();
-                var subjectCharacteristics = exportData.SubjChars.FindAll(sc => sc.SubjectId == subject.Id).ToList();
-                //var uniqSubjectId = subjectObservations.FirstOrDefault().USubjId;
-
-                var firstRow = true;
-                while (subjectObservations.Any() || firstRow )
-                {
-                    var row = datatable.NewRow();
-                    firstRow = false;
-                    
-                    #region Design Elements
-                    row["subjectid"] = uniqSubjectId;
-                    row["studyid"] = subject.Study.Name;
-                    //arm//visit//studt//
-                    #endregion
-
-                    #region Subject Characteristics
-
-                    foreach (var subjCharField in subjCharacsFields)
-                    {
-                        var charVal = subjectCharacteristics.SingleOrDefault(
-                                        sc => sc.CharacteristicFeatureId.Equals(subjCharField.QueryObject.TermId));
-                        if (charVal != null)
-                            row[subjCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
-
-                    }
-
-                    #endregion
-
-                    #region WRITE CLINICAL OBSERVATIONS
-
-                    foreach (var fieldgrp in fieldsByO3Id)//HEADACHE //BMI (EVENTS AND FINDINGS TOGETHER)//NOTE .. TIMEING ARE NOT synchronized YET
-                    {
-                        SdtmRow obs = null;
-                        foreach (var field in fieldgrp) //AEOCCUR / AESEV
-                        {
-                            //ONTOLOGY TERM REQUEST
-                            if (field.QueryObject.IsOntologyEntry)
-                                obs = subjectObservations.FirstOrDefault(
-                               o => ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[field.QueryObject.TermCategory]);
-
-                            //GROUP OF OBSERVATIONS
-                            else if (field.QueryObject.GetType() == typeof(GroupedObservationsQuery))
-                            {
-                                //ASSUMPTION: GROUPS AREONLY COMPOSED OF ONTOLOGY ENTRY
-                                //ASSUMPTION: 
-                                string v;
-                                foreach (var obsQuery in ((GroupedObservationsQuery)field.QueryObject).GroupedObservations)
-                                {
-                                    obs = subjectObservations.FirstOrDefault(
-                                        o=> o.QualifierQualifiers.TryGetValue(obsQuery.TermCategory, out v)
-                                            && obsQuery.TermId.ToString() == o.QualifierQualifiers[obsQuery.TermCategory]);
-                                    if (obs != null) break;
-                                }
-                            }
-
-                            //SINGLE OBSERVATION OBJECT TERM REQUEST
-                            else
-                            {
-                                obs = subjectObservations.FirstOrDefault(
-                                o => ((ObservationQuery)field.QueryObject).TermId == o.DBTopicId);
-                            }
-
-                            
-
-                           //WRITE OBSERVATION INSTANCE TO ROW
-
-                           string val = "";
-                           obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
-                           if(val == null)
-                               obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
-                           row[field.ColumnHeader.ToLower()] = val;   
-                       }
-                        subjectObservations.Remove(obs);
-                    }
-
-                    #endregion
-
-                    datatable.Rows.Add(row);
-                }
-            }
-            return datatable;
-        }
-
-        private List<SdtmRow> getObservations(List<ObservationQuery> Queries)
-        {
-            List<SdtmRow> observations = new List<SdtmRow>();
-
-            var queriesByO3Id = Queries.GroupBy(f => f.QueryObjectName).ToList();
-            foreach (var sameO3queries in queriesByO3Id)
-            {
-                var o3q_g = sameO3queries.Select(group => group).First();
-                var o3q_list = new List<ObservationQuery>();
-                var obs_list = new List<SdtmRow>();
-
-                //EXPANIDNG ALL to GROUP  TO ACCOMMODATE FOR GROUP OBSERVATIONS AS WELL IN THE SAME CODE BLOCK
-                if (o3q_g.GetType().Name == nameof(GroupedObservationsQuery))
-                {
-                    ((GroupedObservationsQuery)o3q_g).GroupedObservations.ForEach(oq => o3q_list.Add(oq));
-                }
-                else
-                    o3q_list.Add(o3q_g);
-                //////////////////////////////////////////////////////////////////////////////////////////////
-
-
-                //QUERY FOR OBSERVATIONS USING O3id OR OntologyEntry
-                foreach (var o3q in o3q_list)
-                {
-                    obs_list.AddRange(o3q.IsOntologyEntry
-                        //QUERY USING OEterms
-                         ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[o3q.TermCategory] == o3q.TermId.ToString() && s.Group == o3q.Group && s.ProjectId == o3q.ProjectId).ToList()
-                        //QUERY USING O3 
-                         : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList());
-                }
-
-                foreach (var oq in sameO3queries) //AEOCCUR / AESEV
-                {
-                    if (!oq.IsFiltered) continue;
-
-                    //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
-                    obs_list.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
-
-                    string v = null;
-                    obs_list = oq.DataType == "string"
-                        ? obs_list.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
-                        : obs_list.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
-                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
-                }
-                observations.AddRange(obs_list);
-            }
-
-            //Retrieve rows for requested individual observations //i.e not ontology entry
-
-            //var observationsIDs = Queries.Where(r => r.GetType().Name != nameof(GroupedObservationsQuery) && !r.IsOntologyEntry).Select(o => o.TermId).ToList();
-            //observations = _sdtmRepository.FindAll(s => observationsIDs.Contains(s.DBTopicId) && s.ProjectId == projectId).ToList();
-
-
-            //var queries = Queries.FindAll(or => or.IsOntologyEntry); //NON GROUP ONES
-
-            ////ASSUMPTION: GROUPED OBSERVATINS ARE ALWAYS ONTOLOGY ENTRY QUERIES!
-            //var groupQueries = Queries.FindAll(q => q.GetType().Name == nameof(GroupedObservationsQuery)).Cast<GroupedObservationsQuery>();
-            //var obsGroupQueries = groupQueries.SelectMany(og => og.GroupedObservations);
-            //queries.AddRange(obsGroupQueries);
-
-            //foreach (var query in queries)
-            //{
-            //    var obs_list = _sdtmRepository.FindAll(
-            //        s => s.QualifierQualifiers[query.TermCategory] == query.TermId.ToString()
-            //             && s.Group == query.Group
-            //             && s.ProjectId == projectId).ToList();
-            //    if (!obs_list.TrueForAll(observations.Contains))
-            //        observations.AddRange(obs_list);
-
-            //}
-
-
-            //switch (query.GetType().Name)
-            //{
-            //    case nameof(ObservationQuery):
-            //        var oq = (ObservationQuery) query;
-
-            //        var obs_list = oq.IsOntologyEntry 
-            //            ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[oq.TermCategory] == oq.TermId.ToString() && s.Group == oq.Group && s.ProjectId == query.ProjectId).ToList()
-            //            : _sdtmRepository.FindAll(s => s.DBTopicId == oq.TermId && s.ProjectId == query.ProjectId).ToList();
-
-            //        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
-            //        obs_list.ForEach(o=>o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p=>p.Key,p=>p.Value));
-
-
-            //        string v = null;
-            //        if (oq.IsFiltered)
-            //            obs_list = oq.DataType == "string"
-            //                    ? obs_list.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
-            //                    : obs_list.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
-            //                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
-            //        observations = obs_list;
-            //    break;
-            //    case nameof(GroupedObservationsQuery):
-            //        var groupQuery = (GroupedObservationsQuery)query;
-            //        foreach (var obq in groupQuery.GroupedObservations)
-            //        {
-            //            var groupobservations = obq.IsOntologyEntry
-            //                ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[obq.TermCategory] == obq.TermId.ToString() && s.Group == obq.Group && s.ProjectId == query.ProjectId).ToList()
-            //                : _sdtmRepository.FindAll(s => obq.TermId == s.DBTopicId && s.ProjectId == query.ProjectId).ToList();
-
-            //            if (groupQuery.IsFiltered)
-            //                groupobservations = obq.DataType == "string"
-            //                    ? groupobservations.FindAll(
-            //                        s => groupQuery.FilterExactValues.Contains(s.Qualifiers[groupQuery.PropertyName]))
-            //                    : groupobservations.FindAll(
-            //                        s =>
-            //                            int.Parse(s.Qualifiers[groupQuery.PropertyName]) >= groupQuery.FilterRangeFrom &&
-            //                            int.Parse(s.Qualifiers[groupQuery.PropertyName]) <= groupQuery.FilterRangeTo);
-
-            //            observations.AddRange(groupobservations);
-            //            //obsGrpReq.TermIds.AddRange(observations.Select(o => o.DBTopicId));
-            //        }
-            //        break;
-            //}
-            return observations.ToList();
-        }
-        #endregion
-
-        //private List<SdtmRow> applyObsFilters(List<SdtmRow> observations, List<DatasetField> fields)
-        //{
-        //    var filteredObservations = new List<SdtmRow>();
-        //    string v;
-
-        //    var fieldsByO3Id = fields.GroupBy(f => f.QueryObject.QueryObjectName).ToList();
-        //    foreach (var fieldgrp in fieldsByO3Id)
-        //    {
-        //        foreach (var field in fieldgrp) //AEOCCUR / AESEV
-        //        {
-        //            var query = field.QueryObject;
-        //            if (query.IsFiltered)
-        //            {
-        //                if (query.IsOntologyEntry)
-        //                    filteredObservations = query.DataType == "string"
-        //                        ? observations.FindAll(
-        //                            o => o.QualifierQualifiers[query.TermCategory] == query.TermId.ToString()
-        //                            && o.Group == query.Group
-        //                            && o.Qualifiers.TryGetValue(query.PropertyName, out v) 
-        //                            && query.FilterExactValues.Contains(o.Qualifiers[query.PropertyName]))
-
-        //                        : observations.FindAll(
-        //                            o => float.Parse(o.Qualifiers[query.PropertyName]) >= query.FilterRangeFrom
-        //                            && float.Parse(o.Qualifiers[query.PropertyName]) <= query.FilterRangeTo);
-
-
-
-        //            }
-        //        }
-        //    }
-
-        //    return filteredObservations;
-        //}
 
         #region OLD METHODS
-        /*
         public List<TreeNodeDTO> GetAvailableFields(int projectId)
         {
 
@@ -643,11 +299,403 @@ namespace eTRIKS.Commons.Service.Services
         //    return dataTree;
         //}
 
-            */
+        #endregion
 
+        #region Checkout Methods
+        public DataExportObject GetDatasetContent(int projectId, UserDataset userDataset)
+        {
+
+            var exportData = new DataExportObject
+            {
+                Subjects = _subjectRepository.FindAll(
+                    s => s.Study.ProjectId == projectId,
+                    new List<string>() {"StudyArm", "Study"}).ToList()
+                };
+            //QUERY FOR CLINICAL OBSERVATIONS
+            var observationQueries = userDataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).Select(f=>f.QueryObject).ToList();
+            exportData.Observations = getObservations(observationQueries);
+
+            //if sapleF
+            
+
+            foreach (var selField in userDataset.Fields)
+            {
+                switch (selField.QueryObjectType)
+                {
+                    case nameof(SubjectCharacteristic):
+                        //TODO:Need to do a separate query for dates
+                        var obsQuery = selField.QueryObject;
+
+                        //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
+                        var characteristics = _subjectCharacteristicRepository.FindAll(
+                           sc => sc.Subject.Study.ProjectId == projectId && obsQuery.TermId == sc.CharacteristicFeatureId,
+                           new List<string>() { "Subject" }).ToList();
+
+                        //APPLY FILTERING IF FILTER PRESENT
+                        if (characteristics.Any() && obsQuery.IsFiltered)
+                        {
+                            characteristics = (obsQuery.DataType == "string")
+                                ? characteristics.FindAll(sc => obsQuery.FilterExactValues.Contains(sc.VerbatimValue))
+                                : characteristics.FindAll(sc =>
+                                                            int.Parse(sc.VerbatimValue) >= obsQuery.FilterRangeFrom &&
+                                                            int.Parse(sc.VerbatimValue) <= obsQuery.FilterRangeTo);
+                        }
+
+                        //ADD TO EXPORT DATA 
+                        exportData.SubjChars.AddRange(characteristics);
+                        exportData.IsSubjectIncluded = true;
+                        break;
+                        
+                    case nameof(SampleCharacteristic):
+                        
+                        var observationQuery = selField.QueryObject;
+
+                        ///////////////////////// TEMPORARY HACK ///////////////////////////////////////////////////////////////////////
+                        observationQuery.TermId = 111;
+
+                        var samples = _bioSampleRepository.FindAll(bs => bs.Subject.Study.ProjectId == projectId && bs.AssayId == observationQuery.TermId, new List<string>() { "SampleCharacteristics" }).ToList();
+                       
+                        // If filter is used for samples then samples should be chosen accordingly
+                       if (samples.Any() && observationQuery.IsFiltered)
+                        {
+                            //samples = (observationQuery.DataType == "string")
+                            //    ? samples.FindAll(bs => observationQuery.FilterExactValues.Contains(bs.VerbatimValue))
+                            //    : samples.FindAll(bs => int.Parse(bs.VerbatimValue) >= observationQuery.FilterRangeFrom && int.Parse(bs.VerbatimValue) <= observationQuery.FilterRangeTo);
+                        }
+                        exportData.Samples.AddRange(samples);
+                        exportData.IsSampleIncluded = true;
+
+                        break;
+                    
+                    case nameof(Arm):
+                        if (selField.QueryObject.IsFiltered)
+                            exportData.Arms = _armRepository.FindAll(
+                                a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)
+                                && selField.QueryObject.FilterExactValues.Contains(a.Name)).ToList();
+                        else
+                            exportData.Arms = _armRepository.FindAll(
+                                a => a.Studies.Select(s=>s.Study.ProjectId).Contains(projectId)).ToList();
+                        break;
+                    case nameof(Study):
+                        var studies = _studyRepository.FindAll(
+                            s => s.ProjectId == projectId
+                            && (selField.QueryObject.IsFiltered && selField.QueryObject.DataType.Equals("string"))
+                                ? selField.QueryObject.FilterExactValues.Contains(s.Name)
+                                : s.ProjectId == projectId,
+                            new List<string>() { "Subjects" }).ToList();
+                        exportData.Studies = studies;
+                        break;
+                    case nameof(Visit):
+                        var visits = _visitRepository.FindAll(
+                            v => v.Study.ProjectId == projectId
+                            //apply filter if present
+                            ).ToList();
+                        exportData.Visits = visits;
+                        break;
+                }
+            }
+
+            exportData.FilterAndJoin();
+
+            return exportData;
+        }
+
+        private List<SdtmRow> getObservations(List<ObservationQuery> Queries)
+        {
+            List<SdtmRow> observations = new List<SdtmRow>();
+
+            var queriesByO3Id = Queries.GroupBy(f => f.QueryObjectName).ToList();
+            foreach (var sameO3queries in queriesByO3Id)
+            {
+                var o3q_g = sameO3queries.Select(group => group).First();
+                var o3q_list = new List<ObservationQuery>();
+                var obs_list = new List<SdtmRow>();
+
+                //EXPANIDNG ALL to GROUP  TO ACCOMMODATE FOR GROUP OBSERVATIONS AS WELL IN THE SAME CODE BLOCK
+                if (o3q_g.GetType().Name == nameof(GroupedObservationsQuery))
+                {
+                    ((GroupedObservationsQuery)o3q_g).GroupedObservations.ForEach(oq=> o3q_list.Add(oq));
+                }
+                else
+                    o3q_list.Add(o3q_g);
+                //////////////////////////////////////////////////////////////////////////////////////////////
+
+
+                foreach (var o3q in o3q_list)
+                {
+                   obs_list.AddRange(o3q.IsOntologyEntry
+                        ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[o3q.TermCategory] == o3q.TermId.ToString() && s.Group == o3q.Group && s.ProjectId == o3q.ProjectId).ToList()
+                        : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList());
+
+                }
+
+                foreach (var oq in sameO3queries) //AEOCCUR / AESEV
+                {
+                    if (oq.IsFiltered)
+                    {
+                        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
+                        obs_list.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
+
+                        string v = null;
+                        obs_list = oq.DataType == "string"
+                                    ? obs_list.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+                                    : obs_list.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
+                                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
+                    }
+                }
+                observations.AddRange(obs_list);
+            }
+
+            //Retrieve rows for requested individual observations //i.e not ontology entry
+
+            //var observationsIDs = Queries.Where(r => r.GetType().Name != nameof(GroupedObservationsQuery) && !r.IsOntologyEntry).Select(o => o.TermId).ToList();
+            //observations = _sdtmRepository.FindAll(s => observationsIDs.Contains(s.DBTopicId) && s.ProjectId == projectId).ToList();
+
+
+            //var queries = Queries.FindAll(or => or.IsOntologyEntry); //NON GROUP ONES
+
+            ////ASSUMPTION: GROUPED OBSERVATINS ARE ALWAYS ONTOLOGY ENTRY QUERIES!
+            //var groupQueries = Queries.FindAll(q => q.GetType().Name == nameof(GroupedObservationsQuery)).Cast<GroupedObservationsQuery>();
+            //var obsGroupQueries = groupQueries.SelectMany(og => og.GroupedObservations);
+            //queries.AddRange(obsGroupQueries);
+
+            //foreach (var query in queries)
+            //{
+            //    var obs_list = _sdtmRepository.FindAll(
+            //        s => s.QualifierQualifiers[query.TermCategory] == query.TermId.ToString()
+            //             && s.Group == query.Group
+            //             && s.ProjectId == projectId).ToList();
+            //    if (!obs_list.TrueForAll(observations.Contains))
+            //        observations.AddRange(obs_list);
+
+            //}
+
+
+            //switch (query.GetType().Name)
+            //{
+            //    case nameof(ObservationQuery):
+            //        var oq = (ObservationQuery) query;
+
+            //        var obs_list = oq.IsOntologyEntry 
+            //            ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[oq.TermCategory] == oq.TermId.ToString() && s.Group == oq.Group && s.ProjectId == query.ProjectId).ToList()
+            //            : _sdtmRepository.FindAll(s => s.DBTopicId == oq.TermId && s.ProjectId == query.ProjectId).ToList();
+
+            //        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
+            //        obs_list.ForEach(o=>o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p=>p.Key,p=>p.Value));
+
+
+            //        string v = null;
+            //        if (oq.IsFiltered)
+            //            obs_list = oq.DataType == "string"
+            //                    ? obs_list.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+            //                    : obs_list.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
+            //                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
+            //        observations = obs_list;
+            //    break;
+            //    case nameof(GroupedObservationsQuery):
+            //        var groupQuery = (GroupedObservationsQuery)query;
+            //        foreach (var obq in groupQuery.GroupedObservations)
+            //        {
+            //            var groupobservations = obq.IsOntologyEntry
+            //                ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[obq.TermCategory] == obq.TermId.ToString() && s.Group == obq.Group && s.ProjectId == query.ProjectId).ToList()
+            //                : _sdtmRepository.FindAll(s => obq.TermId == s.DBTopicId && s.ProjectId == query.ProjectId).ToList();
+
+            //            if (groupQuery.IsFiltered)
+            //                groupobservations = obq.DataType == "string"
+            //                    ? groupobservations.FindAll(
+            //                        s => groupQuery.FilterExactValues.Contains(s.Qualifiers[groupQuery.PropertyName]))
+            //                    : groupobservations.FindAll(
+            //                        s =>
+            //                            int.Parse(s.Qualifiers[groupQuery.PropertyName]) >= groupQuery.FilterRangeFrom &&
+            //                            int.Parse(s.Qualifiers[groupQuery.PropertyName]) <= groupQuery.FilterRangeTo);
+
+            //            observations.AddRange(groupobservations);
+            //            //obsGrpReq.TermIds.AddRange(observations.Select(o => o.DBTopicId));
+            //        }
+            //        break;
+            //}
+            return observations.ToList();
+        }
+
+        private List<SdtmRow> applyObsFilters(List<SdtmRow> observations, List<DatasetField> fields)
+        {
+            var filteredObservations = new List<SdtmRow>();
+            string v;
+
+            var fieldsByO3Id = fields.GroupBy(f => f.QueryObject.QueryObjectName).ToList();
+            foreach (var fieldgrp in fieldsByO3Id)
+            {
+                foreach (var field in fieldgrp) //AEOCCUR / AESEV
+                {
+                    var query = field.QueryObject;
+                    if (query.IsFiltered)
+                    {
+                        if (query.IsOntologyEntry)
+                            filteredObservations = query.DataType == "string"
+                                ? observations.FindAll(
+                                    o => o.QualifierQualifiers[query.TermCategory] == query.TermId.ToString()
+                                    && o.Group == query.Group
+                                    && o.Qualifiers.TryGetValue(query.PropertyName, out v) 
+                                    && query.FilterExactValues.Contains(o.Qualifiers[query.PropertyName]))
+
+                                : observations.FindAll(
+                                    o => float.Parse(o.Qualifiers[query.PropertyName]) >= query.FilterRangeFrom
+                                    && float.Parse(o.Qualifiers[query.PropertyName]) <= query.FilterRangeTo);
+                           
+
+
+                    }
+                }
+            }
+
+            return filteredObservations;
+        }
+
+        public DataTable GetSampleTable(DataExportObject exportData, UserDataset dataset)
+        {
+            var datatable = new DataTable();
+            foreach (var field in dataset.Fields)
+            {
+                datatable.Columns.Add(field.ColumnHeader.ToLower());
+            }
+
+            foreach (var subject in exportData.Subjects)
+            {
+                   var sampleCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SampleCharacteristic)).ToList();
+                   var sm = _bioSampleRepository.FindAll(bs => bs.SubjectId == subject.UniqueSubjectId);
+            
+                    foreach (var sample in sm /*exportData.Samples*/)
+                    {
+                        var row = datatable.NewRow();
+
+                        row["subjectid"] = subject.UniqueSubjectId;
+                        row["sampleid"] = sample.BiosampleStudyId;
+
+                           foreach (var sampleCharField in sampleCharacsFields)
+                                {
+                                 var charVal = sample.SampleCharacteristics.SingleOrDefault(
+                                        sc => sc.CharacteristicFeatureId.Equals(sampleCharField.QueryObject.TermId));
+                                 if (charVal != null)
+                                 row[sampleCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
+                                 }
+                        datatable.Rows.Add(row);
+                     }
+            }
+            return datatable;
+        }
+        
+        public DataTable GetDatasetTable(DataExportObject exportData, UserDataset dataset)
+        {
+            #region Create Table Columns
+            var datatable = new DataTable();
+
+            //datatable.Columns.Add("subjectid");
+            datatable.Columns.Add("studyid");
+            foreach (var field in dataset.Fields)
+            {
+                datatable.Columns.Add(field.ColumnHeader.ToLower());
+            }
+
+            #endregion
+            
+            //var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
+
+            var fieldsByO3Id = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).GroupBy(f => f.QueryObject.QueryObjectName).ToList();
+            var subjCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SubjectCharacteristic)).ToList();
+
+            foreach (var subject in exportData.Subjects)
+            {
+
+                var uniqSubjectId = subject.UniqueSubjectId;
+                var subjectObservations = exportData.Observations.FindAll(o => o.USubjId == uniqSubjectId).ToList();
+                var subjectCharacteristics = exportData.SubjChars.FindAll(sc => sc.SubjectId == subject.Id).ToList();
+                //var uniqSubjectId = subjectObservations.FirstOrDefault().USubjId;
+
+                var firstRow = true;
+                while (subjectObservations.Any() || firstRow)
+                {
+                    var row = datatable.NewRow();
+                    firstRow = false;
+
+                    #region Design Elements
+                    row["subjectid"] = uniqSubjectId;
+                    row["studyid"] = subject.Study.Name;
+                    //arm//visit//studt//
+                    #endregion
+
+                    #region Subject Characteristics
+
+                    foreach (var subjCharField in subjCharacsFields)
+                    {
+                        var charVal = subjectCharacteristics.SingleOrDefault(
+                                        sc => sc.CharacteristicFeatureId.Equals(subjCharField.QueryObject.TermId));
+                        if (charVal != null)
+                            row[subjCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
+
+                    }
+
+                    #endregion
+
+                    #region WRITE CLINICAL OBSERVATIONS
+
+                    foreach (var fieldgrp in fieldsByO3Id)//HEADACHE //BMI (EVENTS AND FINDINGS TOGETHER)//NOTE .. TIMEING ARE NOT synchronized YET
+                    {
+                        SdtmRow obs = null;
+                        foreach (var field in fieldgrp) //AEOCCUR / AESEV
+                        {
+                            //ONTOLOGY TERM REQUEST
+                            if (field.QueryObject.IsOntologyEntry)
+                                obs = subjectObservations.FirstOrDefault(
+                               o => ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[field.QueryObject.TermCategory]);
+
+                            //GROUP OF OBSERVATIONS
+                            else if (field.QueryObject.GetType() == typeof(GroupedObservationsQuery))
+                            {
+                                //ASSUMPTION: GROUPS AREONLY COMPOSED OF ONTOLOGY ENTRY
+                                //ASSUMPTION: 
+                                string v;
+                                foreach (var obsQuery in ((GroupedObservationsQuery)field.QueryObject).GroupedObservations)
+                                {
+                                    obs = subjectObservations.FirstOrDefault(
+                                        o => o.QualifierQualifiers.TryGetValue(obsQuery.TermCategory, out v)
+                                            && obsQuery.TermId.ToString() == o.QualifierQualifiers[obsQuery.TermCategory]);
+                                    if (obs != null) break;
+                                }
+                            }
+
+                            //SINGLE OBSERVATION OBJECT TERM REQUEST
+                            else
+                            {
+                                obs = subjectObservations.FirstOrDefault(
+                                o => ((ObservationQuery)field.QueryObject).TermId == o.DBTopicId);
+                            }
+
+
+
+                            //WRITE OBSERVATION INSTANCE TO ROW
+
+                            string val = "";
+                            obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+                            if (val == null)
+                                obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+                            row[field.ColumnHeader.ToLower()] = val;
+                        }
+                        subjectObservations.Remove(obs);
+                    }
+
+                    #endregion
+
+                    datatable.Rows.Add(row);
+                }
+            }
+            return datatable;
+        }
+
+
+        #endregion
 
         #region Private Methods
-        /*
+
         private DataTable CreateDataTable(DataExportObject exportData, UserDataset userDataset)
         {
             #region Build Table columns
@@ -655,6 +703,13 @@ namespace eTRIKS.Commons.Service.Services
             //var projections = new List<string>();
             datatable.Columns.Add("SUBJECTID");
             datatable.Columns.Add("STUDY");
+
+            // Vahid  added start ******************************************************************************************************************
+            // to be editted accordingly 
+            //  datatable.Columns.Add("SAMPLEID");
+            // Vahid  added finish *****************************************************************************************************************
+
+
 
             foreach (var field in userDataset.Fields)
             {
@@ -704,9 +759,7 @@ namespace eTRIKS.Commons.Service.Services
 
             return datatable;
         }
-        */
 
-        /*
         private DataExportObject GetExportData(int projectId, UserDataset userDataset)
         {
 
@@ -908,9 +961,7 @@ namespace eTRIKS.Commons.Service.Services
 
             return exportData;
         }
-        */
 
-        /*
         private void fillExportDataArms(DataExportObject exportData, int projectId)
         {
             var arms = _armRepository.FindAll(a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)).ToList();
@@ -921,9 +972,7 @@ namespace eTRIKS.Commons.Service.Services
             //exportData.StudiesWithArmsIncluded = _studyRepository.FindAll(s => s.ProjectId == projectId,
             //    new List<string>() { "Arms" }).ToList();
         }
-        */
 
-        /*
         private void fillSubjCharData(DataExportObject exportData, DataField field, int projectId)
         {
             var characteristics = _subjectCharacteristicRepository.FindAll(
@@ -935,9 +984,7 @@ namespace eTRIKS.Commons.Service.Services
             exportData.IsSubjectIncluded = true;
 
         }
-        */
 
-        /*
         private List<TreeNodeDTO> getDataTree(List<SubjectObservation> observations)
         {
             var roots = new List<TreeNodeDTO>();
@@ -1011,9 +1058,7 @@ namespace eTRIKS.Commons.Service.Services
 
             return roots;
         }
-        */
-
-        /*
+        
         private Hashtable getHashtable(DataTable sdtmTable)
         {
             var ht = new Hashtable();
@@ -1031,9 +1076,7 @@ namespace eTRIKS.Commons.Service.Services
             ht.Add("data", sdtmTable);
             return ht;
         }
-        */
 
-        /*
         private TreeNodeDTO createOrFindTreeNode(List<TreeNodeDTO> parent, string nodeId, string nodeText, string type, bool groupNode, Type entity = null, string property = null)
         {
             TreeNodeDTO node;
@@ -1067,9 +1110,7 @@ namespace eTRIKS.Commons.Service.Services
             return node;
 
         }
-        */
 
-        /*
         private UserDataset getUserDataset(UserDatasetDTO dto)
         {
             UserDataset ds = new UserDataset()
@@ -1109,9 +1150,7 @@ namespace eTRIKS.Commons.Service.Services
             //}
             return ds;
         }
-        */
 
-        /*
         private DataField getDataField(DataFieldDTO dto)
         {
             var field = new DataField()
@@ -1126,10 +1165,7 @@ namespace eTRIKS.Commons.Service.Services
             };
             return field;
         }
-    */
         #endregion
-        #endregion
-
 
     }
 }
