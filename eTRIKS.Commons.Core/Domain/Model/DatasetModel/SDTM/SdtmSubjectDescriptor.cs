@@ -70,14 +70,14 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             //SITE ID
             descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
 
-            descriptor.CharacteristicProperties.AddRange(new List<VariableDefinition>()
+            descriptor.CharacteristicProperties = new List<VariableDefinition>()
             {
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "BRTHDTC")?.VariableDefinition,
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "AGE")?.VariableDefinition,
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SEX")?.VariableDefinition,
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RACE")?.VariableDefinition,
                 dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ETHNIC")?.VariableDefinition
-            });
+            };
             
             //QUALIFIERS
             descriptor.QualifierVariables = dataset.Variables
