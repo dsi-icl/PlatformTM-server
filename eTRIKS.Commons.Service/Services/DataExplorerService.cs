@@ -392,6 +392,12 @@ namespace eTRIKS.Commons.Service.Services
                     ActivityId = assay.Id
 
                 });
+
+                assayDTO.Panel = new DTOs.Explorer.PanelDTO()
+                {
+                    AssayId = assay.Id,
+                    AssayName = assay.Name
+                };
                 projectAssays.Add(assayDTO);
             }
             return projectAssays;
