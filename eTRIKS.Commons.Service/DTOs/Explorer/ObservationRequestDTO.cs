@@ -4,9 +4,10 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
 {
     public class ObservationRequestDTO
     {
+        public string QueryFrom { get; set; }
         public string QueryFor { get; set; }
-        public string QueryBy { get; set; }
         public string QueryWhereProperty { get; set; }
+        public string QueryWhereValue { get; set; }
         public string QuerySelectProperty { get; set; }
 
         public string O3 { get; set; }

@@ -17,6 +17,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public List<DataFilter> Filters { get; set; }
         public string LastModified { get; set; }
         public string Type { get; set; }
+        public Guid QueryId { get; set; }
 
 
         public UserDataset()

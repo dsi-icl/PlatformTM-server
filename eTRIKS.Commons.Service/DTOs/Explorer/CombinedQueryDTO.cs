@@ -7,7 +7,7 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
       public string Name {get;set;}
       public List<ObservationRequestDTO> ObsRequests { get; set; }
 
-      public List<PanelDTO> AssayPanelQueries { get; set; }
+      public List<PanelDTO> AssayPanels { get; set; }
 
     }
 }

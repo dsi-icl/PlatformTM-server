@@ -6,8 +6,12 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
     public class Query
     {
         public string QueryObjectName { get; set; }
-        //public string EntityName { get; set; } //Subject // Observation // Sample // Feature?
-        
+
+        public string QueryFrom { get; set; } //Subject // Observation // Sample // Feature?
+        public string QueryFor { get; set; }
+        public string QueryWhereProperty { get; set; }
+        public string QueryWhereValue { get; set; }
+        public string QuerySelectProperty { get; set; }
        // public string PropertyName { get; set; } //SubjectCharacteristics //SampleCharacteristics //Arm //StudyDay //Study
        // public string PropertyValue { get; set; } //QueryValue
         public string DataType { get; set; }

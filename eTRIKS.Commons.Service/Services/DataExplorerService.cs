@@ -32,11 +32,13 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IServiceUoW _dataContext;
 
+        private readonly QueryService _queryService;
+
         private const string SubjectIdColName = "subjectId";
         private const string StudyIdColName = "studyId";
         private const string SampleIdColName = "studyId";
 
-        public DataExplorerService(IServiceUoW uoW)
+        public DataExplorerService(IServiceUoW uoW, QueryService queryService)
         {
             _dataContext = uoW;
             _observationRepository = uoW.GetRepository<Observation, int>();
@@ -47,128 +49,14 @@ namespace eTRIKS.Commons.Service.Services
             _userRepository = uoW.GetRepository<User, Guid>();
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
+
+            _queryService = queryService;
         }
 
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
         {
-            CombinedQuery cQuery = new CombinedQuery();
-
-            cQuery.Name = cdto.Name;
-            cQuery.UserId = Guid.Parse(userId);
-            cQuery.ProjectId = projectId;
-            cQuery.Id = Guid.NewGuid();
-
-
-            ///////////////////////////// Temporary to populate Assaypanel (not active yet)///////////////////////////////////////////////////////
-            var asp = new AssayPanelQueryDTO();
-            asp.AssayId = 111;
-            //asp.SampleQuery = cdto.ObsRequests;
-            cdto.AssayPanels.Add(asp);
-            // how too populate SampleQuery
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            
-            var requests = cdto.ObsRequests;
-
-            foreach (var request in requests)
-            {
-                if (!request.IsMultipleObservations)
-                {
-                    var oq = new ObservationQuery()
-                    {
-                        TermName = request.O3,
-                        TermId = request.O3id,
-                        PropertyName = request.QO2,
-                        PropertyId = request.QO2id,
-                        ProjectId = request.ProjectId,
-
-                        Group = request.Group,
-                        IsOntologyEntry = request.IsOntologyEntry,
-                        TermCategory = request.OntologyEntryCategoryName,
-
-                        ObservationObjectShortName = request.O3code,
-                        DataType = request.DataType,
-                        FilterExactValues = request.FilterExactValues,
-                        FilterRangeFrom = request.FilterRangeFrom,
-                        FilterRangeTo = request.FilterRangeTo,
-                        IsFiltered = request.IsFiltered
-                    };
-
-                    if (request.IsSubjectCharacteristics)
-                        cQuery.SubjectCharacteristics.Add(oq);
-                    if (request.IsClinicalObservations)
-                        cQuery.ClinicalObservations.Add(oq);
-                    if (request.IsDesignElement)
-                        cQuery.DesignElements.Add(oq);
-                    }
-                else
-                {
-                    var goq = new GroupedObservationsQuery()
-                    {
-                        //Name = request.Name,
-                        GroupedObsName = request.O3,
-                        PropertyName = request.QO2,
-                        PropertyLabel = request.QO2_label,
-                        PropertyId = request.QO2id,
-                        Group = request.Group,
-                        GroupedObservations = new List<ObservationQuery>(),
-                        DataType = request.DataType,
-                        FilterExactValues = request.FilterExactValues,
-                        FilterRangeFrom = request.FilterRangeFrom,
-                        FilterRangeTo = request.FilterRangeTo,
-                        IsFiltered = request.IsFiltered,
-                        ProjectId = request.ProjectId
-                    };
-                    goq.GroupedObservations.AddRange(request.GroupedObservations.Select(obsReq => new ObservationQuery()
-                    {
-                        TermId = obsReq.O3id,
-                        TermName = obsReq.O3,
-                        PropertyId = obsReq.QO2id,
-                        PropertyName = obsReq.QO2,
-                        Group = obsReq.Group,
-                        IsOntologyEntry = obsReq.IsOntologyEntry,
-                        TermCategory = obsReq.OntologyEntryCategoryName,
-                        DataType = obsReq.DataType,
-                        ProjectId = obsReq.ProjectId
-                    }));
-                    cQuery.GroupedObservations.Add(goq);
-                }
-            }
-            
-            var assaypanels = cdto.AssayPanels; 
-            foreach (var assayRequest in assaypanels)
-            { 
-                var assayPanelQuery = new AssayPanelQuery(); 
-                assayPanelQuery.AssayId = assayRequest.AssayId;
-
-                foreach (var ap in assayRequest.SampleQuery)
-                {
-                  var oq = new ObservationQuery()
-                    {
-                        TermName = ap.O3,
-                        TermId = ap.O3id,
-                        PropertyName = ap.QO2,
-                        PropertyId = ap.QO2id,
-                        ProjectId = ap.ProjectId,
-
-                        Group = ap.Group,
-                        IsOntologyEntry = ap.IsOntologyEntry,
-                        TermCategory = ap.OntologyEntryCategoryName,
-
-                        ObservationObjectShortName = ap.O3code,
-                        DataType = ap.DataType,
-                        FilterExactValues = ap.FilterExactValues,
-                        FilterRangeFrom = ap.FilterRangeFrom,
-                        FilterRangeTo = ap.FilterRangeTo,
-                        IsFiltered = ap.IsFiltered
-                    };
-                    assayPanelQuery.SampleQuery.Add(oq);
-                }
-                cQuery.AssayPanels.Add(assayPanelQuery);
-            } 
-        
-            return _combinedQueryRepository.Insert(cQuery);
+            return _queryService.SaveQuery(cdto, userId, projectId);
         }
 
         public List<CombinedQuery> GetSavedQueries(int projectId, string userId)
@@ -186,24 +74,6 @@ namespace eTRIKS.Commons.Service.Services
             return query.UserId == Guid.Parse(userId) ? query : null;
         }
 
-        #region //************************************************************** To Be Completed *******************************************************
-
-        //public void UpdateQueries(CombinedQueryDTO cdto, string userId, int projectId)
-        //  //  public List<CombinedQuery> UpdateCart(CombinedQueryDTO cdto, int projectId, string userId)
-        //{
-        //    CombinedQuery cartToUpdate =
-        //   _combinedQueryRepository.FindSingle(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId && d.Name == cdto.Name);
-        //        //ombinedQuery combinedQuery = new CombinedQuery();
-        //        //   _combinedQuery.Update(cartToUpdate);
-
-
-        //        cartToUpdate.Name = cdto.Name;
-        //        //cartToUpdate.UserId = Guid.Parse(userId);
-        //        //cartToUpdate.ProjectId = projectId;
-        //        _combinedQueryRepository.Update(cartToUpdate);
-        //    }
-        //************************************************************** To Be Completed *******************************************************
-        #endregion
         #region Observation Browser methods
         public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
         {
@@ -218,9 +88,11 @@ namespace eTRIKS.Commons.Service.Services
                 DataType = sc.DataType,
                 IsSubjectCharacteristics = true,
                 ProjectId = projectId,
-                QueryFor = nameof(HumanSubject),
-                QueryBy = nameof(HumanSubject.SubjectCharacteristics),
-                QuerySelectProperty = nameof(SubjectCharacteristic.CharacteristicFeatureId)
+                QueryFrom = nameof(HumanSubject),
+                QueryFor = nameof(HumanSubject.SubjectCharacteristics),
+                QueryWhereProperty = nameof(SubjectCharacteristic.CharacteristicFeatureId),
+                QueryWhereValue = sc.Id.ToString(),
+                QuerySelectProperty = nameof(SubjectCharacteristic.VerbatimValue)
 
             }).ToList();
 
@@ -233,8 +105,8 @@ namespace eTRIKS.Commons.Service.Services
                 IsDesignElement = true,
                 DesignElementType = nameof(Arm),
                 QO2 = "Name",
-                QueryFor = nameof(HumanSubject),
-                QueryBy = nameof(HumanSubject.StudyArm),
+                QueryFrom = nameof(HumanSubject),
+                QueryFor = nameof(HumanSubject.StudyArm),
                 QuerySelectProperty = nameof(Arm.Name),
                 ProjectId = projectId
             };
@@ -246,8 +118,8 @@ namespace eTRIKS.Commons.Service.Services
                 DataType = "string",
                 IsDesignElement = true,
                 DesignElementType = nameof(Study),
-                QueryFor = nameof(HumanSubject),
-                QueryBy = nameof(HumanSubject.Study),
+                QueryFrom = nameof(HumanSubject),
+                QueryFor = nameof(HumanSubject.Study),
                 QuerySelectProperty = nameof(Study.Name),
                 QO2 = "Name",
                 ProjectId = projectId
@@ -414,9 +286,10 @@ namespace eTRIKS.Commons.Service.Services
                     DataType = sc.DataType,
                     IsSampleCharacteristic = true,
                     ProjectId = projectId,
-                    QueryFor = nameof(Biosample),
-                    QueryBy = nameof(Biosample.SampleCharacteristics),
+                    QueryFrom = nameof(Biosample),
+                    QueryFor = nameof(Biosample.SampleCharacteristics),
                     QueryWhereProperty = nameof(SampleCharacteristic.CharacteristicFeatureId),
+                    QueryWhereValue = sc.Id.ToString(),
                     QuerySelectProperty = nameof(SampleCharacteristic.VerbatimValue),
                     ActivityId = assay.Id
                 }).ToList();
@@ -427,8 +300,8 @@ namespace eTRIKS.Commons.Service.Services
                     O3 = "Collection Day",
                     O3code = "Day",
                     O3id = 454,
-                    QueryFor = nameof(Biosample),
-                    QueryBy = nameof(Biosample.CollectionStudyDay),
+                    QueryFrom = nameof(Biosample),
+                    QueryFor = nameof(Biosample.CollectionStudyDay),
                     QuerySelectProperty = nameof(RelativeTimePoint.Number),
                     DataType = nameof(Int32),
                     IsSampleCharacteristic = true,
@@ -496,26 +369,12 @@ namespace eTRIKS.Commons.Service.Services
                 if (reqObservations != null)
                     foreach (var requestDto in reqObservations)
                     {
-                        if (requestDto.QueryFor != nameof(HumanSubject))
+                        if (requestDto.QueryFrom != nameof(HumanSubject))
                             continue;
 
-                        string subjProperty;
+                        var subjProperty = _queryService.GetSubjectOrSampleProperty(subject,_queryService.GetQueryFromQueryDTO(requestDto));
 
-                        var queryProperty = subject.GetType().GetProperty(requestDto.QueryBy);
-                        if (queryProperty != null && queryProperty.PropertyType.IsConstructedGenericType)
-                        {
-                            //Property is a collection
-                            //Simple for now since there's only one collection in human subject i.e. subjectcharacteristics
-                            subjProperty = ((IList) queryProperty.GetValue(subject)).Cast<SubjectCharacteristic>()
-                                .SingleOrDefault(sc => sc.CharacteristicFeatureId == requestDto.O3id)?.VerbatimValue;
-                        }
-                        else
-                        {
-                            var properyObj = subject.GetType().GetProperty(requestDto.QueryBy)?.GetValue(subject);
-                            subjProperty = properyObj?.GetType().GetProperty(requestDto.QuerySelectProperty)?.GetValue(properyObj)?.ToString();
-                        }
-
-                        //var charVal = subject.SubjectCharacteristics.SingleOrDefault(sc => sc.CharacteristicFeatureId.Equals(requestDto.O3id));
+                      
                         if (subjProperty == null) continue;
                         row[requestDto.Name] = subjProperty;
                     }
@@ -556,27 +415,11 @@ namespace eTRIKS.Commons.Service.Services
                 if (reqSampleChars != null)
                     foreach (var requestDto in reqSampleChars)
                     {
-                        if (requestDto.QueryFor != nameof(Biosample))
+                        if (requestDto.QueryFrom != nameof(Biosample))
                             continue;
-
-                        string subjProperty;
-
-                        var queryProperty = sample.GetType().GetProperty(requestDto.QueryBy);
-                        if (queryProperty != null && queryProperty.PropertyType.IsConstructedGenericType)
-                        {
-                            //Property is a collection
-                            //Simple for now since there's only one collection in sample i.e. subjectcharacteristics
-                            subjProperty = ((IList)queryProperty.GetValue(sample)).Cast<SampleCharacteristic>()
-                                .SingleOrDefault(sc => sc.CharacteristicFeatureId == requestDto.O3id)?.VerbatimValue;
-                        }
-                        else
-                        {
-                            var properyObj = sample.GetType().GetProperty(requestDto.QueryBy)?.GetValue(sample);
-                            subjProperty = properyObj?.GetType().GetProperty(requestDto.QuerySelectProperty)?.GetValue(properyObj)?.ToString();
-                        }
-                        //var charVal = sample.SampleCharacteristics.SingleOrDefault(sc => sc.CharacteristicFeatureId.Equals(requestDto.O3id));
-                        if (subjProperty == null) continue;
-                        row[requestDto.Name] = subjProperty;
+                        var sampleProperty = _queryService.GetSubjectOrSampleProperty(sample, _queryService.GetQueryFromQueryDTO(requestDto));
+                        if (sampleProperty == null) continue;
+                        row[requestDto.Name] = sampleProperty;
                     }
                 sampleTable.Rows.Add(row);
             }
@@ -811,7 +654,12 @@ namespace eTRIKS.Commons.Service.Services
                     IsEvent = obsObject.Class.ToUpper() == "EVENTS",
                     IsFinding = obsObject.Class.ToUpper() == "FINDINGS",
                     IsClinicalObservations = true,
-                    ProjectId = obsObject.ProjectId.Value
+                    ProjectId = obsObject.ProjectId.Value,
+                    QueryFrom = nameof(SdtmRow),
+                    QueryFor = nameof(SdtmRow), //
+                    QueryWhereProperty = nameof(SdtmRow.DBTopicId),
+                    QueryWhereValue = obsObject.Id.ToString(),
+                    //QuerySelectProperty = nameof()
                 }
             };
             if (obsObject.ControlledTermStr != null) return node;
@@ -841,6 +689,7 @@ namespace eTRIKS.Commons.Service.Services
                 IsMultipleObservations = IsMultiple,
                 IsOntologyEntry = IsOntologyEntry,
                 ProjectId = obsObject.ProjectId.Value,
+                QueryFrom = nameof(SdtmRow)
 
                 //TermIds = termIds,
                 //Id = obsObject.Name.ToLower() + "_" + variableDefinition.Name
