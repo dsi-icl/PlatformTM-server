@@ -4,9 +4,10 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
 {
     public class ObservationRequestDTO
     {
+        public string QueryFrom { get; set; }
         public string QueryFor { get; set; }
-        public string QueryBy { get; set; }
         public string QueryWhereProperty { get; set; }
+        public string QueryWhereValue { get; set; }
         public string QuerySelectProperty { get; set; }
 
         public string O3 { get; set; }
@@ -15,6 +16,8 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public string Id => O3id + (QO2id!=0 ? "_"+QO2id : "");
         public string Name => (O3code + (QO2 != null ? "[" + QO2 + "]" : "")).ToLower();
 
+        public string Group { get; set; }
+        public int ActivityId { get; set; }
         public int ProjectId { get; set; }
         public string O3variable { get; set; }
         public bool IsMultipleObservations { get; set; }
@@ -48,8 +51,8 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public float FilterRangeFrom { get; set; } //the from value selected by user
         public float FilterRangeTo { get; set; } //the to value selected by user
         public bool IsFiltered { get; set; }
-        public string Group { get; set; }
-        public int ActivityId { get; set; }
+        public string FilterText { get; set; }
+
 
         public ObservationRequestDTO()
         {

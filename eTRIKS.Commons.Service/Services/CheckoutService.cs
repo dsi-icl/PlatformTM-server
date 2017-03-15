@@ -14,18 +14,19 @@ namespace eTRIKS.Commons.Service.Services
 {
     public class CheckoutService
     {
-        private IServiceUoW _dataContext;
-
+        private readonly IServiceUoW _dataContext;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
-        private ExportService _exportService;
 
-        public CheckoutService(IServiceUoW uoW, ExportService exportService)
+        private readonly QueryService _queryService;
+
+
+        public CheckoutService(IServiceUoW uoW, QueryService queryService)
         {
             _dataContext = uoW;
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
-            _exportService = exportService;
+            _queryService = queryService;
         }
 
         /// <summary>
@@ -40,105 +41,65 @@ namespace eTRIKS.Commons.Service.Services
         /// <returns></returns>
         public List<UserDataset> CreateCheckoutDatasets(string queryIdStr, string userId)
         {
-
             Guid queryId;
             if (!Guid.TryParse(queryIdStr, out queryId))
                 return null;
             var query = _combinedQueryRepository.Get(queryId);
+            var projectId = query.ProjectId;
 
-            var checkoutDatasets = new List<UserDataset>();
 
             //Create Pheno dataset for all selected clinical and subject observations
             var phenoDataset = CreateSubjectClinicalDataset(query, userId);
-            checkoutDatasets.Add(phenoDataset);
+
+            var checkoutDatasets = new List<UserDataset> {phenoDataset};
 
             //Creates a subject-to-sample mapping dataset for each  assay
-           var projectId = query.ProjectId;
-
-            foreach (var AssayPanel in query.AssayPanels)
+            foreach (var assayPanel in query.AssayPanels)
             {
-                var assaySampleDataset = CreateAssaySampleDataset(AssayPanel, userId, projectId);
+                //THIS IS MAKING THE ASSUMPTION THAT FILTERS ON ONE ASSAY CHARACTERISTICS
+                //WILL NOT
+                //BE PROPAGATED TO THE OTHER ASSAY PANELS IN THE SAME QUERY
+                var singleAssayCombinedQuery = query.AssayPanels.Count > 1 
+                    ? _queryService.CreateSingleAssayCombinedQuery(query, assayPanel) 
+                    : query;
+               
+                var assaySampleDataset = CreateAssaySampleDataset(assayPanel, singleAssayCombinedQuery.Id, userId, projectId);
                 checkoutDatasets.Add(assaySampleDataset);
             }
 
             
-            // TODO Creates assay data dataset for each assay using following
-
-           //foreach (var AssayPanel in query.AssayPanels)
-           // {
-           //     var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, userId, projectId);
-           //     checkoutDatasets.Add(assayPanelDataset);
-           // }
+            //TODO Creates assay data dataset for each assay using following
+            //foreach (var AssayPanel in query.AssayPanels)
+            // {
+            //     var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, userId, projectId);
+            //     checkoutDatasets.Add(assayPanelDataset);
+            // }
 
             return checkoutDatasets;
         }
 
-        public DataTable ExportDataset(string datasetId)
-        {
-            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            var projectId = dataset.ProjectId;
-            var exportData = _exportService.GetDatasetContent(projectId, dataset);
-            var dt = new DataTable();
-
-            if (dataset.Type == "PHENO")
-            {
-                dt = _exportService.GetDatasetTable(exportData, dataset);
-            }
-            if (dataset.Type == "AssaySamples")
-            {
-                dt = _exportService.GetSampleTable(exportData, dataset);
-            }
-
-            dt.TableName = dataset.Name;
-            return dt;
-        }
-
-        public string downloadDatasets(DataTable dtTable)
-        {
-            StringBuilder result = new StringBuilder();
-            if (dtTable.Columns.Count != 0)
-            {
-                foreach (DataColumn col in dtTable.Columns)
-                {
-                    result.Append(col.ColumnName + ',');
-                }
-                result.Append("\r\n");
-                foreach (DataRow row in dtTable.Rows)
-                {
-                    foreach (DataColumn column in dtTable.Columns)
-                    {
-                        result.Append(row[column].ToString() + ',');
-                    }
-                    result.Append("\r\n");
-                }
-            }
-            return result.ToString();
-        }
-
         private UserDataset CreateSubjectClinicalDataset(CombinedQuery query, string userId)
         {
-            var phenoDataset = new UserDataset();
-            phenoDataset.Id = Guid.NewGuid();
-            phenoDataset.OwnerId = userId;
-            phenoDataset.ProjectId = query.ProjectId;
-            phenoDataset.Type = "PHENO";
-            phenoDataset.Name = "Phenotypes";
-            //CREATE DATAFIELDS
-
-            //TEMP //SHOULD ADD SUBJECTID and UNIQUE SUBJECT ID to CHARACTERISTICS/CHARACTERISTICS_OBJ
-            phenoDataset.Fields.Add(new DatasetField()
+            var phenoDataset = new UserDataset
             {
-                FieldName = "Subject[UniqueId]",
-                ColumnHeader = "subjectid",
-                ColumnHeaderIsEditable = false
-            });
+                Id = Guid.NewGuid(),
+                OwnerId = userId,
+                ProjectId = query.ProjectId,
+                Type = "PHENO",
+                Name = "Subject Metadata",
+                QueryId = query.Id
+            };
+
+            //ADD SUBJECTID &  STUDYID DATAFIELD
+            phenoDataset.Fields.Add(CreateSubjectIdField());
+            phenoDataset.Fields.Add(CreateStudyIdField());
 
             //ADD DESIGN ELEMENT FIELDS (STUDY, VISIT, ARM...etc)
             phenoDataset.Fields.AddRange(query.DesignElements.Select(qObj => new DatasetField()
             {
                 QueryObject = qObj,
-                QueryObjectType = qObj.TermName, //TEMP should consider to add type to obsquery if used as generic query
-                ColumnHeader = qObj.TermName
+                QueryObjectType = qObj.QueryFor, 
+                ColumnHeader = qObj.QueryObjectName
             }));
 
             //ADD SUBJECT CHARACTERISTICS (AGE, RACE, SEX ...etc) 
@@ -146,7 +107,7 @@ namespace eTRIKS.Commons.Service.Services
             {
                 QueryObject = qObj,
                 QueryObjectType = nameof(SubjectCharacteristic),
-                ColumnHeader = qObj.ObservationName
+                ColumnHeader = qObj.QueryObjectName//.ObservationName
             })); 
 
             //ADD CLINICAL OBSERVATIONS
@@ -165,55 +126,54 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeader = gObs.ObservationName
             }));
 
+            var exportData = _queryService.GetQueryResult(query.Id);
+            phenoDataset.SubjectCount = exportData.Subjects.Count;
+            
+
             _userDatasetRepository.Insert(phenoDataset);
             _dataContext.Save();
             return phenoDataset;
         }
 
- 
-       private UserDataset CreateAssaySampleDataset(AssayPanelQuery assayPanelQuery, string userId, int projectId)
+        private UserDataset CreateAssaySampleDataset(AssayPanelQuery assayPanelQuery, Guid combinedQueryId, string userId, int projectId)
         {
             // This is for the subject to sample mapping
-            var assaySampleDataset = new UserDataset();
-            assaySampleDataset.Id = Guid.NewGuid();
-            assaySampleDataset.OwnerId = userId;
-            assaySampleDataset.ProjectId = projectId;
-            assaySampleDataset.Type = "AssaySamples";
-            assaySampleDataset.Name = "SubjectsToSamplesMapping";
+            var assaySampleDataset = new UserDataset
+            {
+                Id = Guid.NewGuid(),
+                OwnerId = userId,
+                ProjectId = projectId,
+                Type = "BIOSAMPLES",
+                Name = assayPanelQuery.AssayName + " Sample Metadata",
+                QueryId = combinedQueryId
+            };
             //CREATE DATAFIELDS
 
             // 1. ADD SubjectId Field
-            assaySampleDataset.Fields.Add(new DatasetField()
-            {
-                FieldName = "Subject[UniqueId]",
-                ColumnHeader = "subjectid",
-                ColumnHeaderIsEditable = false
-            });
-            
+            assaySampleDataset.Fields.Add(CreateSubjectIdField());
             // 2.ADD sample Id Field
-            assaySampleDataset.Fields.Add(new DatasetField()
-            {
-                FieldName = "Sample[SampleId]",
-                ColumnHeader = "sampleid",
-                ColumnHeaderIsEditable = false
-            });
+            assaySampleDataset.Fields.Add(CreateSampleIdField());
+            // 3. ADD Study Id
+            assaySampleDataset.Fields.Add(CreateStudyIdField());
 
-            // 3. ADD  Sample characteristics
-            assaySampleDataset.Fields.AddRange(assayPanelQuery.SampleQuery.Select(qObj => new DatasetField()
+            // 4. ADD  Sample characteristics
+            assaySampleDataset.Fields.AddRange(assayPanelQuery.SampleQueries.Select(qObj => new DatasetField()
             {
                 QueryObjectType = nameof(SampleCharacteristic),
-                //   AssayPanels = assayPanelQuery,
                 QueryObject = qObj,
-                ColumnHeader = qObj.ObservationName
+                ColumnHeader = qObj.QueryObjectName
             }));
 
+            var exportData = _queryService.GetQueryResult(combinedQueryId);
+            assaySampleDataset.SubjectCount = exportData.Subjects.Count;
+            assaySampleDataset.SampleCount = exportData.Samples.Count;
 
             _userDatasetRepository.Insert(assaySampleDataset);
             _dataContext.Save();
             return assaySampleDataset;
 
         }
-        // Following is not completed 
+
         private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery, string userId, int projectId)
         {
             // TODO for HD datasets
@@ -223,32 +183,61 @@ namespace eTRIKS.Commons.Service.Services
             assayPanelDataset.ProjectId = projectId;
             assayPanelDataset.Type = "AssayPanel";
             assayPanelDataset.Name = "HDSamples";
-          
-            // 1. ADD SubjectId
-            assayPanelDataset.Fields.Add(new DatasetField()
+
+            return null;
+        }
+
+        private DatasetField CreateSubjectIdField()
+        {
+            return new DatasetField()
             {
                 FieldName = "Subject[UniqueId]",
+                QueryObject =
+                    new Query()
+                    {
+                        QueryFrom = nameof(HumanSubject),
+                        QueryFor = nameof(HumanSubject.UniqueSubjectId),
+                        QuerySelectProperty = nameof(HumanSubject.UniqueSubjectId)
+                    },
                 ColumnHeader = "subjectid",
                 ColumnHeaderIsEditable = false
-            });
-            // 2. ADD sample Id
-            assayPanelDataset.Fields.Add(new DatasetField()
+            };
+        }
+
+        private DatasetField CreateSampleIdField()
+        {
+            return new DatasetField()
             {
                 FieldName = "Sample[SampleId]",
+                QueryObject =
+                    new Query()
+                    {
+                        QueryFrom = nameof(Biosample),
+                        QueryFor = nameof(Biosample.BiosampleStudyId),
+                        QuerySelectProperty = nameof(Biosample.BiosampleStudyId)
+                    },
+                //QueryObjectType = nameof(Biosample),
                 ColumnHeader = "sampleid",
                 ColumnHeaderIsEditable = false
-            });
-            //ADD Range.  
-            assayPanelDataset.Fields.AddRange(assayPanelQuery.SampleQuery.Select(qObj => new DatasetField()
+            };
+        }
+
+        private DatasetField CreateStudyIdField()
+        {
+            return new DatasetField()
             {
-                QueryObjectType = nameof(Biosample),
-                //   AssayPanels = assayPanelQuery,
-                QueryObject = qObj,
-                ColumnHeader = qObj.ObservationName
-            }));
-            _userDatasetRepository.Insert(assayPanelDataset);
-            _dataContext.Save();
-            return assayPanelDataset;
+                FieldName = "Study[Name]",
+                QueryObject =
+                    new Query()
+                    {
+                        QueryFrom = nameof(HumanSubject),
+                        QueryFor = nameof(HumanSubject.Study),
+                        QuerySelectProperty = nameof(Study.Name)
+                    },
+                //QueryObjectType = nameof(Biosample),
+                ColumnHeader = "StudyName",
+                ColumnHeaderIsEditable = false
+            };
         }
     }
 }

@@ -1,13 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("apps/exportwizard")]
+    [Route("apps/export")]
     public class ExportController : Controller
     {
          private readonly ExportService _exportService;
@@ -16,7 +18,34 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             _exportService = exportService;
         }
-        
+
+        [HttpGet("datasets/{datasetId}/preview")]
+        public DataTable GetDataPreview(string datasetId)
+        {
+            return _exportService.ExportDataset(datasetId);//.(projectId, userDatasetDto);
+        }
+
+
+        [Route("datasets/{datasetId}/download")]
+        [HttpGet]
+        public void DownloadDatasets(string datasetId)
+        {
+
+            var dtTable = _exportService.ExportDataset(datasetId);
+            // trick to get the file name
+            string fileName = dtTable.TableName;
+            var csvFile = _exportService.DownloadDataset(dtTable);
+
+
+            HttpContext.Response.Clear();
+            HttpContext.Response.ContentType = "text/csv";
+            HttpContext.Response.Headers.Count();
+            HttpContext.Response.Headers.Add("content-disposition", "attachment; filename=" + fileName + ".csv");
+            HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            HttpContext.Response.WriteAsync(csvFile);
+
+        }
 
         //[HttpGet]
         //[Route("projects/{projectId}/datafields")]
@@ -38,7 +67,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //{
         //    return _exportService.ExportDataTable(projectId, userDatasetDto);
         //}
-        
+
         //[HttpPost]
         //[Route("api/projects/{projectAcc}/export/tree/")]
         //public async Task<List<TreeNodeDTO>> GetDataTree(string projectAcc, [FromBody] UserDatasetDTO userDatasetDto)

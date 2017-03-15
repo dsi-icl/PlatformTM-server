@@ -100,6 +100,7 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<UserDatasetService>();
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
+            services.AddScoped<QueryService>();
 
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();

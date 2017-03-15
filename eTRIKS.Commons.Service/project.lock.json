@@ -9723,6 +9723,7 @@
       "Microsoft.AspNetCore.Http.Abstractions >= 1.1.0",
       "Microsoft.AspNetCore.Identity >= 1.1.0",
       "System.Collections.NonGeneric >= 4.3.0",
+      "System.Linq >= 4.3.0",
       "System.Runtime >= 4.3.0",
       "System.Runtime.InteropServices >= 4.3.0",
       "eTRIKS.Commons.Core >= 1.0.0-*",

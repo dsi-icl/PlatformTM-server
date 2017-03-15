@@ -19,10 +19,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class DataExplorerController : Controller
     {
         private readonly DataExplorerService _explorerService;
+        private readonly QueryService _queryService;
 
-        public DataExplorerController(DataExplorerService explorerService)
+        public DataExplorerController(DataExplorerService explorerService, QueryService queryService)
         {
             _explorerService = explorerService;
+            _queryService = queryService;
         }
 
         [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
@@ -35,7 +37,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public IActionResult SaveQuery(int projectId, [FromBody] CombinedQueryDTO cdto )
        {
           var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-          var savedQuery =  _explorerService.SaveQuery(cdto, userId, projectId);
+          var savedQuery =  _queryService.SaveQuery(cdto, userId, projectId);
             
             if (savedQuery != null)
                 return new CreatedAtRouteResult("GetSavedQuery", new { projectId = projectId, queryId = savedQuery.Id.ToString() }, savedQuery);
@@ -50,7 +52,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!User.Identity.IsAuthenticated)
                 return null;
-            var query =  _explorerService.GetSavedCombinedQuery(projectId, userId,queryId);
+            var query = _queryService.GetSavedCombinedQuery(projectId, userId,queryId);
             if(query != null)
                 return Ok(query);
             return NotFound();
@@ -62,7 +64,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!User.Identity.IsAuthenticated)
                 return null;
-            return _explorerService.GetSavedQueries(projectId, userId);
+            return _queryService.GetSavedQueries(projectId, userId);
         }
 
         /*
