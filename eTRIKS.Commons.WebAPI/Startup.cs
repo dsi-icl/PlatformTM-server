@@ -12,6 +12,7 @@ using MySQL.Data.Entity.Extensions;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Service.Configuration;
+using eTRIKS.Commons.Service.Services.Loading.HdDataLoader;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
 using eTRIKS.Commons.WebAPI.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -103,6 +104,7 @@ namespace eTRIKS.Commons.WebAPI
 
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
+            services.AddScoped<DataMatrixLoader>();
 
             services.AddAuthorization(auth =>
             {
@@ -118,7 +120,7 @@ namespace eTRIKS.Commons.WebAPI
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
-            //services.AddMvc()
+            // services.AddMvc();
             .AddJsonOptions(opts =>
                  {
                      // Force Camel Case to JSON

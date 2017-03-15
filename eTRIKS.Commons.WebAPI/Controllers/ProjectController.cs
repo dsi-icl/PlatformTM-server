@@ -49,7 +49,15 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _projectService.GetProjectActivities(projectId);
         }
+        
+        [HttpGet]
+        [Route("{projectId}/remove")]
+        public void DeleteProject(int projectId) 
+        {
+            _projectService.DeleteProject(projectId);
+        }
 
+        
         [HttpPost]
         public IActionResult AddProject([FromBody] ProjectDTO projectDTO)
         {

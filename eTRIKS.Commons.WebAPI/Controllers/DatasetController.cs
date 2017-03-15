@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net.Http;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using eTRIKS.Commons.Service.Services.Loading.HdDataLoader;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -16,11 +17,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     {
         private readonly DatasetService _datasetService;
         private readonly FileService _fileService;
-
-        public DatasetController(DatasetService datasetService, FileService fileService)
+        private readonly DataMatrixLoader _dataMatrixLoader;
+        public DatasetController(DatasetService datasetService, FileService fileService, DataMatrixLoader dataMatrixLoader) 
         {
+
             _datasetService = datasetService;
             _fileService = fileService;
+            _dataMatrixLoader = dataMatrixLoader;
         }
 
 
@@ -130,5 +133,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
              return _datasetService.CheckFileTemplateMatch(datasetId,fileId);
         }
-    }
+
+
+        [HttpGet("{datasetId}/loadHDdDdata/{fileId}")]
+        public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/ )
+        {
+             return  _dataMatrixLoader.LoadHDdDdata(datasetId, fileId/*, referencFromHdId*/);
+        }
+         
+    } 
 }

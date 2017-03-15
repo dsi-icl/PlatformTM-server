@@ -45,7 +45,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
         /// Also maps to AssayId in case of Assay Observations
         /// </summary>
         public int ActivityId { get; set; }
-
+        public int? ProjectId { get; set; }
 
     }
 
