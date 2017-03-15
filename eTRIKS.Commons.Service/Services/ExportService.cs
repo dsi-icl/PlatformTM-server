@@ -1,58 +1,37 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
-using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using MongoDB.Bson;
-using MySql.Data.MySqlClient;
-using Newtonsoft.Json;
-using System.Reflection;
 using System.Text;
 
 namespace eTRIKS.Commons.Service.Services
 {
     public class ExportService
     {
-        private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
-
         private readonly QueryService _queryService;
        
         public ExportService(IServiceUoW uoW, QueryService queryService)
         {
-            //TODO:remove
-            _bioSampleRepository = uoW.GetRepository<Biosample, int>();
-
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _queryService = queryService;
         }
 
-
-
-        #region Checkout Methods
         public DataTable ExportDataset(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             var projectId = dataset.ProjectId;
-            var exportData = _queryService.GetQueryResult(projectId, dataset.QueryId);
+            var exportData = _queryService.GetQueryResult(dataset.QueryId);
             var dt = new DataTable();
 
             if (dataset.Type == "PHENO")
             {
                 dt = ExportSubjectClinicalTable(exportData, dataset);
             }
-            if (dataset.Type == "AssaySamples")
+            if (dataset.Type == "BIOSAMPLES")
             {
                 dt = ExportSampleTable(exportData, dataset);
             }
@@ -69,28 +48,27 @@ namespace eTRIKS.Commons.Service.Services
                 datatable.Columns.Add(field.ColumnHeader.ToLower());
             }
 
-            //This method should hav
-            foreach (var subject in exportData.Subjects)
+            foreach (var biosample in exportData.Samples)
             {
-                   var sampleCharacsFields = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SampleCharacteristic)).ToList();
-                   var sm = _bioSampleRepository.FindAll(bs => bs.SubjectId == subject.UniqueSubjectId);
-            
-                    foreach (var sample in sm /*exportData.Samples*/)
-                    {
-                        var row = datatable.NewRow();
+                var row = datatable.NewRow();
 
-                        row["subjectid"] = subject.UniqueSubjectId;
-                        row["sampleid"] = sample.BiosampleStudyId;
+                row["subjectid"] = biosample.Subject.UniqueSubjectId;
+                row["sampleid"] = biosample.BiosampleStudyId;
 
-                           //foreach (var sampleCharField in sampleCharacsFields)
-                           //     {
-                           //      var charVal = sample.SampleCharacteristics.SingleOrDefault(
-                           //             sc => sc.CharacteristicFeatureId.Equals(sampleCharField.QueryObject.TermId));
-                           //      if (charVal != null)
-                           //      row[sampleCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
-                           //      }
-                        datatable.Rows.Add(row);
-                     }
+                foreach (var samplePropField in dataset.Fields)
+                {
+                    var charVal = _queryService.GetSubjectOrSampleProperty(biosample, samplePropField.QueryObject);
+                    if (charVal != null)
+                        row[samplePropField.ColumnHeader.ToLower()] = charVal;
+                }
+                //foreach (var sampleCharField in sampleCharacsFields)
+                //     {
+                //      var charVal = sample.SampleCharacteristics.SingleOrDefault(
+                //             sc => sc.CharacteristicFeatureId.Equals(sampleCharField.QueryObject.TermId));
+                //      if (charVal != null)
+                //      row[sampleCharField.ColumnHeader.ToLower()] = charVal.VerbatimValue;
+                //      }
+                datatable.Rows.Add(row);
             }
             return datatable;
         }
@@ -220,9 +198,8 @@ namespace eTRIKS.Commons.Service.Services
             return result.ToString();
         }
 
-        #endregion
 
-
+        #region OLD METHODS
         /*
        public DataExportObject GetDatasetContent(int projectId, UserDataset userDataset)
        {
@@ -911,7 +888,7 @@ namespace eTRIKS.Commons.Service.Services
         #endregion
         */
 
-        #region OLD METHODS
+
         //public List<TreeNodeDTO> GetAvailableFields(int projectId)
         //{
 

@@ -13,6 +13,7 @@ using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.DTOs.Explorer;
+using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -21,10 +22,14 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<SubjectCharacteristic, int> _subjectCharacteristicRepository;
+        private readonly IRepository<SampleCharacteristic, int> _sampleCharacteristicRepository;
         private readonly IRepository<Study, int> _studyRepository;
         private readonly IRepository<Arm, string> _armRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Visit, int> _visitRepository;
+        private readonly IRepository<Biosample, int> _biosampleRepository;
+        private readonly IRepository<Assay, int> _assayRepository;
+
 
 
         public QueryService(IServiceUoW uoW)
@@ -32,10 +37,14 @@ namespace eTRIKS.Commons.Service.Services
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _subjectCharacteristicRepository = uoW.GetRepository<SubjectCharacteristic, int>();
+            _sampleCharacteristicRepository = uoW.GetRepository<SampleCharacteristic, int>();
             _armRepository = uoW.GetRepository<Arm, string>();
             _studyRepository = uoW.GetRepository<Study, int>();
             _visitRepository = uoW.GetRepository<Visit, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _biosampleRepository = uoW.GetRepository<Biosample, int>();
+            _assayRepository = uoW.GetRepository<Assay, int>();
+
         }
 
         public string GetSubjectOrSampleProperty(object subject, Query query)
@@ -68,6 +77,350 @@ namespace eTRIKS.Commons.Service.Services
                     : properyObj?.ToString();
             }
             return subjProperty;
+        }
+
+       
+
+        public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
+        {
+            CombinedQuery cQuery = new CombinedQuery();
+
+            cQuery.Name = cdto.Name;
+            cQuery.UserId = Guid.Parse(userId);
+            cQuery.ProjectId = projectId;
+            cQuery.Id = Guid.NewGuid();
+
+            var requests = cdto.ObsRequests.Union(cdto.SubjCharRequests);
+
+            foreach (var request in requests)
+            {
+                if (!request.IsMultipleObservations)
+                {
+                    var query = GetQueryFromQueryDTO(request);
+                    if (request.IsSubjectCharacteristics)
+                        cQuery.SubjectCharacteristics.Add(query);
+                    if (request.IsClinicalObservations)
+                        cQuery.ClinicalObservations.Add((ObservationQuery)query);
+                    if (request.IsDesignElement)
+                        cQuery.DesignElements.Add(query);
+                }
+                else
+                {
+                    var goq = new GroupedObservationsQuery()
+                    {
+                        //Name = request.Name,
+                        GroupedObsName = request.O3,
+                        PropertyName = request.QO2,
+                        PropertyLabel = request.QO2_label,
+                        PropertyId = request.QO2id,
+                        Group = request.Group,
+                        GroupedObservations = new List<ObservationQuery>(),
+                        DataType = request.DataType,
+                        FilterExactValues = request.FilterExactValues,
+                        FilterRangeFrom = request.FilterRangeFrom,
+                        FilterRangeTo = request.FilterRangeTo,
+                        IsFiltered = request.IsFiltered,
+                        ProjectId = request.ProjectId
+                    };
+                    goq.GroupedObservations.AddRange(request.GroupedObservations.Select(obsReq => new ObservationQuery()
+                    {
+                        TermId = obsReq.O3id,
+                        TermName = obsReq.O3,
+                        PropertyId = obsReq.QO2id,
+                        PropertyName = obsReq.QO2,
+                        Group = obsReq.Group,
+                        IsOntologyEntry = obsReq.IsOntologyEntry,
+                        TermCategory = obsReq.OntologyEntryCategoryName,
+                        DataType = obsReq.DataType,
+                        ProjectId = obsReq.ProjectId
+                    }));
+                    cQuery.GroupedObservations.Add(goq);
+                }
+            }
+
+            var assaypanels = cdto.AssayPanelRequests.Values.Where(ap=>ap.IsRequested);
+            foreach (var assayRequest in assaypanels)
+            {
+                var assayPanelQuery = new AssayPanelQuery();
+                assayPanelQuery.AssayId = assayRequest.AssayId;
+                assayPanelQuery.AssayName = assayRequest.AssayName;
+
+                foreach (var sampleQuery in assayRequest.SampleQuery)
+                {
+                    var query = GetQueryFromQueryDTO(sampleQuery);
+                    assayPanelQuery.SampleQueries.Add(query);
+                }
+                cQuery.AssayPanels.Add(assayPanelQuery);
+            }
+
+            return _combinedQueryRepository.Insert(cQuery);
+        }
+
+        public List<CombinedQuery> GetSavedQueries(int projectId, string userId)
+        {
+            var cart = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId).ToList();
+            return cart;
+        }
+
+        public CombinedQueryDTO GetSavedCombinedQuery(int projectId, string userId, string queryId)
+        {
+            //FOR VALIDATION check if user is indeed the owner of this query
+            if (queryId == "new")
+                return _getNewCqueryForProject(projectId);
+            var query = _combinedQueryRepository.FindSingle(c => c.Id == Guid.Parse(queryId));
+            var queryDto = _getcQueryDTO(query);
+            if (queryDto == null) throw new ArgumentNullException(nameof(queryDto));
+            return queryDto.UserId == userId ? queryDto : null;
+        }
+
+        private CombinedQueryDTO _getNewCqueryForProject(int projectId)
+        {
+            var dto = new CombinedQueryDTO();
+            dto.Name = "New Query";
+            var assays = _assayRepository.FindAll(a => a.ProjectId == projectId).ToList();
+
+            if (assays.Count == 0)
+                return null;
+            foreach (var assay in assays)
+            {
+                var apanel = new AssayPanelDTO
+                {
+                    AssayId = assay.Id,
+                    AssayName = assay.Name
+                };
+                dto.AssayPanelRequests.Add(apanel.AssayId,apanel);
+            }
+            
+            return dto;
+        }
+
+        public DataExportObject GetQueryResult(Guid combinedQueryId)
+        {
+            var combinedQuery = _combinedQueryRepository.Get(combinedQueryId);
+            var queryResult = new DataExportObject();
+            var projectId = combinedQuery.ProjectId;
+
+            //TODO: the list of included proerties should reflect the selected subject properties
+            //IE if StudyArm is selected as a field, then include it, if CollectionStudyDay is included, then include it ...etc
+            //INSTEAD OF INCLUDING ALL PROPERTIES WHICH WOOULD MAKE THE QUERY REALLY SLOW
+            queryResult.Subjects = _subjectRepository.FindAll(
+                s => s.Study.ProjectId == projectId,
+                new List<string>() { "StudyArm", "Study", "SubjectCharacteristics.CharacteristicFeature" }).ToList();
+
+            //QUERY FOR CLINICAL OBSERVATIONS
+            _getObservations(combinedQuery, ref queryResult);
+
+
+            //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
+            foreach (var subjCharQuery in combinedQuery.SubjectCharacteristics)
+            {
+                var characteristics = _subjectCharacteristicRepository.FindAll(
+                    sc =>
+                        sc.Subject.Study.ProjectId == projectId &&
+                        subjCharQuery.QueryWhereValue == sc.CharacteristicFeatureId.ToString(),
+                    new List<string>() {"Subject"}).ToList();
+
+                //APPLY FILTERING IF FILTER PRESENT
+                if (characteristics.Any() && subjCharQuery.IsFiltered)
+                {
+                    characteristics = (subjCharQuery.DataType == "string")
+                        ? characteristics.FindAll(sc => subjCharQuery.FilterExactValues.Contains(sc.VerbatimValue))
+                        : characteristics.FindAll(sc =>
+                            int.Parse(sc.VerbatimValue) >= subjCharQuery.FilterRangeFrom &&
+                            int.Parse(sc.VerbatimValue) <= subjCharQuery.FilterRangeTo);
+                }
+
+                //ADD TO EXPORT DATA 
+                queryResult.SubjChars.AddRange(characteristics);
+            }
+
+
+            foreach (var deQuery in combinedQuery.DesignElements)
+            {
+                switch (deQuery.QueryFor)
+                {
+                    case nameof(HumanSubject.StudyArm):
+                        if (deQuery.IsFiltered)
+                            queryResult.Arms = _armRepository.FindAll(
+                                a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)
+                                && deQuery.FilterExactValues.Contains(a.Name)).ToList();
+                        else
+                            queryResult.Arms = _armRepository.FindAll(
+                                a => a.Studies.Select(s => s.Study.ProjectId).Contains(projectId)).ToList();
+                        break;
+                    case nameof(HumanSubject.Study):
+                        if (deQuery.IsFiltered)
+                            queryResult.Studies = _studyRepository.FindAll(
+                                                        s => s.ProjectId == projectId
+                                                        && deQuery.FilterExactValues.Contains(s.Name),
+                                                        new List<string>() { "Subjects" }).ToList();
+                        else
+                            queryResult.Studies = _studyRepository.FindAll(s => s.ProjectId == projectId).ToList();
+                        break;
+                    case nameof(Visit):
+                        var visits = _visitRepository.FindAll(
+                            v => v.Study.ProjectId == projectId
+                            //apply filter if present
+                            ).ToList();
+                        queryResult.Visits = visits;
+                        break;
+                } 
+            }
+
+            //FOR NOW SHOULD NOT BE ALLOWED UNLESS WE DECIDED TO PROPAGATE ALL ASSAY SPECIFIC FILTERS TO ALL ASSAYS IN THE COMBINED QUERY
+            //if (combinedQuery.AssayPanels.Any() && combinedQuery.AssayPanels.Count > 1)
+            //    return null;
+
+            var apQuery = combinedQuery.AssayPanels.FirstOrDefault();
+            if (apQuery != null)
+            {
+                var assaySamples =
+                    _biosampleRepository.FindAll(s => s.AssayId == apQuery.AssayId,
+                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature","CollectionStudyDay"}).ToList();
+                queryResult.Samples = assaySamples;
+                //HOW DO I FILTER THE SAMPLES BY THE QUERED PROPERTIES?
+                //HOW DO I filter samples by collectionStudyDay?
+
+                //TODO: TEMP SOLUTION FOR COLLECTION STUDY DAY
+                //foreach (var sampleQuery in apQuery.SampleQueries.Where(sq=>sq.QueryFor != nameof(Biosample.SampleCharacteristics)))
+                //{
+                //    assaySamples.FindAll(b => 
+                //    int.Parse(b.GetType().GetProperty("CollectionStudyDay").GetValue(b).properyObj?.GetType().GetProperty(query.QuerySelectProperty)?.GetValue(properyObj)?.ToString().ToString()) >= sampleQuery.FilterRangeFrom &&
+                //    int.Parse(b.GetType().GetProperty("CollectionStudyDay").GetValue(b).ToString()) <= sampleQuery.FilterRangeTo
+                //    );
+
+                //}
+                if (apQuery.SampleQueries.Exists(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay)))
+                {
+                    var dayQuery = apQuery.SampleQueries.Find(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay));
+                    queryResult.Samples = assaySamples.FindAll(s => s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
+                    s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
+                }
+
+                //QUERY AND FILTER SAMPLE CHARACTERISTICS
+                foreach (var sampleQuery in apQuery.SampleQueries.Where(sq=>sq.QueryFor == nameof(Biosample.SampleCharacteristics)))
+                {
+                    var characteristics = _sampleCharacteristicRepository.FindAll(
+                   sc =>
+                       sc.Sample.Study.ProjectId == projectId &&
+                       sampleQuery.QueryWhereValue == sc.CharacteristicFeatureId.ToString(),
+                   new List<string>() { "Sample" }).ToList();
+
+                    //APPLY FILTERING IF FILTER PRESENT
+                    if (characteristics.Any() && sampleQuery.IsFiltered)
+                    {
+                        characteristics = (sampleQuery.DataType == "string")
+                            ? characteristics.FindAll(sc => sampleQuery.FilterExactValues.Contains(sc.VerbatimValue))
+                            : characteristics.FindAll(sc =>
+                                int.Parse(sc.VerbatimValue) >= sampleQuery.FilterRangeFrom &&
+                                int.Parse(sc.VerbatimValue) <= sampleQuery.FilterRangeTo);
+                    }
+                    //ADD TO EXPORT DATA 
+                    queryResult.SampleCharacteristics.AddRange(characteristics);
+                }
+            }
+            
+
+            queryResult.FilterAndJoin();
+
+            return queryResult;
+        }
+
+        public CombinedQuery CreateSingleAssayCombinedQuery(CombinedQuery cQuery, AssayPanelQuery apQuery)
+        {
+            var singleAssayCombinedQuery = new CombinedQuery
+            {
+                ProjectId = cQuery.ProjectId,
+                ClinicalObservations = cQuery.ClinicalObservations,
+                DesignElements = cQuery.DesignElements,
+                GroupedObservations = cQuery.GroupedObservations,
+                SubjectCharacteristics = cQuery.SubjectCharacteristics,
+                UserId = cQuery.UserId,
+                Id = Guid.NewGuid()
+            };
+            singleAssayCombinedQuery.AssayPanels.Add(apQuery);
+            _combinedQueryRepository.Insert(singleAssayCombinedQuery);
+
+            return singleAssayCombinedQuery;
+        }
+
+        private void _getObservations(CombinedQuery combinedQuery, ref DataExportObject queryResult)
+        {
+            List<SdtmRow> observations = new List<SdtmRow>();
+           
+
+            //GROUP CLINICAL OBSERVATIONS (GROUP AND INDIVIDUAL)
+            var obsQueries = combinedQuery.ClinicalObservations.Union(combinedQuery.GroupedObservations).ToList();
+
+            //GROUP CLINICAL OBSERVATIONS BY O3 TO QUERY FOR THE OBSERVATION (E.G. HEADACHE ONLY ONCE EVEN IF TWO REQUEST ARE MADE (e.g. AEOCCUR and AESEV)
+            var queriesByO3Id = obsQueries.GroupBy(f => f.QueryObjectName).ToList();
+            foreach (var sameO3queries in queriesByO3Id)
+            {
+                var o3q_g = sameO3queries.Select(group => group).First();
+                var o3q_list = new List<ObservationQuery>();
+               
+
+                //EXPANIDNG ALL to GROUP  TO ACCOMMODATE FOR GROUP OBSERVATIONS AS WELL IN THE SAME CODE BLOCK
+                if (o3q_g.GetType().Name == nameof(GroupedObservationsQuery))
+                {
+                    ((GroupedObservationsQuery)o3q_g).GroupedObservations.ForEach(oq => o3q_list.Add(oq));
+                }
+                else
+                    o3q_list.Add(o3q_g);
+                //////////////////////////////////////////////////////////////////////////////////////////////
+
+                var obsQueryResult = new List<SdtmRow>();
+                foreach (var o3q in o3q_list)
+                {
+                    obsQueryResult.AddRange(o3q.IsOntologyEntry
+                         ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[o3q.TermCategory] == o3q.TermId.ToString() && s.Group == o3q.Group && s.ProjectId == o3q.ProjectId).ToList()
+                         : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList());
+
+                }
+
+                foreach (var oq in sameO3queries) //AEOCCUR / AESEV
+                {
+                    if (oq.IsFiltered)
+                    {
+                        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
+                        obsQueryResult.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
+
+                        string v = null;
+                        obsQueryResult = oq.DataType == "string"
+                                    ? obsQueryResult.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+                                    : obsQueryResult.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
+                                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
+
+                        queryResult.ObservationsFiltered = true;
+
+                    }
+                }
+                observations.AddRange(obsQueryResult);
+            }
+
+            queryResult.Observations = observations;
+        }
+
+        private CombinedQueryDTO _getcQueryDTO(CombinedQuery cQuery)
+        {
+            var dto = new CombinedQueryDTO();
+            dto.Name = cQuery.Name;
+            dto.UserId = cQuery.UserId.ToString();
+            dto.ObsRequests = new List<ObservationRequestDTO>();
+            foreach (var oq in cQuery.ClinicalObservations.Union(cQuery.GroupedObservations))
+            {
+                dto.ObsRequests.Add(GetDTOforQuery(oq));
+            }
+            foreach (var oq in cQuery.SubjectCharacteristics.Union(cQuery.DesignElements))
+            {
+                dto.SubjCharRequests.Add(GetDTOforQuery(oq));
+            }
+            foreach (var apq in cQuery.AssayPanels)
+            {
+                dto.AssayPanelRequests.Add(apq.AssayId,GetDTOforAssayPanelQuery(apq));
+            }
+
+            return dto;
         }
 
         public Query GetQueryFromQueryDTO(ObservationRequestDTO dto)
@@ -123,223 +476,52 @@ namespace eTRIKS.Commons.Service.Services
             return query;
         }
 
-        public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
+        private ObservationRequestDTO GetDTOforQuery(Query query)
         {
-            CombinedQuery cQuery = new CombinedQuery();
-
-            cQuery.Name = cdto.Name;
-            cQuery.UserId = Guid.Parse(userId);
-            cQuery.ProjectId = projectId;
-            cQuery.Id = Guid.NewGuid();
-
-            var requests = cdto.ObsRequests;
-
-            foreach (var request in requests)
+            var qdto = new ObservationRequestDTO()
             {
+                O3 = query.QueryObjectName, 
+                O3code = query.QueryObjectName,
+                DataType = query.DataType,
+                ProjectId = query.ProjectId,
+                QueryFrom = query.QueryFrom,
+                QueryFor = query.QueryFor,
+                QueryWhereProperty = query.QueryWhereProperty,
+                QueryWhereValue = query.QueryWhereValue,
+                QuerySelectProperty = query.QuerySelectProperty,
 
-                if (!request.IsMultipleObservations)
-                {
 
-                    var query = GetQueryFromQueryDTO(request);
-
-                    if (request.IsSubjectCharacteristics)
-                        cQuery.SubjectCharacteristics.Add(query);
-                    if (request.IsClinicalObservations)
-                        cQuery.ClinicalObservations.Add((ObservationQuery)query);
-                    if (request.IsDesignElement)
-                        cQuery.DesignElements.Add(query);
-                }
-                else
-                {
-                    var goq = new GroupedObservationsQuery()
-                    {
-                        //Name = request.Name,
-                        GroupedObsName = request.O3,
-                        PropertyName = request.QO2,
-                        PropertyLabel = request.QO2_label,
-                        PropertyId = request.QO2id,
-                        Group = request.Group,
-                        GroupedObservations = new List<ObservationQuery>(),
-                        DataType = request.DataType,
-                        FilterExactValues = request.FilterExactValues,
-                        FilterRangeFrom = request.FilterRangeFrom,
-                        FilterRangeTo = request.FilterRangeTo,
-                        IsFiltered = request.IsFiltered,
-                        ProjectId = request.ProjectId
-                    };
-                    goq.GroupedObservations.AddRange(request.GroupedObservations.Select(obsReq => new ObservationQuery()
-                    {
-                        TermId = obsReq.O3id,
-                        TermName = obsReq.O3,
-                        PropertyId = obsReq.QO2id,
-                        PropertyName = obsReq.QO2,
-                        Group = obsReq.Group,
-                        IsOntologyEntry = obsReq.IsOntologyEntry,
-                        TermCategory = obsReq.OntologyEntryCategoryName,
-                        DataType = obsReq.DataType,
-                        ProjectId = obsReq.ProjectId
-                    }));
-                    cQuery.GroupedObservations.Add(goq);
-                }
-            }
-
-            var assaypanels = cdto.AssayPanels;
-            foreach (var assayRequest in assaypanels)
+                IsFiltered = query.IsFiltered,
+                FilterRangeTo = query.FilterRangeTo,
+                FilterRangeFrom = query.FilterRangeFrom,
+                FilterExactValues = query.FilterExactValues,
+                FilterText = query.FilterText
+                
+            };
+            if (query.GetType() == typeof(ObservationQuery) || query.GetType() == typeof(GroupedObservationsQuery))
             {
-                var assayPanelQuery = new AssayPanelQuery();
-                assayPanelQuery.AssayId = assayRequest.AssayId;
-
-                foreach (var sampleQuery in assayRequest.SampleQuery)
-                {
-                    var query = GetQueryFromQueryDTO(sampleQuery);
-                    //var oq = new ObservationQuery()
-                    //{
-                    //    TermName = ap.O3,
-                    //    TermId = ap.O3id,
-                    //    PropertyName = ap.QO2,
-                    //    PropertyId = ap.QO2id,
-                    //    ProjectId = ap.ProjectId,
-
-                    //    Group = ap.Group,
-                    //    IsOntologyEntry = ap.IsOntologyEntry,
-                    //    TermCategory = ap.OntologyEntryCategoryName,
-
-                    //    ObservationObjectShortName = ap.O3code,
-                    //    DataType = ap.DataType,
-                    //    FilterExactValues = ap.FilterExactValues,
-                    //    FilterRangeFrom = ap.FilterRangeFrom,
-                    //    FilterRangeTo = ap.FilterRangeTo,
-                    //    IsFiltered = ap.IsFiltered
-                    //};
-                    assayPanelQuery.SampleQueries.Add(query);
-                }
-                cQuery.AssayPanels.Add(assayPanelQuery);
+                qdto.O3 = ((ObservationQuery)query).TermName;
+                qdto.O3id = ((ObservationQuery)query).TermId;
+                qdto.O3code = ((ObservationQuery)query).ObservationObjectShortName?? (((ObservationQuery)query).ObservationName);
+                qdto.QO2 = ((ObservationQuery) query).PropertyName;
+                qdto.QO2_label = ((ObservationQuery) query).PropertyLabel;
+                qdto.QO2id = ((ObservationQuery) query).PropertyId;
             }
-
-            return _combinedQueryRepository.Insert(cQuery);
+            return qdto;
         }
 
-        public DataExportObject GetQueryResult(int projectId, Guid combinedQueryId)
+        private AssayPanelDTO GetDTOforAssayPanelQuery(AssayPanelQuery apQuery)
         {
-            var combinedQuery = _combinedQueryRepository.Get(combinedQueryId);
-            var queryResult = new DataExportObject();
-
-            queryResult.Subjects = _subjectRepository.FindAll(
-                s => s.Study.ProjectId == projectId,
-                new List<string>() { "StudyArm", "Study", "SubjectCharacteristics.CharacteristicFeature" }).ToList();
-
-            //QUERY FOR CLINICAL OBSERVATIONS
-            var observationQueries = combinedQuery.ClinicalObservations.Union(combinedQuery.GroupedObservations).ToList();//.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).Select(f => f.QueryObject).ToList();
-            queryResult.Observations = getObservations(observationQueries);
-
-            foreach (var subjCharQuery in combinedQuery.SubjectCharacteristics)
+            var apDTO = new AssayPanelDTO()
             {
-                //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
-                var characteristics = _subjectCharacteristicRepository.FindAll(
-                    sc =>
-                        sc.Subject.Study.ProjectId == projectId &&
-                        subjCharQuery.QueryWhereValue == sc.CharacteristicFeatureId.ToString(),
-                    new List<string>() {"Subject"}).ToList();
-
-                //APPLY FILTERING IF FILTER PRESENT
-                if (characteristics.Any() && subjCharQuery.IsFiltered)
-                {
-                    characteristics = (subjCharQuery.DataType == "string")
-                        ? characteristics.FindAll(sc => subjCharQuery.FilterExactValues.Contains(sc.VerbatimValue))
-                        : characteristics.FindAll(sc =>
-                            int.Parse(sc.VerbatimValue) >= subjCharQuery.FilterRangeFrom &&
-                            int.Parse(sc.VerbatimValue) <= subjCharQuery.FilterRangeTo);
-                }
-
-                //ADD TO EXPORT DATA 
-                queryResult.SubjChars.AddRange(characteristics);
-            }
-
-            //foreach(var sampleQuery in combinedQuery)
-
-            foreach (var deQuery in combinedQuery.DesignElements)
+               AssayId = apQuery.AssayId,
+               AssayName = apQuery.AssayName
+            };
+            foreach (var sampleQuery in apQuery.SampleQueries)
             {
-                switch (deQuery.QueryFor)
-                {
-                    case nameof(HumanSubject.StudyArm):
-                        if (deQuery.IsFiltered)
-                            queryResult.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)
-                                && deQuery.FilterExactValues.Contains(a.Name)).ToList();
-                        else
-                            queryResult.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s => s.Study.ProjectId).Contains(projectId)).ToList();
-                        break;
-                    case nameof(HumanSubject.Study):
-                        if (deQuery.IsFiltered)
-                            queryResult.Studies = _studyRepository.FindAll(
-                                                        s => s.ProjectId == projectId
-                                                        && deQuery.FilterExactValues.Contains(s.Name),
-                                                        new List<string>() { "Subjects" }).ToList();
-                        else
-                            queryResult.Studies = _studyRepository.FindAll(s => s.ProjectId == projectId).ToList();
-                        break;
-                    case nameof(Visit):
-                        var visits = _visitRepository.FindAll(
-                            v => v.Study.ProjectId == projectId
-                            //apply filter if present
-                            ).ToList();
-                        queryResult.Visits = visits;
-                        break;
-                } 
+                apDTO.SampleQuery.Add(GetDTOforQuery(sampleQuery));
             }
-            queryResult.FilterAndJoin();
-
-            return queryResult;
-        }
-
-        private List<SdtmRow> getObservations(List<ObservationQuery> Queries)
-        {
-            List<SdtmRow> observations = new List<SdtmRow>();
-
-            var queriesByO3Id = Queries.GroupBy(f => f.QueryObjectName).ToList();
-            foreach (var sameO3queries in queriesByO3Id)
-            {
-                var o3q_g = sameO3queries.Select(group => group).First();
-                var o3q_list = new List<ObservationQuery>();
-                var obs_list = new List<SdtmRow>();
-
-                //EXPANIDNG ALL to GROUP  TO ACCOMMODATE FOR GROUP OBSERVATIONS AS WELL IN THE SAME CODE BLOCK
-                if (o3q_g.GetType().Name == nameof(GroupedObservationsQuery))
-                {
-                    ((GroupedObservationsQuery)o3q_g).GroupedObservations.ForEach(oq => o3q_list.Add(oq));
-                }
-                else
-                    o3q_list.Add(o3q_g);
-                //////////////////////////////////////////////////////////////////////////////////////////////
-
-
-                foreach (var o3q in o3q_list)
-                {
-                    obs_list.AddRange(o3q.IsOntologyEntry
-                         ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[o3q.TermCategory] == o3q.TermId.ToString() && s.Group == o3q.Group && s.ProjectId == o3q.ProjectId).ToList()
-                         : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList());
-
-                }
-
-                foreach (var oq in sameO3queries) //AEOCCUR / AESEV
-                {
-                    if (oq.IsFiltered)
-                    {
-                        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
-                        obs_list.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
-
-                        string v = null;
-                        obs_list = oq.DataType == "string"
-                                    ? obs_list.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
-                                    : obs_list.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
-                                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
-                    }
-                }
-                observations.AddRange(obs_list);
-            }
-            
-            return observations.ToList();
+            return apDTO;
         }
     }
 }

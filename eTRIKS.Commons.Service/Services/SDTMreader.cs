@@ -107,11 +107,15 @@ namespace eTRIKS.Commons.Service.Services
                 else if (descriptor.VisitNumVariable?.Name == colName)
                 {
                     //VISITNUM
+                    int num;
+                    if (!int.TryParse(value, out num)) continue;
                     sdtmrow.VisitNum = int.Parse(value);
                 }
                 else if (descriptor.VisitPlannedStudyDay?.Name == colName)
                 {
                     //VISITNUM
+                    int num;
+                    if(!int.TryParse(value, out num)) continue;
                     sdtmrow.VisitPlannedStudyDay = int.Parse(value);
                 }
                 else if (descriptor.DateTimeVariable?.Name == colName)

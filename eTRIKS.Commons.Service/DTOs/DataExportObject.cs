@@ -26,6 +26,8 @@ namespace eTRIKS.Commons.Service.DTOs
         public bool IsSubjectIncluded { get; set; }
         //************************************************************* This is added to create a bool whether the export data has samples init or not ! used in Export service
         public bool IsSampleIncluded { get; set; }
+        public bool ObservationsFiltered { get; internal set; }
+
         //*************************************************************************************************
         public DataExportObject()
         {
@@ -56,11 +58,6 @@ namespace eTRIKS.Commons.Service.DTOs
                 Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.Id)).ToList();
             Debug.WriteLine(Subjects.Count, " AFTER SubjChars");
 
-            if (SampleCharacteristics.Any())
-                Samples = Samples.FindAll(s => SampleCharacteristics.Select(sc => sc.SampleId).Contains(s.Id)).ToList();
-            if (Samples.Any())
-                Subjects = Subjects.FindAll(sb => Samples.Select(sp => sp.SubjectId).Contains(sb.Id)).ToList();
-
             //filter by visits
             //TODO
 
@@ -70,30 +67,45 @@ namespace eTRIKS.Commons.Service.DTOs
             Observations = Observations?.FindAll(o => Subjects.Select(s => s.UniqueSubjectId).Contains(o.USubjId));
 
             //filter subjects by selected observations
-            if(Observations.Any())
+            if(Observations.Any() && ObservationsFiltered)
                 Subjects = Subjects.FindAll(s => Observations.Select(o => o.USubjId).Contains(s.UniqueSubjectId));
             Debug.WriteLine(Subjects.Count, " AFTER syncing with observations");
+
+            //FILTER SAMPLES BY SELECTED AND FILTERED SAMPLE CHARACTERISTICS
+            if (SampleCharacteristics.Any())
+                Samples = Samples.FindAll(s => SampleCharacteristics.Select(sc => sc.SampleId).Contains(s.Id)).ToList();
+
+            //TODO: TEMP FILTERING BY COLLECTION STUDY DAY
+            
+            
+            //SYNCHRONIZE SAMPLES AND SUBJECTS
+            if (Samples.Any())
+            {
+                Samples = Samples.FindAll(s => Subjects.Select(sc => sc.Id).Contains(s.SubjectId)).ToList();
+                Subjects = Subjects.FindAll(sb => Samples.Select(sp => sp.SubjectId).Contains(sb.Id)).ToList();
+            }
+                
         }
 
 
 
 
-        public string GetArmForSubject(string subjectId)
-        {
-            return Subjects.Find(a => a.Id == subjectId)?.StudyArm.Name;
-        }
+        //public string GetArmForSubject(string subjectId)
+        //{
+        //    return Subjects.Find(a => a.Id == subjectId)?.StudyArm.Name;
+        //}
 
-        public string GetSubjCharacterisiticForSubject(string subjectId, int characteristicId)
-        {
-            return
-                SubjChars.Find(sc => sc.SubjectId == subjectId && sc.CharacteristicFeatureId == characteristicId)?
-                    .VerbatimValue;
-        }
+        //public string GetSubjCharacterisiticForSubject(string subjectId, int characteristicId)
+        //{
+        //    return
+        //        SubjChars.Find(sc => sc.SubjectId == subjectId && sc.CharacteristicFeatureId == characteristicId)?
+        //            .VerbatimValue;
+        //}
 
-        public string GetStudyForSubject(string subjectId)
-        {
-            return Studies.Find(s => s.Subjects.Select(j => j.UniqueSubjectId).Contains(subjectId)).Name;
-        }
+        //public string GetStudyForSubject(string subjectId)
+        //{
+        //    return Studies.Find(s => s.Subjects.Select(j => j.UniqueSubjectId).Contains(subjectId)).Name;
+        //}
 
         //public void FillArms(string projectAcc)
         //{

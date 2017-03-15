@@ -3,17 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.Core.Domain.Model.Users;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs.Explorer;
 
 
@@ -27,16 +22,13 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<CharacteristicFeature, int> _characObjRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-        private readonly IRepository<User, Guid> _userRepository;
-        private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
+
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IServiceUoW _dataContext;
 
         private readonly QueryService _queryService;
 
-        private const string SubjectIdColName = "subjectId";
-        private const string StudyIdColName = "studyId";
-        private const string SampleIdColName = "studyId";
+
 
         public DataExplorerService(IServiceUoW uoW, QueryService queryService)
         {
@@ -46,32 +38,9 @@ namespace eTRIKS.Commons.Service.Services
             _characObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-            _userRepository = uoW.GetRepository<User, Guid>();
-            _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
 
             _queryService = queryService;
-        }
-
-
-        public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
-        {
-            return _queryService.SaveQuery(cdto, userId, projectId);
-        }
-
-        public List<CombinedQuery> GetSavedQueries(int projectId, string userId)
-        {
-
-            List<CombinedQuery> cart = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId).ToList();
-
-            return cart;
-        }
-
-        public CombinedQuery GetSavedCombinedQuery(int projectId, string userId, string queryId)
-        {
-            //FOR VALIDATION check if user is indeed the owner of this query
-            var query = _combinedQueryRepository.FindSingle(c => c.Id == Guid.Parse(queryId));
-            return query.UserId == Guid.Parse(userId) ? query : null;
         }
 
         #region Observation Browser methods
@@ -310,7 +279,7 @@ namespace eTRIKS.Commons.Service.Services
 
                 });
 
-                assayDTO.Panel = new DTOs.Explorer.PanelDTO()
+                assayDTO.AssayPanel = new DTOs.Explorer.AssayPanelDTO()
                 {
                     AssayId = assay.Id,
                     AssayName = assay.Name

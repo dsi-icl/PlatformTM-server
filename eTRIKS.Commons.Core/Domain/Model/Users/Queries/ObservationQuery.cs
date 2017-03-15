@@ -27,7 +27,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
                 if (!IsFiltered)
                     return "";
                 if (DataType == "string")
-                    return string.Join(",", FilterExactValues);
+                    return string.Join(", ", FilterExactValues);
                 if (FilterRangeFrom != 0 && FilterRangeTo != 0)
                     return FilterRangeFrom + " -> " + FilterRangeTo;
                 return "";

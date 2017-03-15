@@ -18,6 +18,8 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public string LastModified { get; set; }
         public string Type { get; set; }
         public Guid QueryId { get; set; }
+        public int SubjectCount { get; set; }
+        public int SampleCount { get; set; }
 
 
         public UserDataset()
