@@ -20,6 +20,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         private readonly DataMatrixLoader _dataMatrixLoader;
         public DatasetController(DatasetService datasetService, FileService fileService, DataMatrixLoader dataMatrixLoader) 
         {
+
             _datasetService = datasetService;
             _fileService = fileService;
             _dataMatrixLoader = dataMatrixLoader;
@@ -135,10 +136,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
 
         [HttpGet("{datasetId}/loadHDdDdata/{fileId}")]
-        public bool LoadHDdDdata(int datasetId, int fileId, int referencFromHdId )
+        public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/ )
         {
-             return  _dataMatrixLoader.LoadHDdDdata(datasetId, fileId, referencFromHdId);
+             return  _dataMatrixLoader.LoadHDdDdata(datasetId, fileId/*, referencFromHdId*/);
         }
-        
+         
     } 
 }

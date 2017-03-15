@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -8,6 +9,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users;
 using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.Service.DTOs;
@@ -21,6 +23,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<User, Guid> _userRepository;
+        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
 
         private IServiceUoW uoW;
 
@@ -31,6 +34,7 @@ namespace eTRIKS.Commons.Service.Services
             _activityRepository = uoW.GetRepository<Activity, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
             _userRepository = uoW.GetRepository<User, Guid>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
         }
 
         public ProjectDTO GetProjectById(int projectId)
@@ -43,7 +47,15 @@ namespace eTRIKS.Commons.Service.Services
                 Accession = project.Accession
             };
         }
-
+        
+        public void DeleteProject(int projectId)
+        {
+            var projectToDelete = _projectRepository.Get(projectId);
+            _projectRepository.Remove(projectToDelete);
+            _sdtmRepository.DeleteMany(s => s.ProjectId == projectId);
+            uoW.Save();
+        }
+         
         public ProjectDTO GetProjectFullDetails(int projectId)
         {
             var project = _projectRepository.FindSingle(p=>p.Id == projectId, 

@@ -82,6 +82,14 @@ namespace eTRIKS.Commons.DataAccess
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
+            if (typeof(TEntity) == typeof(Core.Domain.Model.ObservationModel.Observation) )
+            {
+                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayObservation");
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
 
             var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
             _repositories.Add(typeof(TEntity), repository);

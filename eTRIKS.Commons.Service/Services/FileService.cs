@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using Microsoft.Extensions.Options;
@@ -184,59 +185,60 @@ namespace eTRIKS.Commons.Service.Services
             string PATH = uploadedFilesDirectory + filePath;
             return readDataFile(PATH);
         }
-
+        
         private DataTable readDataFile(string filePath)
         {
             DataTable dt = new DataTable();
-       
-                StreamReader reader = File.OpenText(filePath);
-                //var csv = new CsvReader(reader);
-                var parser = new CsvParser(reader);
-                string[] header = parser.Read();
-                if (!(header.Count() > 1))
-                {
-                    if (header[0].Contains("\t"))
-                    {
-                        parser.Configuration.Delimiter = "\t";
-                        header = header[0].Split('\t');
-                    }
 
+            StreamReader reader = File.OpenText(filePath);
+            //var csv = new CsvReader(reader);
+            var parser = new CsvParser(reader);
+            string[] header = parser.Read();
+            if (!(header.Count() > 1))
+            {
+                if (header[0].Contains("\t"))
+                {
+                    parser.Configuration.Delimiter = "\t";
+                    header = header[0].Split('\t');
                 }
 
+            }
 
-                foreach (string field in header)
+
+            foreach (string field in header)
+            {
+                dt.Columns.Add(field.Replace("\"", "").ToUpper(), typeof(string));
+            }
+
+            while (true)
+            {
+                try
                 {
-                    dt.Columns.Add(field.Replace("\"", "").ToUpper(), typeof (string));
-                }
+                    var row = parser.Read();
+                    if (row == null)
+                        break;
 
-                while (true)
+                    DataRow dr = dt.NewRow();
+                    if (row.Length == 0 || row.Length != dt.Columns.Count)
+                    {
+                        Debug.WriteLine(row.Length + " " + dt.Columns.Count);
+                        return null;
+                    }
+
+                    for (int i = 0; i < row.Length; i++)
+                    {
+                        if (row[i] == null)
+                            Debug.WriteLine(row);
+                        dr[i] = row[i];
+                    }
+                    dt.Rows.Add(dr);
+                }
+                catch (System.NullReferenceException e)
                 {
-                    try
-                    {
-                        var row = parser.Read();
-                        if (row == null)
-                            break;
-
-                        DataRow dr = dt.NewRow();
-                        if (row.Length == 0 || row.Length != dt.Columns.Count){
-                            Debug.WriteLine(row.Length+" "+dt.Columns.Count);
-                            return null;
-                        }
-
-                        for (int i = 0; i < row.Length; i++)
-                        {
-                            if (row[i] == null)
-                                Debug.WriteLine(row);
-                            dr[i] = row[i];
-                        }
-                        dt.Rows.Add(dr);
-                    }
-                    catch (System.NullReferenceException e)
-                    {
-                        Debug.WriteLine(e.Message);
-                    }
+                    Debug.WriteLine(e.Message);
                 }
-                parser.Dispose();
+            }
+            parser.Dispose();
             reader.Dispose();
 
             return dt;
@@ -321,13 +323,32 @@ namespace eTRIKS.Commons.Service.Services
             //var fileService = new FileService(_dataServiceUnit);
             //TEMP usage of dataset.state
             var dataTable = ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
+
+            if (dataTable.Rows.Count > 1000)
+                dataTable.Rows.RemoveRange(5, dataTable.Rows.Count - 5);
+
+            if (dataTable.Columns.Count > 40)
+                dataTable.Columns.RemoveRange(5, dataTable.Columns.Count - 5);
+
             var ht = getHashtable(dataTable);
             ht.Add("fileInfo",file.FileName);
             return ht;
         }
 
+
+
         private Hashtable getHashtable(DataTable sdtmTable)
         {
+
+
+            //if (sdtmTable.Rows.Count > 10000)
+            //    sdtmTable.Rows.RemoveRange(100, sdtmTable.Rows.Count - 100);
+
+
+            //if (sdtmTable.Columns.Count > 50)
+            //    sdtmTable.Columns.RemoveRange(10, sdtmTable.Columns.Count - 10);
+
+
             var ht = new Hashtable();
             var headerList = new List<Dictionary<string, string>>();
             foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
@@ -341,9 +362,10 @@ namespace eTRIKS.Commons.Service.Services
             }
             ht.Add("header", headerList);
             ht.Add("data", sdtmTable.Rows);
-            
+
             return ht;
         }
+
 
         //public void tempmethod()
         //{
@@ -428,7 +450,7 @@ namespace eTRIKS.Commons.Service.Services
 
         //    foreach (DataRow inRow in wideDataTable.Rows)
         //    {
-                
+
 
         //        for (int i = gatherColumnsFrom; i <= gatherColumnsTo; i++)
         //        {
@@ -447,7 +469,7 @@ namespace eTRIKS.Commons.Service.Services
         //        }
         //        //foreach (DataColumn col in inputDataTable.Columns)
         //        //{
-                    
+
         //        //}
         //    }
         //   // var fileInfo = writeDataFile("temp/CyTOFdata_long.csv", longDataTable);
@@ -529,7 +551,7 @@ namespace eTRIKS.Commons.Service.Services
         //            }
         //        }
 
-                
+
         //        //foreach (DataColumn col in inputDataTable.Columns)
         //        //{
 

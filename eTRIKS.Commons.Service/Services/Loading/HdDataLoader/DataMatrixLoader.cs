@@ -18,7 +18,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
     {
 
         private IServiceUoW _dataContext;
-        private readonly IRepository<Core.Domain.Model.Observation, int> _observationRepository;
+        private readonly IRepository<Core.Domain.Model.ObservationModel.Observation, Guid> _observationRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
@@ -28,7 +28,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
         public DataMatrixLoader(IServiceUoW uoW, FileService fileService) 
         {
             _dataContext = uoW;
-            _observationRepository = uoW.GetRepository<Core.Domain.Model.Observation, int>();
+            _observationRepository = uoW.GetRepository<Core.Domain.Model.ObservationModel.Observation, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
            _dataFileRepository = uoW.GetRepository<DataFile, int>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
@@ -49,12 +49,9 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
             return ds;
         }
         // dataset service 
-        public bool LoadHDdDdata(int datasetId, int fileId, int referencFromHdId)      
+        public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/)      
         {
-            // add the file that ibrahim sends to the gene expression folder ... 
-            //so you get the ID for fileId and then you can create a new method in the controller to directly call this method and test whether it works or not
-
-
+           
             var dataset = GetActivityDataset(datasetId);
             var dataFile = _dataFileRepository.Get(fileId); 
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
@@ -62,8 +59,10 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
             var dataTable = _fileService.ReadOriginalFile(filePath);
 
             var sampleList = _biosampleRepository.FindAll(s => s.DatasetId == datasetId).ToList();
-            var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
-            
+         //  var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
+
+            var obsReadyToInsert = new List<Core.Domain.Model.ObservationModel.Observation>();
+
             foreach (DataRow row in dataTable.Rows)
             {
                 for (int index = 0; index < dataTable.Columns.Count; index++)
@@ -72,37 +71,56 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
                     else
                     {
                         var column = dataTable.Columns[index];
-                        var PropertyDescriptor = new PropertyDescriptor();
+                        //var PropertyDescriptor = new PropertyDescriptor();   // add property discreptor
                         //var PropertyDescriptor1 = dataset.Template.Class;
                         //var PropertyDescriptor3 = dataset.Variables.FirstOrDefault();
+                        
 
                         var obs = new Core.Domain.Model.ObservationModel.Observation();
                         {
                             var value = new NumericalValue();
                             value.Value = float.Parse(row[column.ColumnName].ToString());
-                            value.Property = PropertyDescriptor;
-                            //value.Unit = ??
+                            value.Property = new PropertyDescriptor();
+                            {
+                                value.Property.Description = dataset.Template.Description;
+                                value.Property.ObsClass = dataset.Template.Class;
+                                value.Property.Name = dataset.TemplateId;
+                            }
+                            //   value.Unit = ??
+                            obs.ObservedValue = value;                                                         // Observed Value which includes in it the VALUE and its PROPERTY
 
-                            obs.ObservedValue = value;                                                    // Observed Value which includes in it the value and its property
-                            obs.SubjectOfObservationName = scos[column.ColumnName].BiosampleStudyId;      // sample name
-                            obs.SubjectOfObservationId = scos[column.ColumnName].Id.ToString();           // sampleID
+                            // ****** FOR NOW WE USE THE FOLLOWING TILL WE HAVE THE FEATURE referencFromHdId ******
+                            obs.SubjectOfObservationName = column.ColumnName;                                  // sample name (HERE IS THE FILE NAME)
+                            obs.SubjectOfObservationId = column.ColumnName;                                    // sampleID     (here is the file name)
+                            // ****** 
 
-                            obs.FeatureName = row[0].ToString();                                          // feature name 
-                            // obs.FeatureId =;  Not implemented yet                                     // feature ID
-                            
-
+                            //   obs.SubjectOfObservationName = scos[column.ColumnName].BiosampleStudyId;      // sample Name
+                            //   obs.SubjectOfObservationId = scos[column.ColumnName].Id.ToString();           // sample ID
+                            //   obs.StudyId = scos[column.ColumnName].StudyId;                                // study ID
+                            obs.FeatureName = row[0].ToString();                                               // feature name 
+                            // obs.FeatureId =;  Not implemented yet                                           // feature ID
                             obs.DatafileId = dataFile.Id;
                             obs.DatasetId = datasetId;
                             obs.ActivityId = dataset.ActivityId;
                             obs.ProjectId = dataset.Activity.ProjectId;
+                            obs.Id = Guid.NewGuid();
+                            
                         }
-                     //   _observationRepository.Insert(obs);
-                 }
-            }
+
+                        obsReadyToInsert.Add(obs);
+                        if (obsReadyToInsert.Count % 500 == 0)
+                        {
+                            _observationRepository.InsertManyAsync(obsReadyToInsert);
+                            _dataContext.Save();
+                            obsReadyToInsert.Clear();
+                        }
+                    }
+               }
 
             dataFile.State = "LOADED";
             dataFile.IsLoadedToDB = true;
             _dataFileRepository.Update(dataFile);
+            _observationRepository.InsertManyAsync(obsReadyToInsert);
             _dataContext.Save();
             return true;
         }
