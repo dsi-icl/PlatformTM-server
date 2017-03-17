@@ -13,9 +13,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class AccountController : Controller
     {
         private readonly UserAccountService _userAccountService;
-        //private readonly UserManager<UserAccount> _userManager;
-        //private readonly SignInManager<UserAccount> _signInManager;
-        //private readonly UserManager<ApplicationUser, Guid> _userManager;
 
         public AccountController(UserAccountService userAccountService)
         {

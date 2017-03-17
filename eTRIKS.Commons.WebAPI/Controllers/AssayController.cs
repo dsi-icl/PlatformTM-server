@@ -30,24 +30,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpPost]
         public IActionResult AddAssay([FromBody] AssayDTO assayDTO)
         {
-            AssayDTO addedAssay = null;
-
-            addedAssay = _assayService.AddAssay(assayDTO);
-
+            var addedAssay = _assayService.AddAssay(assayDTO);
             if (addedAssay != null)
-            {
-                //var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Created, addedAssay);
-                //string uri = Url.Link("GetAssayById", new { assayId = addedAssay.Id });
-                //response.Headers.Location = new Uri(uri);
-                return new CreatedAtActionResult("GET", "GetAssayById", new { assayId = addedAssay.Id }, addedAssay);
-
-            }
-            else
-            {
-                //var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                //return response;
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+                return new CreatedAtRouteResult("GetAssayById", new { assayId = addedAssay.Id }, addedAssay);
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
         }
 
         [HttpPut("{assayId}")]
@@ -56,32 +42,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             try
             {
                 _assayService.UpdateAssay(assayDTO, assayId);
-                //var response = Request.CreateResponse<AssayDTO>(HttpStatusCode.Accepted, assayDTO);
-                //string uri = Url.Link("GetAssayById", new { assayId = assayDTO.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
-                return new CreatedAtActionResult("GET", "GetAssayById", new { assayId = assayDTO.Id }, assayDTO);
-
+                return new AcceptedAtRouteResult("GetAssayById", new { assayId = assayDTO.Id }, assayDTO);
             }
             catch (Exception e)
             {
                 return new StatusCodeResult(StatusCodes.Status409Conflict);
             }
         }
-
-        //[HttpGet("{assayId}/samples")]
-        //public Hashtable GetAssaySamples(int assayId)
-        //{
-        //    return _assayService.GetSamplesDataPerAssay(assayId);
-        //}
-
-
-        //[HttpGet]
-        //[Route("api/assays/temp/{assayId}/loadPA/{fileId}")]
-        //public IActionResult AddPA(int assayId, int fileId)
-        //{
-        //    _assayService.addPA(assayId, fileId);
-        //    return new OkResult();
-        //}
     }
 }

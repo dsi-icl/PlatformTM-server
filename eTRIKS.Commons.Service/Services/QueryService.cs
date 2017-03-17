@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -173,10 +174,11 @@ namespace eTRIKS.Commons.Service.Services
             return _combinedQueryRepository.Insert(cQuery);
         }
 
-        public List<CombinedQuery> GetSavedQueries(int projectId, string userId)
+        public List<CombinedQueryDTO> GetSavedQueries(int projectId, string userId)
         {
-            var cart = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId).ToList();
-            return cart;
+            var userQueries = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId).ToList();
+            var dtoQueries = userQueries.Select(_getcQueryDTO).ToList();
+            return dtoQueries;
         }
 
         public CombinedQueryDTO GetSavedCombinedQuery(int projectId, string userId, string queryId)
@@ -193,11 +195,11 @@ namespace eTRIKS.Commons.Service.Services
         private CombinedQueryDTO _getNewCqueryForProject(int projectId)
         {
             var dto = new CombinedQueryDTO();
-            dto.Name = "New Query";
+            //dto.Name = "New Query";
             var assays = _assayRepository.FindAll(a => a.ProjectId == projectId).ToList();
 
-            if (assays.Count == 0)
-                return null;
+            //if (assays.Count == 0)
+            //    return null;
             foreach (var assay in assays)
             {
                 var apanel = new AssayPanelDTO
@@ -421,6 +423,7 @@ namespace eTRIKS.Commons.Service.Services
         private CombinedQueryDTO _getcQueryDTO(CombinedQuery cQuery)
         {
             var dto = new CombinedQueryDTO();
+            dto.Id = cQuery.Id.ToString();
             dto.Name = cQuery.Name;
             dto.UserId = cQuery.UserId.ToString();
             dto.ObsRequests = new List<ObservationRequestDTO>();
@@ -495,10 +498,12 @@ namespace eTRIKS.Commons.Service.Services
 
         private ObservationRequestDTO GetDTOforQuery(Query query)
         {
+            int o3id;
             var qdto = new ObservationRequestDTO()
             {
                 O3 = query.QueryObjectName, 
                 O3code = query.QueryObjectName,
+                O3id = int.TryParse(query.QueryWhereValue, out o3id) ? o3id:0,
                 DataType = query.DataType,
                 ProjectId = query.ProjectId,
                 QueryFrom = query.QueryFrom,

@@ -325,10 +325,10 @@ namespace eTRIKS.Commons.Service.Services
             var dataTable = ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
 
             if (dataTable.Rows.Count > 1000)
-                dataTable.Rows.RemoveRange(5, dataTable.Rows.Count - 5);
+                dataTable.Rows.RemoveRange(100, dataTable.Rows.Count - 100);
 
             if (dataTable.Columns.Count > 40)
-                dataTable.Columns.RemoveRange(5, dataTable.Columns.Count - 5);
+                dataTable.Columns.RemoveRange(100, dataTable.Columns.Count - 100);
 
             var ht = getHashtable(dataTable);
             ht.Add("fileInfo",file.FileName);

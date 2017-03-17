@@ -7,6 +7,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 {
     public class SdtmSubjectDescriptor : SdtmRowDescriptor
     {
+        public List<string> CharacteristicsVariableNames => new List<string>() { "BRTHDTC", "AGE", "SEX", "RACE", "ETHNIC", "COUNTRY", "SITEID" };
+        public List<string> TimingVariableNames => new List<string>() { "RFSTDTC", "RFENDTC", "RFXSTDTC", "RFXENDTC", "RFPENDTC", "RFICDTC" };
+
+
         public VariableDefinition ArmVariable { get; set; }
         public VariableDefinition ArmCodeVariable { get; set; }
 
@@ -26,6 +30,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public VariableDefinition SiteIdVariable { get; set; }
 
         public List<VariableDefinition> CharacteristicProperties { get; set; }
+        public List<VariableDefinition> TimingVariableDefinitions { get; set; }
 
         public static SdtmSubjectDescriptor GetSdtmSubjectDescriptor(Dataset dataset)
         {
@@ -70,15 +75,16 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             //SITE ID
             descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
 
-            descriptor.CharacteristicProperties = new List<VariableDefinition>()
-            {
-                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "BRTHDTC")?.VariableDefinition,
-                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "AGE")?.VariableDefinition,
-                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SEX")?.VariableDefinition,
-                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RACE")?.VariableDefinition,
-                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ETHNIC")?.VariableDefinition
-            };
+            //CHARACTERISTICS
+            descriptor.CharacteristicProperties = dataset.Variables.Cast<VariableReference>()
+                    .ToList()
+                    .FindAll(v => descriptor.CharacteristicsVariableNames.Contains(v.VariableDefinition.Name)).Select(v=>v.VariableDefinition).ToList() ;
             
+            //TIMING Variables
+            descriptor.TimingVariableDefinitions = dataset.Variables.Cast<VariableReference>()
+                    .ToList()
+                    .FindAll(v => descriptor.TimingVariableNames.Contains(v.VariableDefinition.Name)).Select(v => v.VariableDefinition).ToList();
+
             //QUALIFIERS
             descriptor.QualifierVariables = dataset.Variables
                         .Select(l => l.VariableDefinition)

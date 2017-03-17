@@ -11,5 +11,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.DesignElements
         public List<StudyArm> Studies { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
+
+        public Arm()
+        {
+            Studies = new List<StudyArm>();
+        }
     }
 }

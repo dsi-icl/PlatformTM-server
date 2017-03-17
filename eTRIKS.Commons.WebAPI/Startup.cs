@@ -93,7 +93,7 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<DatasetService>();
             services.AddScoped<ExportService>();
             services.AddScoped<FileService>();
-            services.AddScoped<ObservationService>();
+            
             services.AddScoped<ProjectService>();
             services.AddScoped<SDTMreader>();
             services.AddScoped<StudyService>();
@@ -106,6 +106,7 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
             services.AddScoped<DataMatrixLoader>();
+            services.AddScoped<ObservationLoader>();
 
             services.AddAuthorization(auth =>
             {

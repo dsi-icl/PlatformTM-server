@@ -20,9 +20,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("{activityId}", Name = "GetActivityById")]
-        public ActivityDTO GetActivity(int activityId)
+        public IActionResult GetActivity(int activityId)
         {
-            return _activityService.GetActivity(activityId);
+            var activity = _activityService.GetActivity(activityId);
+            if(activity != null)
+                return Ok(_activityService.GetActivity(activityId));
+            return NotFound();
         }
 
         [HttpPost]
@@ -33,7 +36,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                 addedActivity = _activityService.AddActivity(activityDTO);
 
             if (addedActivity != null)
-                return new CreatedAtActionResult("GET", "GetActivityById", new { activityId = addedActivity.Id }, addedActivity);
+                return new CreatedAtRouteResult("GetActivityById", new { activityId = addedActivity.Id }, addedActivity);
 
             return new StatusCodeResult(StatusCodes.Status409Conflict);
 
@@ -44,7 +47,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             try{
                 _activityService.UpdateActivity(activityDTO, activityId);
-                return new CreatedAtActionResult("GET", "GetActivityById", new { activityId = activityDTO.Id }, activityDTO);
+                return new AcceptedAtRouteResult("GetActivityById", new { activityId = activityDTO.Id }, activityDTO);
             }
             catch (Exception e)
             {

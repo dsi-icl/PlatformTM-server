@@ -81,14 +81,15 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 {
                     arm = new Arm()
                     {
-                        Id = projectAccession + "-" + sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
+                        Id = "P-"+ projectId + "-ARM-" + sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
                         Code = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
                         Name = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name]
                     };
-                    if (arm.Studies == null) arm.Studies = new List<StudyArm>();
-                    if (!arm.Studies.Exists(s => s.Study.Name == study.Name)) arm.Studies.Add(new StudyArm() { Arm = arm, Study = study });
                     armMap.Add(arm.Name, arm);
                 }
+                if (!arm.Studies.Exists(s => s.Study.Name == study.Name))
+                    arm.Studies.Add(new StudyArm() { Arm = arm, Study = study });
+
 
                 var subjNewFlag = false;
                 /**
@@ -147,7 +148,9 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 {
                     //THIS CHECKS THAT ONLY COLUMNS IN DATA THAT ARE PRESENT IN THE TEMPLATE ARE PARSED
                     var dsVar = descriptor.QualifierVariables.SingleOrDefault(v => v.Name.Equals(qualifier.Key));
-                    if (dsVar != null)
+
+                    if (descriptor.CharacteristicProperties.Exists(c=>c.Name == qualifier.Key) ||
+                        descriptor.TimingVariableDefinitions.Exists(c => c.Name == qualifier.Key))
                     {
                         CharacteristicFeature sco;
                         scos.TryGetValue(qualifier.Key, out sco);
@@ -181,8 +184,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                             DatafileId = datafileId
                         });
                     }
-                    else
-                        throw new Exception("Qualifier not in dataset template");
+                    
                 }
                 if (subjNewFlag)
                     _subjectRepository.Insert(subject);
