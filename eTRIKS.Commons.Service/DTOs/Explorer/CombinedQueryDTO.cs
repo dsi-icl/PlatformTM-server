@@ -5,6 +5,7 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
 {
     public class CombinedQueryDTO
     {
+        public string Id { get; set; }
         public string Name { get; set; }
         public List<ObservationRequestDTO> ObsRequests { get; set; }
         public List<ObservationRequestDTO> SubjCharRequests { get; set; }

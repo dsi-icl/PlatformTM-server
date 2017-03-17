@@ -1,11 +1,11 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Timing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
+using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Service.DTOs;
 
-namespace eTRIKS.Commons.Service.Services
+namespace eTRIKS.Commons.Service.Services.Loading.SDTM
 {
     public class SDTMreader
     {
@@ -103,6 +103,7 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     //VISIT
                     sdtmrow.VisitName = value;
+                    sdtmrow.TimingQualifiers.Add(colName,value);
                 }
                 else if (descriptor.VisitNumVariable?.Name == colName)
                 {
@@ -110,6 +111,7 @@ namespace eTRIKS.Commons.Service.Services
                     int num;
                     if (!int.TryParse(value, out num)) continue;
                     sdtmrow.VisitNum = int.Parse(value);
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.VisitPlannedStudyDay?.Name == colName)
                 {
@@ -117,15 +119,17 @@ namespace eTRIKS.Commons.Service.Services
                     int num;
                     if(!int.TryParse(value, out num)) continue;
                     sdtmrow.VisitPlannedStudyDay = int.Parse(value);
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.DateTimeVariable?.Name == colName)
                 {
                     //DTC
+                    DateTime DT;
+                    if (!DateTime.TryParse(value, out DT)) continue;
                     if (sdtmrow.CollectionDateTime == null)
                         sdtmrow.CollectionDateTime = new AbsoluteTimePoint();
-                    DateTime DT;
-                    if (DateTime.TryParse(value, out DT))
-                        sdtmrow.CollectionDateTime.DateTime = DT;
+                    sdtmrow.CollectionDateTime.DateTime = DT;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.StudyDayVariable?.Name == colName)
                 {
@@ -136,7 +140,7 @@ namespace eTRIKS.Commons.Service.Services
                         sdtmrow.CollectionStudyDay = new RelativeTimePoint();
  
                     sdtmrow.CollectionStudyDay.Number = num;
-                    sdtmrow.CollectionStudyDay.Name = null;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.TimePointNameVariable?.Name == colName)
                 {
@@ -144,6 +148,7 @@ namespace eTRIKS.Commons.Service.Services
                     if (sdtmrow.CollectionStudyTimePoint == null)
                         sdtmrow.CollectionStudyTimePoint = new RelativeTimePoint();
                     sdtmrow.CollectionStudyTimePoint.Name = value;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.TimePointNameVariable?.Name == colName)
                 {
@@ -152,7 +157,8 @@ namespace eTRIKS.Commons.Service.Services
                     if (!int.TryParse(value, out num)) continue;
                     if (sdtmrow.CollectionStudyTimePoint == null)
                         sdtmrow.CollectionStudyTimePoint = new RelativeTimePoint();
-                        sdtmrow.CollectionStudyTimePoint.Number = num;
+                    sdtmrow.CollectionStudyTimePoint.Number = num;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.DurationVariable?.Name == colName)
                 {
@@ -169,6 +175,7 @@ namespace eTRIKS.Commons.Service.Services
                         sdtmrow.DateTimeInterval = new TimeInterval();
                     sdtmrow.DateTimeInterval.Start = new AbsoluteTimePoint();
                     ((AbsoluteTimePoint)sdtmrow.DateTimeInterval.Start).DateTime = dt;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.EndDateTimeVariable?.Name == colName)
                 {
@@ -180,6 +187,7 @@ namespace eTRIKS.Commons.Service.Services
                         sdtmrow.DateTimeInterval = new TimeInterval();
                     sdtmrow.DateTimeInterval.End = new AbsoluteTimePoint();
                     ((AbsoluteTimePoint)sdtmrow.DateTimeInterval.End).DateTime = dt;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.StartStudyDayVariable?.Name == colName)
                 {
@@ -191,6 +199,7 @@ namespace eTRIKS.Commons.Service.Services
                         sdtmrow.StudyDayInterval = new TimeInterval();
                     sdtmrow.StudyDayInterval.Start = new RelativeTimePoint();
                     ((RelativeTimePoint)sdtmrow.StudyDayInterval.Start).Number = val;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else if (descriptor.EndStudyDayVariable?.Name == colName)
                 {
@@ -202,6 +211,7 @@ namespace eTRIKS.Commons.Service.Services
                         sdtmrow.StudyDayInterval = new TimeInterval();
                     sdtmrow.StudyDayInterval.End = new RelativeTimePoint();
                     ((RelativeTimePoint)sdtmrow.StudyDayInterval.End).Number = val;
+                    sdtmrow.TimingQualifiers.Add(colName, value);
                 }
                 else
                     sdtmrow.Leftovers.Add(colName, value);

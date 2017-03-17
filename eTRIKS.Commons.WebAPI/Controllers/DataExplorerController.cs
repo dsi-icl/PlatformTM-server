@@ -28,9 +28,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
-        public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
+        public IActionResult GetSubjectCharacteristics(int projectId)
         {
-            return _explorerService.GetSubjectCharacteristics(projectId);
+            var subjChars = _explorerService.GetSubjectCharacteristics(projectId);
+            if (subjChars != null)
+                return Ok(subjChars);
+            return NotFound();
         }
         
         [HttpPost("projects/{projectId}/saveQuery")]
@@ -51,20 +54,23 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!User.Identity.IsAuthenticated)
-                return null;
+                return Unauthorized();
             var query = _queryService.GetSavedCombinedQuery(projectId, userId,queryId);
             if(query != null)
                 return Ok(query);
             return NotFound();
         }
 
-        [HttpGet("projects/{projectId}/GetSavedQueries", Name = "")]
-        public List<CombinedQuery> GetSavedQueries(int projectId) 
+        [HttpGet("projects/{projectId}/queries/browse", Name = "")]
+        public IActionResult GetSavedQueries(int projectId) 
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!User.Identity.IsAuthenticated)
-                return null;
-            return _queryService.GetSavedQueries(projectId, userId);
+                return Unauthorized();
+            var queries = _queryService.GetSavedQueries(projectId, userId);
+            if (queries != null)
+                return Ok(queries);
+            return NotFound();
         }
 
         /*

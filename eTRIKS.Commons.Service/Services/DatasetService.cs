@@ -557,13 +557,6 @@ namespace eTRIKS.Commons.Service.Services
 
         public async Task<bool> LoadDataset(int datasetId, int fileId)
         {
-            //Dataset dataset = _datasetRepository
-            //    .FindSingle(ds => ds.Id.Equals(datasetId),
-            //     new List<string>(){
-            //            "Domain", 
-            //            "Activity.Project.Studies",
-            //            "Variables.VariableDefinition"
-            //    });
 
             Dataset dataset = GetActivityDataset(datasetId);
             var reload = false;
@@ -608,8 +601,8 @@ namespace eTRIKS.Commons.Service.Services
                 //}
                 else
                 {
-                    var observationService = new ObservationService(this._dataServiceUnit);
-                    loaded = observationService.LoadObservations(sdtmData, sdtmRowDescriptor,reload);
+                    var observationLoader = new ObservationLoader(this._dataServiceUnit);
+                    loaded = observationLoader.LoadObservations(sdtmData, sdtmRowDescriptor,reload);
                 }
 
 

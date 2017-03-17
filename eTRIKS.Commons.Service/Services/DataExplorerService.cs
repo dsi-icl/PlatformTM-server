@@ -10,6 +10,7 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Service.DTOs.Explorer;
+using NuGet.Packaging;
 
 
 namespace eTRIKS.Commons.Service.Services
@@ -44,8 +45,10 @@ namespace eTRIKS.Commons.Service.Services
         }
 
         #region Observation Browser methods
-        public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
+        public SubjectExplorerDTO GetSubjectCharacteristics(int projectId)
         {
+            var subjectExplorerDTO = new SubjectExplorerDTO();
+
             var subjChars = new List<ObservationRequestDTO>();
             var SCs = _characObjRepository.FindAll(sco => sco.ProjectId == projectId && sco.Domain == "DM").ToList();
 
@@ -64,6 +67,9 @@ namespace eTRIKS.Commons.Service.Services
                 QuerySelectProperty = nameof(SubjectCharacteristic.VerbatimValue)
 
             }).ToList();
+
+            subjectExplorerDTO.Characteristics = subjChars.FindAll(s=>s.DataType != "dateTime");
+            subjectExplorerDTO.Timings = subjChars.FindAll(s => s.DataType == "dateTime");
 
             var armSC = new ObservationRequestDTO()
             {
@@ -93,10 +99,10 @@ namespace eTRIKS.Commons.Service.Services
                 QO2 = "Name",
                 ProjectId = projectId
             };
-            subjChars.Add(armSC);
-            subjChars.Add(studySC);
+            subjectExplorerDTO.DesignElements.Add(armSC);
+            subjectExplorerDTO.DesignElements.Add(studySC);
 
-            return subjChars.OrderBy(o => o.O3).ToList();
+            return subjectExplorerDTO;
         }
 
         public ObservationNode GroupObservations(int projectId, List<ObservationRequestDTO> observations)
@@ -156,7 +162,8 @@ namespace eTRIKS.Commons.Service.Services
                     new List<string>()
                     {
                         "DefaultQualifier",
-                        "Qualifiers.Qualifier"
+                        "Qualifiers.Qualifier",
+                        "Timings.Qualifier"
                     }).ToList();
 
 
@@ -272,7 +279,7 @@ namespace eTRIKS.Commons.Service.Services
                     QueryFrom = nameof(Biosample),
                     QueryFor = nameof(Biosample.CollectionStudyDay),
                     QuerySelectProperty = nameof(RelativeTimePoint.Number),
-                    DataType = nameof(Int32),
+                    DataType = "ordinal",
                     IsSampleCharacteristic = true,
                     ProjectId = projectId,
                     ActivityId = assay.Id
@@ -460,6 +467,7 @@ namespace eTRIKS.Commons.Service.Services
                 datatable.Columns.Add(r.Name);
 
             datatable.Columns.Add("visit");
+            datatable.Columns.Add("studyday");
             datatable.Columns.Add("timepoint");
             #endregion
 
@@ -480,12 +488,23 @@ namespace eTRIKS.Commons.Service.Services
                 foreach (var subjObs in subjVisitTPT)//adding columns to the same row each iteration is a different observation but within each iteration
                 //we could be adding more than one column per observation if requested more than one qaulifier
                 {
+                    var allQualifiers = subjObs.ResultQualifiers;
+                    allQualifiers.AddRange(subjObs.Qualifiers);
+                    allQualifiers.AddRange(subjObs.TimingQualifiers);
+
                     row["subjectId"] = subjObs.USubjId;
                     row["study"] = subjObs.StudyId;
                     foreach (var obsreq in reqObservations.Where(r => r.O3id == subjObs.DBTopicId))
+                    {
                         //TODO: assumption to be validated that visits/timepoints are study and dont differ between observations or studies of the same project
-                        row[obsreq.Name] = subjObs.ResultQualifiers[obsreq.QO2];
+                        string val;
+                        if(allQualifiers.TryGetValue(obsreq.QO2, out val))
+                            row[obsreq.Name] = val ;
+                        else row[obsreq.Name] = "-";
+                    }
 
+
+                    //row["studyday"]
                     row["visit"] = subjVisitTPT.Key.Visit;//subjObs.VisitName;
                     row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
                 }
@@ -640,8 +659,8 @@ namespace eTRIKS.Commons.Service.Services
 
         private List<ObservationRequestDTO> createObsRequests(Observation obsObject, bool IsMultiple = false, bool IsOntologyEntry = false)
         {
-            var allQualifiers = obsObject.Qualifiers.Select(q => q.Qualifier).ToList();
-            allQualifiers.AddRange(obsObject.Timings.Select(a => a.Qualifier));
+            var allQualifiers = obsObject.Timings.Select(q => q.Qualifier).ToList();
+            allQualifiers.AddRange(obsObject.Qualifiers.Select(a => a.Qualifier));
 
             var reqs = allQualifiers.Select(variableDefinition => new ObservationRequestDTO()
             {

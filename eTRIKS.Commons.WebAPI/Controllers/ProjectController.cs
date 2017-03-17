@@ -38,7 +38,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _projectService.GetProjectFullDetails(projectId);
         }
 
-        [HttpGet("id/{projectId}", Name = "GetProjectById")]
+        [HttpGet("{projectId}", Name = "GetProjectById")]
         public ProjectDTO GetProject(int projectId)
         {
             return _projectService.GetProjectById(projectId);
@@ -65,23 +65,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             var userId = User.GetUserId();
             if (!User.Identity.IsAuthenticated)
-                return null;
-            //var account = await _accountService.(name);
+                return Unauthorized();
+
             addedProject = _projectService.AddProject(projectDTO,userId);
 
 
             if (addedProject != null)
-            {
-                //var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Created, addedProject);
-                //string uri = Url.Link("GetProjectById", new { projectId = addedProject.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
-                return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = addedProject.Id }, addedProject);
-            }
-            else
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+                return new CreatedAtRouteResult("GetProjectByAcc", new { projectId = addedProject.Id }, addedProject);
+   
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+            
         }
 
         [HttpPut("{projectId}")]
