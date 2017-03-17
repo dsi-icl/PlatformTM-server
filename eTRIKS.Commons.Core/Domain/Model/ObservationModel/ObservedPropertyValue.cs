@@ -2,7 +2,7 @@
 
 namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
-    public abstract class ObservedPropertyValue
+    public  class ObservedPropertyValue
     {
         public PropertyDescriptor Property { get; set; }
     }

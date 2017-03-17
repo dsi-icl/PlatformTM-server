@@ -29,6 +29,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Visit, int> _visitRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IRepository<Assay, int> _assayRepository;
+        private readonly IRepository<Core.Domain.Model.ObservationModel.Observation, Guid> _observationRepository;
 
 
 
@@ -44,6 +45,7 @@ namespace eTRIKS.Commons.Service.Services
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
+            _observationRepository = uoW.GetRepository<Core.Domain.Model.ObservationModel.Observation, Guid>();
 
         }
 
@@ -78,8 +80,23 @@ namespace eTRIKS.Commons.Service.Services
             }
             return subjProperty;
         }
+        //*********************************************************************************************************************************************
+        public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds) 
+        {
+            //var list = new List<string>() { "SID.7069.933" };
+           // var selectedSamples = exportData.Samples;
+            // var sampleIds = selectedSamples.Select(s => s.BiosampleStudyId).ToString();
+           // var sampleIds = selectedSamples.Select(s => s.BiosampleStudyId);
+            // maybe it is good to write a foreach loop and find the relevant observations to an object !!!
 
-       
+
+            //  var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId).ToList();
+            // var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && selectedSamples.Contains(s.SubjectOfObservationName)).ToList();
+            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName)).ToList();
+            return assayObservations;
+        }
+
+        //*********************************************************************************************************************************************
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
         {

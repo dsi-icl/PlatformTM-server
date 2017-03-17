@@ -30,7 +30,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
         /// </summary>
         /// <example> Value for Log Ratio , Value for Severity, Value for Test result, Value for Occurence ... </example>
         public ObservedPropertyValue ObservedValue { get; set; }
-
+        
         //TODO: to reconsider these two propeties later
         public ObservedPropertyValue TemporalValue { get; set; }
         public ObservedPropertyValue TimeSeriesValue { get; set; }

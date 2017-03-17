@@ -51,7 +51,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
         // dataset service 
         public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/)      
         {
-           
+           // _observationRepository.DeleteMany(d=> d.DatasetId == datasetId);
             var dataset = GetActivityDataset(datasetId);
             var dataFile = _dataFileRepository.Get(fileId); 
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
@@ -59,12 +59,13 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
             var dataTable = _fileService.ReadOriginalFile(filePath);
 
             var sampleList = _biosampleRepository.FindAll(s => s.DatasetId == datasetId).ToList();
-         //  var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
+            var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
 
             var obsReadyToInsert = new List<Core.Domain.Model.ObservationModel.Observation>();
 
             foreach (DataRow row in dataTable.Rows)
             {
+                //if(obsReadyToInsert.Count == 500) break;
                 for (int index = 0; index < dataTable.Columns.Count; index++)
 
                     if (index == 0) continue;
@@ -74,10 +75,10 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
                         //var PropertyDescriptor = new PropertyDescriptor();   // add property discreptor
                         //var PropertyDescriptor1 = dataset.Template.Class;
                         //var PropertyDescriptor3 = dataset.Variables.FirstOrDefault();
-                        
+
 
                         var obs = new Core.Domain.Model.ObservationModel.Observation();
-                        {
+                        
                             var value = new NumericalValue();
                             value.Value = float.Parse(row[column.ColumnName].ToString());
                             value.Property = new PropertyDescriptor();
@@ -105,14 +106,15 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
                             obs.ProjectId = dataset.Activity.ProjectId;
                             obs.Id = Guid.NewGuid();
                             
-                        }
+                        
 
                         obsReadyToInsert.Add(obs);
                         if (obsReadyToInsert.Count % 500 == 0)
                         {
                             _observationRepository.InsertManyAsync(obsReadyToInsert);
-                            _dataContext.Save();
+                            //_dataContext.Save();
                             obsReadyToInsert.Clear();
+                           // break;
                         }
                     }
                }

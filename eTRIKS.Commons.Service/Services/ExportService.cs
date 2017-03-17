@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
@@ -6,6 +7,7 @@ using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using System.Text;
+using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -35,10 +37,56 @@ namespace eTRIKS.Commons.Service.Services
             {
                 dt = ExportSampleTable(exportData, dataset);
             }
-
+            if (dataset.Type == "ASSAY")
+            {
+                dt = ExportAssayTable(exportData, dataset);
+            }
             dt.TableName = dataset.Name;
             return dt;
         }
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~***********************************
+        public DataTable ExportAssayTable(DataExportObject exportData, UserDataset dataset)
+        {
+
+            var projectId = dataset.ProjectId;
+            var activityId = exportData.Samples.First().AssayId;
+
+            var datatable = new DataTable();
+            List<string> sampleIds = new List<string>();
+            foreach (var biosample in exportData.Samples)
+            {
+                sampleIds.Add(biosample.BiosampleStudyId);
+                datatable.Columns.Add(biosample.BiosampleStudyId.ToLower());
+            }
+
+
+
+            var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
+            var features = assayObservations.Select(a => a.FeatureName).Distinct().ToList();
+           
+           ////var datatable = new DataTable();
+            
+           //// foreach (var biosample in exportData.Samples)
+           //// {
+           ////     datatable.Columns.Add(biosample.BiosampleStudyId.ToLower());
+           //// }
+         
+            foreach (var feature in features)
+            {
+                var row = datatable.NewRow();
+
+                foreach (var biosample in exportData.Samples)
+                {
+                   var obs = assayObservations.Find(o => o.SubjectOfObservationId == biosample.BiosampleStudyId && o.FeatureName == feature);
+                   row[biosample.BiosampleStudyId] = ((NumericalValue)obs.ObservedValue).Value;
+                }
+                datatable.Rows.Add(row);
+            }
+
+            return datatable;
+          }
+       
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~***********************************
 
         public DataTable ExportSampleTable(DataExportObject exportData, UserDataset dataset)
         {
