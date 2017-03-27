@@ -11,6 +11,7 @@ using eTRIKS.Commons.DataAccess;
 using MySQL.Data.Entity.Extensions;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
+using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Service.Configuration;
 using eTRIKS.Commons.Service.Services.Loading.HdDataLoader;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
@@ -20,6 +21,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -101,7 +103,6 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
             services.AddScoped<QueryService>();
-
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
             services.AddScoped<DataMatrixLoader>();
@@ -121,7 +122,7 @@ namespace eTRIKS.Commons.WebAPI
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
-            // services.AddMvc();
+            //services.AddMvc();
             .AddJsonOptions(opts =>
                  {
                      // Force Camel Case to JSON
@@ -129,7 +130,13 @@ namespace eTRIKS.Commons.WebAPI
                      //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
                  });
 
-
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.Observation>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.ObservedPropertyValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.CategoricalValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.OrdinalValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.NumericalValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.IntervalValue>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

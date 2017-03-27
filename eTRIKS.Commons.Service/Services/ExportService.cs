@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
@@ -6,6 +8,11 @@ using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using System.Text;
+using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
+using System.Runtime.Serialization.Formatters;
+using eTRIKS.Commons.Service.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -13,20 +20,64 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly QueryService _queryService;
-       
-        public ExportService(IServiceUoW uoW, QueryService queryService)
+
+        private readonly IServiceUoW _dataServiceUnit;
+      
+        private string uploadedFilesDirectory;
+        private FileStorageSettings ConfigSettings { get; set; }
+
+        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings,
+            FileService fileService)
         {
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _queryService = queryService;
+
+            _dataServiceUnit = uoW;
+            ConfigSettings = settings.Value;
+            uploadedFilesDirectory = ConfigSettings.FileDirectory;
         }
 
-        public DataTable ExportDataset(string datasetId)
+        public bool IsFileReady(string datasetId)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            bool status = dataset.FileIsReady;
+
+            return status;
+        }
+        
+        public FileStream DownloadDataset(string datasetId, out string filename)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            FileStream fileStream = null;
+            filename = dataset.Name;
+            try
+            {
+                if (dataset.FileIsReady)
+                {
+                    var filePath = dataset.ExportFileURI;
+                    fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None, 8192, true);
+                   // fileStream = new FileStream(filePath, FileMode., FileAccess.Read, FileShare.None, 8192, true);
+                }
+            
+            return fileStream;
+           
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+         }
+
+
+        public async Task<bool> ExportDataset(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             var projectId = dataset.ProjectId;
             var exportData = _queryService.GetQueryResult(dataset.QueryId);
+            
+            // prepare the relevant datatable
             var dt = new DataTable();
-
             if (dataset.Type == "PHENO")
             {
                 dt = ExportSubjectClinicalTable(exportData, dataset);
@@ -35,9 +86,92 @@ namespace eTRIKS.Commons.Service.Services
             {
                 dt = ExportSampleTable(exportData, dataset);
             }
+            
+            if (dataset.Type == "ASSAY")
+                {
+                     dt = await ExportAssayTable(exportData, dataset);
 
+                }
             dt.TableName = dataset.Name;
-            return dt;
+
+            
+           
+           // 2. convert datatable to string
+            StringBuilder result = new StringBuilder();
+            if (dt.Columns.Count != 0)
+            {
+                foreach (DataColumn col in dt.Columns)
+                {
+                    result.Append(col.ColumnName + ',');
+                }
+                result.Append("\r\n");
+                foreach (DataRow row in dt.Rows)
+                {
+                    foreach (DataColumn column in dt.Columns)
+                    {
+                        result.Append(row[column].ToString() + ',');
+                    }
+                    result.Append("\r\n");
+                }
+            }
+            var file = result.ToString();
+
+            // 3. write the string as a file in the server
+            string fileDir = uploadedFilesDirectory + "SAVED\\" + dataset.Name;
+
+            if (!File.Exists(fileDir))
+            {
+                File.WriteAllText(fileDir, file);
+            }
+
+            dataset.FileIsReady = true;
+            dataset.ExportFileURI = fileDir;
+          //  dataset.Name = dt.TableName + ".csv";
+            _userDatasetRepository.Update(dataset);
+            _dataServiceUnit.Save();
+            return true;
+
+        }
+
+        public async Task<DataTable> ExportAssayTable(DataExportObject exportData, UserDataset dataset)
+        {
+
+            return await Task.Factory.StartNew(() =>
+            {
+                var projectId = dataset.ProjectId;
+                var activityId = exportData.Samples.First().AssayId;
+
+                var datatable = new DataTable();
+                datatable.Columns.Add("features");
+
+                List<string> sampleIds = new List<string>();
+                foreach (var biosample in exportData.Samples)
+                {
+                    sampleIds.Add(biosample.BiosampleStudyId);
+                    datatable.Columns.Add(biosample.BiosampleStudyId.ToLower());
+
+                }
+
+                var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
+                var features = assayObservations.Select(a => a.FeatureName).Distinct().ToList();
+
+
+                foreach (var feature in features)
+                {
+                    var row = datatable.NewRow();
+                    row["features"] = feature;
+                    foreach (var biosample in exportData.Samples)
+                    {
+                        var obs =
+                            assayObservations.Find(
+                                o => o.SubjectOfObservationId == biosample.BiosampleStudyId && o.FeatureName == feature);
+                        row[biosample.BiosampleStudyId.ToLower()] = ((NumericalValue) obs.ObservedValue).Value;
+                    }
+                 datatable.Rows.Add(row);
+                }
+                return datatable;
+            });
+
         }
 
         public DataTable ExportSampleTable(DataExportObject exportData, UserDataset dataset)
@@ -70,6 +204,7 @@ namespace eTRIKS.Commons.Service.Services
                 //      }
                 datatable.Rows.Add(row);
             }
+
             return datatable;
         }
 
@@ -1127,3 +1262,79 @@ namespace eTRIKS.Commons.Service.Services
         #endregion
     }
 }
+
+
+
+
+////////////////////////public async Task<DataTable> ExportDataset(string datasetId)
+////////////////////////{
+
+////////////////////////    //return await Task.Factory.StartNew(() =>
+////////////////////////    //{
+
+////////////////////////    var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+////////////////////////    var projectId = dataset.ProjectId;
+////////////////////////    var exportData = _queryService.GetQueryResult(dataset.QueryId);
+////////////////////////    var dt = new DataTable();
+
+////////////////////////    if (dataset.Type == "PHENO")
+////////////////////////    {
+////////////////////////        dt = ExportSubjectClinicalTable(exportData, dataset);
+////////////////////////    }
+////////////////////////    if (dataset.Type == "BIOSAMPLES")
+////////////////////////    {
+////////////////////////        dt = ExportSampleTable(exportData, dataset);
+////////////////////////    }
+////////////////////////    if (dataset.Type == "ASSAY")
+////////////////////////    {
+////////////////////////        dt = await ExportAssayTable(exportData, dataset);
+////////////////////////    }
+////////////////////////    dt.TableName = dataset.Name;
+
+////////////////////////    return dt;
+////////////////////////    //});
+////////////////////////}
+
+
+
+
+////////////////////////public async Task<DataTable> /*DataTable */ExportAssayTable(DataExportObject exportData, UserDataset dataset)
+////////////////////////{
+////////////////////////    var projectId = dataset.ProjectId;
+////////////////////////    var activityId = exportData.Samples.First().AssayId;
+
+
+////////////////////////    return await Task.Factory.StartNew(() =>
+////////////////////////    {
+////////////////////////        var datatable = new DataTable();
+////////////////////////        datatable.Columns.Add("features");
+
+////////////////////////        List<string> sampleIds = new List<string>();
+////////////////////////        foreach (var biosample in exportData.Samples)
+////////////////////////        {
+////////////////////////            sampleIds.Add(biosample.BiosampleStudyId);
+////////////////////////            datatable.Columns.Add(biosample.BiosampleStudyId.ToLower());
+
+////////////////////////        }
+
+////////////////////////        var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
+////////////////////////        var features = assayObservations.Select(a => a.FeatureName).Distinct().ToList();
+
+
+////////////////////////        foreach (var feature in features)
+////////////////////////        {
+////////////////////////            var row = datatable.NewRow();
+////////////////////////            row["features"] = feature;
+////////////////////////            foreach (var biosample in exportData.Samples)
+////////////////////////            {
+////////////////////////                var obs =
+////////////////////////                    assayObservations.Find(
+////////////////////////                        o => o.SubjectOfObservationId == biosample.BiosampleStudyId && o.FeatureName == feature);
+////////////////////////                row[biosample.BiosampleStudyId.ToLower()] = ((NumericalValue)obs.ObservedValue).Value;
+////////////////////////            }
+////////////////////////            datatable.Rows.Add(row);
+////////////////////////        }
+
+////////////////////////        return datatable;
+////////////////////////    });
+////////////////////////}

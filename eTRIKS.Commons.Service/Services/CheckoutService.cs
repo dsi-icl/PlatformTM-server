@@ -66,14 +66,18 @@ namespace eTRIKS.Commons.Service.Services
                 var assaySampleDataset = CreateAssaySampleDataset(assayPanel, singleAssayCombinedQuery.Id, userId, projectId);
                 checkoutDatasets.Add(assaySampleDataset);
             }
-
             
-            //TODO Creates assay data dataset for each assay using following
-            //foreach (var AssayPanel in query.AssayPanels)
-            // {
-            //     var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, userId, projectId);
-            //     checkoutDatasets.Add(assayPanelDataset);
-            // }
+            //Creates assay data dataset for each assay 
+            foreach (var AssayPanel in query.AssayPanels)
+            {
+                var singleAssayCombinedQuery = query.AssayPanels.Count > 1
+                    ? _queryService.CreateSingleAssayCombinedQuery(query, AssayPanel)
+                    : query;
+
+
+                var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, singleAssayCombinedQuery.Id, userId, projectId);
+                checkoutDatasets.Add(assayPanelDataset);
+            }
 
             return checkoutDatasets;
         }
@@ -174,20 +178,30 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery, string userId, int projectId)
+        private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery, Guid combinedQueryId, string userId, int projectId)
         {
             // TODO for HD datasets
-            var assayPanelDataset = new UserDataset();
-            assayPanelDataset.Id = Guid.NewGuid();
-            assayPanelDataset.OwnerId = userId;
-            assayPanelDataset.ProjectId = projectId;
-            assayPanelDataset.Type = "AssayPanel";
-            assayPanelDataset.Name = "HDSamples";
+            var assayPanelDataset = new UserDataset
+            {
+                Id = Guid.NewGuid(),
+                OwnerId = userId,
+                ProjectId = projectId,
+                Type = "ASSAY",
+                Name = assayPanelQuery.AssayName + " Assay",
+                QueryId = combinedQueryId
+            };
 
-            return null;
+
+            var exportData = _queryService.GetQueryResult(combinedQueryId);
+            assayPanelDataset.SubjectCount = exportData.Subjects.Count;
+            assayPanelDataset.SampleCount = exportData.Samples.Count;
+
+            _userDatasetRepository.Insert(assayPanelDataset);
+            _dataContext.Save();
+            return assayPanelDataset;
         }
 
-        private DatasetField CreateSubjectIdField()
+    private DatasetField CreateSubjectIdField()
         {
             return new DatasetField()
             {

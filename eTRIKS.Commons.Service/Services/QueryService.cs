@@ -30,6 +30,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Visit, int> _visitRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IRepository<Assay, int> _assayRepository;
+        private readonly IRepository<Core.Domain.Model.ObservationModel.Observation, Guid> _observationRepository;
 
 
 
@@ -45,6 +46,7 @@ namespace eTRIKS.Commons.Service.Services
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
+            _observationRepository = uoW.GetRepository<Core.Domain.Model.ObservationModel.Observation, Guid>();
 
         }
 
@@ -59,14 +61,8 @@ namespace eTRIKS.Commons.Service.Services
             {
                 //Property is a collection
                 //Simple for now since there's only one collection in human subject i.e. subjectcharacteristics
-                var obj =
-                    ((IList)queryProperty.GetValue(subject)).Cast<object>()
-                        .SingleOrDefault(
-                            sc => sc.GetType()
-                                    .GetProperty(query.QueryWhereProperty)
-                                    .GetValue(sc).ToString() == query.QueryWhereValue);
-                subjProperty =
-                    obj.GetType().GetProperty(query.QuerySelectProperty).GetValue(obj).ToString();
+                var obj =((IList)queryProperty.GetValue(subject)).Cast<object>().SingleOrDefault(sc => sc.GetType().GetProperty(query.QueryWhereProperty).GetValue(sc).ToString() == query.QueryWhereValue);
+                subjProperty =obj.GetType().GetProperty(query.QuerySelectProperty).GetValue(obj).ToString();
             }
             else
             {
@@ -79,8 +75,16 @@ namespace eTRIKS.Commons.Service.Services
             }
             return subjProperty;
         }
+        public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        {
 
-       
+
+            List<string> feat = new List<string>(new string[] { "ID.1.4", "ID.1.5", "ID.1.6", "ID.1.7" });
+
+
+            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName)/* && feat.Contains(s.FeatureName)*/).ToList();
+            return assayObservations;
+        }
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
         {

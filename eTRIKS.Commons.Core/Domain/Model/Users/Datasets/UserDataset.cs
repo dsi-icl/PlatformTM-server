@@ -20,6 +20,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public Guid QueryId { get; set; }
         public int SubjectCount { get; set; }
         public int SampleCount { get; set; }
+        // add the fields
+        public string ExportFileURI { get; set; }
+        public bool FileIsReady { get; set; }
+
+
 
 
         public UserDataset()
