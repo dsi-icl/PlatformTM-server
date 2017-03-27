@@ -30,6 +30,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpPost]
         public IActionResult AddAssay([FromBody] AssayDTO assayDTO)
         {
+            if (!ModelState.IsValid)
+                return BadRequest();
             var addedAssay = _assayService.AddAssay(assayDTO);
             if (addedAssay != null)
                 return new CreatedAtRouteResult("GetAssayById", new { assayId = addedAssay.Id }, addedAssay);

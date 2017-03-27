@@ -13,6 +13,7 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.JoinEntities;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
@@ -25,9 +26,12 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<DataFile, int> _dataFileRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Observation, int> _observationRepository;
-        private readonly FileService _fileService;
 
-        public DatasetService(IServiceUoW uoW, FileService fileService)
+        private readonly FileService _fileService;
+        private readonly CacheService _cacheService;
+        
+
+        public DatasetService(IServiceUoW uoW, FileService fileService, CacheService cacheService)
         {
             _dataServiceUnit = uoW;
             _datasetRepository = uoW.GetRepository<Dataset, int>();
@@ -36,7 +40,10 @@ namespace eTRIKS.Commons.Service.Services
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _observationRepository = uoW.GetRepository<Observation, int>();
 
+           
+
             _fileService = fileService;
+            _cacheService = cacheService;
         }
 
        
@@ -603,6 +610,10 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     var observationLoader = new ObservationLoader(this._dataServiceUnit);
                     loaded = observationLoader.LoadObservations(sdtmData, sdtmRowDescriptor,reload);
+                    if (loaded)
+                    {
+                       await _cacheService.GenerateAndCacheClinicalDTO(dataFile.ProjectId);
+                    }
                 }
 
 

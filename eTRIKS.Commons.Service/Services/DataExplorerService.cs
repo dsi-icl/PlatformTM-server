@@ -23,11 +23,12 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<CharacteristicFeature, int> _characObjRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-
+        private readonly ICacheRepository<ClinicalExplorerDTO> _cacheRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IServiceUoW _dataContext;
 
         private readonly QueryService _queryService;
+        //private readonly CacheService _cacheService;
 
 
 
@@ -41,7 +42,10 @@ namespace eTRIKS.Commons.Service.Services
             _assayRepository = uoW.GetRepository<Assay, int>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
 
+            _cacheRepository = uoW.GetCacheRepository<ClinicalExplorerDTO>();
+
             _queryService = queryService;
+            //_cacheService = cacheService;
         }
 
         #region Observation Browser methods
@@ -153,8 +157,12 @@ namespace eTRIKS.Commons.Service.Services
             return new ObservationNode() { DefaultObservation = obsRequest, Qualifiers = reqs, Name = obsRequest.Name };
         }
 
-        public async Task<IEnumerable<ClinicalDataTreeDTO>> GetClinicalObsTree(int projectId)
+        public async Task<ClinicalExplorerDTO> GetClinicalObsTree(int projectId)
         {
+            //var cachedTree = _cacheService.GetClinicalTreeDTO<ClinicalExplorerDTO>(c=>c.ProjectId == projectId);
+            var cachedTree = _cacheRepository.GetFromCache(c => c.ProjectId == projectId);
+            if (cachedTree != null)
+                return cachedTree;
 
             //TODO: will replace Observation here with ObservationDescriptor
             List<Observation> studyObservations = _observationRepository.FindAll(
@@ -167,7 +175,8 @@ namespace eTRIKS.Commons.Service.Services
                     }).ToList();
 
 
-            List<ClinicalDataTreeDTO> cdTreeList = new List<ClinicalDataTreeDTO>();
+            ClinicalExplorerDTO clinicalExplorerDTO = new ClinicalExplorerDTO();
+            clinicalExplorerDTO.ProjectId = projectId;
 
             //Group by class
             var groupedByClass = studyObservations.GroupBy(ob => ob.Class);
@@ -177,7 +186,7 @@ namespace eTRIKS.Commons.Service.Services
                     continue;
 
                 var classNode = new ClinicalDataTreeDTO();
-                cdTreeList.Add(classNode);
+                clinicalExplorerDTO.Classes.Add(classNode);
                 classNode.Class = classGroup.Key;
 
                 //Group by domain
@@ -195,7 +204,7 @@ namespace eTRIKS.Commons.Service.Services
 
 
                     //Group by category
-                    var groupedByCategory = domainGroup.GroupBy(x => x.Group);
+                    var groupedByCategory = domainGroup.GroupBy(x => x.Group).OrderByDescending(g=>g.Key);
                     int i = 0;
                     foreach (var catGroup in groupedByCategory)
                     {
@@ -210,7 +219,7 @@ namespace eTRIKS.Commons.Service.Services
                         }
 
                         //***********************!!!!!!!!!!!!!!HACK!!!!!!!!!!!ALERT!!!!!!!!!!!!!!!!!!!!!!!!!**************************
-                        if (domainNode.Code == "AE" && projectId == 25)
+                        if (domainNode.Code == "AE" && projectId == 95 || projectId == 25)
                         {
                             var AEs = await getEventsByMedDRA(projectId, catGroup.ToList(), groupNode.Code, groupNode.Name);
                             groupNode.Terms.AddRange(AEs);
@@ -223,7 +232,8 @@ namespace eTRIKS.Commons.Service.Services
                     }
                 }
             }
-            return cdTreeList;
+            _cacheRepository.Save(clinicalExplorerDTO);
+            return clinicalExplorerDTO;
 
         }
 
@@ -634,7 +644,7 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     O3 = obsObject.ControlledTermStr,
                     O3id = obsObject.Id,
-                    O3code = obsObject.Name.ToLower(),
+                    O3code = obsObject.Group!=null?(obsObject.Group+"_"+obsObject.Name).ToLower(): obsObject.Name.ToLower(),
                     QO2 = obsObject.DefaultQualifier.Name,
                     QO2id = obsObject.DefaultQualifier.Id,
                     DataType = obsObject.DefaultQualifier.DataType,
@@ -667,7 +677,7 @@ namespace eTRIKS.Commons.Service.Services
 
                 O3 = obsObject.Name,//obsObject.ControlledTermStr,
                 O3id = obsObject.Id,
-                O3code = obsObject.Name.ToLower(),
+                O3code = obsObject.Group != null ? (obsObject.Group + "_" + obsObject.Name).ToLower() : obsObject.Name.ToLower(),
                 QO2 = variableDefinition.Name,
                 QO2id = variableDefinition.Id,
                 DataType = variableDefinition.DataType,

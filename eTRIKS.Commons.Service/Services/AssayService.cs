@@ -9,6 +9,7 @@ using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -73,6 +74,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public AssayDTO AddAssay(AssayDTO assayDto)
         {
+            
             var assay = new Assay();
             //var project = _projectRepository.FindSingle(d => d.Accession
             //    .Equals(assayDto.ProjectAcc));

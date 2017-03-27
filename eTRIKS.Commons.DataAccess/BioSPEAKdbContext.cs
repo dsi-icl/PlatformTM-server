@@ -32,6 +32,7 @@ namespace eTRIKS.Commons.DataAccess
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
+        private readonly Dictionary<Type, object> _cacheRepositories;
         private IUserRepository userRepository;
         private IUserAccountRepository _userAccountRepository;
         private bool _disposed;
@@ -40,6 +41,7 @@ namespace eTRIKS.Commons.DataAccess
         public BioSPEAKdbContext(DbContextOptions<BioSPEAKdbContext> options, IOptions<DataAccessSettings> settings) : base(options){
             _dbsettings = settings;
             _repositories = new Dictionary<Type, object>();
+            _cacheRepositories = new Dictionary<Type,object>();
             _disposed = false;
         }
 
@@ -97,6 +99,21 @@ namespace eTRIKS.Commons.DataAccess
             return repository;
         }
 
+        public ICacheRepository<TEntity> GetCacheRepository<TEntity>() where TEntity : class
+        {
+            if (_cacheRepositories.Keys.Contains(typeof(TEntity)))
+            {
+                Debug.WriteLine("Retrieving ", typeof(TEntity).Name);
+                return _cacheRepositories[typeof(TEntity)] as ICacheRepository<TEntity>;
+            }
+
+            var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+            var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+
+            var cacheRepository = new CacheRepository<TEntity>(mongodb, "Biospeak_cache");
+            _cacheRepositories.Add(typeof(TEntity), cacheRepository);
+            return cacheRepository;
+        }
         public void Register<TEntity, TPrimaryKey>(IRepository<TEntity, TPrimaryKey> repository) where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
         {
             _repositories.Add(typeof(TEntity), repository);
