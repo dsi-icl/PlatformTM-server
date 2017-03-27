@@ -21,7 +21,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 
     public class NumericalValue : ObservedPropertyValue
     {
-        public float Value { get; set; }
+        public double Value { get; set; }
         public string Unit { get; set; }
         public CVterm UnitCVterm { get; set; }
     }

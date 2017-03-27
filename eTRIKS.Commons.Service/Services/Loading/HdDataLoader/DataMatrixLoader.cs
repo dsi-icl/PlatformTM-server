@@ -51,7 +51,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
         // dataset service 
         public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/)      
         {
-           // _observationRepository.DeleteMany(d=> d.DatasetId == datasetId);
+            _observationRepository.DeleteMany(d=> d.DatasetId == datasetId);
             var dataset = GetActivityDataset(datasetId);
             var dataFile = _dataFileRepository.Get(fileId); 
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
@@ -62,25 +62,18 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
             var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
 
             var obsReadyToInsert = new List<Core.Domain.Model.ObservationModel.Observation>();
-
+            
             foreach (DataRow row in dataTable.Rows)
             {
-                //if(obsReadyToInsert.Count == 500) break;
                 for (int index = 0; index < dataTable.Columns.Count; index++)
-
                     if (index == 0) continue;
                     else
                     {
                         var column = dataTable.Columns[index];
-                        //var PropertyDescriptor = new PropertyDescriptor();   // add property discreptor
-                        //var PropertyDescriptor1 = dataset.Template.Class;
-                        //var PropertyDescriptor3 = dataset.Variables.FirstOrDefault();
-
-
                         var obs = new Core.Domain.Model.ObservationModel.Observation();
-                        
+                        // Fill an Observation
                             var value = new NumericalValue();
-                            value.Value = float.Parse(row[column.ColumnName].ToString());
+                            value.Value = double.Parse(row[column.ColumnName].ToString());
                             value.Property = new PropertyDescriptor();
                             {
                                 value.Property.Description = dataset.Template.Description;
@@ -106,23 +99,25 @@ namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
                             obs.ProjectId = dataset.Activity.ProjectId;
                             obs.Id = Guid.NewGuid();
                             
-                        
-
                         obsReadyToInsert.Add(obs);
-                        if (obsReadyToInsert.Count % 500 == 0)
+                     //   observationsTotal.Add(obs);
+                     
+                        if (obsReadyToInsert.Count % ((dataTable.Columns.Count) - 1) == 0)
                         {
-                            _observationRepository.InsertManyAsync(obsReadyToInsert);
-                            //_dataContext.Save();
+                            _observationRepository.InsertMany(obsReadyToInsert);
                             obsReadyToInsert.Clear();
-                           // break;
                         }
+
                     }
                }
+            if (obsReadyToInsert.Count > 0)
+            {
+                Debug.WriteLine("Created Observations are NOT Equal to measured values in the file please check!!");
+            }
 
             dataFile.State = "LOADED";
             dataFile.IsLoadedToDB = true;
             _dataFileRepository.Update(dataFile);
-            _observationRepository.InsertManyAsync(obsReadyToInsert);
             _dataContext.Save();
             return true;
         }

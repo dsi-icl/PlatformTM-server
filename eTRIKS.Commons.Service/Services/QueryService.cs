@@ -61,14 +61,8 @@ namespace eTRIKS.Commons.Service.Services
             {
                 //Property is a collection
                 //Simple for now since there's only one collection in human subject i.e. subjectcharacteristics
-                var obj =
-                    ((IList)queryProperty.GetValue(subject)).Cast<object>()
-                        .SingleOrDefault(
-                            sc => sc.GetType()
-                                    .GetProperty(query.QueryWhereProperty)
-                                    .GetValue(sc).ToString() == query.QueryWhereValue);
-                subjProperty =
-                    obj.GetType().GetProperty(query.QuerySelectProperty).GetValue(obj).ToString();
+                var obj =((IList)queryProperty.GetValue(subject)).Cast<object>().SingleOrDefault(sc => sc.GetType().GetProperty(query.QueryWhereProperty).GetValue(sc).ToString() == query.QueryWhereValue);
+                subjProperty =obj.GetType().GetProperty(query.QuerySelectProperty).GetValue(obj).ToString();
             }
             else
             {
@@ -81,23 +75,16 @@ namespace eTRIKS.Commons.Service.Services
             }
             return subjProperty;
         }
-        //*********************************************************************************************************************************************
-        public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds) 
+        public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
         {
-            //var list = new List<string>() { "SID.7069.933" };
-           // var selectedSamples = exportData.Samples;
-            // var sampleIds = selectedSamples.Select(s => s.BiosampleStudyId).ToString();
-           // var sampleIds = selectedSamples.Select(s => s.BiosampleStudyId);
-            // maybe it is good to write a foreach loop and find the relevant observations to an object !!!
 
 
-            //  var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId).ToList();
-            // var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && selectedSamples.Contains(s.SubjectOfObservationName)).ToList();
-            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName)).ToList();
+            List<string> feat = new List<string>(new string[] { "ID.1.4", "ID.1.5", "ID.1.6", "ID.1.7" });
+
+
+            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName)/* && feat.Contains(s.FeatureName)*/).ToList();
             return assayObservations;
         }
-
-        //*********************************************************************************************************************************************
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
         {
