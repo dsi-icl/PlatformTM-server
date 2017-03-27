@@ -13,6 +13,7 @@ using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Service.Configuration;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 using eTRIKS.Commons.Service.Services.Loading.HdDataLoader;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
 using eTRIKS.Commons.WebAPI.Auth;
@@ -75,7 +76,12 @@ namespace eTRIKS.Commons.WebAPI
             services.Configure<DataAccessSettings>(Configuration.GetSection("DBSettings"));
             services.Configure<FileStorageSettings>(Configuration.GetSection("FileStorageSettings"));
 
-           
+            BsonClassMap.RegisterClassMap<ObservationNode>();
+            BsonClassMap.RegisterClassMap<GroupNode>();
+            BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
+
+
+
 
             services.AddDbContext<BioSPEAKdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
             services.AddScoped<IServiceUoW, BioSPEAKdbContext>();
@@ -103,6 +109,8 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
             services.AddScoped<QueryService>();
+            services.AddScoped<CacheService>();
+
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
             services.AddScoped<DataMatrixLoader>();

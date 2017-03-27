@@ -43,11 +43,12 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             //AND NOT JUST INFLUENCED BY ONE DATASET OR THE FIRST DATASET LOADED AS IT IS NOW!!
             var projectO3s = _observationRepository.FindAll(o => o.ProjectId == projectId && o.DomainCode == dsDomainCode).ToList();
 
-            List<string> O3keys =
-                projectO3s.Select(
-                    currObservation =>
-                        currObservation.Class + currObservation.DomainCode + currObservation.Group +
-                        currObservation.Name).ToList();
+            //List<string> O3keys =
+            //    projectO3s.Select(
+            //        currObservation =>
+            //            currObservation.Class + currObservation.DomainCode + currObservation.Group +
+            //            currObservation.Name).ToList();
+            var O3map = projectO3s.ToDictionary(o3 => o3.Class + o3.DomainCode + o3.Group + o3.Name+o3.ControlledTermStr);
 
             var observations =
                 sdtmData.GroupBy(
@@ -60,13 +61,17 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                             subgroup = o.Subgroup,
                             o3CVterm = o.TopicControlledTerm ?? o.TopicSynonym
                         });
-
+            var obsPrevLoaded = new Dictionary<string,Observation>();
             foreach (var observation in observations)
             {
-                var O3key = dsClass + observation.Key.domain + observation.Key.group + observation.Key.o3;
-
-                if (O3keys.Contains(O3key))
+                var O3key = dsClass + observation.Key.domain + observation.Key.group + observation.Key.o3 + observation.Key.o3CVterm;
+                Observation o3;
+                if (O3map.TryGetValue(O3key, out o3))
+                {
+                    obsPrevLoaded.Add(O3key,o3);
                     continue;
+                }
+
                 Observation obsDescriptor = new Observation();
                 obsDescriptor.Name = observation.Key.o3;
                 obsDescriptor.Group = observation.Key.group;
@@ -92,7 +97,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                              Qualifier = qualifier
                          }));
 
-                obsDescriptor.Timings.AddRange(sdtmRowDescriptor.GetAllTimingVariables().FindAll(v => v != null).Select(
+                obsDescriptor.Timings.AddRange(sdtmRowDescriptor.TimeVariables.Select(
                         qualifier => new ObservationTiming()
                         {
                             Observation = obsDescriptor,
@@ -107,7 +112,8 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
 
                 obsDescriptor.DefaultQualifier = sdtmRowDescriptor.GetDefaultQualifier(observation.FirstOrDefault());
 
-                _observationRepository.Insert(obsDescriptor);
+                var newObs = _observationRepository.Insert(obsDescriptor);
+                obsPrevLoaded.Add(O3key,newObs);
             }
             var success = _dataContext.Save().Equals("CREATED");
 
@@ -124,10 +130,10 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 {
                     foreach (var sdtmRow in observation)
                     {
-                        var O3 =
-                            savedObs.FirstOrDefault(
-                                o => o.Name == sdtmRow.Topic && o.Group == sdtmRow.Group && o.Subgroup == sdtmRow.Subgroup);
-                        if (O3 != null) sdtmRow.DBTopicId = O3.Id;
+                        Observation O3;
+                        var o3key = dsClass + observation.Key.domain + observation.Key.group + observation.Key.o3 + observation.Key.o3CVterm;
+
+                        if (obsPrevLoaded.TryGetValue(o3key, out O3)) sdtmRow.DBTopicId = O3.Id;
                         _sdtmRepository.Update(sdtmRow);
                     }
                 }

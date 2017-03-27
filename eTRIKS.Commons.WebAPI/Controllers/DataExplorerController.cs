@@ -105,7 +105,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("projects/{projectId}/observations/clinical/browse")]
-        public async Task<IEnumerable<ClinicalDataTreeDTO>> GetClinicalTree(int projectId)
+        public async Task<ClinicalExplorerDTO> GetClinicalTree(int projectId)
         {
             return await _explorerService.GetClinicalObsTree(projectId);
         }

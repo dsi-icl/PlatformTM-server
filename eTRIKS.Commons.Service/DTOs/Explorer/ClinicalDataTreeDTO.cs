@@ -1,8 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace eTRIKS.Commons.Service.DTOs.Explorer
 {
+    public class ClinicalExplorerDTO
+    {
+        public Guid Id;
+        public List<ClinicalDataTreeDTO> Classes { get; set; }
+        public int ProjectId { get; set; }
+
+        public ClinicalExplorerDTO()
+        {
+            Classes = new List<ClinicalDataTreeDTO>();
+        }
+    }
     public class ClinicalDataTreeDTO
     {
         public string Class;

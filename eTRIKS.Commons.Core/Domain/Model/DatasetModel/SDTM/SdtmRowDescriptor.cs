@@ -27,6 +27,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public List<VariableDefinition> ResultVariables { get; set; }
         public List<VariableDefinition> SynonymVariables { get; set; }
         public List<VariableDefinition> VariableQualifierVariables { get; set; }
+        public List<VariableDefinition> TimeVariables { get; set; }
         public VariableDefinition DefaultQualifier { get; set; }
 
         //VISIT VARIABLES
@@ -129,6 +130,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             descriptor.ResultVariables = dataset.Variables
                         .Select(l => l.VariableDefinition)
                         .Where(v => v.RoleId == "CL-Role-T-8")
+                        .ToList();
+            descriptor.TimeVariables = dataset.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.RoleId == "CL-Role-T-6")
                         .ToList();
 
             //MedDRAVariables

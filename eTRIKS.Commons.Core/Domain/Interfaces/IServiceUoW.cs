@@ -18,5 +18,6 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
         Task<int> SaveChangesAsync();
 
+        ICacheRepository<TEntity> GetCacheRepository<TEntity>() where TEntity : class;
     }
 }
