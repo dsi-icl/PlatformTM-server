@@ -97,25 +97,9 @@ namespace eTRIKS.Commons.Service.Services
             
            
            // 2. convert datatable to string
-            StringBuilder result = new StringBuilder();
-            if (dt.Columns.Count != 0)
-            {
-                foreach (DataColumn col in dt.Columns)
-                {
-                    result.Append(col.ColumnName + ',');
-                }
-                result.Append("\r\n");
-                foreach (DataRow row in dt.Rows)
-                {
-                    foreach (DataColumn column in dt.Columns)
-                    {
-                        result.Append(row[column].ToString() + ',');
-                    }
-                    result.Append("\r\n");
-                }
-            }
-            var file = result.ToString();
-
+            string file = DatatableToString(dt);
+             
+           
             // 3. write the string as a file in the server
             string fileDir = uploadedFilesDirectory + "SAVED\\" + dataset.Name;
 
@@ -311,10 +295,10 @@ namespace eTRIKS.Commons.Service.Services
             return datatable;
         }
 
-        public string DownloadDataset(DataTable dtTable)
+        public string DatatableToString(DataTable dtTable)
         {
             StringBuilder result = new StringBuilder();
-            if (dtTable.Columns.Count != 0)
+            if (dtTable.Columns.Count != 0) 
             {
                 foreach (DataColumn col in dtTable.Columns)
                 {
