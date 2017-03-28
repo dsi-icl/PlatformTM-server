@@ -476,8 +476,8 @@ namespace eTRIKS.Commons.Service.Services
                 string dsName = dataset.Activity.Name+"_" +dataset.TemplateId;
                 sdtmTable.TableName = dsName;
                 //Write new transformed to file 
-                var fileInfo = _fileService.writeDataFile(projectId, dataFile.Path, sdtmTable);
-                standardFile = _fileService.addOrUpdateFile(projectId, fileInfo);
+                var fileInfo = _fileService.WriteDataFile(dataFile.Path, sdtmTable);
+                standardFile = _fileService.AddOrUpdateFile(projectId, fileInfo);
                 //var file = _dataFileRepository.Get(4);
                 
                 //Update dataset

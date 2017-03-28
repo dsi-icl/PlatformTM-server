@@ -299,18 +299,22 @@ namespace eTRIKS.Commons.Service.Services
                 if (apQuery.SampleQueries.Exists(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay)))
                 {
                     var dayQuery = apQuery.SampleQueries.Find(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay));
-                    queryResult.Samples = assaySamples.FindAll(s => s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
-                    s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
+                    if (dayQuery.IsFiltered)
+                        queryResult.Samples = assaySamples.FindAll(
+                            s =>
+                                s.CollectionStudyDay?.Number != null &&
+                                s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
+                                s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
                 }
 
                 //QUERY AND FILTER SAMPLE CHARACTERISTICS
                 foreach (var sampleQuery in apQuery.SampleQueries.Where(sq=>sq.QueryFor == nameof(Biosample.SampleCharacteristics)))
                 {
                     var characteristics = _sampleCharacteristicRepository.FindAll(
-                   sc =>
-                       sc.Sample.Study.ProjectId == projectId &&
-                       sampleQuery.QueryWhereValue == sc.CharacteristicFeatureId.ToString(),
-                   new List<string>() { "Sample" }).ToList();
+                        sc =>
+                            sc.Sample.Study.ProjectId == projectId &&
+                            sampleQuery.QueryWhereValue == sc.CharacteristicFeatureId.ToString(),
+                            new List<string>() {"Sample"}).ToList();
 
                     //APPLY FILTERING IF FILTER PRESENT
                     if (characteristics.Any() && sampleQuery.IsFiltered)

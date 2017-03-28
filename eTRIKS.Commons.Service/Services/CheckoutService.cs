@@ -201,7 +201,7 @@ namespace eTRIKS.Commons.Service.Services
             return assayPanelDataset;
         }
 
-    private DatasetField CreateSubjectIdField()
+        private DatasetField CreateSubjectIdField()
         {
             return new DatasetField()
             {

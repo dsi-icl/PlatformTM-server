@@ -16,13 +16,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class DatasetController : Controller
     {
         private readonly DatasetService _datasetService;
-        private readonly FileService _fileService;
         private readonly DataMatrixLoader _dataMatrixLoader;
-        public DatasetController(DatasetService datasetService, FileService fileService, DataMatrixLoader dataMatrixLoader) 
+        public DatasetController(DatasetService datasetService, DataMatrixLoader dataMatrixLoader) 
         {
 
             _datasetService = datasetService;
-            _fileService = fileService;
             _dataMatrixLoader = dataMatrixLoader;
         }
 
@@ -94,11 +92,6 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _datasetService.mapToTemplate(datasetId,fileId, dataTemplateMap);
         }
 
-        [HttpGet("{datasetId}/preview/file/{fileId}")]
-        public Hashtable GetDatasetPreview(int datasetId, int fileId)
-        {
-           return _fileService.getFilePreview(fileId);
-        }
 
         [HttpGet("{datasetId}/saveDataFile/file/{fileId}")]
         public bool LoadDataFile(int datasetId, int fileId)

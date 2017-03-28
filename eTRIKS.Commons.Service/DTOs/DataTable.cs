@@ -37,9 +37,10 @@ namespace eTRIKS.Commons.Service.DTOs
     }
     public class DataRow : OrderedDictionary
     {
-        public Object[] ItemArray {
-            get { return this.ItemArray; }
-            
+        private object[] _itemArray; 
+        public object[] ItemArray {
+            get { return this._itemArray; }
+            set { this._itemArray = value; }
         }
 
         public object this[DataColumn col]{

@@ -40,16 +40,24 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("{fileId}/preview")]
-        public Hashtable GetFilePreview(int fileId)
+        public IActionResult GetFilePreview(int fileId)
         {
-            return _fileService.getFilePreview(fileId);
+            try
+            {
+                var dt = _fileService.GetFilePreview(fileId);
+                return new OkObjectResult(dt);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("projects/{projectId}/createdir")]
         public List<string> CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
             var fullpath = _fileService.GetFullPath(projectId.ToString(), dir.name);
-            var diInfo =    _fileService.addDirectory(projectId, fullpath);
+            var diInfo =    _fileService.AddDirectory(projectId, fullpath);
             return diInfo?.GetDirectories().Select(d => d.Name).ToList();
         }
 
@@ -57,7 +65,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("projects/{projectId}/directories")]
         public List<string> GetDirectories(int projectId)
         {
-            return _fileService.getDirectories(projectId);
+            return _fileService.GetDirectories(projectId);
         }
 
         [HttpPost("projects/{projectId}/upload/{dir?}")]
@@ -79,7 +87,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                             
                     }
                     var fi = new FileInfo(Path.Combine(path, file.FileName));
-                    _fileService.addOrUpdateFile(projectId, fi);
+                    _fileService.AddOrUpdateFile(projectId, fi);
                     return Ok();
                 }
                 return BadRequest($"Expected a multipart request, but got '{Request.ContentType}'");
