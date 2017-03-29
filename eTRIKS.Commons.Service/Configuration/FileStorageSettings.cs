@@ -7,6 +7,7 @@ namespace eTRIKS.Commons.Service.Configuration
 {
     public class FileStorageSettings
     {
-        public string FileDirectory { get; set; }
+        public string UploadFileDirectory { get; set; }
+        public string DownloadFileDirectory { get; set; }
     }
 }

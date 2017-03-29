@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Http;
@@ -22,17 +23,27 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class ExportController : Controller
     {
         private readonly ExportService _exportService;
+        private readonly FileService _fileService;
 
-        public ExportController(ExportService exportService)
+        public ExportController(ExportService exportService, FileService fileService)
         {
             _exportService = exportService;
+            _fileService = fileService;
         }
 
-        ////////////[HttpGet("datasets/{datasetId}/preview")]
-        ////////////public async Task<DataTable> GetDataPreview(string datasetId)
-        ////////////{
-        ////////////    return await _exportService.ExportDataset(datasetId); //.(projectId, userDatasetDto);
-        ////////////}
+        [HttpGet("datasets/{datasetId}/preview")]
+        public async Task<IActionResult> GetDataPreview(string datasetId)
+        {
+            try
+            {
+                var dt = await _exportService.ExportDataset(datasetId);
+                return new OkObjectResult(dt);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
 
 
         [Route("datasets/{datasetId}/IsFileReady")]
@@ -43,34 +54,50 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return status;
         }
 
-        [Route("datasets/{datasetId}/download")]
+        [Route("datasets/{datasetId}/export")]
         [HttpGet]
-        public async void /*Task*/ PrepareFileForDownload(string datasetId)   // prepare the file in server
+        public async Task<ActionResult> PrepareFileForDownload(string datasetId)   // prepare the file in server
         {
-
-            var filePrepared = await _exportService.ExportDataset(datasetId);   
-
+            try
+            {
+                var dt = await _exportService.ExportDataset(datasetId);
+                var filePath = _exportService.GetDownloadPath(datasetId);
+                var fileInfo = _fileService.WriteDataFile(filePath, dt);
+                _exportService.SetDatasetReadyForDownload(datasetId, fileInfo.FullName);
+                return Accepted();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
             // TEMP as this should be called by front end seperately to download the file
-            if (filePrepared)
-                DownloadDatasets(datasetId);
+            //if (filePrepared)
+            //    DownloadDatasets(datasetId);
         }
         
-        [Route("datasets/{datasetId}/download1")]
+        [Route("datasets/{datasetId}/download")]
         [HttpGet]
-        public async void DownloadDatasets(string datasetId)  // file is ready download it 
+        public async Task<ActionResult> DownloadDatasets(string datasetId)
         {
+            //TEMP
+            await PrepareFileForDownload(datasetId);
+            //
+
             string filename;
-            var fileStream = _exportService.DownloadDataset( /*"55e87400-8968-4986-83e1-9527803250ce"*/ datasetId, out filename);
+            var fileStream = _exportService.DownloadDataset(datasetId, out filename);
+            if (fileStream == null) return NotFound("cannot file ddlkjaskjh ");
             
             HttpContext.Response.Clear();
-            HttpContext.Response.ContentType = "text/csv";
-            HttpContext.Response.Headers.Add("content-disposition", "attachment");
-            HttpContext.Response.Headers.Add("x-filename", filename + ".csv");
-            HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "x-filename");
-            HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.ContentType = "text/csv";
+            Response.Headers.Add("content-disposition", "attachment");
+            Response.Headers.Add("x-filename", filename + ".csv");
+            Response.Headers.Add("Access-Control-Expose-Headers", "x-filename");
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
             await fileStream.CopyToAsync(HttpContext.Response.Body);
             
-            fileStream.Close();
+            fileStream.Close(); 
+            return new FileStreamResult(fileStream,"text/csv") {FileDownloadName = filename+".csv"};
         }
 
 

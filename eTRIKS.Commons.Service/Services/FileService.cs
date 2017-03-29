@@ -14,22 +14,22 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using Microsoft.Extensions.Options;
 using eTRIKS.Commons.Service.Configuration;
 using Microsoft.IdentityModel.Protocols;
+using Remotion.Linq.Parsing;
 
 namespace eTRIKS.Commons.Service.Services
 {
     public class FileService
     {
-        private IServiceUoW _dataServiceUnit;
-        private IRepository<DataFile, int> _fileRepository;
-        private IRepository<Project, int> _projectRepository;
+        private readonly IServiceUoW _dataServiceUnit;
+        private readonly IRepository<DataFile, int> _fileRepository;
+        private readonly IRepository<Project, int> _projectRepository;
         private FileStorageSettings ConfigSettings { get; set; }
-        private string uploadedFilesDirectory;
-        private string stdFilesDirecotry;
+        private readonly string _uploadFileDirectory;
+        private readonly string _downloadFileDirectory;
 
 
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Observation, int> _observationRepository;
-        // private DatasetService _datasetService;
 
         public FileService(IServiceUoW uoW, IOptions<FileStorageSettings> settings)
         {
@@ -37,14 +37,13 @@ namespace eTRIKS.Commons.Service.Services
             _fileRepository = uoW.GetRepository<DataFile, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
             ConfigSettings = settings.Value;
-            uploadedFilesDirectory = ConfigSettings.FileDirectory;//ConfigurationManager.AppSettings["FileDirectory"];
-            stdFilesDirecotry = uploadedFilesDirectory + "\\Mapped";
+            _uploadFileDirectory = ConfigSettings.UploadFileDirectory;
+            _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
 
 
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _observationRepository = uoW.GetRepository<Observation, int>();
-            // _datasetService = datasetService;
-            //  _datasetService = new DatasetService(uoW);
+
         }
         public List<FileDTO> GetUploadedFiles(int projectId,string path)
         {
@@ -64,16 +63,13 @@ namespace eTRIKS.Commons.Service.Services
             }).ToList();
         }
 
-        public DirectoryInfo addDirectory(int projectId, string newDir)
+        public DirectoryInfo AddDirectory(int projectId, string newDir)
         {
             if (Directory.Exists(newDir))
                 return new DirectoryInfo(newDir);
 
-            
             var di = Directory.CreateDirectory(newDir);
-                //_fileService.addDirectory(projectId, new DirectoryInfo(newDir), projectId);
-            
-           
+
             var project = _projectRepository.FindSingle(p => p.Id == projectId);
             if(project ==null)
                 return null;
@@ -109,7 +105,7 @@ namespace eTRIKS.Commons.Service.Services
             //TODO:IF selectFile.State != LOADED, success is still false. Will not be able to delete file
             if (success)
             {
-                string fileDir = uploadedFilesDirectory;
+                string fileDir = _uploadFileDirectory;
                 string path = fileDir + "\\" + selectFile.Path + "\\" + selectFile.FileName;
                 File.Delete(path);
             }
@@ -146,9 +142,8 @@ namespace eTRIKS.Commons.Service.Services
             return true;
         }
 
-        public DataFile addOrUpdateFile(int projectId, FileInfo fi)
+        public DataFile AddOrUpdateFile(int projectId, FileInfo fi)
         {
-            //TODO: projectId
             if (fi == null)
                 return null;
             var filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
@@ -158,14 +153,16 @@ namespace eTRIKS.Commons.Service.Services
                 var project = _projectRepository.FindSingle(p => p.Id == projectId);
                 if (project == null)
                     return null;
-                file = new DataFile();
-                file.FileName = fi.Name;
-                file.DateAdded = fi.CreationTime.ToString("d") + " " + fi.CreationTime.ToString("t");
-                file.State = "NEW";
-                file.Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
-                file.IsDirectory = false;
+                file = new DataFile
+                {
+                    FileName = fi.Name,
+                    DateAdded = fi.CreationTime.ToString("d") + " " + fi.CreationTime.ToString("t"),
+                    State = "NEW",
+                    Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
+                    IsDirectory = false,
+                    ProjectId = project.Id
+                };
                 _fileRepository.Insert(file);
-                file.ProjectId = project.Id;
             }
             else
             {
@@ -173,16 +170,39 @@ namespace eTRIKS.Commons.Service.Services
                 if (file.IsLoadedToDB)
                     file.State = "UPDATED";
                 _fileRepository.Update(file);
-
             }
             return _dataServiceUnit.Save().Equals("CREATED") ? file : null;
+        }
+
+        public List<string> GetDirectories(int projectId)
+        {
+            var dirs = _fileRepository.FindAll(f => f.IsDirectory.Equals(true) && f.ProjectId == projectId);
+            return dirs?.Select(d => d.FileName).ToList();
+        }
+
+        public DataTable GetFilePreview(int fileId)
+        {
+
+            var file = _fileRepository.Get(fileId);
+            var filePath = Path.Combine(file.Path, file.FileName);
+
+            var dataTable = ReadOriginalFile(filePath);
+
+            if (dataTable.Rows.Count > 1000)
+                dataTable.Rows.RemoveRange(100, dataTable.Rows.Count - 100);
+
+            if (dataTable.Columns.Count > 40)
+                dataTable.Columns.RemoveRange(100, dataTable.Columns.Count - 100);
+            dataTable.TableName = file.FileName;
+
+            return dataTable;
         }
 
         #region IO methods
 
         public DataTable ReadOriginalFile(string filePath)
         {
-            string PATH = uploadedFilesDirectory + filePath;
+            string PATH = _uploadFileDirectory + filePath;
             return readDataFile(PATH);
         }
         
@@ -191,7 +211,6 @@ namespace eTRIKS.Commons.Service.Services
             DataTable dt = new DataTable();
 
             StreamReader reader = File.OpenText(filePath);
-            //var csv = new CsvReader(reader);
             var parser = new CsvParser(reader);
             string[] header = parser.Read();
             if (!(header.Count() > 1))
@@ -201,7 +220,6 @@ namespace eTRIKS.Commons.Service.Services
                     parser.Configuration.Delimiter = "\t";
                     header = header[0].Split('\t');
                 }
-
             }
 
 
@@ -236,6 +254,7 @@ namespace eTRIKS.Commons.Service.Services
                 catch (System.NullReferenceException e)
                 {
                     Debug.WriteLine(e.Message);
+                    throw ;
                 }
             }
             parser.Dispose();
@@ -247,7 +266,7 @@ namespace eTRIKS.Commons.Service.Services
         public List<Dictionary<string, string>> getFileColHeaders(string filePath)
         {
             //Parse header of the file
-            string PATH = uploadedFilesDirectory + filePath;// + studyId + "\\" + fileName;
+            string PATH = _uploadFileDirectory + filePath;// + studyId + "\\" + fileName;
             StreamReader reader = File.OpenText(PATH);
             string firstline = reader.ReadLine();
 
@@ -271,30 +290,29 @@ namespace eTRIKS.Commons.Service.Services
             return res;
         }
 
-        public FileInfo writeDataFile(int projectId, string filePath, DataTable dt)
+        public FileInfo WriteDataFile(string path, DataTable dt)
         {
+            var dirPath = Path.Combine(_downloadFileDirectory, path);
+            var di = Directory.CreateDirectory(dirPath);
+            if(!di.Exists) return null;
+            var filePath = Path.Combine(dirPath, dt.TableName + ".csv");
 
-            var PATH = stdFilesDirecotry + filePath;
-            var DirInfo = addDirectory(projectId, PATH);
 
-            string strFilePath = DirInfo.FullName + "\\" + dt.TableName + ".csv";
+            StreamWriter writer = File.CreateText(filePath);
 
-            StreamWriter writer = File.CreateText(strFilePath);
-
-            IEnumerable<String> headerValues = dt.Columns.Cast<DataColumn>()
+            var headerValues = dt.Columns.Cast<DataColumn>()
                 .Select(column => QuoteValue(column.ColumnName));
 
-            writer.WriteLine(String.Join(",", headerValues));
-            IEnumerable<String> items;
+            writer.WriteLine(string.Join(",", headerValues));
 
             foreach (DataRow row in dt.Rows)
             {
-                items = row.ItemArray.Select(o => QuoteValue(o.ToString()));
-                writer.WriteLine(String.Join(",", items));
+                var items = row.Values.Cast<string>().Select(o => QuoteValue(o.ToString()));
+                writer.WriteLine(string.Join(",", items));
             }
             writer.Flush();
             writer.Dispose();
-            return new FileInfo(strFilePath);
+            return new FileInfo(filePath);
         }
 
         private static string QuoteValue(string value)
@@ -305,66 +323,34 @@ namespace eTRIKS.Commons.Service.Services
 
         #endregion
 
-        public List<string> getDirectories(int projectId)
-        {
-           var dirs =  _fileRepository.FindAll(f => f.IsDirectory.Equals(true) && f.ProjectId == projectId);
-            if (dirs == null) return null;
-            return dirs.Select(d => d.FileName).ToList();
-        }
-
-        public Hashtable getFilePreview(int fileId)
-        {
-            //var dataset = GetActivityDataset(datasetId);
-            //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
-            //var studyId = dataset.Activity.StudyId;
-            var file = _fileRepository.Get(fileId);
-            var filePath = file.Path + "\\" + file.FileName;
-
-            //var fileService = new FileService(_dataServiceUnit);
-            //TEMP usage of dataset.state
-            var dataTable = ReadOriginalFile(filePath);// : fileService.readStandardFile(studyId, fileName);
-
-            if (dataTable.Rows.Count > 1000)
-                dataTable.Rows.RemoveRange(100, dataTable.Rows.Count - 100);
-
-            if (dataTable.Columns.Count > 40)
-                dataTable.Columns.RemoveRange(100, dataTable.Columns.Count - 100);
-
-            var ht = getHashtable(dataTable);
-            ht.Add("fileInfo",file.FileName);
-            return ht;
-        }
+        //private Hashtable getHashtable(DataTable sdtmTable)
+        //{
 
 
-
-        private Hashtable getHashtable(DataTable sdtmTable)
-        {
-
-
-            //if (sdtmTable.Rows.Count > 10000)
-            //    sdtmTable.Rows.RemoveRange(100, sdtmTable.Rows.Count - 100);
+        //    //if (sdtmTable.Rows.Count > 10000)
+        //    //    sdtmTable.Rows.RemoveRange(100, sdtmTable.Rows.Count - 100);
 
 
-            //if (sdtmTable.Columns.Count > 50)
-            //    sdtmTable.Columns.RemoveRange(10, sdtmTable.Columns.Count - 10);
+        //    //if (sdtmTable.Columns.Count > 50)
+        //    //    sdtmTable.Columns.RemoveRange(10, sdtmTable.Columns.Count - 10);
 
 
-            var ht = new Hashtable();
-            var headerList = new List<Dictionary<string, string>>();
-            foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
-            {
-                var header = new Dictionary<string, string>
-                {
-                    {"data", col.ColumnName.ToLower()},
-                    {"title", col.ColumnName}
-                };
-                headerList.Add(header);
-            }
-            ht.Add("header", headerList);
-            ht.Add("data", sdtmTable.Rows);
+        //    var ht = new Hashtable();
+        //    var headerList = new List<Dictionary<string, string>>();
+        //    foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
+        //    {
+        //        var header = new Dictionary<string, string>
+        //        {
+        //            {"data", col.ColumnName.ToLower()},
+        //            {"title", col.ColumnName}
+        //        };
+        //        headerList.Add(header);
+        //    }
+        //    ht.Add("header", headerList);
+        //    ht.Add("data", sdtmTable.Rows);
 
-            return ht;
-        }
+        //    return ht;
+        //}
 
 
         //public void tempmethod()
@@ -597,7 +583,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public string GetFullPath(string projectId, string subdir)
         {
-            return Path.Combine(uploadedFilesDirectory, "P-" + projectId, subdir);
+            return Path.Combine(_uploadFileDirectory, "P-" + projectId, subdir);
         }
     }
 }

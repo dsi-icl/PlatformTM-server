@@ -19,18 +19,13 @@ namespace eTRIKS.Commons.Service.Services
     {
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly QueryService _queryService;
-
         private readonly IServiceUoW _dataServiceUnit;
-        private string uploadedFilesDirectory;
-        private FileStorageSettings ConfigSettings { get; set; }
 
-        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings)
+        public ExportService(IServiceUoW uoW, QueryService queryService)
         {
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _queryService = queryService;
             _dataServiceUnit = uoW;
-            ConfigSettings = settings.Value; 
-            uploadedFilesDirectory = ConfigSettings.FileDirectory;
         }
 
         public bool IsFileReady(string datasetId)
@@ -43,26 +38,16 @@ namespace eTRIKS.Commons.Service.Services
         public FileStream DownloadDataset(string datasetId, out string filename)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            FileStream fileStream = null;
             filename = dataset.Name;
-            try
-            {
-                if (dataset.FileIsReady)
-                {
-                    var filePath = dataset.ExportFileURI;
-                    fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-                }
 
-             return fileStream;
-           }
-            catch (Exception)
-            {
+            if (!dataset.FileIsReady) return null;
+            var filePath = dataset.ExportFileURI;
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
 
-                throw;
-            }
+            return fileStream;
          }
         
-        public async Task<bool> ExportDataset(string datasetId)
+        public async Task<DataTable> ExportDataset(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             var exportData = _queryService.GetQueryResult(dataset.QueryId);
@@ -78,30 +63,30 @@ namespace eTRIKS.Commons.Service.Services
                 dt = ExportSampleTable(exportData, dataset);
             }
             if (dataset.Type == "ASSAY")
-                {
-                     dt = await ExportAssayTable(exportData, dataset);
-
-                }
-            dt.TableName = dataset.Name;
-            
-           // 2. convert datatable to string
-            string file = DatatableToString(dt);
-
-            // 3. write the string as a file in the server
-            string fileDir = uploadedFilesDirectory + "SAVED\\" + dataset.Name + " for query ID " + dataset.QueryId;
-            if (!File.Exists(fileDir))
             {
-                File.WriteAllText(fileDir, file);
-            }
+                dt = await ExportAssayTable(exportData, dataset);
 
-            dataset.FileIsReady = true;
-            dataset.ExportFileURI = fileDir;
-            _userDatasetRepository.Update(dataset);
-            _dataServiceUnit.Save();
-            return true;
+            }
+            dt.TableName = dataset.Name;
+            return dt;
         }
 
-        public async Task<DataTable> ExportAssayTable(DataExportObject exportData, UserDataset dataset)
+        public void SetDatasetReadyForDownload(string datasetId, string filePath)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            dataset.FileIsReady = true;
+            dataset.ExportFileURI = filePath;
+            _userDatasetRepository.Update(dataset);
+            _dataServiceUnit.Save();
+        }
+
+        public string GetDownloadPath(string datasetId)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            return Path.Combine("P-" + dataset.ProjectId, "Query ID " + dataset.QueryId);
+        }
+
+        private async Task<DataTable> ExportAssayTable(DataExportObject exportData, UserDataset dataset)
         {
 
             return await Task.Factory.StartNew(() =>
@@ -139,7 +124,7 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        public DataTable ExportSampleTable(DataExportObject exportData, UserDataset dataset)
+        private DataTable ExportSampleTable(DataExportObject exportData, UserDataset dataset)
         {
             var datatable = new DataTable();
             foreach (var field in dataset.Fields)
@@ -173,7 +158,7 @@ namespace eTRIKS.Commons.Service.Services
             return datatable;
         }
 
-        public DataTable ExportSubjectClinicalTable(DataExportObject exportData, UserDataset dataset)
+        private DataTable ExportSubjectClinicalTable(DataExportObject exportData, UserDataset dataset)
         {
             #region Create Table Columns
             var datatable = new DataTable();
