@@ -307,7 +307,7 @@ namespace eTRIKS.Commons.Service.Services
 
             foreach (DataRow row in dt.Rows)
             {
-                var items = row.Values.Cast<string>().Select(o => QuoteValue(o.ToString()));
+                var items = row.Values.Cast<object>().Select(o => QuoteValue(o.ToString()));
                 writer.WriteLine(string.Join(",", items));
             }
             writer.Flush();

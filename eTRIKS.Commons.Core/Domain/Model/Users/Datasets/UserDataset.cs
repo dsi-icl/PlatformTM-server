@@ -22,7 +22,8 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public int SampleCount { get; set; }
         // add the fields
         public string ExportFileURI { get; set; }
-        public bool FileIsReady { get; set; }
+        // 0 is not prepared; 1 is preparing, 2 prepared
+        public int FileIsReady { get; set; }
 
 
 

@@ -91,7 +91,8 @@ namespace eTRIKS.Commons.Service.Services
                 ProjectId = query.ProjectId,
                 Type = "PHENO",
                 Name = "Subject Metadata",
-                QueryId = query.Id
+                QueryId = query.Id,
+                FileIsReady = 0
             };
 
             //ADD SUBJECTID &  STUDYID DATAFIELD
@@ -149,7 +150,8 @@ namespace eTRIKS.Commons.Service.Services
                 ProjectId = projectId,
                 Type = "BIOSAMPLES",
                 Name = assayPanelQuery.AssayName + " Sample Metadata",
-                QueryId = combinedQueryId
+                QueryId = combinedQueryId,
+                FileIsReady = 0
             };
             //CREATE DATAFIELDS
 
@@ -188,7 +190,8 @@ namespace eTRIKS.Commons.Service.Services
                 ProjectId = projectId,
                 Type = "ASSAY",
                 Name = assayPanelQuery.AssayName + " Assay",
-                QueryId = combinedQueryId
+                QueryId = combinedQueryId,
+                FileIsReady = 0
             };
 
 

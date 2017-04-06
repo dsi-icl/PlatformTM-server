@@ -20,18 +20,22 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly QueryService _queryService;
         private readonly IServiceUoW _dataServiceUnit;
+        private readonly string _downloadFileDirectory;
+        private FileStorageSettings ConfigSettings { get; set; }
 
-        public ExportService(IServiceUoW uoW, QueryService queryService)
+        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings)
         {
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _queryService = queryService;
             _dataServiceUnit = uoW;
+            ConfigSettings = settings.Value;
+            _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
         }
 
-        public bool IsFileReady(string datasetId)
+        public int IsFileReady(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            bool status = dataset.FileIsReady;
+            int status = dataset.FileIsReady;
             return status;
         }
         
@@ -40,13 +44,13 @@ namespace eTRIKS.Commons.Service.Services
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             filename = dataset.Name;
 
-            if (!dataset.FileIsReady) return null;
+            if (dataset.FileIsReady!=2) return null;
             var filePath = dataset.ExportFileURI;
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-
             return fileStream;
          }
-        
+
+
         public async Task<DataTable> ExportDataset(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
@@ -62,68 +66,87 @@ namespace eTRIKS.Commons.Service.Services
             {
                 dt = ExportSampleTable(exportData, dataset);
             }
-            if (dataset.Type == "ASSAY")
-            {
-                dt = await ExportAssayTable(exportData, dataset);
-
-            }
             dt.TableName = dataset.Name;
             return dt;
         }
+        
 
-        public void SetDatasetReadyForDownload(string datasetId, string filePath)
+        public void SetDatasetStatus(string datasetId, string filePath, int status)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            dataset.FileIsReady = true;
+            dataset.FileIsReady = status;
             dataset.ExportFileURI = filePath;
             _userDatasetRepository.Update(dataset);
             _dataServiceUnit.Save();
         }
-
+         
         public string GetDownloadPath(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             return Path.Combine("P-" + dataset.ProjectId, "Query ID " + dataset.QueryId);
         }
 
-        private async Task<DataTable> ExportAssayTable(DataExportObject exportData, UserDataset dataset)
+        //temp added
+        public UserDataset GetDataset(string datasetId)
         {
-
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            return dataset;
+        }
+        
+        public async Task<FileInfo> ExportDatasetForAssay(UserDataset dataset, string filePath)
+        {
+            var exportData = _queryService.GetQueryResult(dataset.QueryId);
+            var fileInfo = await ExportAssayTable(exportData, dataset, filePath);
+            return fileInfo; 
+        }
+        
+        private async Task <FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        {
             return await Task.Factory.StartNew(() =>
             {
-                var projectId = dataset.ProjectId;
+                var projectId = dataset.ProjectId;  
                 var activityId = exportData.Samples.First().AssayId;
-
-                var datatable = new DataTable();
-                datatable.Columns.Add("features");
-
-                List<string> sampleIds = new List<string>();
-                foreach (var biosample in exportData.Samples)
-                {
-                    sampleIds.Add(biosample.BiosampleStudyId);
-                    datatable.Columns.Add(biosample.BiosampleStudyId.ToLower());
-
-                }
+                
+                // GET sampleIds, observations, and features
+                var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
                 var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
-                var features = assayObservations.Select(a => a.FeatureName).Distinct().ToList();
-                foreach (var feature in features)
+                var orderObservations = assayObservations.OrderBy(o => o.FeatureName)/*.ThenBy(f => f.SubjectOfObservationName)*/;
+                
+                var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
+                var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
+
+                // create directory and write the data to file
+                var dirPath = Path.Combine(_downloadFileDirectory, path);
+                var di = Directory.CreateDirectory(dirPath);
+                if (!di.Exists) return null;
+                var filePath = Path.Combine(dirPath, dataset.Name + ".csv");
+                StreamWriter writer = File.CreateText(filePath);
+                
+                // First write the header (which are samples' Ids)
+                writer.WriteLine("features" + "," + string.Join(",", sampleIds));
+                
+                var sb = new StringBuilder();
+                var i = 0;
+                var j = 0;
+               
+                foreach (var value in values)
                 {
-                    var row = datatable.NewRow();
-                    row["features"] = feature;
-                    foreach (var biosample in exportData.Samples)
+                    i++;
+                    sb.Append(value + ",");
+                    if (i == exportData.Samples.Count)
                     {
-                        var obs =
-                            assayObservations.Find(
-                                o => o.SubjectOfObservationId == biosample.BiosampleStudyId && o.FeatureName == feature);
-                        row[biosample.BiosampleStudyId.ToLower()] = ((NumericalValue) obs.ObservedValue).Value;
+                        writer.WriteLine(features[j] + "," + sb);
+                        sb.Clear();
+                        i = 0;
+                        j++;
                     }
-                 datatable.Rows.Add(row);
                 }
-                return datatable;
+                writer.Flush();
+                writer.Dispose();
+                return new FileInfo(filePath);
             });
-
         }
-
+        
         private DataTable ExportSampleTable(DataExportObject exportData, UserDataset dataset)
         {
             var datatable = new DataTable();
