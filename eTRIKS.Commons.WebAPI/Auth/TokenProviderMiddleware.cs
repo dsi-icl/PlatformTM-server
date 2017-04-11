@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace eTRIKS.Commons.WebAPI.Auth
 {
@@ -91,8 +92,8 @@ namespace eTRIKS.Commons.WebAPI.Auth
             };
             // Serialize and return the response
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
-           // return new JsonResult(response);
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver()}));
+            //return new OkObjectResult(response);
         }
     }
 }
