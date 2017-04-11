@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
@@ -26,7 +27,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("projects/{projectId}")]
         public List<UserDatasetDTO> GetUserDatasets(int projectId)
         {
-            var userId = User.GetUserId();
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             if (!User.Identity.IsAuthenticated)
                 return null;
             return _userDataService.GetUserDatasets(projectId, userId);
@@ -36,7 +37,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("{datasetId}", Name = "GetUserDatasetById")]
         public  UserDatasetDTO GetUserDataset(string datasetId)
         {
-            var userId = User.GetUserId();
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             return !User.Identity.IsAuthenticated ? null : _userDataService.GetUserDataset(datasetId, userId);
         }
 
@@ -44,25 +45,15 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         public IActionResult AddUserDataset([FromBody] UserDatasetDTO dto)
         {
             UserDatasetDTO addedUserDataset = null;
-
-            var userId = User.GetUserId();
             if (!User.Identity.IsAuthenticated)
                 return null;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             addedUserDataset = _userDataService.AddUserDataset(dto,userId);
 
             if (addedUserDataset != null)
-            {
-                //var response = Request.CreateResponse<UserDatasetDTO>(HttpStatusCode.Created, addedUserDataset);
-                //string uri = Url.Link("GetUserDatasetById", new { datasetId = addedUserDataset.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetUserDatasetById", new { datasetId = addedUserDataset.Id }, addedUserDataset);
-            }
-            else
-            {
-                //var response = Request.CreateResponse(HttpStatusCode.Conflict);
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
         }
 
         [HttpPut("{datasetId}")]
@@ -70,9 +61,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             try
             {
-                var userId = User.GetUserId();
                 if (!User.Identity.IsAuthenticated)
                     return null;
+
+                var userId = User.FindFirst(ClaimTypes.UserData).Value;
                 _userDataService.UpdateUserDataset(dto,userId);
                 return new StatusCodeResult(StatusCodes.Status202Accepted);
             }

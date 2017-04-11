@@ -159,13 +159,13 @@ namespace eTRIKS.Commons.Service.Services
 
         public async Task<ClinicalExplorerDTO> GetClinicalObsTree(int projectId)
         {
-            //var cachedTree = _cacheService.GetClinicalTreeDTO<ClinicalExplorerDTO>(c=>c.ProjectId == projectId);
+           // _cacheRepository.RemoveFromCache(c=>c.ProjectId == projectId);
             var cachedTree = _cacheRepository.GetFromCache(c => c.ProjectId == projectId);
             if (cachedTree != null)
                 return cachedTree;
 
             //TODO: will replace Observation here with ObservationDescriptor
-            List<Observation> studyObservations = _observationRepository.FindAll(
+            var studyObservations = _observationRepository.FindAll(
                     o => o.ProjectId == projectId,
                     new List<string>()
                     {
@@ -510,7 +510,7 @@ namespace eTRIKS.Commons.Service.Services
                         string val;
                         if(allQualifiers.TryGetValue(obsreq.QO2, out val))
                             row[obsreq.Name] = val ;
-                        else row[obsreq.Name] = "-";
+                        else row[obsreq.Name] = "";
                     }
 
 
@@ -684,6 +684,7 @@ namespace eTRIKS.Commons.Service.Services
                 QO2_label = variableDefinition.Label,
                 IsEvent = obsObject.Class.ToUpper() == "EVENTS",
                 IsFinding = obsObject.Class.ToUpper() == "FINDINGS",
+                IsClinicalObservations = true,
                 IsMultipleObservations = IsMultiple,
                 IsOntologyEntry = IsOntologyEntry,
                 ProjectId = obsObject.ProjectId.Value,

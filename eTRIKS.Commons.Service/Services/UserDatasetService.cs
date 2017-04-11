@@ -30,7 +30,7 @@ namespace eTRIKS.Commons.Service.Services
             //var project = _projectRepository.FindSingle(p => p.Id == projectId);
             List<UserDataset> datasets = _userDatasetRepository.FindAll(
                 d => d.OwnerId == UserId.ToString() && d.ProjectId == projectId).ToList();
-            return datasets.Select(WriteDTO).ToList();
+            return datasets.OrderBy(d=>d.ProjectId).ThenBy(d=>d.QueryId).Select(WriteDTO).ToList();
         }
 
         public UserDatasetDTO GetUserDataset(string datasetId, string userId)
@@ -118,6 +118,9 @@ namespace eTRIKS.Commons.Service.Services
                 OwnerId = dataset.OwnerId,
                 ProjectId = dataset.ProjectId,
                 Type = dataset.Type,
+                SubjectCount = dataset.SubjectCount,
+                SampleCount = dataset.SampleCount,
+                FileStatus = dataset.FileStatus,
                 Filters = dataset.Filters.Select(f=> new DataFilterDTO()
                 {
                     

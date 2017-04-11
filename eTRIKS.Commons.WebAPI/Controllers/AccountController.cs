@@ -1,4 +1,5 @@
-﻿using eTRIKS.Commons.Core.Application.AccountManagement;
+﻿using System.Security.Claims;
+using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using Microsoft.AspNetCore.Identity;
@@ -46,6 +47,18 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return GetErrorResult(result);
             
         }
+
+        [HttpGet("currentuser")]
+        public ActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            if (User.Identity.IsAuthenticated)
+            {
+                return new OkObjectResult(_userAccountService.GetUserInfo(userId));
+            }
+            return new UnauthorizedResult();
+        }
+
         private IActionResult GetErrorResult(IdentityResult result)
         {
             if (!result.Succeeded)

@@ -92,7 +92,7 @@ namespace eTRIKS.Commons.Service.Services
                 Type = "PHENO",
                 Name = "Subject Metadata",
                 QueryId = query.Id,
-                FileIsReady = 0
+                FileStatus = 0
             };
 
             //ADD SUBJECTID &  STUDYID DATAFIELD
@@ -151,7 +151,7 @@ namespace eTRIKS.Commons.Service.Services
                 Type = "BIOSAMPLES",
                 Name = assayPanelQuery.AssayName + " Sample Metadata",
                 QueryId = combinedQueryId,
-                FileIsReady = 0
+                FileStatus = 0
             };
             //CREATE DATAFIELDS
 
@@ -191,7 +191,7 @@ namespace eTRIKS.Commons.Service.Services
                 Type = "ASSAY",
                 Name = assayPanelQuery.AssayName + " Assay",
                 QueryId = combinedQueryId,
-                FileIsReady = 0
+                FileStatus = 0
             };
 
 

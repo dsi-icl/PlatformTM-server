@@ -135,6 +135,7 @@ namespace eTRIKS.Commons.DataAccess
         }
 
         public override void Dispose()
+
         {
             Dispose(true);
             GC.SuppressFinalize(this);

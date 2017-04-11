@@ -28,7 +28,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet]
         public IEnumerable<ProjectDTO> Get()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             return !User.Identity.IsAuthenticated ? null : _projectService.GetProjects(userId);
         }
 
@@ -63,12 +63,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             ProjectDTO addedProject = null;
 
-            var userId = User.GetUserId();
+           
             if (!User.Identity.IsAuthenticated)
                 return Unauthorized();
 
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             addedProject = _projectService.AddProject(projectDTO,userId);
-
 
             if (addedProject != null)
                 return new CreatedAtRouteResult("GetProjectByAcc", new { projectId = addedProject.Id }, addedProject);

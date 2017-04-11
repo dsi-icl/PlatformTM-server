@@ -1,6 +1,7 @@
 ﻿using eTRIKS.Commons.Service.DTOs;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -62,43 +63,22 @@ namespace eTRIKS.Commons.WebAPI.Auth
             {
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("Invalid username or password.");
-                return;   
+                //return new UnauthorizedResult();    
             }
             var identity = await _accountService.GetClaimsPrincipleForUser(appUser);
-            //var result = await _accountService.SignIn(userDTO);
-            // Obviously, at this point you need to validate the username and password against whatever system you wish.
-            //if (result.Succeeded)
-            //{
-            //    DateTime expires = DateTime.UtcNow.AddMinutes(2);
-            //    var token = GenerateToken(userDTO, expires);
-            //    return new { authenticated = true, entityId = 1, token = token, tokenExpires = expires };
-            //}
-            //return new { authenticated = false };
-            //Create ClaimsIdentity
-            //ClaimsIdentity identity = new ClaimsIdentity(context.Options.AuthenticationType);
-            //identity.AddClaim(new Claim(ClaimTypes.Name, context.UserName));
-            //identity.AddClaim(new Claim(ClaimTypes.Role, "User"));
-            //identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, appUser.Account.UserId.ToString()));
-            ////identity.AddClaim(new Claim("PSK", appUser.Account.PSK));
-
-            //ClaimsIdentity identity = new ClaimsIdentity(
-            //    new GenericIdentity(userDTO.Username, "TokenAuth"),
-            //    new[] {
-            //        new System.Security.Claims.Claim("ID", userDTO.Username)
-            //    }
-            //);
+            var userData = _accountService.GetUserInfo(identity.FindFirstValue(ClaimTypes.NameIdentifier)).Result;
            
             var now = DateTime.UtcNow;
+            
             //Generate Token
             var jwtHandler = new JwtSecurityTokenHandler();
             var securityToken = jwtHandler.CreateToken(new SecurityTokenDescriptor
             {
-                
                 Issuer = _options.Issuer,
                 Audience = _options.Audience,
                 SigningCredentials = _options.SigningCredentials,
                 Subject = (ClaimsIdentity)identity.Identity,
-                NotBefore = now,
+                NotBefore = now,   
                 Expires = now.Add(_options.ExpiresSpan)
             });
             var encodedToken = jwtHandler.WriteToken(securityToken);
@@ -106,11 +86,13 @@ namespace eTRIKS.Commons.WebAPI.Auth
             var response = new
             {
                 access_token = encodedToken,
+                user = userData,
                 expires_in = (int)_options.ExpiresSpan.TotalSeconds
             };
             // Serialize and return the response
             context.Response.ContentType = "application/json";
             await context.Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented }));
+           // return new JsonResult(response);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("{cartId}")]
         public IActionResult CheckoutDatasets(string cartId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             var datasets = _checkoutService.CreateCheckoutDatasets(cartId,userId);
             if (datasets != null)
                 return Ok(datasets);

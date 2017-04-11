@@ -82,7 +82,7 @@ namespace eTRIKS.Commons.Service.Services
             List<string> feat = new List<string>(new string[] { "ID.1.4", "ID.1.5", "ID.1.6", "ID.1.7" });
 
 
-            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName)/* && feat.Contains(s.FeatureName)*/).ToList();
+            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName) /*&& feat.Contains(s.FeatureName)*/).ToList();
             return assayObservations;
         }
 

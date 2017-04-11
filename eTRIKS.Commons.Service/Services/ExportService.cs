@@ -35,7 +35,7 @@ namespace eTRIKS.Commons.Service.Services
         public int IsFileReady(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            int status = dataset.FileIsReady;
+            int status = dataset.FileStatus;
             return status;
         }
         
@@ -44,7 +44,7 @@ namespace eTRIKS.Commons.Service.Services
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             filename = dataset.Name;
 
-            if (dataset.FileIsReady!=2) return null;
+            if (dataset.FileStatus!=2) return null;
             var filePath = dataset.ExportFileURI;
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             return fileStream;
@@ -74,7 +74,7 @@ namespace eTRIKS.Commons.Service.Services
         public void SetDatasetStatus(string datasetId, string filePath, int status)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            dataset.FileIsReady = status;
+            dataset.FileStatus = status;
             dataset.ExportFileURI = filePath;
             _userDatasetRepository.Update(dataset);
             _dataServiceUnit.Save();
