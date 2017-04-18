@@ -51,7 +51,7 @@ namespace eTRIKS.Commons.Service.Services
          }
 
 
-        public async Task<DataTable> ExportDataset(string datasetId)
+        public  DataTable ExportDataset(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             var exportData = _queryService.GetQueryResult(dataset.QueryId);

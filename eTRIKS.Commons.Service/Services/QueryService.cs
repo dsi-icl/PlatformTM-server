@@ -94,6 +94,7 @@ namespace eTRIKS.Commons.Service.Services
             cQuery.UserId = Guid.Parse(userId);
             cQuery.ProjectId = projectId;
             cQuery.Id = Guid.NewGuid();
+            cQuery.IsSavedByUser = cdto.IsSavedByUser;
 
             var requests = cdto.ObsRequests.Union(cdto.SubjCharRequests);
 
@@ -161,10 +162,11 @@ namespace eTRIKS.Commons.Service.Services
             return _combinedQueryRepository.Insert(cQuery);
         }
 
-        public List<CombinedQueryDTO> GetSavedQueries(int projectId, string userId)
+        public List<CombinedQueryDTO> GetSavedQueries(string userId)
         {
-            var userQueries = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) && d.ProjectId == projectId).ToList();
-            var dtoQueries = userQueries.Select(_getcQueryDTO).ToList();
+            var userQueries = _combinedQueryRepository.FindAll(
+                d => d.UserId == Guid.Parse(userId) && d.IsSavedByUser).ToList();
+            var dtoQueries = userQueries.Select(GetcQueryDTO).ToList();
             return dtoQueries;
         }
 
@@ -174,7 +176,7 @@ namespace eTRIKS.Commons.Service.Services
             if (queryId == "new")
                 return _getNewCqueryForProject(projectId);
             var query = _combinedQueryRepository.FindSingle(c => c.Id == Guid.Parse(queryId));
-            var queryDto = _getcQueryDTO(query);
+            var queryDto = GetcQueryDTO(query);
             if (queryDto == null) throw new ArgumentNullException(nameof(queryDto));
             return queryDto.UserId == userId ? queryDto : null;
         }
@@ -182,8 +184,8 @@ namespace eTRIKS.Commons.Service.Services
         private CombinedQueryDTO _getNewCqueryForProject(int projectId)
         {
             var dto = new CombinedQueryDTO();
-            //dto.Name = "New Query";
             var assays = _assayRepository.FindAll(a => a.ProjectId == projectId).ToList();
+            dto.IsSavedByUser = false;
 
             //if (assays.Count == 0)
             //    return null;
@@ -196,7 +198,6 @@ namespace eTRIKS.Commons.Service.Services
                 };
                 dto.AssayPanelRequests.Add(apanel.AssayId,apanel);
             }
-            
             return dto;
         }
 
@@ -411,7 +412,7 @@ namespace eTRIKS.Commons.Service.Services
             queryResult.Observations = observations;
         }
 
-        private CombinedQueryDTO _getcQueryDTO(CombinedQuery cQuery)
+        public static CombinedQueryDTO GetcQueryDTO(CombinedQuery cQuery)
         {
             var dto = new CombinedQueryDTO();
             dto.Id = cQuery.Id.ToString();
@@ -487,7 +488,7 @@ namespace eTRIKS.Commons.Service.Services
             return query;
         }
 
-        private ObservationRequestDTO GetDTOforQuery(Query query)
+        private static ObservationRequestDTO GetDTOforQuery(Query query)
         {
             int o3id;
             var qdto = new ObservationRequestDTO()
@@ -523,7 +524,7 @@ namespace eTRIKS.Commons.Service.Services
             return qdto;
         }
 
-        private AssayPanelDTO GetDTOforAssayPanelQuery(AssayPanelQuery apQuery)
+        private static AssayPanelDTO GetDTOforAssayPanelQuery(AssayPanelQuery apQuery)
         {
             var apDTO = new AssayPanelDTO()
             {

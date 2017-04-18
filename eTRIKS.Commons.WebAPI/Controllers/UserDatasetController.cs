@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.Services;
 using eTRIKS.Commons.Service.Services.UserManagement;
@@ -12,7 +13,7 @@ using eTRIKS.Commons.WebAPI.Extensions;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("mydatasets")]
+    [Route("datasets")]
     public class UserDatasetController : Controller
     {
         private readonly UserDatasetService _userDataService;
@@ -24,14 +25,14 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _accountService = accountService;
         }
 
-        [HttpGet("projects/{projectId}")]
-        public List<UserDatasetDTO> GetUserDatasets(int projectId)
+        [HttpGet("user")]
+        public IActionResult GetUserDatasets()
         {
             var userId = User.FindFirst(ClaimTypes.UserData).Value;
             if (!User.Identity.IsAuthenticated)
                 return null;
-            return _userDataService.GetUserDatasets(projectId, userId);
-
+            var datasets =  _userDataService.GetUserDatasets(userId);
+            return new OkObjectResult(datasets);
         }
 
         [HttpGet("{datasetId}", Name = "GetUserDatasetById")]
@@ -57,7 +58,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpPut("{datasetId}")]
-        public IActionResult UpdateUserDataset(Guid datasetId, [FromBody] UserDatasetDTO dto)
+        public IActionResult UpdateUserDataset(Guid datasetId, [FromBody] UserDataset dataset)
         {
             try
             {
@@ -65,12 +66,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
                     return null;
 
                 var userId = User.FindFirst(ClaimTypes.UserData).Value;
-                _userDataService.UpdateUserDataset(dto,userId);
-                return new StatusCodeResult(StatusCodes.Status202Accepted);
+                _userDataService.UpdateUserDataset(dataset,userId);
+                return new AcceptedResult();
             }
             catch (Exception e)
             {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
+                return new BadRequestObjectResult(e.Message);
             }
         }
     }

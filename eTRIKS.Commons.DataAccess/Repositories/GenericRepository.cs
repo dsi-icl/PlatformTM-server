@@ -18,9 +18,7 @@ namespace eTRIKS.Commons.DataAccess.Repositories
         {
             DataContext = dataContext;
             //DataContext.Configuration.ProxyCreationEnabled = false;
-            Entities = DataContext.Set<TEntity>();
-            
-            
+            Entities = DataContext.Set<TEntity>(); 
         }
         public GenericRepository(DbSet<TEntity> entities)
         {

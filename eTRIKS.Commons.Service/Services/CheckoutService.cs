@@ -49,7 +49,7 @@ namespace eTRIKS.Commons.Service.Services
 
 
             //Create Pheno dataset for all selected clinical and subject observations
-            var phenoDataset = CreateSubjectClinicalDataset(query, userId);
+            var phenoDataset = CreateOrFindSubjectClinicalDataset(query, userId);
 
             var checkoutDatasets = new List<UserDataset> {phenoDataset};
 
@@ -63,7 +63,7 @@ namespace eTRIKS.Commons.Service.Services
                     ? _queryService.CreateSingleAssayCombinedQuery(query, assayPanel) 
                     : query;
                
-                var assaySampleDataset = CreateAssaySampleDataset(assayPanel, singleAssayCombinedQuery.Id, userId, projectId);
+                var assaySampleDataset = CreateOrFindAssaySampleDataset(assayPanel, singleAssayCombinedQuery.Id, userId, projectId);
                 checkoutDatasets.Add(assaySampleDataset);
             }
             
@@ -75,16 +75,24 @@ namespace eTRIKS.Commons.Service.Services
                     : query;
 
 
-                var assayPanelDataset = CreateAssayPanelDataset(AssayPanel, singleAssayCombinedQuery.Id, userId, projectId);
+                var assayPanelDataset = CreateOrFindAssayPanelDataset(AssayPanel, singleAssayCombinedQuery.Id, userId, projectId);
                 checkoutDatasets.Add(assayPanelDataset);
             }
 
             return checkoutDatasets;
         }
 
-        private UserDataset CreateSubjectClinicalDataset(CombinedQuery query, string userId)
+        private UserDataset CreateOrFindSubjectClinicalDataset(CombinedQuery query, string userId)
         {
-            var phenoDataset = new UserDataset
+            var phenoDataset = _userDatasetRepository.FindSingle(
+                d => d.ProjectId == query.ProjectId
+                     && d.QueryId == query.Id
+                     && d.Type == "PHENO"
+                     && d.OwnerId == userId);
+            if (phenoDataset != null)
+                return phenoDataset;
+            
+            phenoDataset = new UserDataset
             {
                 Id = Guid.NewGuid(),
                 OwnerId = userId,
@@ -92,7 +100,7 @@ namespace eTRIKS.Commons.Service.Services
                 Type = "PHENO",
                 Name = "Subject Metadata",
                 QueryId = query.Id,
-                FileStatus = 0
+                FileStatus = 0,
             };
 
             //ADD SUBJECTID &  STUDYID DATAFIELD
@@ -140,10 +148,20 @@ namespace eTRIKS.Commons.Service.Services
             return phenoDataset;
         }
 
-        private UserDataset CreateAssaySampleDataset(AssayPanelQuery assayPanelQuery, Guid combinedQueryId, string userId, int projectId)
+        private UserDataset CreateOrFindAssaySampleDataset(AssayPanelQuery assayPanelQuery, Guid combinedQueryId, string userId, int projectId)
         {
+            var assaySampleDataset = _userDatasetRepository.FindSingle(
+                d => d.ProjectId == projectId
+                     && d.QueryId == combinedQueryId
+                     && d.Type == "BIOSAMPLES"
+                     && d.OwnerId == userId);
+            //TODO:should add AssayId???
+
+            if (assaySampleDataset != null)
+                return assaySampleDataset;
+
             // This is for the subject to sample mapping
-            var assaySampleDataset = new UserDataset
+            assaySampleDataset = new UserDataset
             {
                 Id = Guid.NewGuid(),
                 OwnerId = userId,
@@ -151,6 +169,7 @@ namespace eTRIKS.Commons.Service.Services
                 Type = "BIOSAMPLES",
                 Name = assayPanelQuery.AssayName + " Sample Metadata",
                 QueryId = combinedQueryId,
+                
                 FileStatus = 0
             };
             //CREATE DATAFIELDS
@@ -180,10 +199,19 @@ namespace eTRIKS.Commons.Service.Services
 
         }
 
-        private UserDataset CreateAssayPanelDataset(AssayPanelQuery assayPanelQuery, Guid combinedQueryId, string userId, int projectId)
+        private UserDataset CreateOrFindAssayPanelDataset(AssayPanelQuery assayPanelQuery, Guid combinedQueryId, string userId, int projectId)
         {
-            // TODO for HD datasets
-            var assayPanelDataset = new UserDataset
+            var assayPanelDataset = _userDatasetRepository.FindSingle(
+                d => d.ProjectId == projectId
+                     && d.QueryId == combinedQueryId
+                     && d.Type == "ASSAY"
+                     && d.OwnerId == userId);
+            //TODO:should add AssayId???
+
+            if (assayPanelDataset != null)
+                return assayPanelDataset;
+
+            assayPanelDataset = new UserDataset
             {
                 Id = Guid.NewGuid(),
                 OwnerId = userId,
@@ -193,7 +221,6 @@ namespace eTRIKS.Commons.Service.Services
                 QueryId = combinedQueryId,
                 FileStatus = 0
             };
-
 
             var exportData = _queryService.GetQueryResult(combinedQueryId);
             assayPanelDataset.SubjectCount = exportData.Subjects.Count;
@@ -256,5 +283,7 @@ namespace eTRIKS.Commons.Service.Services
                 ColumnHeaderIsEditable = false
             };
         }
+
+        
     }
 }

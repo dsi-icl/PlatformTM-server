@@ -9,13 +9,14 @@ using Microsoft.AspNetCore.Http;
 using eTRIKS.Commons.WebAPI.Extensions;
 using System.Collections;
 using System.Security.Claims;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [Route("projects")]
     public class ProjectController : Controller
     {
-        private ProjectService _projectService;
+        private readonly ProjectService _projectService;
         private readonly UserAccountService _accountService;
 
 
@@ -49,7 +50,27 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _projectService.GetProjectActivities(projectId);
         }
-        
+
+        [HttpGet("{projectId}/datasets")]
+        public List<UserDatasetDTO> GetUserProjectDatasets(int projectId)
+        {
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            return _projectService.GetProjectSavedDatasets(projectId, userId);
+
+        }
+
+        [HttpGet("{projectId}/queries")]
+        public List<CombinedQueryDTO> GetUserSavedQueries(int projectId)
+        {
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            return _projectService.GetProjectSavedQueries(projectId, userId);
+
+        }
+
         [HttpGet]
         [Route("{projectId}/remove")]
         public void DeleteProject(int projectId) 
@@ -83,23 +104,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             try
             {
                 _projectService.UpdateProject(projectDTO, projectId);
-                //var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Accepted, projectDTO);
-                //string uri = Url.Link("GetProjectById", new { projectId = projectDTO.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = projectDTO.Id }, projectDTO);
 
             }
             catch (Exception e)
             {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
+                return new BadRequestObjectResult(e.Message);
             }
         }
-
-        //[HttpGet("{projectId}/assays")]
-        //public List<AssayDTO> GetAssays(int projectId)
-        //{
-        //    return _projectService.GetProjectAssays(projectId);
-        //}
     }
 }

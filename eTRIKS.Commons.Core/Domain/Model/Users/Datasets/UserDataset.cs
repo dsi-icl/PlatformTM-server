@@ -20,11 +20,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public Guid QueryId { get; set; }
         public int SubjectCount { get; set; }
         public int SampleCount { get; set; }
-        // add the fields
         public string ExportFileURI { get; set; }
         // 0 is not prepared; 1 is preparing, 2 prepared
         public int FileStatus { get; set; }
-
+        public bool IsSaved { get; set; }
 
 
 

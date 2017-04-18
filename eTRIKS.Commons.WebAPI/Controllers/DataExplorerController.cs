@@ -20,11 +20,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     {
         private readonly DataExplorerService _explorerService;
         private readonly QueryService _queryService;
+        private readonly ProjectService _projectService;
 
-        public DataExplorerController(DataExplorerService explorerService, QueryService queryService)
+        public DataExplorerController(DataExplorerService explorerService, QueryService queryService, ProjectService projectService)
         {
             _explorerService = explorerService;
             _queryService = queryService;
+            _projectService = projectService;
         }
 
         [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
@@ -67,7 +69,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             var userId = User.FindFirst(ClaimTypes.UserData).Value;
             if (!User.Identity.IsAuthenticated)
                 return Unauthorized();
-            var queries = _queryService.GetSavedQueries(projectId, userId);
+            var queries = _projectService.GetProjectSavedQueries(projectId, userId);
             if (queries != null)
                 return Ok(queries);
             return NotFound();

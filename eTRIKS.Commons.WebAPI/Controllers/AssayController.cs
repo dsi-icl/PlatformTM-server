@@ -48,7 +48,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             }
             catch (Exception e)
             {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
+                return new BadRequestObjectResult(e.Message);
             }
         }
     }

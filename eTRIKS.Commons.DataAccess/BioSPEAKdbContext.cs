@@ -35,6 +35,8 @@ namespace eTRIKS.Commons.DataAccess
         private readonly Dictionary<Type, object> _cacheRepositories;
         private IUserRepository userRepository;
         private IUserAccountRepository _userAccountRepository;
+        private MongoClient _mongoClient;
+        private IMongoDatabase _mongodb;
         private bool _disposed;
 
 
@@ -42,6 +44,8 @@ namespace eTRIKS.Commons.DataAccess
             _dbsettings = settings;
             _repositories = new Dictionary<Type, object>();
             _cacheRepositories = new Dictionary<Type,object>();
+            _mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+            _mongodb = _mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
             _disposed = false;
         }
 
@@ -69,20 +73,27 @@ namespace eTRIKS.Commons.DataAccess
 
             if (typeof(TEntity).Name.Equals("SdtmRow") || typeof(TEntity) == (typeof(PlatformAnnotation)))
             {
-                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
-                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
 
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb,"Biospeak_clinical");
-                _repositories.Add(typeof(TEntity), MongoRepository);
-                return MongoRepository;
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"Biospeak_clinical");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
             }
-            if (typeof(TEntity) == typeof(UserDataset) || typeof(TEntity) == typeof(CombinedQuery))
+            if (typeof(TEntity) == typeof(UserDataset))
             {
-                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
-                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb,"userDatasets");
-                _repositories.Add(typeof(TEntity), MongoRepository);
-                return MongoRepository;
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"userDatasets");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+            if (typeof(TEntity) == typeof(CombinedQuery))
+            {
+               
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "userQueries");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
             }
             if (typeof(TEntity) == typeof(Core.Domain.Model.ObservationModel.Observation) )
             {

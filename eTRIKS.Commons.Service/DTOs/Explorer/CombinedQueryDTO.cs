@@ -10,7 +10,7 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public List<ObservationRequestDTO> ObsRequests { get; set; }
         public List<ObservationRequestDTO> SubjCharRequests { get; set; }
         public Dictionary<int,AssayPanelDTO> AssayPanelRequests { get; set; }
-        //public List<AssayPanelDTO> AssayPanelRequests { get; set; }
+        public bool IsSavedByUser { get; set; }
 
         public string UserId { get; set; }
         public CombinedQueryDTO()

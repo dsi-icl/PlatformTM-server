@@ -20,11 +20,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("datasets/{datasetId}/preview")]
-        public async Task<IActionResult> GetDataPreview(string datasetId)
+        public  IActionResult GetDataPreview(string datasetId)
         {
             try
             {
-                var dt = await _exportService.ExportDataset(datasetId);
+                var dt =  _exportService.ExportDataset(datasetId);
                 return new OkObjectResult(dt);
             }
             catch (Exception e)
@@ -47,29 +47,21 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet]
         public async void  PrepareFileForDownload2(string datasetId) // prepare the file in server
         {
-           try
+            _exportService.SetDatasetStatus(datasetId, "", 1);
+            var filePath = _exportService.GetDownloadPath(datasetId);
+            var dataset = _exportService.GetDataset(datasetId);
+
+            if (dataset.Type == "ASSAY")
             {
-                _exportService.SetDatasetStatus(datasetId, "", 1);
-                var filePath = _exportService.GetDownloadPath(datasetId);
-                var dataset = _exportService.GetDataset(datasetId);
-
-                if (dataset.Type == "ASSAY")
-                {
-                    var fileInfo = await _exportService.ExportDatasetForAssay(dataset, filePath);
-                    _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
-                }
-
-                else
-                {
-                    var dt = await _exportService.ExportDataset(datasetId);
-                    var fileInfo = _fileService.WriteDataFile(filePath, dt);  
-                    _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
-                }
+                var fileInfo = await _exportService.ExportDatasetForAssay(dataset, filePath);
+                _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
             }
 
-            catch (Exception e)
+            else
             {
-                throw;
+                var dt = _exportService.ExportDataset(datasetId);
+                var fileInfo = _fileService.WriteDataFile(filePath, dt);  
+                _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
             }
         }
 
