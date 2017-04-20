@@ -167,7 +167,7 @@ namespace eTRIKS.Commons.Service.Services
             else
             {
                 file.LastModified = fi.LastWriteTime.ToString("d") + " " + fi.LastWriteTime.ToString("t");
-                if (file.IsLoadedToDB)
+                if (file.IsLoadedToDB || file.State == "FAILED TO LOAD")
                     file.State = "UPDATED";
                 _fileRepository.Update(file);
             }
