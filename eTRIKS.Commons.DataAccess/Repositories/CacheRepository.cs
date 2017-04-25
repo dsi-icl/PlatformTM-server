@@ -29,7 +29,7 @@ namespace eTRIKS.Commons.DataAccess.Repositories
 
         public void RemoveFromCache(Expression<Func<TEntity, bool>> filter = null)
         {
-            _collection.DeleteOne(filter);
+            _collection.DeleteMany(filter);
         }
     }
 }

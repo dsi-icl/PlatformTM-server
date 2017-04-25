@@ -232,9 +232,7 @@ namespace eTRIKS.Commons.Service.Services
                     }
                 }
             }
-            _cacheRepository.Save(clinicalExplorerDTO);
             return clinicalExplorerDTO;
-
         }
 
         public List<AssayBrowserDTO> GetProjectAssays(int projectId)
