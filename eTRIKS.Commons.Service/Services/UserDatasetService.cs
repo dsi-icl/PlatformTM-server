@@ -25,12 +25,19 @@ namespace eTRIKS.Commons.Service.Services
             _projectRepository = uoW.GetRepository<Project, int>();
         }
 
-        public List<UserDatasetDTO> GetUserDatasets(int projectId, string UserId)
+        public List<UserDatasetDTO> GetUserProjectDatasets(int projectId, string UserId)
         {
             //var project = _projectRepository.FindSingle(p => p.Id == projectId);
             List<UserDataset> datasets = _userDatasetRepository.FindAll(
                 d => d.OwnerId == UserId.ToString() && d.ProjectId == projectId).ToList();
-            return datasets.Select(WriteDTO).ToList();
+            return datasets.OrderBy(d=>d.ProjectId).ThenBy(d=>d.QueryId).Select(WriteDTO).ToList();
+        }
+
+        public List<UserDatasetDTO> GetUserDatasets(string userId)
+        {
+            List<UserDataset> datasets = _userDatasetRepository.FindAll(
+                d => d.OwnerId == userId && d.IsSaved).ToList();
+            return datasets.OrderBy(d => d.ProjectId).ThenBy(d => d.QueryId).Select(WriteDTO).ToList();
         }
 
         public UserDatasetDTO GetUserDataset(string datasetId, string userId)
@@ -55,13 +62,15 @@ namespace eTRIKS.Commons.Service.Services
             return dto;
         }
 
-        public void UpdateUserDataset(UserDatasetDTO dto, string userId)
+        public void UpdateUserDataset(UserDataset dataset, string userId)
         {
             //check that the owner of this dataset is the caller
-            var dataset = ReadDTO(dto);
-            var datasetToUpdate = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(dto.Id));
-            datasetToUpdate = ReadDTO(dto, datasetToUpdate);
-            _userDatasetRepository.Update(datasetToUpdate);
+            //var dataset = ReadDTO(dto);
+            //var datasetToUpdate = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(dto.Id));
+            //datasetToUpdate = ReadDTO(dto, datasetToUpdate);
+            dataset.IsSaved = true;
+            dataset.LastModified = DateTime.Today.ToString("f");
+            _userDatasetRepository.Update(dataset);
         }
 
         private UserDataset ReadDTO(UserDatasetDTO dto, UserDataset copyInto=null)
@@ -107,7 +116,7 @@ namespace eTRIKS.Commons.Service.Services
             return ds;
         }
 
-        private UserDatasetDTO WriteDTO(UserDataset dataset)
+        public static UserDatasetDTO WriteDTO(UserDataset dataset)
         {
             return new UserDatasetDTO()
             {
@@ -118,6 +127,9 @@ namespace eTRIKS.Commons.Service.Services
                 OwnerId = dataset.OwnerId,
                 ProjectId = dataset.ProjectId,
                 Type = dataset.Type,
+                SubjectCount = dataset.SubjectCount,
+                SampleCount = dataset.SampleCount,
+                FileStatus = dataset.FileStatus,
                 Filters = dataset.Filters.Select(f=> new DataFilterDTO()
                 {
                     

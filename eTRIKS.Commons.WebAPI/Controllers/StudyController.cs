@@ -28,22 +28,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpPost]
         public IActionResult Addstudy([FromBody] StudyDTO studyDTO)
         {
-            StudyDTO addedstudy = null;
-
-            addedstudy = _studyService.Addstudy(studyDTO);
+            var addedstudy = _studyService.Addstudy(studyDTO);
 
             if (addedstudy != null)
-            {
-                //var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Created, addedstudy);
-                //string uri = Url.Link("GetstudyById", new { studyId = addedstudy.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetstudyById", new { studyId = addedstudy.Id }, studyDTO);
-            }
-            else
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+
+            return new BadRequestResult();
         }
 
         [HttpPut("{studyId}")]
@@ -52,16 +42,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             try
             {
                 _studyService.Updatestudy(studyDTO, studyId);
-                //var response = Request.CreateResponse<StudyDTO>(HttpStatusCode.Accepted, studyDTO);
-                //string uri = Url.Link("GetstudyById", new { studyId = studyDTO.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetstudyById", new { studyId = studyDTO.Id }, studyDTO);
-
             }
             catch (Exception e)
             {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
+                return new BadRequestObjectResult(e.Message);
             }
         }
 

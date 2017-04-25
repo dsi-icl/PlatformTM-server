@@ -15,13 +15,11 @@ namespace eTRIKS.Commons.Service.Services
 
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<DatasetTemplate, string> _templateRepository;
-        private readonly TemplateRepository _tempRepository;
 
         public TemplateService(IServiceUoW uoW)
         {
             _dataServiceUnit = uoW;
             _templateRepository = uoW.GetRepository<DatasetTemplate, string>();
-            //_tempRepository = new TemplateRepository(_templateRepository);
         }
 
 

@@ -220,7 +220,6 @@ namespace eTRIKS.Commons.DataAccess.Repositories
         {
             var filter = new BsonDocument("_id", Guid.Parse(entity.Id.ToString()));
             var result = collection.ReplaceOne(filter, entity);
-            //throw new NotImplementedException();
             return entity;
         }
 
@@ -228,7 +227,11 @@ namespace eTRIKS.Commons.DataAccess.Repositories
 
         public Task<int> UpdateAsync(TEntity entity)
         {
+            //var filter = new BsonDocument("_id", Guid.Parse(entity.Id.ToString()));
+            //var result = await collection.ReplaceOneAsync(filter, entity);
+            //return result.MatchedCount;
             throw new NotImplementedException();
+
         }
 
         public void Remove(TEntity entity)

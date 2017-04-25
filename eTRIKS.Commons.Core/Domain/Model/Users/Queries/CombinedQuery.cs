@@ -18,6 +18,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         public Guid UserId { get; set; }
         public int ProjectId { get; set; }
         public string Name { get; set; }
+        public bool IsSavedByUser { get; set; }
 
         public CombinedQuery()
         {

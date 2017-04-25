@@ -30,7 +30,7 @@ namespace eTRIKS.Commons.WebAPI
 {
     public class Startup
     {
-        public IConfigurationRoot Configuration { get; }
+        private IConfigurationRoot Configuration { get; }
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()

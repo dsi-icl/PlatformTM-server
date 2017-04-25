@@ -11,9 +11,11 @@ using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
+using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.Service.DTOs;
-
+using eTRIKS.Commons.Service.DTOs.Explorer;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -22,8 +24,10 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-        private readonly IRepository<User, Guid> _userRepository;
+        private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
+        private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
+
 
         private IServiceUoW uoW;
 
@@ -31,9 +35,10 @@ namespace eTRIKS.Commons.Service.Services
         {
             this.uoW = uoW;
             _projectRepository = uoW.GetRepository<Project, int>();
+            _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _activityRepository = uoW.GetRepository<Activity, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-            _userRepository = uoW.GetRepository<User, Guid>();
+            _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
         }
 
@@ -193,6 +198,22 @@ namespace eTRIKS.Commons.Service.Services
                 }).ToList()
             }).ToList();
         }
-        
+
+        public List<CombinedQueryDTO> GetProjectSavedQueries(int projectId, string userId)
+        {
+            var userQueries = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) 
+            && d.ProjectId == projectId
+            && d.IsSavedByUser).ToList();
+            var dtoQueries = userQueries.Select(QueryService.GetcQueryDTO).ToList();
+            return dtoQueries;
+        }
+
+        public List<UserDatasetDTO> GetProjectSavedDatasets(int projectId, string UserId)
+        {
+            List<UserDataset> datasets = _userDatasetRepository.FindAll(
+                d => d.OwnerId == UserId.ToString() && d.ProjectId == projectId ).ToList();
+            return datasets.OrderBy(d => d.ProjectId).ThenBy(d => d.QueryId).Select(UserDatasetService.WriteDTO).ToList();
+        }
+
     }
 }

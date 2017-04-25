@@ -20,11 +20,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     {
         private readonly DataExplorerService _explorerService;
         private readonly QueryService _queryService;
+        private readonly ProjectService _projectService;
 
-        public DataExplorerController(DataExplorerService explorerService, QueryService queryService)
+        public DataExplorerController(DataExplorerService explorerService, QueryService queryService, ProjectService projectService)
         {
             _explorerService = explorerService;
             _queryService = queryService;
+            _projectService = projectService;
         }
 
         [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
@@ -39,7 +41,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpPost("projects/{projectId}/saveQuery")]
         public IActionResult SaveQuery(int projectId, [FromBody] CombinedQueryDTO cdto )
        {
-          var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+          var userId = User.FindFirst(ClaimTypes.UserData).Value;
           var savedQuery =  _queryService.SaveQuery(cdto, userId, projectId);
             
             if (savedQuery != null)
@@ -52,7 +54,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("projects/{projectId}/queries/{queryId}", Name = "GetSavedQuery")]
         public IActionResult GetSavedQuery(int projectId, string queryId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             if (!User.Identity.IsAuthenticated)
                 return Unauthorized();
             var query = _queryService.GetSavedCombinedQuery(projectId, userId,queryId);
@@ -64,10 +66,10 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("projects/{projectId}/queries/browse", Name = "")]
         public IActionResult GetSavedQueries(int projectId) 
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             if (!User.Identity.IsAuthenticated)
                 return Unauthorized();
-            var queries = _queryService.GetSavedQueries(projectId, userId);
+            var queries = _projectService.GetProjectSavedQueries(projectId, userId);
             if (queries != null)
                 return Ok(queries);
             return NotFound();

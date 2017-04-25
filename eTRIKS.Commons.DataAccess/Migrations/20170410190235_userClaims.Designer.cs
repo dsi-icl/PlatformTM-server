@@ -8,9 +8,10 @@ using eTRIKS.Commons.DataAccess;
 namespace eTRIKS.Commons.DataAccess.Migrations
 {
     [DbContext(typeof(BioSPEAKdbContext))]
-    partial class BioSPEAKdbContextModelSnapshot : ModelSnapshot
+    [Migration("20170410190235_userClaims")]
+    partial class userClaims
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");

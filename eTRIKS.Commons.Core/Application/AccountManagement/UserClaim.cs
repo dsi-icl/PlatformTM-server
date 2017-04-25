@@ -5,22 +5,17 @@ namespace eTRIKS.Commons.Core.Application.AccountManagement
 {
     public class UserClaim : Identifiable<int>
     {
-        
-
-        public virtual Guid UserId { get; set; }
-        public virtual string ClaimType { get; set; }
-        public virtual string ClaimValue { get; set; }
-
-        private UserAccount _user;
-        public virtual UserAccount User
+        public string ClaimType { get; set; }
+        public string ClaimValue { get; set; }
+        public Guid UserAccountId { get; set; }
+        private UserAccount _userAccount;
+        public UserAccount UserAccount
         {
-            get { return _user; }
+            get { return _userAccount; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException("value");
-                _user = value;
-                UserId = value.Id;
+                _userAccount = value;
+                UserAccountId = value.Id;
             }
         }
     }

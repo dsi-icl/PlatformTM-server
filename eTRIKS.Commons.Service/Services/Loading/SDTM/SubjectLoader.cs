@@ -116,6 +116,11 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 {
                     subjNewFlag = false;
                     subject.DatasetId = datasetId;
+                    subject.DatafileId = sdtmSubject.DatafileId;
+                    subject.Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name];
+                    subject.ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name];
+                    subject.Study = study;
+                    subject.StudyArm = arm;
                 }
 
                 //SET/UPDATE SUBJECT CHARACTERISTICS
