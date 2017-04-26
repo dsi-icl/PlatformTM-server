@@ -32,44 +32,6 @@ namespace eTRIKS.Commons.Service.Services
             _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
         }
 
-        public int IsFileReady(string datasetId)
-        {
-            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            int status = dataset.FileStatus;
-            return status;
-        }
-        
-        public FileStream DownloadDataset(string datasetId, out string filename)
-        {
-            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            filename = dataset.Name;
-
-            if (dataset.FileStatus!=2) return null;
-            var filePath = dataset.ExportFileURI;
-            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            return fileStream;
-         }
-
-
-        public  DataTable ExportDataset(string datasetId)
-        {
-            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            var exportData = _queryService.GetQueryResult(dataset.QueryId);
-            
-            // 1. prepare the relevant datatable
-            var dt = new DataTable();
-            if (dataset.Type == "PHENO")
-            {
-                dt = ExportSubjectClinicalTable(exportData, dataset);
-            }
-            if (dataset.Type == "BIOSAMPLES")
-            {
-                dt = ExportSampleTable(exportData, dataset);
-            }
-            dt.TableName = dataset.Name;
-            return dt;
-        }
-        
 
         public void SetDatasetStatus(string datasetId, string filePath, int status)
         {
@@ -79,39 +41,77 @@ namespace eTRIKS.Commons.Service.Services
             _userDatasetRepository.Update(dataset);
             _dataServiceUnit.Save();
         }
-         
-        public string GetDownloadPath(string datasetId)
-        {
-            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            return Path.Combine("P-" + dataset.ProjectId, "Query ID " + dataset.QueryId);
-        }
 
-        //temp added
-        public UserDataset GetDataset(string datasetId)
+        public int IsFileReady(string datasetId)
         {
             var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
-            return dataset;
+            int status = dataset.FileStatus;
+            return status;
         }
         
-        public async Task<FileInfo> ExportDatasetForAssay(UserDataset dataset, string filePath)
-        {
+        public async Task<FileInfo> CreateFileForDataset(UserDataset dataset, string filePath)
+        { 
             var exportData = _queryService.GetQueryResult(dataset.QueryId);
-            var fileInfo = await ExportAssayTable(exportData, dataset, filePath);
-            return fileInfo; 
+
+            FileInfo fileInfo = null;
+            
+            if (dataset.Type == "BIOSAMPLES")
+            {
+                fileInfo = await ExportSampleTable(exportData, dataset, filePath);
+            }
+            if (dataset.Type == "ASSAY")
+            {
+                fileInfo = await ExportAssayTable(exportData, dataset, filePath);
+            }
+            if (dataset.Type == "PHENO")
+            {
+                fileInfo = await ExportSubjectClinicalTable(exportData, dataset, filePath);
+            }
+            return fileInfo;
         }
-        
-        private async Task <FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        private async Task<FileInfo> ExportSampleTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
         {
             return await Task.Factory.StartNew(() =>
             {
-                var projectId = dataset.ProjectId;  
+              
+                var datatable = new DataTable();
+                foreach (var field in dataset.Fields)
+                {
+                    datatable.Columns.Add(field.ColumnHeader.ToLower());
+                }
+
+                foreach (var biosample in exportData.Samples)
+                {
+                    var row = datatable.NewRow();
+
+                    row["subjectid"] = biosample.Subject.UniqueSubjectId;
+                    row["sampleid"] = biosample.BiosampleStudyId;
+
+                    foreach (var samplePropField in dataset.Fields)
+                    {
+                        var charVal = _queryService.GetSubjectOrSampleProperty(biosample, samplePropField.QueryObject);
+                        if (charVal != null)
+                            row[samplePropField.ColumnHeader.ToLower()] = charVal;
+                    }
+                    datatable.Rows.Add(row);
+                }
+                var filePath = DatatableToFile(datatable, path, dataset);
+                return new FileInfo(filePath);
+            });
+        }
+        
+        private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        {
+            return await Task.Factory.StartNew(() =>
+            {
+                var projectId = dataset.ProjectId;
                 var activityId = exportData.Samples.First().AssayId;
-                
+
                 // GET sampleIds, observations, and features
                 var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
                 var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
                 var orderObservations = assayObservations.OrderBy(o => o.FeatureName)/*.ThenBy(f => f.SubjectOfObservationName)*/;
-                
+
                 var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
                 var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
 
@@ -121,14 +121,14 @@ namespace eTRIKS.Commons.Service.Services
                 if (!di.Exists) return null;
                 var filePath = Path.Combine(dirPath, dataset.Name + ".csv");
                 StreamWriter writer = File.CreateText(filePath);
-                
+
                 // First write the header (which are samples' Ids)
                 writer.WriteLine("features" + "," + string.Join(",", sampleIds));
-                
+
                 var sb = new StringBuilder();
                 var i = 0;
                 var j = 0;
-               
+
                 foreach (var value in values)
                 {
                     i++;
@@ -146,7 +146,188 @@ namespace eTRIKS.Commons.Service.Services
                 return new FileInfo(filePath);
             });
         }
+
+        private async Task<FileInfo> ExportSubjectClinicalTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        {
+            return await Task.Factory.StartNew(() =>
+            {
+
+                #region Create Table Columns
+                var datatable = new DataTable();
+
+                //datatable.Columns.Add("subjectid");
+                //datatable.Columns.Add("studyid");
+                foreach (var field in dataset.Fields)
+                {
+                    datatable.Columns.Add(field.ColumnHeader.ToLower());
+                }
+
+                #endregion
+
+                //var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
+
+                var fieldsByO3Id = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).GroupBy(f => f.QueryObject.QueryObjectName).ToList();
+                var subjPropertiesFields = dataset.Fields.FindAll(f => f.QueryObjectType != nameof(SdtmRow)).ToList();
+
+                foreach (var subject in exportData.Subjects)
+                {
+
+                    var uniqSubjectId = subject.UniqueSubjectId;
+                    var subjectObservations = exportData.Observations.FindAll(o => o.USubjId == uniqSubjectId).ToList();
+                    var subjectCharacteristics = exportData.SubjChars.FindAll(sc => sc.SubjectId == subject.Id).ToList();
+
+                    var firstRow = true;
+                    while (subjectObservations.Any() || firstRow)
+                    {
+                        var row = datatable.NewRow();
+                        firstRow = false;
+
+                        #region Design Elements
+                        // row["studyid"] = subject.Study.Name;
+                        #endregion
+
+                        #region Subject Properties
+
+                        foreach (var subjPropField in subjPropertiesFields)
+                        {
+                            var charVal = _queryService.GetSubjectOrSampleProperty(subject, subjPropField.QueryObject);
+                            if (charVal != null)
+                                row[subjPropField.ColumnHeader.ToLower()] = charVal;
+                        }
+
+                        #endregion
+
+                        #region WRITE CLINICAL OBSERVATIONS
+
+                        foreach (var fieldgrp in fieldsByO3Id)//HEADACHE //BMI (EVENTS AND FINDINGS TOGETHER)//NOTE .. TIMEING ARE NOT synchronized YET
+                        {
+                            SdtmRow obs = null;
+                            foreach (var field in fieldgrp) //AEOCCUR / AESEV
+                            {
+                                //ONTOLOGY TERM REQUEST
+                                var query = (ObservationQuery)field.QueryObject;
+                                if (query.IsOntologyEntry)
+                                    obs = subjectObservations.FirstOrDefault(
+                                   o => ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[query.TermCategory]);
+
+                                //GROUP OF OBSERVATIONS
+                                else if (field.QueryObject.GetType() == typeof(GroupedObservationsQuery))
+                                {
+                                    //ASSUMPTION: GROUPS AREONLY COMPOSED OF ONTOLOGY ENTRY
+                                    //ASSUMPTION: 
+                                    string v;
+                                    foreach (var obsQuery in ((GroupedObservationsQuery)field.QueryObject).GroupedObservations)
+                                    {
+                                        obs = subjectObservations.FirstOrDefault(
+                                            o => o.QualifierQualifiers.TryGetValue(obsQuery.TermCategory, out v)
+                                                && obsQuery.TermId.ToString() == o.QualifierQualifiers[obsQuery.TermCategory]);
+                                        if (obs != null) break;
+                                    }
+                                }
+
+                                //SINGLE OBSERVATION OBJECT TERM REQUEST
+                                else
+                                {
+                                    obs = subjectObservations.FirstOrDefault(
+                                    o => ((ObservationQuery)field.QueryObject).TermId == o.DBTopicId);
+                                }
+
+
+
+                                //WRITE OBSERVATION INSTANCE TO ROW
+
+                                string val = "";
+                                obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+                                if (val == null)
+                                    obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+                                row[field.ColumnHeader.ToLower()] = val;
+                            }
+                            subjectObservations.Remove(obs);
+                        }
+
+                        #endregion
+
+                        datatable.Rows.Add(row);
+                    }
+                }
+                var filePath = DatatableToFile(datatable, path, dataset);
+                return new FileInfo(filePath);
+            });
+        }
         
+        private string DatatableToFile(DataTable dtTable, string path, UserDataset dataset)
+        {
+            // datatable to string
+            StringBuilder result = new StringBuilder();
+            if (dtTable.Columns.Count != 0)
+            {
+                foreach (DataColumn col in dtTable.Columns)
+                {
+                    result.Append(col.ColumnName + ',');
+                }
+                result.Append("\r\n");
+                foreach (DataRow row in dtTable.Rows)
+                {
+                    foreach (DataColumn column in dtTable.Columns)
+                    {
+                        result.Append(row[column].ToString() + ',');
+                    }
+                    result.Append("\r\n");
+                }
+            }
+
+           // var stringFromDT = DatatableToString(dtTable);
+
+            var dirPath = Path.Combine(_downloadFileDirectory, path);
+            var di = Directory.CreateDirectory(dirPath);
+            if (!di.Exists) return null;
+            var filePath = Path.Combine(dirPath, dataset.Name + ".csv");
+            StreamWriter writer = File.CreateText(filePath);
+
+            writer.WriteLine(result);
+
+            writer.Flush();
+            writer.Dispose();
+
+            return filePath;
+        }
+
+        public FileStream DownloadDataset(string datasetId, out string filename)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            filename = dataset.Name;
+
+            if (dataset.FileStatus != 2) return null;
+            var filePath = dataset.ExportFileURI;
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            return fileStream;
+        }
+
+        public string GetDownloadPath(string datasetId, out UserDataset dataset)
+        {
+            dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            return Path.Combine("P-" + dataset.ProjectId, "Query ID " + dataset.QueryId);
+        }
+        
+        public DataTable ExportDatasetForPreview(string datasetId)
+        {
+            var dataset = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
+            var exportData = _queryService.GetQueryResult(dataset.QueryId);
+
+            // 1. prepare the relevant datatable
+            var dt = new DataTable();
+            if (dataset.Type == "PHENO")
+            {
+                dt = ExportSubjectClinicalTable(exportData, dataset);
+            }
+            if (dataset.Type == "BIOSAMPLES")
+            {
+                dt = ExportSampleTable(exportData, dataset);
+            }
+            dt.TableName = dataset.Name;
+            return dt;
+        }
+     
         private DataTable ExportSampleTable(DataExportObject exportData, UserDataset dataset)
         {
             var datatable = new DataTable();
@@ -194,7 +375,7 @@ namespace eTRIKS.Commons.Service.Services
             }
 
             #endregion
-            
+
             //var subjGroupedObservations = exportData.Observations.GroupBy(ob => new { subjId = ob.USubjId });
 
             var fieldsByO3Id = dataset.Fields.FindAll(f => f.QueryObjectType == nameof(SdtmRow)).GroupBy(f => f.QueryObject.QueryObjectName).ToList();
@@ -214,7 +395,7 @@ namespace eTRIKS.Commons.Service.Services
                     firstRow = false;
 
                     #region Design Elements
-                   // row["studyid"] = subject.Study.Name;
+                    // row["studyid"] = subject.Study.Name;
                     #endregion
 
                     #region Subject Properties
@@ -236,7 +417,7 @@ namespace eTRIKS.Commons.Service.Services
                         foreach (var field in fieldgrp) //AEOCCUR / AESEV
                         {
                             //ONTOLOGY TERM REQUEST
-                            var query = (ObservationQuery) field.QueryObject;
+                            var query = (ObservationQuery)field.QueryObject;
                             if (query.IsOntologyEntry)
                                 obs = subjectObservations.FirstOrDefault(
                                o => ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[query.TermCategory]);
@@ -284,27 +465,7 @@ namespace eTRIKS.Commons.Service.Services
             return datatable;
         }
 
-        public string DatatableToString(DataTable dtTable)
-        {
-            StringBuilder result = new StringBuilder();
-            if (dtTable.Columns.Count != 0) 
-            {
-                foreach (DataColumn col in dtTable.Columns)
-                {
-                    result.Append(col.ColumnName + ',');
-                }
-                result.Append("\r\n");
-                foreach (DataRow row in dtTable.Rows)
-                {
-                    foreach (DataColumn column in dtTable.Columns)
-                    {
-                        result.Append(row[column].ToString() + ',');
-                    }
-                    result.Append("\r\n");
-                }
-            }
-            return result.ToString();
-        }
+
 
 
         #region OLD METHODS
