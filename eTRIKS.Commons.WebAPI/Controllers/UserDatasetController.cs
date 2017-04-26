@@ -42,6 +42,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return !User.Identity.IsAuthenticated ? null : _userDataService.GetUserDataset(datasetId, userId);
         }
 
+        [HttpGet("{datasetId}/delete")]
+        public void DeleteDataset(string datasetId)
+        {
+            _userDataService.DeleteDataset(datasetId);
+        }
+
         [HttpPost]
         public IActionResult AddUserDataset([FromBody] UserDatasetDTO dto)
         {

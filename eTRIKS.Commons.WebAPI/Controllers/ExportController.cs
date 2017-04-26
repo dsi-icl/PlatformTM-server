@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -20,11 +21,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("datasets/{datasetId}/preview")]
-        public  IActionResult GetDataPreview(string datasetId)
+        public IActionResult GetDataPreview(string datasetId)
         {
             try
             {
-                var dt =  _exportService.ExportDataset(datasetId);
+                var dt = _exportService.ExportDatasetForPreview(datasetId);
                 return new OkObjectResult(dt);
             }
             catch (Exception e)
@@ -36,35 +37,32 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [Route("datasets/{datasetId}/IsFileReady")]
         [HttpGet]
-        public int IsFileReady(string datasetId)  
+        public int IsFileReady(string datasetId)
         {
             var status = _exportService.IsFileReady(datasetId);
             return status;
         }
 
-        
         [Route("datasets/{datasetId}/export")]
         [HttpGet]
-        public async void  PrepareFileForDownload2(string datasetId) // prepare the file in server
+        public async void PrepareFileForDownload(string datasetId) // prepare the file in server
         {
             _exportService.SetDatasetStatus(datasetId, "", 1);
-            var filePath = _exportService.GetDownloadPath(datasetId);
-            var dataset = _exportService.GetDataset(datasetId);
-
-            if (dataset.Type == "ASSAY")
+            UserDataset dataset;
+            var filePath = _exportService.GetDownloadPath(datasetId, out dataset);
+            try
             {
-                var fileInfo = await _exportService.ExportDatasetForAssay(dataset, filePath);
+                var fileInfo = await _exportService.CreateFileForDataset(dataset, filePath);
                 _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
             }
-
-            else
+            catch (Exception)
             {
-                var dt = _exportService.ExportDataset(datasetId);
-                var fileInfo = _fileService.WriteDataFile(filePath, dt);  
-                _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
-            }
+                // in the case of an error the file status should be changed to 0
+                _exportService.SetDatasetStatus(datasetId, "", 0);
+                throw;
+            } 
         }
-
+        
         [Route("datasets/{datasetId}/download")]
         [HttpGet]
         public async Task<ActionResult> DownloadDatasets(string datasetId)

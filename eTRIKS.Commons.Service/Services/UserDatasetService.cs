@@ -25,6 +25,11 @@ namespace eTRIKS.Commons.Service.Services
             _projectRepository = uoW.GetRepository<Project, int>();
         }
 
+        public void DeleteDataset(string datasetId) 
+        {
+            _userDatasetRepository.DeleteMany(d => d.Id == Guid.Parse(datasetId));
+        }
+
         public List<UserDatasetDTO> GetUserProjectDatasets(int projectId, string UserId)
         {
             //var project = _projectRepository.FindSingle(p => p.Id == projectId);
