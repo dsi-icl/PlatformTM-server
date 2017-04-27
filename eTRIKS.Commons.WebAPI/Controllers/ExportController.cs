@@ -72,10 +72,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             if (fileStream == null) return NotFound("cannot file ddlkjaskjh ");
             
             HttpContext.Response.Clear();
-            Response.ContentType = "text/csv";
+            Response.ContentType = "application/octet-stream";
             Response.Headers.Add("content-disposition", "attachment");
             Response.Headers.Add("x-filename", filename + ".csv");
-            Response.Headers.Add("Access-Control-Expose-Headers", "x-filename");
+            Response.Headers.Add("content-length", fileStream.Length.ToString());
+            Response.Headers.Add("Access-Control-Expose-Headers", "x-filename , content-length, content-disposition");
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             await fileStream.CopyToAsync(HttpContext.Response.Body);
             
