@@ -111,14 +111,14 @@ namespace eTRIKS.Commons.Service.Services
                 var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
                 var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
 
-                //////var orderObservations = assayObservations.OrderBy(o => o.FeatureName);
+                var orderObservations = assayObservations.OrderBy(o => o.FeatureName).ThenBy(o => o.SubjectOfObservationName);
                 //////var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
                 //////var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
 
                
-                var features = assayObservations.Select(a => a.FeatureName).Distinct().ToList();
-                var values = assayObservations.Select(a => a.Value).ToList(); 
-                var samples = assayObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
+                var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
+                var values = orderObservations.Select(a => a.Value).ToList(); 
+                var samples = orderObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
                 
 
 
