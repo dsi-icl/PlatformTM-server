@@ -50,7 +50,20 @@ namespace eTRIKS.Commons.DataAccess.Repositories
                     .ToListAsync();
             return null;
         }
-
+        
+        public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
+        {
+            if (filterExpression != null)
+            {
+                return collection
+                    .Find(filterExpression)
+                    .Project(projectionExpression)
+                    .ToList();
+            }
+         
+            return null;
+        }
+        
         public async Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null)
         {
             var filterDoc = new BsonDocument();
