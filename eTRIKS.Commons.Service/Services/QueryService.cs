@@ -82,7 +82,7 @@ namespace eTRIKS.Commons.Service.Services
             List<string> feat = new List<string>(new string[] { "ID.1.4", "ID.1.5", "ID.1.6", "ID.1.7" });
 
 
-            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName) /*&& feat.Contains(s.FeatureName)*/).ToList();
+            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationId) /*&& feat.Contains(s.FeatureName)*/).ToList();
             return assayObservations;
         }
 
@@ -281,9 +281,10 @@ namespace eTRIKS.Commons.Service.Services
             var apQuery = combinedQuery.AssayPanels.FirstOrDefault();
             if (apQuery != null)
             {
+                //TODO:BRING BACK COLLECTIONSTUDYDAY
                 var assaySamples =
                     _biosampleRepository.FindAll(s => s.AssayId == apQuery.AssayId,
-                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature","CollectionStudyDay"}).ToList();
+                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature"}).ToList();
                 queryResult.Samples = assaySamples;
                 //HOW DO I FILTER THE SAMPLES BY THE QUERED PROPERTIES?
                 //HOW DO I filter samples by collectionStudyDay?
@@ -297,16 +298,16 @@ namespace eTRIKS.Commons.Service.Services
                 //    );
 
                 //}
-                if (apQuery.SampleQueries.Exists(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay)))
-                {
-                    var dayQuery = apQuery.SampleQueries.Find(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay));
-                    if (dayQuery.IsFiltered)
-                        queryResult.Samples = assaySamples.FindAll(
-                            s =>
-                                s.CollectionStudyDay?.Number != null &&
-                                s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
-                                s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
-                }
+                //if (apQuery.SampleQueries.Exists(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay)))
+                //{
+                //    var dayQuery = apQuery.SampleQueries.Find(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay));
+                //    if (dayQuery.IsFiltered)
+                //        queryResult.Samples = assaySamples.FindAll(
+                //            s =>
+                //                s.CollectionStudyDay?.Number != null &&
+                //                s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
+                //                s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
+                //}
 
                 //QUERY AND FILTER SAMPLE CHARACTERISTICS
                 foreach (var sampleQuery in apQuery.SampleQueries.Where(sq=>sq.QueryFor == nameof(Biosample.SampleCharacteristics)))

@@ -4,6 +4,7 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
+    //EQUIVALENT TO SDTMdescriptor
     public class ObservationDescriptor : Identifiable<int>
     {
         //TODO: rename ObjectofObservation to Feature

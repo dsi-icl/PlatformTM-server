@@ -373,8 +373,18 @@ namespace eTRIKS.Commons.Service.Services
                 new List<string>() {
                     "Study",
                     "Subject",
-                    "CollectionStudyDay",
                     "SampleCharacteristics" }).ToList();
+
+
+
+            //var sampleTimePoints = _biosampleRepository.FindAll(s => s.AssayId == assayId,
+            //    new List<string>() {
+            //        "CollectionStudyDay" }).ToList();
+
+            //foreach (var biosample in samples)
+            //{
+            //    biosample.CollectionStudyDay = sampleTimePoints.Find(s => s.Id == biosample.Id).CollectionStudyDay;
+            //}
 
             var sampleTable = new DataTable();
             sampleTable.Columns.Add("subjectId");

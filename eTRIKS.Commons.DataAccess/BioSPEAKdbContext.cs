@@ -67,7 +67,7 @@ namespace eTRIKS.Commons.DataAccess
             // Checks if the Dictionary Key contains the Model class
             if (_repositories.Keys.Contains(typeof(TEntity)))
             {
-                Debug.WriteLine("Retrieving ",typeof(TEntity).Name);
+                Debug.WriteLine("Retrieving repository for ", typeof(TEntity).Name);
                 return _repositories[typeof(TEntity)] as IRepository<TEntity, TPrimaryKey>;
             }
 
@@ -99,7 +99,7 @@ namespace eTRIKS.Commons.DataAccess
             {
                 var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayObservation");
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayTEMPObservation");
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
@@ -114,7 +114,7 @@ namespace eTRIKS.Commons.DataAccess
         {
             if (_cacheRepositories.Keys.Contains(typeof(TEntity)))
             {
-                Debug.WriteLine("Retrieving ", typeof(TEntity).Name);
+                Debug.WriteLine("Retrieving repository for ", typeof(TEntity).Name);
                 return _cacheRepositories[typeof(TEntity)] as ICacheRepository<TEntity>;
             }
 

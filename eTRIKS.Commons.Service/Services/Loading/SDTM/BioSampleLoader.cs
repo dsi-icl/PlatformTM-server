@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
@@ -14,6 +16,8 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<Study, int> _studyRepository;
+        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
+
 
         private readonly IRepository<CharacteristicFeature, int> _characteristicObjRepository;
 
@@ -28,12 +32,19 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _studyRepository = uoW.GetRepository<Study, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+
 
             _characteristicObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
         }
 
-        public bool LoadBioSamples(List<SdtmRow> sampleData, SdtmSampleDescriptor descriptor, bool reload)
+        public async Task<bool> LoadBioSamples(Dataset dataset, int fileId, bool reload)
         {
+            var descriptor = SdtmSampleDescriptor.GetSdtmSampleDescriptor(dataset);
+            List<SdtmRow> sampleData = await _sdtmRepository.FindAllAsync(
+                    dm => dm.DatasetId.Equals(dataset.Id) && dm.DatafileId.Equals(fileId));
+
+
             if (sampleData.Count == 0)
                 return false;
 
@@ -86,7 +97,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                     CollectionStudyDay = sdtmRow.CollectionStudyDay,
                     DatasetId = sdtmRow.DatasetId,
                     DataFileId = sdtmRow.DatafileId,
-                    IsBaseline = sdtmRow.Qualifiers.ContainsKey(descriptor.IsBaseLineVariable.Name) && sdtmRow.Qualifiers[descriptor.IsBaseLineVariable.Name] == "Y"
+                    IsBaseline = sdtmRow.Qualifiers != null && descriptor.IsBaseLineVariable != null && (sdtmRow.Qualifiers.ContainsKey(descriptor.IsBaseLineVariable?.Name) && sdtmRow.Qualifiers[descriptor.IsBaseLineVariable?.Name] == "Y")
                 };
 
                 //CHECK IF ASSAY HAS TEMOPORALDATA
@@ -108,7 +119,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 //ADD CHARACTERISTIC FEATURE IN BSTEST
                 string charValue;
                 var characValueVariable = descriptor.GetValueVariable(sdtmRow);
-                if (sdtmRow.ResultQualifiers.TryGetValue(characValueVariable.Name, out charValue))
+                if (characValueVariable != null && sdtmRow.ResultQualifiers.TryGetValue(characValueVariable.Name, out charValue))
                 {
                     var charFeature = getCharacteristicFeature(sdtmRow.Topic,sdtmRow.TopicSynonym,characValueVariable.DataType);
                     charFeature.ActivityId = assayId;
@@ -190,9 +201,12 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             }
             return feature;
         }
-        public void UnloadBioSamples(int datasetId)
+        public bool UnloadBioSamples(int datasetId, int fileId)
         {
-            
+            _bioSampleRepository.DeleteMany(s => s.DatasetId == datasetId && s.DataFileId.Value == fileId);
+            _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+
+            return _dataContext.Save() == "CREATED";
         }
     }
 }

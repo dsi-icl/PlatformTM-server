@@ -63,8 +63,8 @@ namespace eTRIKS.Commons.WebAPI.Auth
             if (appUser == null)
             {
                 context.Response.StatusCode = 400;
-                await context.Response.WriteAsync("Invalid username or password.");
-                //return new UnauthorizedResult();    
+                var err = new {msg = "Invalid username or password."};
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(err, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() }));    
             }
             var identity = await _accountService.GetClaimsPrincipleForUser(appUser);
             var userData = _accountService.GetUserInfo(identity.FindFirstValue(ClaimTypes.NameIdentifier)).Result;

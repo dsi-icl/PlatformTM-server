@@ -27,5 +27,6 @@ namespace eTRIKS.Commons.Service.DTOs
         public int percentMatched { get; internal set; }
         public List<string> unmappedCols { get; internal set; }
         public bool IsLoaded { get; set; }
+        public int PercentLoaded { get; set; }
     }
 }

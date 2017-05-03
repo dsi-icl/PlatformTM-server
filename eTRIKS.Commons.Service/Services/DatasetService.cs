@@ -14,6 +14,7 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.Service.DTOs.Explorer;
+using eTRIKS.Commons.Service.Services.Loading.AssayData;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
 
 namespace eTRIKS.Commons.Service.Services
@@ -25,24 +26,20 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
-        private readonly IRepository<Observation, int> _observationRepository;
 
-        private readonly FileService _fileService;
+        private readonly IRepository<Observation, int> _observationRepository;
         private readonly CacheService _cacheService;
         
 
-        public DatasetService(IServiceUoW uoW, FileService fileService, CacheService cacheService)
+        public DatasetService(IServiceUoW uoW, CacheService cacheService)
         {
             _dataServiceUnit = uoW;
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
-            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _observationRepository = uoW.GetRepository<Observation, int>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
 
-           
-
-            _fileService = fileService;
             _cacheService = cacheService;
         }
 
@@ -381,190 +378,8 @@ namespace eTRIKS.Commons.Service.Services
             return map;
         }
 
-        public int? mapToTemplate(int datasetId, int fileId, DataTemplateMap map)
-        {
-            var dataset = GetActivityDataset(datasetId);
-            var projectId = dataset.Activity.ProjectId;
-            //var projectAcc = dataset.Activity.Project.Accession;
-            //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
-
-            var dataFile = _dataFileRepository.Get(fileId);
-            var filePath = dataFile.Path + "\\" + dataFile.FileName;
-
-            //FileService fileService = new FileService(_dataServiceUnit);
-            DataTable inputDataTable = _fileService.ReadOriginalFile(filePath);
-            DataTable sdtmTable = new DataTable();
-
-            //var varMaps = new List<DataTemplateMap.VariableMap>();
-            foreach (
-                var varMap in
-                    map.VarTypes.SelectMany(variableType => variableType.vars.Where(varMap => varMap.DataType != null)))
-            {
-                sdtmTable.Columns.Add(varMap.ShortName); //,Type.GetType(varMap.DataType)
-                // varMaps.Add(varMap);
-            }
-
-
-            for (int i = 0; i < map.TopicColumns.Count; i++)
-                foreach (DataRow inputRow in inputDataTable.Rows) // Loop over the rows.
-                {
-                    DataRow sdtmRow = sdtmTable.NewRow();
-
-                    //Identifiers
-                    foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Identifiers")).vars)
-                    {
-                        if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
-                            continue;
-                        if (varMap.MapToStringValueList[0] != null && varMap.MapToStringValueList[0] != string.Empty)
-                        {
-                            sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[0];
-                        }
-
-                        else if (varMap.MapToColList[0] != null)
-                        {
-                            var colName = varMap.MapToColList[0].colName;
-                            sdtmRow[varMap.ShortName] = inputRow[colName];
-                        }
-                        //if (varMap.ShortName.Equals("STUDYID"))
-                        //    studyId = sdtmRow[varMap.ShortName].ToString();
-                    }
-
-                    //Observation Topic & Qualifiers
-                    if (map.VarTypes.Exists(vt => vt.name.Equals("Observation Descriptors")))
-                    foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Observation Descriptors")).vars)
-                    {
-                        if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
-                            continue;
-                        if (varMap.MapToStringValueList[i] != null && varMap.MapToStringValueList[i] != string.Empty)
-                        {
-                            sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[i];
-                        }
-                        else if (varMap.MapToColList[i] != null)
-                        {
-                            var colName = varMap.MapToColList[i].colName;
-                            sdtmRow[varMap.ShortName] = inputRow[colName];
-                        }
-                        else
-                        {
-                            sdtmRow[varMap.ShortName] = null;
-                        }
-                    }
-
-                    //Timings
-                    if (map.VarTypes.Exists(vt => vt.name.Equals("Timing Descriptors")))
-                    foreach (var varMap in map.VarTypes.Find(vt => vt.name.Equals("Timing Descriptors")).vars)
-                    {
-                        if (varMap.MapToStringValueList.Count == 0 && varMap.MapToColList.Count == 0)
-                            continue;
-                        if (varMap.MapToStringValueList[0] != null && varMap.MapToStringValueList[0] != string.Empty)
-                        {
-                            sdtmRow[varMap.ShortName] = varMap.MapToStringValueList[0];
-                        }
-
-                        else if (varMap.MapToColList[0] != null)
-                        {
-                            var colName = varMap.MapToColList[0].colName;
-                            sdtmRow[varMap.ShortName] = inputRow[colName];
-                        }
-                    }
-                    sdtmTable.Rows.Add(sdtmRow);
-                }
-
-            DataFile standardFile = null;
-            if (sdtmTable.Rows.Count != 0)
-            {
-                string dsName = dataset.Activity.Name+"_" +dataset.TemplateId;
-                sdtmTable.TableName = dsName;
-                //Write new transformed to file 
-                var fileInfo = _fileService.WriteDataFile(dataFile.Path, sdtmTable);
-                standardFile = _fileService.AddOrUpdateFile(projectId, fileInfo);
-                //var file = _dataFileRepository.Get(4);
-                
-                //Update dataset
-                //STUPID EF 1.1
-                //dataset.DataFiles.Add(standardFile);
-                dataset.DataFiles.Add(new DatasetDatafile() {DatasetId = datasetId,DatafileId = dataFile.Id});
-                /////////////////////////////////////
-
-                _datasetRepository.Update(dataset);
-                _dataServiceUnit.Save();
-            }
-            dataset.State = "mapped";
-            //var ht = new Hashtable();
-            //var headerList = new List<Dictionary<string, string>>();
-            //foreach (var col in sdtmTable.Columns.Cast<DataColumn>())
-            //{
-            //    var header = new Dictionary<string, string>
-            //    {
-            //        {"data", col.ColumnName.ToLower()},
-            //        {"title", col.ColumnName}
-            //    };
-            //    headerList.Add(header);
-            //}
-            //ht.Add("header", headerList);
-            //ht.Add("data", sdtmTable);
-            //return ht;
-            if (standardFile != null)
-                return standardFile.Id;
-            else return null;
-        }
-
-        public bool PersistSDTM(int datasetId, int fileId)
-        {
-            var dataset = GetActivityDataset(datasetId);
-            var dataFile = _dataFileRepository.Get(fileId);
-
-            if (!dataFile.State.ToLower().Equals("new"))
-            {
-                /**
-                 * Replacing previously loaded file
-                 * Remove file from collection before reloading it
-                 */
-                _sdtmRepository.DeleteMany(s=>s.DatafileId == fileId && s.DatasetId == datasetId);
-                Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
-            }
-
-            var filePath = dataFile.Path + "\\" + dataFile.FileName;
-            //var fileService = new FileService(_dataServiceUnit);
-            var dataTable = _fileService.ReadOriginalFile(filePath);
-
-            var sdtmRowDescriptor = SdtmRowDescriptor.GetSdtmRowDescriptor(dataset);
-            var SDTM = new List<SdtmRow>();
-            try
-            {
-                foreach (DataRow row in dataTable.Rows)
-                {
-                    var sdtmRow = SDTMreader.readSDTMrow(row, dataTable, sdtmRowDescriptor);
-
-                    sdtmRow.Id = Guid.NewGuid();
-                    sdtmRow.DatasetId = datasetId;
-                    sdtmRow.ActivityId = dataset.ActivityId;
-                    sdtmRow.DatafileId = fileId;
-                    sdtmRow.ProjectId = dataset.Activity.ProjectId;
-                    sdtmRow.ProjectAccession = dataset.Activity.Project.Accession;
-
-                    SDTM.Add(sdtmRow);
-                }
-                _sdtmRepository.InsertMany(SDTM);
-                Debug.WriteLine(dataTable.Rows.Count + " RECORD(s) SUCCESSFULLY ADDED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-                return false;
-            }
-            
-
-            dataFile.State = "SAVED";
-            _dataFileRepository.Update(dataFile);
-
-            _dataServiceUnit.Save();
-            return true;
-        }
-
         public async Task<bool> LoadDataset(int datasetId, int fileId)
         {
-
             Dataset dataset = GetActivityDataset(datasetId);
             var reload = false;
             var loaded = false;
@@ -573,47 +388,33 @@ namespace eTRIKS.Commons.Service.Services
             if (dataFile.IsLoadedToDB)
                 reload = true;
 
-
-            //TODO: if failed to load delete file from mongodb
-            //Todo: exception handling if failed 
-
-            var sdtmRowDescriptor = SdtmRowDescriptor.GetSdtmRowDescriptor(dataset);
-            List<SdtmRow> sdtmData = await _sdtmRepository.FindAllAsync(
-                    dm => dm.DatasetId.Equals(datasetId) && dm.DatafileId.Equals(fileId));
-
-           
-            
             try
             {
-                if (dataset.Template.Code.Equals("DM"))
+                switch (dataset.Template.Code)
                 {
-                    var sdtmSubjectDescriptor = SdtmSubjectDescriptor.GetSdtmSubjectDescriptor(dataset);
-                    var subjectLoader = new SubjectLoader(_dataServiceUnit);
-                    loaded = subjectLoader.LoadSubjects(sdtmData, sdtmSubjectDescriptor, reload);
-                }
-                else if (dataset.Template.Code.Equals("BS"))
-                {
-                    var sdtmSampleDescriptor = SdtmSampleDescriptor.GetSdtmSampleDescriptor(dataset);
-                    var sampleLoader = new BioSampleLoader(_dataServiceUnit);
-                    loaded = sampleLoader.LoadBioSamples(sdtmData, sdtmSampleDescriptor, reload);
-                }
-                else if (dataset.Template.Code.Equals("CY") || dataset.Template.Code.Equals("HD"))
-                {
-                    var hdDataService = new HDdataService(_dataServiceUnit);
-                    //loaded = await hdDataService.LoadHDdata(sdtmData, datasetId);
-                }
-                //else if (dataset.Domain.Code.Equals("SC"))
-                //{
-
-                //}
-                else
-                {
-                    var observationLoader = new ObservationLoader(this._dataServiceUnit);
-                    loaded = observationLoader.LoadObservations(sdtmData, sdtmRowDescriptor,reload);
-                    if (loaded)
-                    {
-                       await _cacheService.GenerateAndCacheClinicalDTO(dataFile.ProjectId);
-                    }
+                    case "DM":
+                        var subjectLoader = new SubjectLoader(_dataServiceUnit);
+                        loaded = await subjectLoader.LoadSubjects(dataset, fileId, reload);
+                        break;
+                    case "BS":
+                        var sampleLoader = new BioSampleLoader(_dataServiceUnit);
+                        loaded = await sampleLoader.LoadBioSamples(dataset, fileId, reload);
+                        break;
+                    case "CY":
+                    case "HD":
+                        var hdDataLoader = new HDloader(_dataServiceUnit);
+                        //loaded = await hdDataLoader.LoadHDdata(dataset,fileId, datasetId);
+                        break;
+                    case "MX":
+                        break;
+                    default:
+                        var observationLoader = new ObservationLoader(this._dataServiceUnit);
+                        loaded = await observationLoader.LoadObservations(dataset, fileId, reload);
+                        if (loaded)
+                        {
+                            await _cacheService.GenerateAndCacheClinicalDTO(dataFile.ProjectId);
+                        }
+                        break;
                 }
 
 
@@ -631,8 +432,6 @@ namespace eTRIKS.Commons.Service.Services
                     _dataServiceUnit.Save();
                 }
 
-               
-
                  if(!loaded && dataFile.State == "SAVED")
                     _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
 
@@ -648,18 +447,53 @@ namespace eTRIKS.Commons.Service.Services
             return loaded;
         }
 
-        public void UnloadDataset(int datasetId, int fileId, string status="UNLOADED")
+        public bool UnloadDataset(int datasetId, int fileId, string status="UNLOADED")
         {
-            //TODO: THIS IS ESSENTIALLY UNLOADFILE
-            //WHEN WE HAVE A VIEW FOR DATASETS, THEN THIS WILL MAKE MORE SENSE
-            //IN THIS CASE, ALL FILES of the SELECTED DATASETS WILL BE UNLOADED
-            _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
-            Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
-            _observationRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == fileId);
+            try
+            {
+                var dataset = _datasetRepository.FindSingle(ds=>ds.Id == datasetId, new List<string>() {"Template","Activity"});
+                switch (dataset.Template.Code)
+                {
+                    case "DM":
+                        var subjectLoader = new SubjectLoader(_dataServiceUnit);
+                        subjectLoader.UnloadSubjects(datasetId, fileId);
+                        break;
+                    case "BS":
+                        var sampleLoader = new BioSampleLoader(_dataServiceUnit);
+                        sampleLoader.UnloadBioSamples(datasetId, fileId);
+                        break;
+                    default:
+                        var observationLoader = new ObservationLoader(_dataServiceUnit);
+                        observationLoader.UnloadObservations(datasetId, fileId);
+                        _cacheService.GenerateAndCacheClinicalDTO(dataset.Activity.ProjectId);
+                        break;
+                }
+            
+                Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATAFILE:" + fileId);
+            }
+
+            // in case an error hapens it returns false for success and therefore the main file would not be deleted. (try method)
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+                return false;
+            }
+
+            //SINCE UNLOAD FILE CAN BE CALLED INDEPENDENTLY OF REMOVING FILE, NEED TO SET STATUS
             var file = _dataFileRepository.Get(fileId);
             file.State = status;
             _dataFileRepository.Update(file);
             _dataServiceUnit.Save();
+            return true;
+        }
+
+        public bool UnloadFileDatasets(int fileId)
+        {
+            var file = _dataFileRepository.FindSingle(f => f.Id == fileId, new List<string>() {"Datasets"});
+            bool result = true;
+            foreach (var dataset in file.Datasets)
+                result = result && UnloadDataset(dataset.DatasetId, fileId);
+            return result;
         }
 
 
@@ -888,56 +722,6 @@ namespace eTRIKS.Commons.Service.Services
                 Code = x.Code,
 
             };
-
-        public FileDTO CheckFileTemplateMatch(int datasetId, int fileId)
-        {
-            var dataset = GetActivityDataset(datasetId);
-            //var dataFile = dataset.DataFiles.SingleOrDefault(df => df.Id.Equals(fileId));
-
-            var dataFile = _dataFileRepository.Get(fileId);
-            var studyId = dataset.Activity.ProjectId;
-            var filePath = dataFile.Path + "\\" + dataFile.FileName;
-            //var fileService = new FileService(_dataServiceUnit);
-            var colHeaders = _fileService.getFileColHeaders(filePath);
-            
-            FileDTO fileDto = new FileDTO();
-            fileDto.FileName = dataFile.FileName;
-            fileDto.columnHeaders = colHeaders;
-            fileDto.DataFileId = dataFile.Id;
-            
-            var varNames = dataset.Variables.Select(v => v.VariableDefinition.Name).ToList();
-            var headers = colHeaders.Select(d => d["colName"]).ToList<string>();
-
-            fileDto.templateMatched = headers.All(header => varNames.Contains(header));
-            if (!fileDto.templateMatched)
-            {
-                var mappedVars = headers.FindAll(h => varNames.Contains(h));
-                if (mappedVars.Count() > 0)
-                {
-                    float p = ((float)mappedVars.Count / headers.Count)*100;
-                    if(p >= 50)
-                    {
-                        fileDto.unmappedCols = headers.FindAll(h => !varNames.Contains(h));
-                        fileDto.percentMatched = (int)p;
-                    }
-                    
-                }
-                    
-            }
-            if (fileDto.templateMatched)
-            {
-                //dataset.StandardDataFile = filePath;
-                //TODO: TEMP usage of dataset state
-                //dataset.State = "standard";
-                fileDto.percentMatched = 100;
-                fileDto.IsStandard = true;
-                dataFile.IsStandard = true;
-                _dataFileRepository.Update(dataFile);
-                _dataServiceUnit.Save();
-            }
-                
-            return fileDto;
-        }
 
         
     }
