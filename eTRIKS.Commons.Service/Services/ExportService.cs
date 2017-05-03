@@ -110,10 +110,17 @@ namespace eTRIKS.Commons.Service.Services
                 // GET sampleIds, observations, and features
                 var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
                 var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
-                var orderObservations = assayObservations.OrderBy(o => o.FeatureName)/*.ThenBy(f => f.SubjectOfObservationName)*/;
 
-                var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
-                var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
+                //////var orderObservations = assayObservations.OrderBy(o => o.FeatureName);
+                //////var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
+                //////var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
+
+               
+                var features = assayObservations.Select(a => a.FeatureName).Distinct().ToList();
+                var values = assayObservations.Select(a => a.Value).ToList(); 
+                var samples = assayObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
+                
+
 
                 // create directory and write the data to file
                 var dirPath = Path.Combine(_downloadFileDirectory, path);
@@ -123,7 +130,7 @@ namespace eTRIKS.Commons.Service.Services
                 StreamWriter writer = File.CreateText(filePath);
 
                 // First write the header (which are samples' Ids)
-                writer.WriteLine("features" + "," + string.Join(",", sampleIds));
+                writer.WriteLine("features" + "," + string.Join(",", samples));
 
                 var sb = new StringBuilder();
                 var i = 0;
@@ -143,6 +150,8 @@ namespace eTRIKS.Commons.Service.Services
                 }
                 writer.Flush();
                 writer.Dispose();
+
+
                 return new FileInfo(filePath);
             });
         }
@@ -757,7 +766,8 @@ namespace eTRIKS.Commons.Service.Services
             //1- Query for observations
             foreach (var selField in userDataset.Fields)
             {
-                var queryFields = new List<object>(); //List of all filters to query Mongo
+                var 
+                 = new List<object>(); //List of all filters to query Mongo
 
 
                 //if (selField.Entity == typeof(ObjectOfObservation).FullName)

@@ -10,11 +10,14 @@ using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
+using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.DTOs.Explorer;
 using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
+using MongoDB.Driver;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -75,15 +78,16 @@ namespace eTRIKS.Commons.Service.Services
             }
             return subjProperty;
         }
-        public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        //public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
         {
+            var assayObservations =
+                _observationRepository.FindObservations(s =>
+                    s.ProjectId == projectId && s.ActivityId == activityId && /*s.SubjectOfObservationName == "SID.7002.551"*/ sampleIds.Contains(s.SubjectOfObservationName),
+                    x => new AssayDataDTO() {FeatureName = x.FeatureName, SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
+                                                         );
 
-
-            List<string> feat = new List<string>(new string[] { "ID.1.4", "ID.1.5", "ID.1.6", "ID.1.7" });
-
-
-            var assayObservations = _observationRepository.FindAll(s => s.ActivityId == activityId && s.ProjectId == projectId && sampleIds.Contains(s.SubjectOfObservationName) /*&& feat.Contains(s.FeatureName)*/).ToList();
-            return assayObservations;
+            return assayObservations.Cast<AssayDataDTO>().ToList();
         }
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)

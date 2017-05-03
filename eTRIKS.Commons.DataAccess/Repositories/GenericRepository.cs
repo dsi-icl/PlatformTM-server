@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 
 namespace eTRIKS.Commons.DataAccess.Repositories
 {
@@ -25,6 +26,13 @@ namespace eTRIKS.Commons.DataAccess.Repositories
             Entities = (DbSet<TEntity>)entities;
             //dataContext = entities
         }
+      
+        public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
+        {
+            throw new NotImplementedException();
+        }
+        
+
 
         public TEntity Get(TPrimaryKey key)
         {
