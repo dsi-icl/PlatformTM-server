@@ -99,7 +99,7 @@ namespace eTRIKS.Commons.DataAccess
             {
                 var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayTEMPObservation");
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayObservation");
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
