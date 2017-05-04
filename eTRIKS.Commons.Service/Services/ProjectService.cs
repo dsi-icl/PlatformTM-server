@@ -215,5 +215,19 @@ namespace eTRIKS.Commons.Service.Services
             return datasets.OrderBy(d => d.ProjectId).ThenBy(d => d.QueryId).Select(UserDatasetService.WriteDTO).ToList();
         }
 
+        public List<UserDTO> GetProjectUsers(int projectId)
+        {
+            var project = _projectRepository.FindSingle(p => p.Id == projectId,
+                new List<string>() {"Users.User"});
+            var users = project.Users.Select(u => new UserDTO()
+            {
+                FirstName = u.User.FirstName,
+                LastName = u.User.LastName,
+                Organization = u.User.Organization,
+                Email = u.User.Email,
+                
+            }).ToList();
+            return users;
+        }
     }
 }
