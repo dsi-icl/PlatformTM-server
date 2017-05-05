@@ -18,11 +18,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class FileController : Controller
     {
         private readonly FileService _fileService;
+        private readonly DatasetService _datasetService;
         private IHostingEnvironment _environment;
 
-        public FileController(FileService fileService, IHostingEnvironment env)
+        public FileController(FileService fileService, DatasetService datasetService, IHostingEnvironment env)
         {
             _fileService = fileService;
+            _datasetService = datasetService;
             _environment = env;
         }
 
@@ -33,9 +35,36 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet]
+        [Route("{fileId}/load/datasets/{datasetId}")]
+        public async void LoadFile(int fileId, int datasetId)
+        {
+            var success = await _fileService.LoadFile(fileId, datasetId);
+            //if (success)
+            //    return Ok(true);
+            //return new BadRequestResult();
+        }
+
+        [HttpGet]
+        [Route("{fileId}/progress")]
+        public IActionResult GetLoadingProgress(int fileId)
+        {
+            var progressDTO = _fileService.GetFileDTO(fileId);
+            return new OkObjectResult(progressDTO);
+        }
+
+        [HttpGet]
+        [Route("{fileId}/unload")]
+        public void UnloadFile(int fileId)
+        {
+            _datasetService.UnloadFileDatasets(fileId);
+            //    _fileService.DeleteFile(fileId);
+        }
+
+        [HttpGet]
         [Route("{fileId}/remove")]
         public void DeleteFile(int fileId)
         {
+            if(_datasetService.UnloadFileDatasets(fileId))
             _fileService.DeleteFile(fileId);
         }
 
@@ -51,6 +80,19 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpPost]
+        [Route("{fileId}/mapToTemplate/datasets/{datasetId}")]
+        public int? MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
+        {
+            return _fileService.mapToTemplate(datasetId, fileId, dataTemplateMap);
+        }
+
+        [HttpGet("{fileId}/match/datasets/{datasetId}")]
+        public FileDTO CheckValidTemplate(int datasetId, int fileId)
+        {
+            return _fileService.MatchFileToTemplate(datasetId, fileId);
         }
 
         [HttpPost("projects/{projectId}/createdir")]
@@ -113,6 +155,5 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             return _fileService.GetUploadedFiles(projectId, relativePath);
         }
-  
     }
 }

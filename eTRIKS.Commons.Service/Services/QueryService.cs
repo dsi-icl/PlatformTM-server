@@ -285,9 +285,10 @@ namespace eTRIKS.Commons.Service.Services
             var apQuery = combinedQuery.AssayPanels.FirstOrDefault();
             if (apQuery != null)
             {
+                //TODO:BRING BACK COLLECTIONSTUDYDAY
                 var assaySamples =
                     _biosampleRepository.FindAll(s => s.AssayId == apQuery.AssayId,
-                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature","CollectionStudyDay"}).ToList();
+                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature", "CollectionStudyDay" }).ToList();
                 queryResult.Samples = assaySamples;
                 //HOW DO I FILTER THE SAMPLES BY THE QUERED PROPERTIES?
                 //HOW DO I filter samples by collectionStudyDay?
@@ -308,8 +309,7 @@ namespace eTRIKS.Commons.Service.Services
                         queryResult.Samples = assaySamples.FindAll(
                             s =>
                                 s.CollectionStudyDay?.Number != null &&
-                                s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
-                                s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
+                                dayQuery.FilterExactValues.Contains(s.CollectionStudyDay?.Number.Value.ToString()));
                 }
 
                 //QUERY AND FILTER SAMPLE CHARACTERISTICS

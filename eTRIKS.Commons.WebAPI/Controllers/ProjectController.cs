@@ -71,6 +71,15 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         }
 
+        [HttpGet("{projectId}/users")]
+        public IActionResult GetProjectUsers(int projectId)
+        {
+            var users = _projectService.GetProjectUsers(projectId);
+            if (users != null)
+                return new OkObjectResult(users);
+            return NotFound();
+        }
+
         [HttpGet]
         [Route("{projectId}/remove")]
         public void DeleteProject(int projectId) 

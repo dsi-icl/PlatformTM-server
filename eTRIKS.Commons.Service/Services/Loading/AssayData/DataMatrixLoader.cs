@@ -2,17 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 
-namespace eTRIKS.Commons.Service.Services.Loading.HdDataLoader
+namespace eTRIKS.Commons.Service.Services.Loading.AssayData
 {
     public class DataMatrixLoader
     {

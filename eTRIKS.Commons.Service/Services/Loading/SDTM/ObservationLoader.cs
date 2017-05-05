@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.JoinEntities;
 
@@ -21,8 +22,12 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
         }
 
-        public bool LoadObservations(List<SdtmRow> sdtmData, SdtmRowDescriptor sdtmRowDescriptor, bool reload)
+        public async Task<bool> LoadObservations(Dataset dataset, int fileId, bool reload)
         {
+            var sdtmRowDescriptor = SdtmRowDescriptor.GetSdtmRowDescriptor(dataset);
+            List<SdtmRow> sdtmData = await _sdtmRepository.FindAllAsync(
+                    dm => dm.DatasetId.Equals(dataset.Id) && dm.DatafileId.Equals(fileId));
+
             var dsDomainCode = sdtmRowDescriptor.DomainCode;
             var dsClass = sdtmRowDescriptor.Class;
 
@@ -140,6 +145,14 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             }
 
             return success;
+        }
+
+        public void UnloadObservations(int datasetId, int fileId)
+        {
+            _observationRepository.DeleteMany(o => o.DatafileId == fileId && o.DatasetId == datasetId);
+            _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+
+            _dataContext.Save();
         }
     }
 }

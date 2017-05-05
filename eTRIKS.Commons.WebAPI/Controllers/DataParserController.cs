@@ -3,22 +3,25 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Service.Services;
+using eTRIKS.Commons.Service.Services.HelperService;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
+    [Route("temp")]
     public class DataParserController : Controller
     {
 
         //private FileHandler _fileHandler;
         private TemplateService templateService;
-        private FileService _fileService;
+        private Formatter _formatterService;
 
-        public DataParserController(TemplateService tmplService, FileService fileService)
+        public DataParserController(Formatter formatterService)
         {
             //_fileHandler = fileHandler;
-            templateService = tmplService;
-            _fileService = fileService;
+            //templateService = tmplService;
+            _formatterService = formatterService;
         }
 
         //[HttpGet]
@@ -58,17 +61,19 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         //    //templateService.loadCVterms(tempFilepath, tempVarFilepath);
         //}
 
-        //[HttpGet]
-        //[Route("api/temp/widetolong")]
-        //public void widetolong()
-        //{
-        //    //string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
-        //    //string tempFilepath = "temp/BStemplate.csv";
-        //    //string tempVarFilepath = "temp/BStemplateVars.csv";
-        //   // _fileService.getLongFormat2();
-        //}
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("widetolong")]
+        public void widetolong()
+        {
+            //string fileDir = ConfigurationManager.AppSettings["FileDirectory"];
+            //string tempFilepath = "temp/BStemplate.csv";
+            //string tempVarFilepath = "temp/BStemplateVars.csv";
+            // _fileService.getLongFormat2();
+            _formatterService.TransformToHD("P-95\\Luminex data\\CRC305ABC_cytokines_results.csv");
+        }
 
 
-       
+
     }
 }

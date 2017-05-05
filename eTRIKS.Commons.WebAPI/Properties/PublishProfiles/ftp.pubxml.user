@@ -11,7 +11,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   </PropertyGroup>
   <ItemGroup>
     <File Include="appsettings.json">
-      <publishTime>04/11/2017 17:47:54</publishTime>
+      <publishTime>04/25/2017 18:44:51</publishTime>
     </File>
     <File Include="CsvHelper.dll">
       <publishTime>09/09/2016 14:59:46</publishTime>
@@ -20,34 +20,34 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/14/2016 20:41:14</publishTime>
     </File>
     <File Include="eTRIKS.Commons.Core.dll">
-      <publishTime>04/18/2017 23:02:33</publishTime>
+      <publishTime>05/04/2017 01:41:52</publishTime>
     </File>
     <File Include="eTRIKS.Commons.Core.pdb">
-      <publishTime>04/18/2017 23:02:33</publishTime>
+      <publishTime>05/04/2017 01:41:52</publishTime>
     </File>
     <File Include="eTRIKS.Commons.DataAccess.dll">
-      <publishTime>04/18/2017 23:02:35</publishTime>
+      <publishTime>05/04/2017 01:41:54</publishTime>
     </File>
     <File Include="eTRIKS.Commons.DataAccess.pdb">
-      <publishTime>04/18/2017 23:02:35</publishTime>
+      <publishTime>05/04/2017 01:41:54</publishTime>
     </File>
     <File Include="eTRIKS.Commons.Service.dll">
-      <publishTime>04/18/2017 23:02:36</publishTime>
+      <publishTime>05/04/2017 01:41:55</publishTime>
     </File>
     <File Include="eTRIKS.Commons.Service.pdb">
-      <publishTime>04/18/2017 23:02:36</publishTime>
+      <publishTime>05/04/2017 01:41:55</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.deps.json">
-      <publishTime>04/18/2017 23:02:39</publishTime>
+      <publishTime>05/04/2017 01:41:58</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.dll">
-      <publishTime>04/18/2017 23:02:38</publishTime>
+      <publishTime>05/04/2017 01:41:57</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.pdb">
-      <publishTime>04/18/2017 23:02:38</publishTime>
+      <publishTime>05/04/2017 01:41:57</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.runtimeconfig.json">
-      <publishTime>04/18/2017 23:02:39</publishTime>
+      <publishTime>05/04/2017 01:41:58</publishTime>
     </File>
     <File Include="Microsoft.ApplicationInsights.AspNetCore.dll">
       <publishTime>09/28/2016 16:29:52</publishTime>
@@ -311,13 +311,13 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/14/2016 20:41:30</publishTime>
     </File>
     <File Include="MongoDB.Bson.dll">
-      <publishTime>03/01/2017 03:42:36</publishTime>
+      <publishTime>03/09/2017 00:04:06</publishTime>
     </File>
     <File Include="MongoDB.Driver.Core.dll">
-      <publishTime>03/01/2017 03:42:38</publishTime>
+      <publishTime>03/09/2017 00:04:08</publishTime>
     </File>
     <File Include="MongoDB.Driver.dll">
-      <publishTime>03/01/2017 03:42:40</publishTime>
+      <publishTime>03/09/2017 00:04:10</publishTime>
     </File>
     <File Include="Newtonsoft.Json.dll">
       <publishTime>01/19/2017 20:03:54</publishTime>
@@ -692,7 +692,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/05/2016 04:57:22</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>04/18/2017 23:02:40</publishTime>
+      <publishTime>05/04/2017 01:41:59</publishTime>
     </File>
   </ItemGroup>
 </Project>

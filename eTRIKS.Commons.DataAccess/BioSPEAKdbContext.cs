@@ -67,7 +67,7 @@ namespace eTRIKS.Commons.DataAccess
             // Checks if the Dictionary Key contains the Model class
             if (_repositories.Keys.Contains(typeof(TEntity)))
             {
-                Debug.WriteLine("Retrieving ",typeof(TEntity).Name);
+                Debug.WriteLine("Retrieving repository for ", typeof(TEntity).Name);
                 return _repositories[typeof(TEntity)] as IRepository<TEntity, TPrimaryKey>;
             }
 
@@ -114,7 +114,7 @@ namespace eTRIKS.Commons.DataAccess
         {
             if (_cacheRepositories.Keys.Contains(typeof(TEntity)))
             {
-                Debug.WriteLine("Retrieving ", typeof(TEntity).Name);
+                Debug.WriteLine("Retrieving repository for ", typeof(TEntity).Name);
                 return _cacheRepositories[typeof(TEntity)] as ICacheRepository<TEntity>;
             }
 

@@ -5,6 +5,7 @@ using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
     //EQUIVALENT TO VARIABLE DEFINITION
+    //REUSABLE WITHIN A PROJECT
     public class PropertyDescriptor : Identifiable<int>
     {
         //public VariableReference DatasetVariable { get; set; }

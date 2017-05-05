@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.JoinEntities;
@@ -16,6 +17,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
         private readonly IRepository<HumanSubject, string> _subjectRepository;
         private readonly IRepository<Study, int> _studtRepository;
         private readonly IRepository<CharacteristicFeature, int> _characteristicObjRepository;
+        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
 
         private readonly IServiceUoW _dataContext;
 
@@ -25,28 +27,28 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _studtRepository = uoW.GetRepository<Study, int>();
             _characteristicObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="subjectData"></param>
-        /// <param name="descriptor"></param>
-        /// <returns></returns>
-        public bool LoadSubjects(List<SdtmRow> subjectData, SdtmSubjectDescriptor descriptor, bool reload)
+        
+        public async Task<bool> LoadSubjects(Dataset dataset, int fileId, bool reload)
         {
-            if (subjectData.Count == 0)
+            var descriptor = SdtmSubjectDescriptor.GetSdtmSubjectDescriptor(dataset);
+            List<SdtmRow> sdtmData = await _sdtmRepository.FindAllAsync(
+                    dm => dm.DatasetId.Equals(dataset.Id) && dm.DatafileId.Equals(fileId));
+
+            if (sdtmData.Count == 0)
                 return false;
 
-            var projectId = subjectData.First().ProjectId;
-            var projectAccession = subjectData.First().ProjectAccession;
-            var activityId = subjectData.First().ActivityId;
-            var datafileId = subjectData.First().DatafileId;
-            var datasetId = subjectData.First().DatasetId;
+            var projectId = sdtmData.First().ProjectId;
+            var projectAccession = sdtmData.First().ProjectAccession;
+            var activityId = sdtmData.First().ActivityId;
+            var datafileId = sdtmData.First().DatafileId;
 
             if (reload)
             {
-                _subjectRepository.DeleteMany(o => o.DatasetId == datasetId && o.DatafileId == datafileId);
+                _subjectRepository.DeleteMany(o => o.DatasetId == dataset.Id && o.DatafileId == datafileId);
                 _dataContext.Save().Equals("CREATED");
             }
 
@@ -64,7 +66,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
             //TODO: should I add datafileId to subject as well? to be able to delete subjects for this datafile
             var subjects = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).ToList();
 
-            foreach (var sdtmSubject in subjectData)
+            foreach (var sdtmSubject in sdtmData)
             {
                 Study study;
                 if (!studyMap.TryGetValue(sdtmSubject.StudyId, out study))
@@ -115,7 +117,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 else
                 {
                     subjNewFlag = false;
-                    subject.DatasetId = datasetId;
+                    subject.DatasetId = dataset.Id;
                     subject.DatafileId = sdtmSubject.DatafileId;
                     subject.Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name];
                     subject.ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name];
@@ -185,7 +187,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                             VerbatimValue = qualifier.Value,
                             VerbatimName = sco.ShortName,
                             Subject = subject,
-                            DatasetId = datasetId,
+                            DatasetId = dataset.Id,
                             DatafileId = datafileId
                         });
                     }
@@ -196,6 +198,15 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
                 else _subjectRepository.Update(subject);
             }
             return _dataContext.Save().Equals("CREATED");
+        }
+
+        public bool UnloadSubjects(int datasetId, int fileId)
+        {
+
+            _subjectRepository.DeleteMany(s=>s.DatasetId == datasetId && s.DatafileId == fileId);
+            _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
+
+            return _dataContext.Save() == "CREATED";
         }
     }
 }

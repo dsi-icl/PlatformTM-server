@@ -14,7 +14,8 @@ using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Service.Configuration;
 using eTRIKS.Commons.Service.DTOs.Explorer;
-using eTRIKS.Commons.Service.Services.Loading.HdDataLoader;
+using eTRIKS.Commons.Service.Services.HelperService;
+using eTRIKS.Commons.Service.Services.Loading.AssayData;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
 using eTRIKS.Commons.WebAPI.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -79,6 +80,7 @@ namespace eTRIKS.Commons.WebAPI
             BsonClassMap.RegisterClassMap<ObservationNode>();
             BsonClassMap.RegisterClassMap<GroupNode>();
             BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
+            BsonClassMap.RegisterClassMap<MissingValue>();
 
 
 
@@ -114,7 +116,10 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
             services.AddScoped<DataMatrixLoader>();
+            services.AddScoped<HDloader>();
             services.AddScoped<ObservationLoader>();
+
+            services.AddScoped<Formatter>();
 
             services.AddAuthorization(auth =>
             {
