@@ -288,7 +288,7 @@ namespace eTRIKS.Commons.Service.Services
                 //TODO:BRING BACK COLLECTIONSTUDYDAY
                 var assaySamples =
                     _biosampleRepository.FindAll(s => s.AssayId == apQuery.AssayId,
-                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature"}).ToList();
+                        new List<string>() {"Subject", "SampleCharacteristics.CharacteristicFeature", "CollectionStudyDay" }).ToList();
                 queryResult.Samples = assaySamples;
                 //HOW DO I FILTER THE SAMPLES BY THE QUERED PROPERTIES?
                 //HOW DO I filter samples by collectionStudyDay?
@@ -302,16 +302,15 @@ namespace eTRIKS.Commons.Service.Services
                 //    );
 
                 //}
-                //if (apQuery.SampleQueries.Exists(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay)))
-                //{
-                //    var dayQuery = apQuery.SampleQueries.Find(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay));
-                //    if (dayQuery.IsFiltered)
-                //        queryResult.Samples = assaySamples.FindAll(
-                //            s =>
-                //                s.CollectionStudyDay?.Number != null &&
-                //                s.CollectionStudyDay?.Number.Value >= dayQuery.FilterRangeFrom &&
-                //                s.CollectionStudyDay?.Number.Value <= dayQuery.FilterRangeTo);
-                //}
+                if (apQuery.SampleQueries.Exists(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay)))
+                {
+                    var dayQuery = apQuery.SampleQueries.Find(sq => sq.QueryFor == nameof(Biosample.CollectionStudyDay));
+                    if (dayQuery.IsFiltered)
+                        queryResult.Samples = assaySamples.FindAll(
+                            s =>
+                                s.CollectionStudyDay?.Number != null &&
+                                dayQuery.FilterExactValues.Contains(s.CollectionStudyDay?.Number.Value.ToString()));
+                }
 
                 //QUERY AND FILTER SAMPLE CHARACTERISTICS
                 foreach (var sampleQuery in apQuery.SampleQueries.Where(sq=>sq.QueryFor == nameof(Biosample.SampleCharacteristics)))

@@ -372,7 +372,7 @@ namespace eTRIKS.Commons.Service.Services
             var samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
                 new List<string>() {
                     "Study",
-                    "Subject",
+                    "Subject","CollectionStudyDay",
                     "SampleCharacteristics" }).ToList();
 
 
