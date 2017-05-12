@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using MongoDB.Driver;
 
 namespace eTRIKS.Commons.Core.Domain.Interfaces
 {
@@ -40,8 +39,9 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
        
         List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null);
-       
-
+        
+        ////List<object> FindObservationsPaging(Expression<Func<TEntity, bool>> filterExpression = null,Expression<Func<TEntity, object>> projectionExpression = null,Expression<Func<TEntity, object>> features = null,Expression<Func<TEntity, object>> samples = null,int? page = null,int? pageSize = null);
+         
         Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null);
           
 

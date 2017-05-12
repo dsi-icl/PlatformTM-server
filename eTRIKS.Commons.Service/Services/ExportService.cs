@@ -115,12 +115,18 @@ namespace eTRIKS.Commons.Service.Services
                 //////var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
                 //////var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
 
-               
-                var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
-                var values = orderObservations.Select(a => a.Value).ToList(); 
-                var samples = orderObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
-                
+                var features = new List<string>();
+                var samples = new List<string>();
+                var values = new List<double>();
 
+                foreach (var observation in orderObservations)
+                {
+                    features.Add(observation.FeatureName);
+                    samples.Add(observation.SubjectOfObservationName);
+                    values.Add(observation.Value);
+                }
+                samples = samples.Distinct().ToList();
+                features = features.Distinct().ToList();
 
                 // create directory and write the data to file
                 var dirPath = Path.Combine(_downloadFileDirectory, path);
@@ -155,6 +161,67 @@ namespace eTRIKS.Commons.Service.Services
                 return new FileInfo(filePath);
             });
         }
+
+        ////private async Task<FileInfo> ExportAssayTablePaging(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        ////{
+        ////    return await Task.Factory.StartNew(() =>
+        ////    {
+        ////        var projectId = dataset.ProjectId;
+        ////        var activityId = exportData.Samples.First().AssayId;
+
+        ////        var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
+        ////        var features = new List<string>();
+        ////        var samples = new List<string>();
+        ////        var values = new List<double>();
+        ////        int qNumber = 0;
+
+        ////        var dirPath = Path.Combine(_downloadFileDirectory, path);
+        ////        var di = Directory.CreateDirectory(dirPath);
+        ////        if (!di.Exists) return null;
+        ////        var filePath = Path.Combine(dirPath, dataset.Name + ".csv");
+        ////        StreamWriter writer = File.CreateText(filePath);
+
+        ////        writer.WriteLine("features" + "," + string.Join(",", sampleIds));
+        ////        var assayObservations = new List<AssayDataDTO>();
+        ////        var firstLoop = true;
+
+        ////        while (assayObservations.Count > 0 || firstLoop == true)
+        ////        {
+        ////            firstLoop = false;
+        ////            assayObservations.Clear();
+        ////            qNumber++;
+
+        ////            assayObservations = _queryService.GetAssayObservationsPaging(projectId, activityId, sampleIds, qNumber);
+        ////            foreach (var observation in assayObservations)
+        ////            {
+        ////                features.Add(observation.FeatureName);
+        ////                samples.Add(observation.SubjectOfObservationName);
+        ////                values.Add(observation.Value);
+        ////            }
+        ////            samples = samples.Distinct().ToList();
+        ////            features = features.Distinct().ToList();
+        ////            var sb = new StringBuilder();
+        ////            var i = 0;
+        ////            var j = 0;
+        ////            foreach (var value in values)
+        ////            {
+        ////                i++;
+        ////                sb.Append(value + ","); 
+        ////                if (i == exportData.Samples.Count)
+        ////                {
+        ////                    writer.WriteLine(features[j] + "," + sb);
+        ////                    sb.Clear();
+        ////                    i = 0;
+        ////                    j++;
+        ////                }
+        ////            }
+        ////        }
+        ////        writer.Flush();
+        ////        writer.Dispose();
+        ////        return new FileInfo(filePath);
+        ////    });
+        ////}
+
 
         private async Task<FileInfo> ExportSubjectClinicalTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
         {

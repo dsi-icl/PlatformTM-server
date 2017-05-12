@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model.Base;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
+
 
 namespace eTRIKS.Commons.DataAccess.Repositories
 {
@@ -32,7 +32,10 @@ namespace eTRIKS.Commons.DataAccess.Repositories
             throw new NotImplementedException();
         }
         
-
+        ////public List<object> FindObservationsPaging(Expression<Func<TEntity, bool>> filterExpression = null,Expression<Func<TEntity, object>> projectionExpression = null,Expression<Func<TEntity, object>> features = null,Expression<Func<TEntity, object>> samples = null, int? page = null,int? pageSize = null)
+        ////{
+        ////    throw new NotImplementedException(); 
+        ////}
 
         public TEntity Get(TPrimaryKey key)
         {
