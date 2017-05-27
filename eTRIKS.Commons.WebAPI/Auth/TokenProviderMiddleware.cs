@@ -62,9 +62,13 @@ namespace eTRIKS.Commons.WebAPI.Auth
 
             if (appUser == null)
             {
-                context.Response.StatusCode = 400;
-                var err = new {msg = "Invalid username or password."};
-                await context.Response.WriteAsync(JsonConvert.SerializeObject(err, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() }));    
+                context.Response.StatusCode = 200;
+                context.Response.ContentType = "application/json";
+                var result = new
+                {   token_result= "fail",
+                    msg = "Invalid username or password"
+                };
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(result, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() }));    
             }
             var identity = await _accountService.GetClaimsPrincipleForUser(appUser);
             var userData = _accountService.GetUserInfo(identity.FindFirstValue(ClaimTypes.NameIdentifier)).Result;
@@ -87,6 +91,7 @@ namespace eTRIKS.Commons.WebAPI.Auth
             var response = new
             {
                 access_token = encodedToken,
+                token_result = "success",
                 user = userData,
                 expires_in = (int)_options.ExpiresSpan.TotalSeconds
             };

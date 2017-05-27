@@ -11,7 +11,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
   </PropertyGroup>
   <ItemGroup>
     <File Include="appsettings.json">
-      <publishTime>04/25/2017 18:44:51</publishTime>
+      <publishTime>04/05/2017 19:29:11</publishTime>
     </File>
     <File Include="CsvHelper.dll">
       <publishTime>09/09/2016 14:59:46</publishTime>
@@ -26,28 +26,28 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>05/04/2017 01:41:52</publishTime>
     </File>
     <File Include="eTRIKS.Commons.DataAccess.dll">
-      <publishTime>05/04/2017 01:41:54</publishTime>
+      <publishTime>05/05/2017 01:18:13</publishTime>
     </File>
     <File Include="eTRIKS.Commons.DataAccess.pdb">
-      <publishTime>05/04/2017 01:41:54</publishTime>
+      <publishTime>05/05/2017 01:18:13</publishTime>
     </File>
     <File Include="eTRIKS.Commons.Service.dll">
-      <publishTime>05/04/2017 01:41:55</publishTime>
+      <publishTime>05/05/2017 01:18:14</publishTime>
     </File>
     <File Include="eTRIKS.Commons.Service.pdb">
-      <publishTime>05/04/2017 01:41:55</publishTime>
+      <publishTime>05/05/2017 01:18:14</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.deps.json">
-      <publishTime>05/04/2017 01:41:58</publishTime>
+      <publishTime>05/15/2017 17:13:07</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.dll">
-      <publishTime>05/04/2017 01:41:57</publishTime>
+      <publishTime>05/15/2017 17:12:42</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.pdb">
-      <publishTime>05/04/2017 01:41:57</publishTime>
+      <publishTime>05/15/2017 17:12:42</publishTime>
     </File>
     <File Include="eTRIKS.Commons.WebAPI.runtimeconfig.json">
-      <publishTime>05/04/2017 01:41:58</publishTime>
+      <publishTime>05/15/2017 17:13:08</publishTime>
     </File>
     <File Include="Microsoft.ApplicationInsights.AspNetCore.dll">
       <publishTime>09/28/2016 16:29:52</publishTime>
@@ -692,7 +692,7 @@ by editing this MSBuild file. In order to learn more about this please visit htt
       <publishTime>11/05/2016 04:57:22</publishTime>
     </File>
     <File Include="Web.config">
-      <publishTime>05/04/2017 01:41:59</publishTime>
+      <publishTime>05/15/2017 17:13:08</publishTime>
     </File>
   </ItemGroup>
 </Project>

@@ -105,6 +105,11 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _explorerService.GroupObservations(projectId, observations);
         }
+        [HttpPost("projects/{projectId}/observations/clinical/{obsId}/qualifiers")]
+        public List<ObservationRequestDTO> GetObservationQualifiers(int projectId, [FromBody] ObservationRequestDTO obsReq)
+        {
+            return _explorerService.GetObsQualifierRequests(projectId, obsReq);
+        }
 
         [HttpGet("projects/{projectId}/observations/clinical/browse")]
         public async Task<ClinicalExplorerDTO> GetClinicalTree(int projectId)
