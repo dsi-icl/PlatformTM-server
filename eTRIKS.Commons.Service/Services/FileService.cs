@@ -50,7 +50,7 @@ namespace eTRIKS.Commons.Service.Services
             _observationRepository = uoW.GetRepository<Observation, int>();
         }
 
-        public async Task<bool> LoadFile(int fileId, int datasetId)
+        public bool LoadFile(int fileId, int datasetId)
         {
             
             var file = _fileRepository.Get(fileId);
@@ -69,7 +69,7 @@ namespace eTRIKS.Commons.Service.Services
                     filePath = file.Path + "\\" + file.FileName;
                     dataTable = ReadOriginalFile(filePath);
                     var hdDataloader = new HDloader(_dataServiceUnit);
-                    success = await hdDataloader.LoadHDdata(datasetId, fileId, dataTable);
+                    success = hdDataloader.LoadHDdata(datasetId, fileId, dataTable);
                     return success;
             }
             return false;

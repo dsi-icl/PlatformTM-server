@@ -25,7 +25,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
             _observationRepository = uoW.GetRepository<Observation, Guid>();
         }
 
-        internal async Task<bool> LoadHDdata(int datasetId, int fileId, DataTable dataTable)
+        internal  bool LoadHDdata(int datasetId, int fileId, DataTable dataTable)
         {
             var dataset = _datasetRepository.FindSingle(d => d.Id == datasetId);
             var dataFile = _dataFileRepository.Get(fileId);
@@ -96,7 +96,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
                 _observationRepository.InsertMany(observations);
                 Debug.WriteLine(dataTable.Rows.Count + " RECORD(s) SUCCESSFULLY ADDED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 dataFile.State = "FAILED";
                 dataFile.IsLoadedToDB = false;
