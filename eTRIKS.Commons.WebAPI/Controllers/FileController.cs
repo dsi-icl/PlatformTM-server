@@ -36,9 +36,9 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("{fileId}/load/datasets/{datasetId}")]
-        public async void LoadFile(int fileId, int datasetId)
+        public void LoadFile(int fileId, int datasetId)
         {
-            var success = await _fileService.LoadFile(fileId, datasetId);
+            var success = _fileService.LoadFile(fileId, datasetId);
             //if (success)
             //    return Ok(true);
             //return new BadRequestResult();
@@ -54,17 +54,16 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         [HttpGet]
         [Route("{fileId}/unload")]
-        public void UnloadFile(int fileId)
+        public async void UnloadFile(int fileId)
         {
-            _datasetService.UnloadFileDatasets(fileId);
-            //    _fileService.DeleteFile(fileId);
+            await _datasetService.UnloadFileDatasets(fileId);
         }
 
         [HttpGet]
         [Route("{fileId}/remove")]
-        public void DeleteFile(int fileId)
+        public async void DeleteFile(int fileId)
         {
-            if(_datasetService.UnloadFileDatasets(fileId))
+            if(await _datasetService.UnloadFileDatasets(fileId))
             _fileService.DeleteFile(fileId);
         }
 

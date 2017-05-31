@@ -14,7 +14,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     {
 
         //private FileHandler _fileHandler;
-        private TemplateService templateService;
+        //private TemplateService templateService;
         private Formatter _formatterService;
 
         public DataParserController(Formatter formatterService)

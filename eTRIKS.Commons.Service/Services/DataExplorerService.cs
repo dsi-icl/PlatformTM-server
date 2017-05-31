@@ -376,7 +376,6 @@ namespace eTRIKS.Commons.Service.Services
                     "SampleCharacteristics" }).ToList();
 
 
-
             //var sampleTimePoints = _biosampleRepository.FindAll(s => s.AssayId == assayId,
             //    new List<string>() {
             //        "CollectionStudyDay" }).ToList();
@@ -393,6 +392,7 @@ namespace eTRIKS.Commons.Service.Services
 
             if (reqSampleChars != null)
             {
+                reqSampleChars = reqSampleChars.FindAll(r => r.IsSampleCharacteristic && r.ActivityId == assayId);
                 foreach (var column in reqSampleChars)
                     sampleTable.Columns.Add(column.Name.ToLower());
             }
@@ -832,6 +832,62 @@ namespace eTRIKS.Commons.Service.Services
 
             return AEsByMedDRA;
 
+        }
+
+        public List<ObservationRequestDTO> GetObsQualifierRequests(int projectId,ObservationRequestDTO obsreq)
+        {
+            List<ObservationRequestDTO> obsRequests;
+            if (obsreq.IsOntologyEntry)
+            {
+                var sdtmrows = obsreq.Group != null ?
+                     _sdtmRepository.FindAll(
+                        s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue
+                         && s.ProjectId == projectId
+                         && s.Group == obsreq.Group)
+                     .ToList()
+                     : _sdtmRepository.FindAll(
+                         s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue
+                         && s.ProjectId == projectId)
+                     .ToList();
+
+                var dbtopicid = sdtmrows.FirstOrDefault().DBTopicId;
+                var O3 = _observationRepository.FindSingle(o => o.Id == dbtopicid,
+                    new List<string>()
+                    {
+                        "DefaultQualifier",
+                        "Qualifiers.Qualifier",
+                        "Timings.Qualifier"
+                    });
+
+                //temp for now just do it for thefrom te first o3
+                var qualifiers = O3.Qualifiers.Select(q => q.Qualifier).ToList();
+                qualifiers.AddRange(O3.Timings.Select(q => q.Qualifier));
+
+                obsRequests = qualifiers.Select(qualifier => new ObservationRequestDTO()
+                {
+                    O3 = obsreq.O3,
+                    O3id = obsreq.O3id,
+                    O3code = obsreq.O3code,
+                    QO2 = qualifier.Name,
+                    QO2id = qualifier.Id,
+                    DataType = qualifier.DataType,
+                    QO2_label = qualifier.Label,
+                    Group = obsreq.Group,
+                    IsEvent = obsreq.IsEvent,
+                    IsFinding = obsreq.IsFinding,
+                    IsClinicalObservations = obsreq.IsClinicalObservations,
+                    IsOntologyEntry = obsreq.IsOntologyEntry,
+                    OntologyEntryCategoryName = obsreq.OntologyEntryCategoryName,
+                    OntologyEntryValue = obsreq.OntologyEntryValue,
+                    ProjectId = obsreq.ProjectId,
+                    TermIds = sdtmrows.Select(p => p.DBTopicId).Distinct().ToList(),
+                }).ToList();
+            }
+            else
+            {
+                obsRequests = null;
+            }
+            return obsRequests;
         }
 
         private ObservationNode createMedDRATermNode(IGrouping<string, SdtmRow> PTs, string oeCategory, string gcode, string gname)

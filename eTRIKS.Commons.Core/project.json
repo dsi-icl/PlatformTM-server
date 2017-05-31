@@ -2,7 +2,6 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "MongoDB.Driver": "2.4.3",
     "System.Collections": "4.3.0",
     "System.Linq": "4.3.0",
     "System.Linq.Expressions": "4.3.0",

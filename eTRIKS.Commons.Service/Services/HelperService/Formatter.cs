@@ -77,9 +77,9 @@ namespace eTRIKS.Commons.Service.Services.HelperService
 
             //List<string> ids = new List<string>() { "SAMPLEID","POP","COUNT", "PERTOT"};
             List<string> ids = new List<string>() { "SAMPLEID" };
-            List<string> gatherColumns = new List<string>();
-            int gatherColumnsFrom = 7;
-            int gatherColumnsTo = 111;
+            //List<string> gatherColumns = new List<string>();
+            //int gatherColumnsFrom = 7;
+            //int gatherColumnsTo = 111;
 
 
 
@@ -147,7 +147,7 @@ namespace eTRIKS.Commons.Service.Services.HelperService
             newTable.TableName = "CRC305ABC_LUMINEX_DATA";
             int gatherColumnsFrom = 8, gatherColumnsTo = 28;
 
-            int studyIdcol = 0, sampleId = 1; 
+            //int studyIdcol = 0, sampleId = 1; 
 
             foreach (var header in headers)
             {

@@ -440,14 +440,14 @@ namespace eTRIKS.Commons.Service.Services
             catch (Exception e)
             {
                 Debug.WriteLine("Failed to load descriptors to SQL database", e.Message);
-                UnloadDataset(datasetId,fileId,"LOADING FAILED");
+                await UnloadDataset(datasetId,fileId,"LOADING FAILED");
 
             }
 
             return loaded;
         }
 
-        public bool UnloadDataset(int datasetId, int fileId, string status="UNLOADED")
+        public async Task<bool> UnloadDataset(int datasetId, int fileId, string status="UNLOADED")
         {
             try
             {
@@ -465,7 +465,7 @@ namespace eTRIKS.Commons.Service.Services
                     default:
                         var observationLoader = new ObservationLoader(_dataServiceUnit);
                         observationLoader.UnloadObservations(datasetId, fileId);
-                        _cacheService.GenerateAndCacheClinicalDTO(dataset.Activity.ProjectId);
+                        await _cacheService.GenerateAndCacheClinicalDTO(dataset.Activity.ProjectId);
                         break;
                 }
             
@@ -487,12 +487,12 @@ namespace eTRIKS.Commons.Service.Services
             return true;
         }
 
-        public bool UnloadFileDatasets(int fileId)
+        public async Task<bool> UnloadFileDatasets(int fileId)
         {
             var file = _dataFileRepository.FindSingle(f => f.Id == fileId, new List<string>() {"Datasets"});
             bool result = true;
             foreach (var dataset in file.Datasets)
-                result = result && UnloadDataset(dataset.DatasetId, fileId);
+                result = result && await UnloadDataset(dataset.DatasetId, fileId);
             return result;
         }
 

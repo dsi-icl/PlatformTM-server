@@ -1,23 +1,17 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Base;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.DTOs;
 using eTRIKS.Commons.Service.DTOs.Explorer;
-using Microsoft.EntityFrameworkCore.Query.ExpressionTranslators;
-using MongoDB.Driver;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -34,8 +28,6 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<Core.Domain.Model.ObservationModel.Observation, Guid> _observationRepository;
-
-
 
         public QueryService(IServiceUoW uoW)
         {
@@ -375,10 +367,11 @@ namespace eTRIKS.Commons.Service.Services
         private void _getObservations(CombinedQuery combinedQuery, ref DataExportObject queryResult)
         {
             List<SdtmRow> observations = new List<SdtmRow>();
-           
+            HashSet<string> ObsFilteredSubjectIds = new HashSet<string>();
 
-            //GROUP CLINICAL OBSERVATIONS (GROUP AND INDIVIDUAL)
-            var obsQueries = combinedQuery.ClinicalObservations.Union(combinedQuery.GroupedObservations).ToList();
+
+        //GROUP CLINICAL OBSERVATIONS (GROUP AND INDIVIDUAL)
+        var obsQueries = combinedQuery.ClinicalObservations.Union(combinedQuery.GroupedObservations).ToList();
 
             //GROUP CLINICAL OBSERVATIONS BY O3 TO QUERY FOR THE OBSERVATION (E.G. HEADACHE ONLY ONCE EVEN IF TWO REQUEST ARE MADE (e.g. AEOCCUR and AESEV)
             var queriesByO3Id = obsQueries.GroupBy(f => f.QueryObjectName).ToList();
@@ -398,34 +391,41 @@ namespace eTRIKS.Commons.Service.Services
                 //////////////////////////////////////////////////////////////////////////////////////////////
 
                 var obsQueryResult = new List<SdtmRow>();
+
+                //QUERYING FOR OBSERVATIONS
                 foreach (var o3q in o3q_list)
                 {
                     obsQueryResult.AddRange(o3q.IsOntologyEntry
                          ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[o3q.TermCategory] == o3q.TermId.ToString() && s.Group == o3q.Group && s.ProjectId == o3q.ProjectId).ToList()
                          : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList());
-
                 }
 
+                //FILTERING OBSERVATIONS
                 foreach (var oq in sameO3queries) //AEOCCUR / AESEV
                 {
-                    if (oq.IsFiltered)
-                    {
-                        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
-                        obsQueryResult.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
+                    if (!oq.IsFiltered) continue;
 
-                        string v = null;
-                        obsQueryResult = oq.DataType == "string"
-                                    ? obsQueryResult.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
-                                    : obsQueryResult.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
-                                                                float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
+                    //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
+                    obsQueryResult.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
 
-                        queryResult.ObservationsFiltered = true;
+                    string v = null;
+                    obsQueryResult = oq.DataType == "string"
+                        ? obsQueryResult.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+                        : obsQueryResult.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
+                                                      float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
 
-                    }
+                    var filteredSubjectIds = obsQueryResult.Select(o => o.USubjId).Distinct().ToList();
+
+                    if (!ObsFilteredSubjectIds.Any()) ObsFilteredSubjectIds.UnionWith(filteredSubjectIds);
+
+                    ObsFilteredSubjectIds.IntersectWith(filteredSubjectIds);
+                    queryResult.ObservationsFiltered = true;
                 }
                 observations.AddRange(obsQueryResult);
             }
 
+            //CASCADE FILTERING OF OBERVATIONS FROM ALL FILTERS ON OBSERVATIONS
+            observations = observations.FindAll(o => ObsFilteredSubjectIds.Contains(o.USubjId));
             queryResult.Observations = observations;
         }
 
