@@ -21,7 +21,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .IsRequired();
 
             // Table & Column Mappings
-            builder.ToTable("Variable_Reference_TBL");
+            builder.ToTable("VariableReferences");
             builder.Property(t => t.VariableDefinitionId).HasColumnName("VariableId");
             builder.Property(t => t.DatasetId).HasColumnName("ActivityDatasetId");
             

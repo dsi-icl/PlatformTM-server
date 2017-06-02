@@ -8,7 +8,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
 {
     public class DatasetField
     {
-        public ObservationQuery QueryObject { get; set; }
+        public Query QueryObject { get; set; }
         public string ColumnHeader { get; set; }
         public bool ColumnHeaderIsEditable { get; set; } = true;
         private string _name;
@@ -18,9 +18,20 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
             {
                 if (QueryObject != null)
                 {
-                    if (QueryObjectType == nameof(SubjectCharacteristic))
-                        return "SubjectCharacteristics[" + QueryObject.QueryObjectName + "]";
-                    return QueryObject.TermName + (QueryObject.PropertyLabel != null ? "[" + QueryObject.PropertyLabel + "]" : "");
+                    //if (QueryObjectType == nameof(SubjectCharacteristic))
+                    //    return "SubjectCharacteristics" + QueryObject.QueryObjectName + "";
+                    ////********************************************************************************************************************************************************
+
+                    //if (QueryObjectType == nameof(SampleCharacteristic))
+                    //    return "SampleCharacteristics" + QueryObject.QueryObjectName + "";
+                    ////********************************************************************************************************************************************************
+                    if (QueryObject is ObservationQuery)
+                    {
+                        return ((ObservationQuery)QueryObject).TermName + (((ObservationQuery)QueryObject).PropertyLabel != null ? "" + ((ObservationQuery)QueryObject).PropertyLabel + "" : "");
+
+                    }
+                    return QueryObject.QueryFor + "[" + QueryObject.QuerySelectProperty + "]";
+
                 }
                     
                 return _name;

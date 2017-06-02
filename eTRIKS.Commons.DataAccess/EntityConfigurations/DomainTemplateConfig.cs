@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 {
-    public class DomainTemplateConfig : EntityTypeConfiguration<DomainTemplate>
+    public class DomainTemplateConfig : EntityTypeConfiguration<DatasetTemplate>
     {
-        public override void Configure(EntityTypeBuilder<DomainTemplate> builder)
+        public override void Configure(EntityTypeBuilder<DatasetTemplate> builder)
         {
             // Primary Key
             builder.HasKey(t => t.Id);
@@ -17,7 +17,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .IsRequired()
                 .HasMaxLength(200);
 
-            builder.Property(t => t.Name)
+            builder.Property(t => t.Domain)
                 .HasMaxLength(2000);
 
             builder.Property(t => t.Class)
@@ -33,7 +33,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Templates.DomainDataset_TBL");
+            builder.ToTable("DomainTemplates");
             builder.Property(t => t.Id).HasColumnName("OID");
         }
     }

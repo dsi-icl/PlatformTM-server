@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 {
-    public class CharacteristicObjectConfig : EntityTypeConfiguration<CharacteristicObject>
+    public class CharacteristicObjectConfig : EntityTypeConfiguration<CharacteristicFeature>
     {
-        public override void Configure(EntityTypeBuilder<CharacteristicObject> builder)
+        public override void Configure(EntityTypeBuilder<CharacteristicFeature> builder)
         {
             // Primary Key
             builder.HasKey(t => t.Id);
@@ -18,6 +18,10 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.HasOne(t => t.ControlledTerm)
                 .WithMany()
                 .HasForeignKey(t => t.CVtermId);
+
+            builder.HasOne(t => t.Activity)
+                .WithMany()
+                .HasForeignKey(t => t.ActivityId);
 
             builder.HasOne(t => t.Project)
                 .WithMany()

@@ -13,6 +13,12 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             // Table & Column Mappings
             builder.ToTable("UserAccountClaims");
             builder.Property(t => t.Id).HasColumnName("CalimId");
+
+           
+
+            builder.HasOne(t => t.UserAccount)
+               .WithMany(s => s.Claims)
+               .HasForeignKey(t => t.UserAccountId);
         }
     }
 }

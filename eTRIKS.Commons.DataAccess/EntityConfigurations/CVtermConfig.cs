@@ -38,7 +38,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("CVterm_TBL");
+            builder.ToTable("CVterms");
             builder.Property(t => t.Id).HasColumnName("OID");
 
             // Relationships

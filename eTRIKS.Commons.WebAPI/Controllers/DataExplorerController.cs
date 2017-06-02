@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using eTRIKS.Commons.Service.Services;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using eTRIKS.Commons.WebAPI.Extensions;
@@ -17,23 +19,30 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class DataExplorerController : Controller
     {
         private readonly DataExplorerService _explorerService;
+        private readonly QueryService _queryService;
+        private readonly ProjectService _projectService;
 
-        public DataExplorerController(DataExplorerService explorerService)
+        public DataExplorerController(DataExplorerService explorerService, QueryService queryService, ProjectService projectService)
         {
             _explorerService = explorerService;
+            _queryService = queryService;
+            _projectService = projectService;
         }
 
         [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
-        public List<ObservationRequestDTO> GetSubjectCharacteristics(int projectId)
+        public IActionResult GetSubjectCharacteristics(int projectId)
         {
-            return _explorerService.GetSubjectCharacteristics(projectId);
+            var subjChars = _explorerService.GetSubjectCharacteristics(projectId);
+            if (subjChars != null)
+                return Ok(subjChars);
+            return NotFound();
         }
         
         [HttpPost("projects/{projectId}/saveQuery")]
         public IActionResult SaveQuery(int projectId, [FromBody] CombinedQueryDTO cdto )
        {
-          var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-          var savedQuery =  _explorerService.SaveQuery(cdto, userId, projectId);
+          var userId = User.FindFirst(ClaimTypes.UserData).Value;
+          var savedQuery =  _queryService.SaveQuery(cdto, userId, projectId);
             
             if (savedQuery != null)
                 return new CreatedAtRouteResult("GetSavedQuery", new { projectId = projectId, queryId = savedQuery.Id.ToString() }, savedQuery);
@@ -45,39 +54,42 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet("projects/{projectId}/queries/{queryId}", Name = "GetSavedQuery")]
         public IActionResult GetSavedQuery(int projectId, string queryId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             if (!User.Identity.IsAuthenticated)
-                return null;
-            var query =  _explorerService.GetSavedCombinedQuery(projectId, userId,queryId);
+                return Unauthorized();
+            var query = _queryService.GetSavedCombinedQuery(projectId, userId,queryId);
             if(query != null)
                 return Ok(query);
             return NotFound();
         }
 
-        [HttpGet("projects/{projectId}/GetSavedQueries", Name = "")]
-        public List<CombinedQuery> GetSavedQueries(int projectId) 
+        [HttpGet("projects/{projectId}/queries/browse", Name = "")]
+        public IActionResult GetSavedQueries(int projectId) 
+        {
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
+            var queries = _projectService.GetProjectSavedQueries(projectId, userId);
+            if (queries != null)
+                return Ok(queries);
+            return NotFound();
+        }
+
+        /*
+        [Route("projects/{projectId}/UpdateQueries")]
+        [HttpGet]
+        //public IEnumerable<CombinedQueryDTO> Get()
+        public List<CombinedQuery> UpdateQueries(CombinedQueryDTO cdto, int projectId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             if (!User.Identity.IsAuthenticated)
                 return null;
-            return _explorerService.GetSavedQueries(projectId, userId);
+            return _explorerService.UpdateQueries(cdto, projectId, userId);
         }
-
-       
-
-        //[Route("projects/{projectId}/UpdateQueries")]
-        //[HttpGet]
-        ////public IEnumerable<CombinedQueryDTO> Get()
-        //public List<CombinedQuery> UpdateQueries(CombinedQueryDTO cdto, int projectId)
-        //{
-        //    var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-        //    if (!User.Identity.IsAuthenticated)
-        //        return null;
-        //    return _explorerService.UpdateQueries(cdto, projectId, userId);
-        //}
-
+        */
+         
         [HttpPost("projects/{projectId}/subjects/search")]
-        public  Hashtable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
+        public  DataTable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {
             return  _explorerService.GetSubjectData(projectId, requestedSCs);
         }
@@ -93,18 +105,28 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         {
             return _explorerService.GroupObservations(projectId, observations);
         }
+        [HttpPost("projects/{projectId}/observations/clinical/{obsId}/qualifiers")]
+        public List<ObservationRequestDTO> GetObservationQualifiers(int projectId, [FromBody] ObservationRequestDTO obsReq)
+        {
+            return _explorerService.GetObsQualifierRequests(projectId, obsReq);
+        }
 
         [HttpGet("projects/{projectId}/observations/clinical/browse")]
-        public async Task<IEnumerable<ClinicalDataTreeDTO>> GetClinicalTree(int projectId)
+        public async Task<ClinicalExplorerDTO> GetClinicalTree(int projectId)
         {
             return await _explorerService.GetClinicalObsTree(projectId);
         }
 
         [HttpGet("projects/{projectId}/assays/browse")]
-        public List<AssayDTO> GetAssays(int projectId)
+        public List<AssayBrowserDTO> GetAssays(int projectId)
         {
             return _explorerService.GetProjectAssays(projectId);
         }
 
+        [HttpPost("projects/{projectId}/assays/{assayId}/samples/search")]
+        public DataTable GetAssaySamples(int projectId, int assayId, [FromBody] List<ObservationRequestDTO> characteristics)
+        {
+            return _explorerService.GetSampleDataForAssay(assayId, characteristics);
+        }
     }
 }

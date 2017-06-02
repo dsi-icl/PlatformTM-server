@@ -50,6 +50,43 @@ namespace eTRIKS.Commons.DataAccess.Repositories
                     .ToListAsync();
             return null;
         }
+        
+        public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
+        {
+            if (filterExpression != null)
+            {
+                return collection
+                    .Find(filterExpression)
+                    .Project(projectionExpression)
+                    .ToList();
+
+            //if (filterExpression != null)
+            //    return collection
+            //         .AsQueryable()
+            //         .Where(filterExpression)
+            //         .Select(projectionExpression)
+            //         .ToList();
+              }
+              
+            return null;
+        }
+
+
+        ////public List<object> FindObservationsPaging(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null, Expression<Func<TEntity, object>> features = null , Expression<Func<TEntity, object>> samples = null, int? page = null, int? pageSize = null)
+        ////{
+        ////    if (filterExpression != null)
+        ////        return collection   
+        ////                          .AsQueryable()
+        ////                          .Where(filterExpression)
+        ////                          .OrderBy(features)
+        ////                          .ThenBy(samples)
+        ////                          .Select(projectionExpression)
+        ////                          .Skip((page.Value - 1) * pageSize.Value)
+        ////                          .Take(pageSize.Value)
+        ////                          .ToList();
+        ////    return null;
+        ////}
+
 
         public async Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null)
         {
@@ -220,7 +257,6 @@ namespace eTRIKS.Commons.DataAccess.Repositories
         {
             var filter = new BsonDocument("_id", Guid.Parse(entity.Id.ToString()));
             var result = collection.ReplaceOne(filter, entity);
-            //throw new NotImplementedException();
             return entity;
         }
 
@@ -228,7 +264,11 @@ namespace eTRIKS.Commons.DataAccess.Repositories
 
         public Task<int> UpdateAsync(TEntity entity)
         {
+            //var filter = new BsonDocument("_id", Guid.Parse(entity.Id.ToString()));
+            //var result = await collection.ReplaceOneAsync(filter, entity);
+            //return result.MatchedCount;
             throw new NotImplementedException();
+
         }
 
         public void Remove(TEntity entity)

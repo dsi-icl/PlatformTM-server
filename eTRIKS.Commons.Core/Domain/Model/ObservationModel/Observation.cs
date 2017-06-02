@@ -4,34 +4,48 @@ using eTRIKS.Commons.Core.Domain.Model.Base;
 
 namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
-    //IF Observation Data is going to be stored in MySQL then will leave references to other entites such as O3 and Subject
-    //As long as the Descriptor is saved in MySQL with references to project, stud
     public class Observation : Identifiable<Guid>
     {
-        public string ObjectOfObservation { get; set; } //Headache or PTB2 //FEATURE
-        public int O3Id { get; set; }
-        //public string SubjectOfObservation { get; set; } //Subject1 or Sample 1
-        public string SO2Id { get; set; } //Subject or Sample Id
-        public string SO2Type { get; set; } //Subject or Sample
-        public string Study { get; set; } //CRC305A CRC305B
-        public int StudyDBId { get; set; }
+        /// <summary>
+        /// Mapped to the value of FeatureIdentifier set in the feature annotation dataset (Topic Variable in SDTM / FeatureIdentifier in other templates)
+        /// </summary>
+        public string FeatureName { get; set; } //Headache or PTB2 //FEATURE 
+        public int FeatureId { get; set; }
 
-        public List<ObservedPropertyValue> ObservedProperties { get; set; } //the measures being observed (e.g. OCCURENCE, RESULT, DOSAGE ...
-        public ObservedPropertyValue DefaultObservedProperty { get; set; }
-        public List<ObservedPropertyValue> TemporalProperties { get; set; } //Date of collection, duration, interval ...etc
-        public List<ObservedPropertyValue> TimeSeriesDescriptors { get; set; } //Visit, Study day, timepoint ..etc
+        /// <summary>
+        /// mapped to the value of Sample Submitted Identifier (BSREFID in case of SDTM-BS) or (USUBJID in case of SDTM-DM)
+        /// </summary>
+        public string SubjectOfObservationName { get; set; }
+        /// <summary>
+        /// Mapped to the value of the MySQL Study/Sample table primary key (SubjectId or SampleId)
+        /// </summary>
+        public string SubjectOfObservationId { get; set; }
+
+
+        public string StudyName { get; set; } //CRC305A CRC305B
+        public int StudyId { get; set; } //MySQL Study Table primary key
+
+        /// <summary>
+        /// The value for a particular qualifier property (Property Descriptor) 
+        /// </summary>
+        /// <example> Value for Log Ratio , Value for Severity, Value for Test result, Value for Occurence ... </example>
+        public ObservedPropertyValue ObservedValue { get; set; }
+        
+        //TODO: to reconsider these two propeties later
+        public ObservedPropertyValue TemporalValue { get; set; }
+        public ObservedPropertyValue TimeSeriesValue { get; set; }
 
         //TODO: need to decide whether I shuold keep these here or move to feature obj and subj class... 
-        public List<ObservedPropertyValue> FeatureProperties { get; set; } //Properties about the feature/O3 featured in this observation NOT the observation itself
-        public List<ObservedPropertyValue> SO2Properties { get; set; } //Properties of the sample or the subject being observed
+        //public List<ObservedPropertyValue> FeatureProperties { get; set; } //Properties about the feature/O3 featured in this observation NOT the observation itself
+        //public List<ObservedPropertyValue> SO2Properties { get; set; } //Properties of the sample or the subject being observed
 
-
-        //public MeasureOfObservationProperty ObservedPropertyValue { get; set; }
-        //public VariableDefinition TimeDescriptor { get; set; } //should be a key, value
-        //public Visit Visit { get; set; }
-
-        //ALREADY this observation has an observationdescription
-
+        public int DatasetId { get; set; }
+        public int DatafileId { get; set; }
+        /// <summary>
+        /// Also maps to AssayId in case of Assay Observations
+        /// </summary>
+        public int ActivityId { get; set; }
+        public int? ProjectId { get; set; }
 
     }
 

@@ -27,6 +27,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public List<VariableDefinition> ResultVariables { get; set; }
         public List<VariableDefinition> SynonymVariables { get; set; }
         public List<VariableDefinition> VariableQualifierVariables { get; set; }
+        public List<VariableDefinition> TimeVariables { get; set; }
         public VariableDefinition DefaultQualifier { get; set; }
 
         //VISIT VARIABLES
@@ -48,11 +49,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public VariableDefinition EndStudyDayVariable { get; set; } //--ENDY
 
         //SUBJECT SPECIFIC VARIABLES
-        public VariableDefinition ArmVariable { get; set; }
-        public VariableDefinition ArmCodeVariable { get; set; }
-        public VariableDefinition RefStartDate { get; set; }
-        public VariableDefinition RefEndDate { get; set; }
-        public VariableDefinition SiteIdVariable { get; set; }
+        //public VariableDefinition ArmVariable { get; set; }
+        //public VariableDefinition ArmCodeVariable { get; set; }
+        //public VariableDefinition RefStartDate { get; set; }
+        //public VariableDefinition RefEndDate { get; set; }
+        //public VariableDefinition SiteIdVariable { get; set; }
 
         public bool ObsIsAFinding { get; set; } = false;
         public bool ObsIsAnEvent { get; set; } = false;
@@ -64,15 +65,15 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 
 
 
-        public Dictionary<string, VariableDefinition> name2variable { get; set; }
+        //public Dictionary<string, VariableDefinition> name2variable { get; set; }
 
         public static SdtmRowDescriptor GetSdtmRowDescriptor(Dataset dataset)
         {
             var descriptor = new SdtmRowDescriptor();
 
-            descriptor.Class = dataset.Domain.Class;
-            descriptor.Domain = dataset.Domain.Name;
-            descriptor.DomainCode = dataset.Domain.Code;
+            descriptor.Class = dataset.Template.Class;
+            descriptor.Domain = dataset.Template.Domain;
+            descriptor.DomainCode = dataset.Template.Code;
 
             descriptor.ObsIsAFinding = descriptor.Class.ToUpper() == ("FINDINGS");
             descriptor.ObsIsAnEvent = descriptor.Class.ToUpper() == "EVENTS";
@@ -95,13 +96,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
 
             descriptor.TopicCVtermVariable = dataset.Variables
                         .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "DECOD");
-            if (dataset.Domain.Class.ToLower().Equals("findings"))
+            if (dataset.Template.Class.ToLower().Equals("findings"))
                 descriptor.TopicCVtermVariable = dataset.Variables
                     .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "LOINC");
 
             descriptor.TopicSynonymVariable = dataset.Variables
                     .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "MODIFY");
-            if (dataset.Domain.Class.ToLower().Equals("findings") || dataset.Domain.Code.ToLower().Equals("bs"))
+            if (dataset.Template.Class.ToLower().Equals("findings") || dataset.Template.Code.ToLower().Equals("bs"))
                 descriptor.TopicSynonymVariable = dataset.Variables
                     .Select(l => l.VariableDefinition).FirstOrDefault(v => v.Name == descriptor.DomainCode + "TEST");
 
@@ -129,6 +130,10 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             descriptor.ResultVariables = dataset.Variables
                         .Select(l => l.VariableDefinition)
                         .Where(v => v.RoleId == "CL-Role-T-8")
+                        .ToList();
+            descriptor.TimeVariables = dataset.Variables
+                        .Select(l => l.VariableDefinition)
+                        .Where(v => v.RoleId == "CL-Role-T-6")
                         .ToList();
 
             //MedDRAVariables
@@ -178,17 +183,17 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
                dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == descriptor.DomainCode + "ENDY")?.VariableDefinition;
 
 
-            //DEMOGRAPHICS SPECIFIC VARIABLES
-            //ARM
-            descriptor.ArmVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARM")?.VariableDefinition;
-            //ARMCODE
-            descriptor.ArmCodeVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARMCD")?.VariableDefinition;
-            //Subject Reference Start Date
-            descriptor.RefStartDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFSTDTC")?.VariableDefinition;
-            //Reference End Date
-            descriptor.RefEndDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFENDTC")?.VariableDefinition;
-            //SITE ID
-            descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
+            ////DEMOGRAPHICS SPECIFIC VARIABLES
+            ////ARM
+            //descriptor.ArmVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARM")?.VariableDefinition;
+            ////ARMCODE
+            //descriptor.ArmCodeVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "ARMCD")?.VariableDefinition;
+            ////Subject Reference Start Date
+            //descriptor.RefStartDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFSTDTC")?.VariableDefinition;
+            ////Reference End Date
+            //descriptor.RefEndDate = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "RFENDTC")?.VariableDefinition;
+            ////SITE ID
+            //descriptor.SiteIdVariable = dataset.Variables.SingleOrDefault(v => v.VariableDefinition.Name == "SITEID")?.VariableDefinition;
 
             return descriptor;
         }
@@ -199,9 +204,9 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             const string charResVar = "STRESC";
             const string oriResVar = "ORRES";
             const string occurVar = "SEV";
-            string s;
             if (ObsIsAFinding)
             {
+                string s;
                 if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+numResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + numResVar] != "")
                 {
                     return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + numResVar));
@@ -220,6 +225,13 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
                 return QualifierVariables.Find(rv => rv.Name.Equals(DomainCode + occurVar));
             }
             return null;
+        }
+
+        public List<VariableDefinition> GetAllTimingVariables()
+        {
+            var list = new List<VariableDefinition>();
+            list.AddRange(new List<VariableDefinition>() {VisitNameVariable,VisitNumVariable,VisitPlannedStudyDay,StudyDayVariable,DateTimeVariable});
+            return list;
         }
     }
 

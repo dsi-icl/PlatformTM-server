@@ -32,6 +32,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public Dictionary<string, string> ResultQualifiers { get; set; }
         public Dictionary<string, string> QualifierQualifiers { get; set; }
         public Dictionary<string, string> QualifierSynonyms { get; set; }
+        public Dictionary<string, string> TimingQualifiers { get; set; }
 
         public AbsoluteTimePoint CollectionDateTime { get; set; } //Date of Collection / --DTC
         public RelativeTimePoint CollectionStudyDay { get; set; } //--DY
@@ -48,14 +49,6 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public int VisitPlannedStudyDay { get; set; }
 
         public Dictionary<string, string> Leftovers { get; set; }
-
-
-        //DM SPECIFIC PROPERTIES ... they are qualifiers for subject for a DM domain
-        //public string Arm { get; set; }
-        //public string ArmCode { get; set; }
-        //public string SiteId { get; set; }
-        //public DateTime RFENDTC;
-        //public DateTime RFSTDTC;
 
         public bool BaseLineFlag { get; set; } //--BLFL
 
@@ -77,11 +70,29 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
             ResultQualifiers = new Dictionary<string, string>();
             QualifierSynonyms = new Dictionary<string, string>();
             QualifierQualifiers = new Dictionary<string, string>();
+            TimingQualifiers = new Dictionary<string, string>();
             Leftovers = new Dictionary<string, string>();
         }
 
+        public override bool Equals(Object o)
+        {
+            // If parameter is null return false.
+            if (o == null)
+            {
+                return false;
+            }
 
+            // If parameter cannot be cast to Point return false.
+            SdtmRow r = o as SdtmRow;
+            
 
- 
+            // Return true if the fields match:
+            return (Id == r.Id);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
+        }
     }
 }

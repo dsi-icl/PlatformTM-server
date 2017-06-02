@@ -24,12 +24,18 @@ namespace eTRIKS.Commons.Service.DTOs
         //public List<FileDTO> DataFileDtos { get; set; } 
         public string StandardDataFile { get; set; }
         public string State { get; set; }
-        public List<DatasetVariableDTO> variables { get; set; }
-        public bool isNew { get; set; }
+        public List<DatasetVariableDTO> Variables { get; set; }
+        public List<DatasetVariableDTO> GenericFields { get; set; }
+        public List<DatasetVariableDTO> HeaderFields { get; set; }
+        public bool IsHeaderIncluded { get; set; }
+        public bool IsNew { get; set; }
+        public bool HasHeader { get; set; }
 
         public DatasetDTO()
         {
-            variables = new List<DatasetVariableDTO>();
+            Variables = new List<DatasetVariableDTO>();
+            GenericFields = new List<DatasetVariableDTO>();
+            HeaderFields = new List<DatasetVariableDTO>();
         }
     }
 
@@ -43,10 +49,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public string Description { get; set; }
         public string DataType { get; set; }
         public bool? IsCurated { get; set; }
-       
-        //public CVterm VariableType { get; set; }
-        //public string VariableTypeId { get; set; }
-        //public CVterm Role { get; set; }
+      
         public string RoleId { get; set; }
         public Nullable<int> OrderNumber { get; set; }
         public Nullable<bool> IsRequired { get; set; }
@@ -59,8 +62,11 @@ namespace eTRIKS.Commons.Service.DTOs
         //public string DerivedVariablePropertiesId { get; set; }
         public bool IsComputed { get; set; }
         public List<ExpressionElement> ExpressionList { get; set; }
-
         public string UsageId { get; set; }
+        public bool IsGeneric { get; set; }
+        public string Section { get; set; }
+        public List<string> AllowedQualifiers { get; set; }
+        public string GenericFieldQualifier { get; set; }
     }
     public class ExpressionElement
     {

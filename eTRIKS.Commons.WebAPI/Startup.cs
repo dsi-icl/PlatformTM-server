@@ -11,13 +11,19 @@ using eTRIKS.Commons.DataAccess;
 using MySQL.Data.Entity.Extensions;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
+using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Service.Configuration;
+using eTRIKS.Commons.Service.DTOs.Explorer;
+using eTRIKS.Commons.Service.Services.HelperService;
+using eTRIKS.Commons.Service.Services.Loading.AssayData;
+using eTRIKS.Commons.Service.Services.Loading.SDTM;
 using eTRIKS.Commons.WebAPI.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -25,7 +31,7 @@ namespace eTRIKS.Commons.WebAPI
 {
     public class Startup
     {
-        public IConfigurationRoot Configuration { get; }
+        private IConfigurationRoot Configuration { get; }
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -71,7 +77,13 @@ namespace eTRIKS.Commons.WebAPI
             services.Configure<DataAccessSettings>(Configuration.GetSection("DBSettings"));
             services.Configure<FileStorageSettings>(Configuration.GetSection("FileStorageSettings"));
 
-           
+            BsonClassMap.RegisterClassMap<ObservationNode>();
+            BsonClassMap.RegisterClassMap<GroupNode>();
+            BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
+            BsonClassMap.RegisterClassMap<MissingValue>();
+
+
+
 
             services.AddDbContext<BioSPEAKdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
             services.AddScoped<IServiceUoW, BioSPEAKdbContext>();
@@ -89,16 +101,25 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<DatasetService>();
             services.AddScoped<ExportService>();
             services.AddScoped<FileService>();
-            services.AddScoped<ObservationService>();
+            
             services.AddScoped<ProjectService>();
             services.AddScoped<SDTMreader>();
             services.AddScoped<StudyService>();
-            services.AddScoped<SubjectService>();
+            
             services.AddScoped<TemplateService>();
             services.AddScoped<UserDatasetService>();
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
+            services.AddScoped<QueryService>();
+            services.AddScoped<CacheService>();
 
+            services.AddScoped<SubjectLoader>();
+            services.AddScoped<BioSampleLoader>();
+            services.AddScoped<DataMatrixLoader>();
+            services.AddScoped<HDloader>();
+            services.AddScoped<ObservationLoader>();
+
+            services.AddScoped<Formatter>();
 
             services.AddAuthorization(auth =>
             {
@@ -114,7 +135,7 @@ namespace eTRIKS.Commons.WebAPI
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
-            //services.AddMvc()
+            //services.AddMvc();
             .AddJsonOptions(opts =>
                  {
                      // Force Camel Case to JSON
@@ -122,7 +143,13 @@ namespace eTRIKS.Commons.WebAPI
                      //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
                  });
 
-
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.Observation>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.ObservedPropertyValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.CategoricalValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.OrdinalValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.NumericalValue>();
+            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.IntervalValue>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline

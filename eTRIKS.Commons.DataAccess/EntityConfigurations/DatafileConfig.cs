@@ -16,7 +16,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 
             // Table & Column Mappings
             builder
-                .ToTable("DataFiles_TBL");
+                .ToTable("DataFiles");
 
 
             builder

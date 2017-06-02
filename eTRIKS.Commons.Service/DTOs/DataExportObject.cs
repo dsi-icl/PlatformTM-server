@@ -21,9 +21,14 @@ namespace eTRIKS.Commons.Service.DTOs
         public List<Arm> Arms { get; set; }
         public List<Study> Studies { get; set; }
         public List<HumanSubject> Subjects { get; set; }
-        //public List<Study> StudiesWithArmsIncluded { get; internal set; }
+        public List<Biosample> Samples { get; set; }
+        public List<SampleCharacteristic> SampleCharacteristics { get; set; }
         public bool IsSubjectIncluded { get; set; }
+        //************************************************************* This is added to create a bool whether the export data has samples init or not ! used in Export service
+        public bool IsSampleIncluded { get; set; }
+        public bool ObservationsFiltered { get; internal set; }
 
+        //*************************************************************************************************
         public DataExportObject()
         {
             Observations = new List<SdtmRow>();
@@ -31,24 +36,26 @@ namespace eTRIKS.Commons.Service.DTOs
             Visits = new List<Visit>();
             Arms = new List<Arm>();
             Studies = new List<Study>();
+            Samples = new List<Biosample>();
+            SampleCharacteristics = new List<SampleCharacteristic>();
         }
        
         public void FilterAndJoin()
         {
-            //filter subjects by studies
-            if(Arms.Any())
-                Subjects = Subjects.FindAll(s => Arms.Select(a => a.Name).Contains(s.StudyArm.Name)).ToList();
+            //filter subjects by arms
+            if (Arms.Any())
+                Subjects = Subjects.FindAll(s => Arms.Select(a=>a.Id).Contains(s.StudyArmId)).ToList();
 
             Debug.WriteLine(Subjects.Count," AFTER ARMS");
 
-            //filter subjects by arms
-            if(Studies.Any())
-                Subjects = Subjects.FindAll(s => Studies.Select(st => st.Name).Contains(s.Study.Name)).ToList();
+            //filter subjects by studies
+            if (Studies.Any())
+                Subjects = Subjects.FindAll(subj => Studies.Select(st => st.Id).Contains(subj.StudyId)).ToList();
             Debug.WriteLine(Subjects.Count, " AFTER Studies");
 
-            //filter by subCharacteristics
+            //filter subjects by subCharacteristics
             if (SubjChars.Any())
-            Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.Id)).ToList();
+                Subjects = Subjects.FindAll(s => SubjChars.Select(sc => sc.SubjectId).Contains(s.Id)).ToList();
             Debug.WriteLine(Subjects.Count, " AFTER SubjChars");
 
             //filter by visits
@@ -56,28 +63,49 @@ namespace eTRIKS.Commons.Service.DTOs
 
             //TODO : WILL RETRIEVE SUBJECTS THAT HAVE SAME UNIQUE IDS ACROSS PROJECTS  (i.e. need to load observations to Mongo with 
             //TODO: DB subjectId
+            //filter observations for filtered subjects
             Observations = Observations?.FindAll(o => Subjects.Select(s => s.UniqueSubjectId).Contains(o.USubjId));
+
+            //filter subjects by selected observations
+            if(Observations.Any() && ObservationsFiltered)
+                Subjects = Subjects.FindAll(s => Observations.Select(o => o.USubjId).Contains(s.UniqueSubjectId));
+            Debug.WriteLine(Subjects.Count, " AFTER syncing with observations");
+
+            //FILTER SAMPLES BY SELECTED AND FILTERED SAMPLE CHARACTERISTICS
+            if (SampleCharacteristics.Any())
+                Samples = Samples.FindAll(s => SampleCharacteristics.Select(sc => sc.SampleId).Contains(s.Id)).ToList();
+
+            //TODO: TEMP FILTERING BY COLLECTION STUDY DAY
+            
+            
+            //SYNCHRONIZE SAMPLES AND SUBJECTS
+            if (Samples.Any())
+            {
+                Samples = Samples.FindAll(s => Subjects.Select(sc => sc.Id).Contains(s.SubjectId)).ToList();
+                Subjects = Subjects.FindAll(sb => Samples.Select(sp => sp.SubjectId).Contains(sb.Id)).ToList();
+            }
+                
         }
 
 
 
 
-        public string GetArmForSubject(string subjectId)
-        {
-            return Subjects.Find(a => a.Id == subjectId)?.StudyArm.Name;
-        }
+        //public string GetArmForSubject(string subjectId)
+        //{
+        //    return Subjects.Find(a => a.Id == subjectId)?.StudyArm.Name;
+        //}
 
-        public string GetSubjCharacterisiticForSubject(string subjectId, int characteristicId)
-        {
-            return
-                SubjChars.Find(sc => sc.SubjectId == subjectId && sc.CharacteristicObjectId == characteristicId)?
-                    .VerbatimValue;
-        }
+        //public string GetSubjCharacterisiticForSubject(string subjectId, int characteristicId)
+        //{
+        //    return
+        //        SubjChars.Find(sc => sc.SubjectId == subjectId && sc.CharacteristicFeatureId == characteristicId)?
+        //            .VerbatimValue;
+        //}
 
-        public string GetStudyForSubject(string subjectId)
-        {
-            return Studies.Find(s => s.Subjects.Select(j => j.UniqueSubjectId).Contains(subjectId)).Name;
-        }
+        //public string GetStudyForSubject(string subjectId)
+        //{
+        //    return Studies.Find(s => s.Subjects.Select(j => j.UniqueSubjectId).Contains(subjectId)).Name;
+        //}
 
         //public void FillArms(string projectAcc)
         //{

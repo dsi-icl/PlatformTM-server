@@ -9,13 +9,14 @@ using Microsoft.AspNetCore.Http;
 using eTRIKS.Commons.WebAPI.Extensions;
 using System.Collections;
 using System.Security.Claims;
+using eTRIKS.Commons.Service.DTOs.Explorer;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
     [Route("projects")]
     public class ProjectController : Controller
     {
-        private ProjectService _projectService;
+        private readonly ProjectService _projectService;
         private readonly UserAccountService _accountService;
 
 
@@ -28,7 +29,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [HttpGet]
         public IEnumerable<ProjectDTO> Get()
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             return !User.Identity.IsAuthenticated ? null : _projectService.GetProjects(userId);
         }
 
@@ -38,7 +39,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _projectService.GetProjectFullDetails(projectId);
         }
 
-        [HttpGet("id/{projectId}", Name = "GetProjectById")]
+        [HttpGet("{projectId}", Name = "GetProjectById")]
         public ProjectDTO GetProject(int projectId)
         {
             return _projectService.GetProjectById(projectId);
@@ -50,30 +51,60 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _projectService.GetProjectActivities(projectId);
         }
 
+        [HttpGet("{projectId}/datasets")]
+        public List<UserDatasetDTO> GetUserProjectDatasets(int projectId)
+        {
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            return _projectService.GetProjectSavedDatasets(projectId, userId);
+
+        }
+
+        [HttpGet("{projectId}/queries")]
+        public List<CombinedQueryDTO> GetUserSavedQueries(int projectId)
+        {
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            if (!User.Identity.IsAuthenticated)
+                return null;
+            return _projectService.GetProjectSavedQueries(projectId, userId);
+
+        }
+
+        [HttpGet("{projectId}/users")]
+        public IActionResult GetProjectUsers(int projectId)
+        {
+            var users = _projectService.GetProjectUsers(projectId);
+            if (users != null)
+                return new OkObjectResult(users);
+            return NotFound();
+        }
+
+        [HttpGet]
+        [Route("{projectId}/remove")]
+        public void DeleteProject(int projectId) 
+        {
+            _projectService.DeleteProject(projectId);
+        }
+
+        
         [HttpPost]
         public IActionResult AddProject([FromBody] ProjectDTO projectDTO)
         {
             ProjectDTO addedProject = null;
 
-            var userId = User.GetUserId();
+           
             if (!User.Identity.IsAuthenticated)
-                return null;
-            //var account = await _accountService.(name);
+                return Unauthorized();
+
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
             addedProject = _projectService.AddProject(projectDTO,userId);
 
-
             if (addedProject != null)
-            {
-                //var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Created, addedProject);
-                //string uri = Url.Link("GetProjectById", new { projectId = addedProject.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
-                return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = addedProject.Id }, addedProject);
-            }
-            else
-            {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
-            }
+                return new CreatedAtRouteResult("GetProjectByAcc", new { projectId = addedProject.Id }, addedProject);
+   
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+            
         }
 
         [HttpPut("{projectId}")]
@@ -82,23 +113,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             try
             {
                 _projectService.UpdateProject(projectDTO, projectId);
-                //var response = Request.CreateResponse<ProjectDTO>(HttpStatusCode.Accepted, projectDTO);
-                //string uri = Url.Link("GetProjectById", new { projectId = projectDTO.Id });
-                //response.Headers.Location = new Uri(uri);
-                //return response;
                 return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = projectDTO.Id }, projectDTO);
 
             }
             catch (Exception e)
             {
-                return new StatusCodeResult(StatusCodes.Status409Conflict);
+                return new BadRequestObjectResult(e.Message);
             }
         }
-
-        //[HttpGet("{projectId}/assays")]
-        //public List<AssayDTO> GetAssays(int projectId)
-        //{
-        //    return _projectService.GetProjectAssays(projectId);
-        //}
     }
 }

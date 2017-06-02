@@ -4,12 +4,13 @@ using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
 {
+    //EQUIVALENT TO SDTMdescriptor
     public class ObservationDescriptor : Identifiable<int>
     {
         //TODO: rename ObjectofObservation to Feature
         public ObjectOfObservation O3 { get; set; } //VSTESTCD //
         public int ObjectOfObservationId { get; set; }
-        public DomainTemplate Domain { get; set; }
+        public DatasetTemplate Domain { get; set; }
         public string DomainId { get; set; }
         public PropertyDescriptor DefaultPropertyDescriptor { get; set; }//AspectOfObservationDescriptor//MeasureOfObservationDescriptor
         public int DefaultPropertyDescriptorId { get; set; }

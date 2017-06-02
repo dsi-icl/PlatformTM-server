@@ -18,11 +18,13 @@ namespace eTRIKS.Commons.WebAPI.Controllers
     public class FileController : Controller
     {
         private readonly FileService _fileService;
+        private readonly DatasetService _datasetService;
         private IHostingEnvironment _environment;
 
-        public FileController(FileService fileService, IHostingEnvironment env)
+        public FileController(FileService fileService, DatasetService datasetService, IHostingEnvironment env)
         {
             _fileService = fileService;
+            _datasetService = datasetService;
             _environment = env;
         }
 
@@ -32,20 +34,71 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _fileService.GetFileDTO(fileId);
         }
 
-        [HttpGet("{fileId}/preview")]
-        public Hashtable GetFilePreview(int fileId)
+        [HttpGet]
+        [Route("{fileId}/load/datasets/{datasetId}")]
+        public void LoadFile(int fileId, int datasetId)
         {
-            return _fileService.getFilePreview(fileId);
+            var success = _fileService.LoadFile(fileId, datasetId);
+            //if (success)
+            //    return Ok(true);
+            //return new BadRequestResult();
+        }
+
+        [HttpGet]
+        [Route("{fileId}/progress")]
+        public IActionResult GetLoadingProgress(int fileId)
+        {
+            var progressDTO = _fileService.GetFileDTO(fileId);
+            return new OkObjectResult(progressDTO);
+        }
+
+        [HttpGet]
+        [Route("{fileId}/unload")]
+        public async void UnloadFile(int fileId)
+        {
+            await _datasetService.UnloadFileDatasets(fileId);
+        }
+
+        [HttpGet]
+        [Route("{fileId}/remove")]
+        public async void DeleteFile(int fileId)
+        {
+            if(await _datasetService.UnloadFileDatasets(fileId))
+            _fileService.DeleteFile(fileId);
+        }
+
+        [HttpGet("{fileId}/preview")]
+        public IActionResult GetFilePreview(int fileId)
+        {
+            try
+            {
+                var dt = _fileService.GetFilePreview(fileId);
+                return new OkObjectResult(dt);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("{fileId}/mapToTemplate/datasets/{datasetId}")]
+        public int? MapToTemplate(int datasetId, int fileId, [FromBody] DataTemplateMap dataTemplateMap)
+        {
+            return _fileService.mapToTemplate(datasetId, fileId, dataTemplateMap);
+        }
+
+        [HttpGet("{fileId}/match/datasets/{datasetId}")]
+        public FileDTO CheckValidTemplate(int datasetId, int fileId)
+        {
+            return _fileService.MatchFileToTemplate(datasetId, fileId);
         }
 
         [HttpPost("projects/{projectId}/createdir")]
         public List<string> CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
-
             var fullpath = _fileService.GetFullPath(projectId.ToString(), dir.name);
-            
-            var diInfo =    _fileService.addDirectory(projectId, fullpath);
-            
+            var diInfo =    _fileService.AddDirectory(projectId, fullpath);
             return diInfo?.GetDirectories().Select(d => d.Name).ToList();
         }
 
@@ -53,104 +106,36 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         [Route("projects/{projectId}/directories")]
         public List<string> GetDirectories(int projectId)
         {
-            return _fileService.getDirectories(projectId);
+            return _fileService.GetDirectories(projectId);
         }
 
-        //[HttpPost]
-        //[Route("api/files/projects/{projectId}/upload/{dir?}")]
-        //public async IActionResult UploadFile(int projectId, string dir="")
-        //{
-        //    try
-        //    {
-        //        //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-        //        string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-        //        string path = rawFilesDirectory + "P-"+ projectId + "\\" + dir  ;
-        //        if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-        //        if (Request.ContentType.IndexOf("multipart/",StringComparison.OrdinalIgnoreCase) >=0)
-        //        {
-        //            var streamProvider = new StreamProvider(path);
-
-        //            await Request.Form.Files[0].ReadAsMultipartAsync(streamProvider);
-        //            List<string> messages = new List<string>();
-        //            foreach (var file in streamProvider.FileData)
-        //            {
-        //                FileInfo fi = new FileInfo(file.LocalFileName);
-
-        //                if (_fileService.addOrUpdateFile(projectId, fi)==null)
-        //                    throw new Exception("Failed to updated database");
-        //                messages.Add("File uploaded as " + fi.FullName + " (" + fi.Length + " bytes)");
-        //            }
-
-        //            return messages;
-        //        }
-        //        else
-        //        {
-        //            return BadRequest($"Expected a multipart request, but got '{Request.ContentType}'");
-        //            //HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid Request!");
-        //            //throw new HttpResponseException(response);
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        throw new Exception(e.Message);
-        //    }
-        //}
-
         [HttpPost("projects/{projectId}/upload/{dir?}")]
-        public async Task<IActionResult> UploadFile(int projectId, [FromBody]ICollection<IFormFile> files, string dir = "")
+        public async Task<IActionResult> UploadFile(int projectId,  string dir = "")
         {
             try
             {
-                //string PATH = HttpContext.Current.Server.MapPath("~/App_Data");
-                //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-                //string path = rawFilesDirectory + "P-" + projectId + "\\" + dir;
+                var path = _fileService.GetFullPath(projectId.ToString(), dir);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
 
-                string path = _fileService.GetFullPath(projectId.ToString(), dir);
-                //var path2 = Path.Combine(_environment.WebRootPath)
-
-
-                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
                 if (Request.ContentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    //var streamProvider = new StreamProvider(path);
-
-                    //await Request.Form.Files[0].ReadAsMultipartAsync(streamProvider);
-                    //List<string> messages = new List<string>();
-                    //foreach (var file in streamProvider.FileData)
-                    //{
-                    //    FileInfo fi = new FileInfo(file.LocalFileName);
-
-                    //    if (_fileService.addOrUpdateFile(projectId, fi) == null)
-                    //        throw new Exception("Failed to updated database");
-                    //    messages.Add("File uploaded as " + fi.FullName + " (" + fi.Length + " bytes)");
-                    //}
-
-                    //return messages;
-
-                    foreach (var file in files)
+                    var file= Request.Form.Files[0];
+                    if (file.Length <= 0) return BadRequest("File size is zero");
+                    using (var fileStream = new FileStream(Path.Combine(path, file.FileName), FileMode.Create))
                     {
-                        if (file.Length > 0)
-                        {
-                            using (var fileStream = new FileStream(Path.Combine(path, file.FileName), FileMode.Create))
-                            {
-                                await file.CopyToAsync(fileStream);
-                            }
-                            FileInfo fi = new FileInfo(file.FileName);
-                            _fileService.addOrUpdateFile(projectId, fi);
-                        }
+                        await file.CopyToAsync(fileStream);
+                            
                     }
+                    var fi = new FileInfo(Path.Combine(path, file.FileName));
+                    _fileService.AddOrUpdateFile(projectId, fi);
                     return Ok();
                 }
-                else
-                {
-                    return BadRequest($"Expected a multipart request, but got '{Request.ContentType}'");
-                    //HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.BadRequest, "Invalid Request!");
-                    //throw new HttpResponseException(response);
-                }
+                return BadRequest($"Expected a multipart request, but got '{Request.ContentType}'");
             }
             catch (Exception e)
             {
-                throw new Exception(e.Message);
+                return BadRequest(e.Message);
             }
         }
 
@@ -167,10 +152,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             //_fileService.GetFullPath(projectId.ToString(), subdir?.Replace('_', '\\'));
             //    _fileService.GetProjectPath()
 
-            return _fileService.getUploadedFiles(projectId, relativePath);
+            return _fileService.GetUploadedFiles(projectId, relativePath);
         }
-
-        
-        
     }
 }

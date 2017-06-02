@@ -24,7 +24,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Dictionary_TBL");
+            builder.ToTable("Dictionaries");
             builder.Property(t => t.Id).HasColumnName("OID");
 
             // Relationships

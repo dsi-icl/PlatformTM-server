@@ -26,5 +26,7 @@ namespace eTRIKS.Commons.Service.DTOs
         public bool templateAlmostMatched { get; internal set; }
         public int percentMatched { get; internal set; }
         public List<string> unmappedCols { get; internal set; }
+        public bool IsLoaded { get; set; }
+        public int PercentLoaded { get; set; }
     }
 }

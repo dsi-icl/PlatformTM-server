@@ -17,6 +17,10 @@ namespace eTRIKS.Commons.Service.DTOs
         public string LastModified { get; set; }
         public List<DataFieldDTO> Fields { get; set; }
         public List<DataFilterDTO> Filters { get; set; }
+        public int SubjectCount { get; set; }
+        public int SampleCount { get; set; }
+        public int FileStatus { get; set; }
+
         //public List<ComputedDataField> ComputedFields { get; set; }
 
         public  UserDatasetDTO()

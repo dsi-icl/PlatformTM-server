@@ -22,12 +22,25 @@ namespace eTRIKS.Commons.Service.DTOs
             Rows = new List<DataRow>();
         }
     }
+    public class DataColumn
+    {
+        public string ColumnName { get; set; }
+        public string Label { get; set; }
+        public Type DataType { get; set; }
 
+        public DataColumn(string colName, Type type)
+        {
+            ColumnName = colName;
+            DataType = type;
+            Label = colName;
+        }
+    }
     public class DataRow : OrderedDictionary
     {
-        public Object[] ItemArray {
-            get { return this.ItemArray; }
-            
+        private object[] _itemArray; 
+        public object[] ItemArray {
+            get { return this._itemArray; }
+            set { this._itemArray = value; }
         }
 
         public object this[DataColumn col]{
@@ -58,15 +71,5 @@ namespace eTRIKS.Commons.Service.DTOs
             this.Add(new DataColumn(colName, typeof(string)));
         }
     }
-    public class DataColumn
-    {
-        public string ColumnName { get; set; }
-        public Type DataType { get; set; }
-
-        public  DataColumn(string colName, Type type)
-        {
-            ColumnName = colName;
-            DataType = type;
-        }
-    }
+    
 }
