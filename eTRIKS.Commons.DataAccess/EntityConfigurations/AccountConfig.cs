@@ -17,6 +17,8 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             // Table & Column Mappings
             builder.ToTable("UserAccounts");
             builder.Property(t => t.Id).HasColumnName("UserAccountId");
+
+            //builder.HasMany(a=>a.Claims)
         }
     }
 }

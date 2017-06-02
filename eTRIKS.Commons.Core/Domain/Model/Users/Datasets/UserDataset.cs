@@ -11,18 +11,25 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public string Name { get; set; }
         public string Description { get; set; }
         public List<string> Tags { get; set; }
-        //public User Owner { get; set; }
         public string OwnerId { get; set; }
-        //public Project Project { get; set; }
         public int ProjectId { get; set; }
-        public List<DataField> Fields { get; set; }
+        public List<DatasetField> Fields { get; set; }
         public List<DataFilter> Filters { get; set; }
         public string LastModified { get; set; }
         public string Type { get; set; }
+        public Guid QueryId { get; set; }
+        public int SubjectCount { get; set; }
+        public int SampleCount { get; set; }
+        public string ExportFileURI { get; set; }
+        // 0 is not prepared; 1 is preparing, 2 prepared
+        public int FileStatus { get; set; }
+        public bool IsSaved { get; set; }
+
+
 
         public UserDataset()
         {
-            Fields = new List<DataField>();
+            Fields = new List<DatasetField>();
             Filters = new List<DataFilter>();
         }
     }
@@ -40,34 +47,11 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
         public bool IsFiltered { get; set; }
     }
 
-
-
-
-    //this represents a request for an observation, the projection is for the mongo document for that specific observation
-    //filters already include the DataFilter for the observation as well as any other filters on other qualifiers
-    //public class Criterion
-    //{
-    //    public string O3 { get; set; }
-    //    public List<DataFilterExact> ExactFilters { get; set; } //will contain the topic variable DataFilter+any other qo2 e.g. aesev
-    //    public List<DataFilterRange> RangeFilters { get; set; } //a qo2 with numeric values e.g. VSORRES
-    //    public List<string> Projection { get; set; }
-
-    //    public Criterion()
-    //    {
-    //        ExactFilters = new List<DataFilterExact>();
-    //        RangeFilters = new List<DataFilterRange>();
-    //        Projection = new List<string>();
-    //    }
-    //}
-
-
-
     [KnownType(typeof(DataFilterRange))]
     [KnownType(typeof(DataFilterExact))]
     public class DataFilter
     {
         public DataField DataField { get; set; }
-        //public string Property { set; get; }
     }
     public class DataFilterRange : DataFilter
     {
@@ -84,9 +68,4 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
             Values = new List<string>();
         }
     }
-    //public class Range
-    //{
-    //    public int Upperbound { get; set; }
-    //    public int Lowerbound { get; set; }
-    //}
 }

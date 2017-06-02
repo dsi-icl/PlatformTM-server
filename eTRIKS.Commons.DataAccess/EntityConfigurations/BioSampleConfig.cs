@@ -1,6 +1,7 @@
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace eTRIKS.Commons.DataAccess.EntityConfigurations
@@ -15,10 +16,25 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             builder.Property(t => t.Id)
                .IsRequired();
             builder
-                .ToTable("BioSamples_TBL");
+                .ToTable("BioSamples");
             builder
                 .Property(t => t.Id)
                 .HasColumnName("BioSampleDBId");
+
+            builder
+                .HasOne(b => b.CollectionStudyDay)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            builder
+                .HasOne(b => b.CollectionStudyTimePoint)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            builder
+                .HasOne(b => b.Visit)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+
+
         }
     }
 }

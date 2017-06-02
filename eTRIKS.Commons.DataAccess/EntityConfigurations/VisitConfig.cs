@@ -20,7 +20,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             //.HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Visit_TBL");
+            builder.ToTable("Visits");
             builder.Property(t => t.Id).HasColumnName("VisitId");
             builder.Property(t => t.Name).HasColumnName("Name");
             builder.Property(t => t.StudyId).HasColumnName("StudyId");

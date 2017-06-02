@@ -16,7 +16,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 
             // Table & Column Mappings
             builder
-               .ToTable("Activity_TBL");
+               .ToTable("Activities");
             builder
                 .Property(t => t.Id)
                 .HasColumnName("ActivityId");

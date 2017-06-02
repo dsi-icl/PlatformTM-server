@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using eTRIKS.Commons.Core.Domain.Interfaces;
@@ -14,6 +15,7 @@ using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
 using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.Domain.Model.Users;
+using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Core.JoinEntities;
 using eTRIKS.Commons.DataAccess.Configuration;
 using eTRIKS.Commons.DataAccess.EntityConfigurations;
@@ -30,36 +32,23 @@ namespace eTRIKS.Commons.DataAccess
         //private readonly IDataContext _dataContext;
 
         private readonly Dictionary<Type, object> _repositories;
+        private readonly Dictionary<Type, object> _cacheRepositories;
         private IUserRepository userRepository;
         private IUserAccountRepository _userAccountRepository;
+        private MongoClient _mongoClient;
+        private IMongoDatabase _mongodb;
         private bool _disposed;
 
 
         public BioSPEAKdbContext(DbContextOptions<BioSPEAKdbContext> options, IOptions<DataAccessSettings> settings) : base(options){
             _dbsettings = settings;
             _repositories = new Dictionary<Type, object>();
+            _cacheRepositories = new Dictionary<Type,object>();
+            _mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+            _mongodb = _mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
             _disposed = false;
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //    => optionsBuilder
-        //        .UseMySQL(@"Server=localhost;database=ef;uid=root;pwd=19931101;");
-
-        //public BioSPEAKdbContext() : base("name=eTRIKScontext_MySQL")
-        //{
-        //    //_dataContext = context;
-
-        //    Database.SetInitializer<BioSPEAKdbContext>(null);
-
-        //    DbConfiguration.SetConfiguration(new MySqlEFConfiguration());
-        //    Configuration.ProxyCreationEnabled = true;
-        //    Configuration.LazyLoadingEnabled = true;
-
-        //    _repositories = new Dictionary<Type, object>();
-
-        //    this.Database.Log = s => System.Diagnostics.Debug.WriteLine(s);
-        //    _disposed = false;
-        //}
 
         public IUserRepository GetUserRepository()
         {
@@ -78,24 +67,39 @@ namespace eTRIKS.Commons.DataAccess
             // Checks if the Dictionary Key contains the Model class
             if (_repositories.Keys.Contains(typeof(TEntity)))
             {
-                // Return the repository for that Model class
+                Debug.WriteLine("Retrieving repository for ", typeof(TEntity).Name);
                 return _repositories[typeof(TEntity)] as IRepository<TEntity, TPrimaryKey>;
             }
 
             if (typeof(TEntity).Name.Equals("SdtmRow") || typeof(TEntity) == (typeof(PlatformAnnotation)))
             {
-                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
-                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
 
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb,"Biospeak_clinical");
-                _repositories.Add(typeof(TEntity), MongoRepository);
-                return MongoRepository;
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"Biospeak_clinical");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
             }
-            if (typeof(TEntity) == (typeof(UserDataset)))
+            if (typeof(TEntity) == typeof(UserDataset))
+            {
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"userDatasets");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+            if (typeof(TEntity) == typeof(CombinedQuery))
+            {
+               
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "userQueries");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+            if (typeof(TEntity) == typeof(Core.Domain.Model.ObservationModel.Observation) )
             {
                 var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
-                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb,"userDatasets");
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayObservation");
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
@@ -106,6 +110,21 @@ namespace eTRIKS.Commons.DataAccess
             return repository;
         }
 
+        public ICacheRepository<TEntity> GetCacheRepository<TEntity>() where TEntity : class
+        {
+            if (_cacheRepositories.Keys.Contains(typeof(TEntity)))
+            {
+                Debug.WriteLine("Retrieving repository for ", typeof(TEntity).Name);
+                return _cacheRepositories[typeof(TEntity)] as ICacheRepository<TEntity>;
+            }
+
+            var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+            var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+
+            var cacheRepository = new CacheRepository<TEntity>(mongodb, "Biospeak_cache");
+            _cacheRepositories.Add(typeof(TEntity), cacheRepository);
+            return cacheRepository;
+        }
         public void Register<TEntity, TPrimaryKey>(IRepository<TEntity, TPrimaryKey> repository) where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
         {
             _repositories.Add(typeof(TEntity), repository);
@@ -114,8 +133,7 @@ namespace eTRIKS.Commons.DataAccess
         {
             try
             {
-                base.SaveChanges();
-                // tran.Complete();
+                var ret = base.SaveChanges();
                 return "CREATED";
             }
             catch (Exception e)
@@ -128,6 +146,7 @@ namespace eTRIKS.Commons.DataAccess
         }
 
         public override void Dispose()
+
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -152,14 +171,15 @@ namespace eTRIKS.Commons.DataAccess
             modelBuilder.AddConfiguration<Assay>(new AssayConfig());
 
             modelBuilder.AddConfiguration<Biosample>(new BioSampleConfig());
-            modelBuilder.AddConfiguration<Characterisitc>(new CharacterisitcConfig());
-            modelBuilder.AddConfiguration<CharacteristicObject>(new CharacteristicObjectConfig());
+            modelBuilder.AddConfiguration<Characteristic>(new CharacteristicConfig());
+            modelBuilder.AddConfiguration<CharacteristicFeature>(new CharacteristicObjectConfig());
             modelBuilder.AddConfiguration<UserClaim>(new ClaimConfig());
 
 
 
-            modelBuilder.AddConfiguration<DomainTemplate>(new DomainTemplateConfig());
-            modelBuilder.AddConfiguration<DomainVariableTemplate>(new DomainTemplateVariableConfig());
+            modelBuilder.AddConfiguration<DatasetTemplate>(new DomainTemplateConfig());
+            modelBuilder.AddConfiguration<DatasetTemplateField>(new DomainTemplateVariableConfig());
+            modelBuilder.AddConfiguration<TemplateFieldDB>(new TemplateFieldDBsConfig());
             modelBuilder.AddConfiguration<CVterm>(new CVtermConfig());
             modelBuilder.AddConfiguration<DB>(new DbConfig());
             modelBuilder.AddConfiguration<Dbxref>(new DBxrefConfig());

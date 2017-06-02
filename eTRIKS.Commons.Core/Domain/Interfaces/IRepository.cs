@@ -37,8 +37,13 @@ namespace eTRIKS.Commons.Core.Domain.Interfaces
 
         Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null);
 
+       
+        List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null);
+        
+        ////List<object> FindObservationsPaging(Expression<Func<TEntity, bool>> filterExpression = null,Expression<Func<TEntity, object>> projectionExpression = null,Expression<Func<TEntity, object>> features = null,Expression<Func<TEntity, object>> samples = null,int? page = null,int? pageSize = null);
+         
         Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null);
-
+          
 
         TEntity FindSingle(Expression<Func<TEntity, bool>> filter = null,
                            List<string> includeProperties = null);

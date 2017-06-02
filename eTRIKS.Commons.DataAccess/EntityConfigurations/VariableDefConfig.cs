@@ -56,7 +56,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Variable_Definition_TBL");
+            builder.ToTable("VariableDefinitions");
             builder.Property(t => t.Id).HasColumnName("OID");
 
 

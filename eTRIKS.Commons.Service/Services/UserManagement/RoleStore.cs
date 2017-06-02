@@ -23,18 +23,17 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
 
         public void Dispose()
         {
-            _disposed = true;
-            //Dispose(true);
-            //GC.SuppressFinalize(this);
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        //protected virtual void Dispose(bool disposing)
-        //{
-        //    if (_disposed) return;
-        //    if (disposing)
-        //        base.Dispose();
-        //    _disposed = true;
-        //}
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            if (disposing)
+                //handle.Dispose();
+                _disposed = true;
+        }
 
         public Task<Role> FindByIdAsync(string roleId, CancellationToken cancellationToken)
         {

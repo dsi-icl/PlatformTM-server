@@ -24,7 +24,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .HasMaxLength(2000);
 
             // Table & Column Mappings
-            builder.ToTable("Study_TBL");
+            builder.ToTable("Studies");
             builder.Property(t => t.Id).HasColumnName("StudyId");
 
             // Relationships

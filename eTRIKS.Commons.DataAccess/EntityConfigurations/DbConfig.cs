@@ -10,10 +10,10 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
         public override void Configure(EntityTypeBuilder<DB> builder)
         {
             // Primary Key
-            builder.HasKey(t => t.OID);
+            builder.HasKey(t => t.Id);
 
             // Properties
-            builder.Property(t => t.OID)
+            builder.Property(t => t.Id)
                 .IsRequired()
                 .HasMaxLength(200);
 
@@ -30,8 +30,8 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                .HasMaxLength(2000);
 
             // Table & Column Mappings
-            builder.ToTable("Db_TBL");
-            builder.Property(t => t.OID).HasColumnName("OID");
+            builder.ToTable("Dbs");
+            builder.Property(t => t.Id).HasColumnName("OID");
             builder.Property(t => t.Name).HasColumnName("Name");
             builder.Property(t => t.UrlPrefix).HasColumnName("URLPrefix");
             builder.Property(t => t.Url).HasColumnName("URL");

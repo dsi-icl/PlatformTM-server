@@ -14,7 +14,7 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
 
 
             // Table & Column Mappings
-            builder.ToTable("Project_TBL");
+            builder.ToTable("Projects");
             builder.Property(t => t.Id).HasColumnName("ProjectId");
 
             //builder.HasMany(t => t.Users)

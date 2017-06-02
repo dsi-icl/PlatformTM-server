@@ -22,10 +22,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
         }
 
         [HttpGet("clinical/{domainId}")]
-        public DatasetDTO Get(string domainId)
+        public DatasetDTO GetClinicalTemplates(string domainId)
         {
             return _templateService.GetTemplateDataset(domainId);
         }
+
+        [HttpGet("assay/features/{domainId}")]
+        public DatasetDTO GetFeatureTemplate(string domainId)
+        {
+            return _templateService.GetTemplateDataset(domainId);
+        }
+
 
         [HttpGet("assay/features")]
         public List<DatasetDTO> GetAssayFeatureTemplates()

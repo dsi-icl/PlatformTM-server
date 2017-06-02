@@ -17,11 +17,11 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
             //.HasMaxLength(200);
 
             // Properties
-            builder.Property(t => t.DomainId)
+            builder.Property(t => t.TemplateId)
                 .IsRequired()
                 .HasMaxLength(200);
             // Table & Column Mappings
-            builder.ToTable("Dataset_TBL");
+            builder.ToTable("Datasets");
             builder.Property(t => t.Id).HasColumnName("OID");
 
             // Relationships
@@ -30,10 +30,10 @@ namespace eTRIKS.Commons.DataAccess.EntityConfigurations
                 .IsRequired()
                 .HasForeignKey(d => d.ActivityId);
 
-            builder.HasOne(d => d.Domain)
+            builder.HasOne(d => d.Template)
                 .WithMany()
                 .IsRequired()
-                .HasForeignKey(t => t.DomainId);
+                .HasForeignKey(t => t.TemplateId);
         }
     }
 }

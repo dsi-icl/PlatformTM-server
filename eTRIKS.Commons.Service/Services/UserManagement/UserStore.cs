@@ -2,13 +2,17 @@
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Threading;
 using Microsoft.EntityFrameworkCore;
 
 namespace eTRIKS.Commons.Service.Services.UserManagement
 {
-    public class UserStore : IUserStore<UserAccount>, IUserPasswordStore<UserAccount>
+    public class UserStore : IUserPasswordStore<UserAccount>, IUserClaimStore<UserAccount>
     {
         private readonly IServiceUoW _unitOfWork;
         private readonly IUserRepository _userRepository;
@@ -24,55 +28,34 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             ErrorDescriber = describer ?? new IdentityErrorDescriber();
         }
 
-        public Task SetPasswordHashAsync(UserAccount account, string passwordHash, CancellationToken cancellationToken)
-        {
-            account.PasswordHash = passwordHash;
-            return Task.FromResult(0);
-        }
-
-        public Task<string> GetPasswordHashAsync(UserAccount account, CancellationToken cancellationToken)
-        {
-            if (account == null)
-                throw new ArgumentNullException("UserAccount");
-            return Task.FromResult<string>(account.PasswordHash);
-        }
-
-        public Task<bool> HasPasswordAsync(UserAccount user, CancellationToken cancellationToken)
-        {
-            return Task.FromResult(user.PasswordHash != null);
-        }
+       
 
         public Task<string> GetUserIdAsync(UserAccount account, CancellationToken cancellationToken)
         {
             if (account == null)
                 throw new ArgumentNullException("UserAccount");
-            return Task.FromResult<string>(account.UserId.ToString());
+            return Task.FromResult<string>(account.Id.ToString());
         }
-
         public Task<string> GetUserNameAsync(UserAccount account, CancellationToken cancellationToken)
         {
             if (account == null)
                 throw new ArgumentNullException("UserAccount");
             return Task.FromResult<string>(account.UserName);
         }
-
         public Task SetUserNameAsync(UserAccount user, string userName, CancellationToken cancellationToken)
         {
             user.UserName = userName;
             return Task.FromResult(true);
         }
-
         public Task<string> GetNormalizedUserNameAsync(UserAccount user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.UserName);
         }
-
         public Task SetNormalizedUserNameAsync(UserAccount user, string normalizedName, CancellationToken cancellationToken)
         {
             user.UserName = normalizedName;
             return Task.FromResult(true);
         }
-
         public Task<IdentityResult> CreateAsync(UserAccount userAccount, CancellationToken cancellationToken)
         {
             _userRepository.Insert(userAccount.User);
@@ -80,7 +63,6 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             _unitOfWork.SaveChangesAsync();
             return Task.FromResult(IdentityResult.Success);
         }
-
         public async Task<IdentityResult> UpdateAsync(UserAccount user, CancellationToken cancellationToken)
         {
             if (user == null)
@@ -98,21 +80,79 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
             }
             return IdentityResult.Success;
         }
-
         public Task<IdentityResult> DeleteAsync(UserAccount user, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
-
         public Task<UserAccount> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var guidId = Guid.Parse(userId);
+            return Task.FromResult(_accountRepository.FindSingle(u => u.Id == guidId, new List<string>() {"Claims","User"}));
         }
-
         public async Task<UserAccount> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             return await _accountRepository.FindByUserNameAsync(normalizedUserName);
         }
+
+    
+        public Task SetPasswordHashAsync(UserAccount account, string passwordHash, CancellationToken cancellationToken)
+        {
+            account.PasswordHash = passwordHash;
+            return Task.FromResult(0);
+        }
+        public Task<string> GetPasswordHashAsync(UserAccount account, CancellationToken cancellationToken)
+        {
+            if (account == null)
+                throw new ArgumentNullException("UserAccount");
+            return Task.FromResult<string>(account.PasswordHash);
+        }
+        public Task<bool> HasPasswordAsync(UserAccount user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.PasswordHash != null);
+        }
+
+
+
+        public Task<IList<Claim>> GetClaimsAsync(UserAccount userAccount, CancellationToken cancellationToken)
+        {
+            var account = _accountRepository.FindSingle(a=>a.UserName == userAccount.UserName, new List<string>() {"Claims"});
+            var userClaims = new List<Claim>();
+            if (account != null)
+            {
+                var claims = account.Claims;
+                userClaims.AddRange(claims.Select(userClaim => new Claim(userClaim.ClaimType, userClaim.ClaimValue)));
+            }
+            return Task.FromResult((IList<Claim>) userClaims);
+        }
+        public Task ReplaceClaimAsync(UserAccount userAccount, Claim claim, Claim newClaim, CancellationToken cancellationToken)
+        {
+           return Task.CompletedTask;
+        }
+        public Task<IList<UserAccount>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken)
+        {
+            return null;
+        }
+        public Task RemoveClaimsAsync(UserAccount userAccount, IEnumerable<Claim> claims, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(0);
+        }
+        public async Task AddClaimsAsync(UserAccount userAccount, IEnumerable<Claim> claims, CancellationToken cancellationToken)
+        {
+            foreach (var claim in claims)
+            {
+                var userClaim = new UserClaim()
+                {
+                    ClaimType = claim.Type,
+                    ClaimValue = claim.Value
+                };
+                userAccount.Claims.Add(userClaim);
+            }
+
+            _accountRepository.Update(userAccount);
+            await _unitOfWork.SaveChangesAsync();
+
+        }
+
 
         public void Dispose()
         {
@@ -205,5 +245,6 @@ namespace eTRIKS.Commons.Service.Services.UserManagement
         //        User = userAccount.User
         //    };
         //}
+        
     }
 }

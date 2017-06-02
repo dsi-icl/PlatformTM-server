@@ -4,6 +4,6 @@ namespace eTRIKS.Commons.Core.Domain.Model
 {
     public class Subject
     {
-        public ICollection<Characterisitc> Characteristics { get; set; }
+        public ICollection<Characteristic> Characteristics { get; set; }
     }
 }
