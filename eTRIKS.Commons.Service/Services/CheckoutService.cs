@@ -98,7 +98,7 @@ namespace eTRIKS.Commons.Service.Services
                 OwnerId = userId,
                 ProjectId = query.ProjectId,
                 Type = "PHENO",
-                Name = "Subject Metadata",
+                Name = "Subjects",
                 QueryId = query.Id,
                 FileStatus = 0,
             };
@@ -167,7 +167,7 @@ namespace eTRIKS.Commons.Service.Services
                 OwnerId = userId,
                 ProjectId = projectId,
                 Type = "BIOSAMPLES",
-                Name = assayPanelQuery.AssayName + " Sample Metadata",
+                Name = assayPanelQuery.AssayName + " Samples",
                 QueryId = combinedQueryId,
                 
                 FileStatus = 0
@@ -217,7 +217,7 @@ namespace eTRIKS.Commons.Service.Services
                 OwnerId = userId,
                 ProjectId = projectId,
                 Type = "ASSAY",
-                Name = assayPanelQuery.AssayName + " Assay",
+                Name = assayPanelQuery.AssayName + " Data Matrix",
                 QueryId = combinedQueryId,
                 FileStatus = 0
             };

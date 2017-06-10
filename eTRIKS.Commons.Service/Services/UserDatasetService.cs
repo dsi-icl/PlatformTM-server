@@ -71,11 +71,13 @@ namespace eTRIKS.Commons.Service.Services
         {
             //check that the owner of this dataset is the caller
             //var dataset = ReadDTO(dto);
-            //var datasetToUpdate = _userDatasetRepository.FindSingle(d => d.Id == Guid.Parse(dto.Id));
+            var datasetToUpdate = _userDatasetRepository.FindSingle(d => d.Id == dataset.Id);
             //datasetToUpdate = ReadDTO(dto, datasetToUpdate);
-            dataset.IsSaved = true;
-            dataset.LastModified = DateTime.Today.ToString("f");
-            _userDatasetRepository.Update(dataset);
+            datasetToUpdate.IsSaved = true;
+            datasetToUpdate.LastModified = DateTime.Today.ToString("f");
+            datasetToUpdate.Description = dataset.Description;
+            datasetToUpdate.Name = dataset.Name;
+            _userDatasetRepository.Update(datasetToUpdate);
         }
 
         private UserDataset ReadDTO(UserDatasetDTO dto, UserDataset copyInto=null)

@@ -396,10 +396,16 @@ namespace eTRIKS.Commons.Service.Services
                     obsQueryResult.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
 
                     string v = null;
+                    float vn;
                     obsQueryResult = oq.DataType == "string"
-                        ? obsQueryResult.FindAll(s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) && oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
-                        : obsQueryResult.FindAll(s => float.Parse(s.Qualifiers[oq.PropertyName]) >= oq.FilterRangeFrom &&
-                                                      float.Parse(s.Qualifiers[oq.PropertyName]) <= oq.FilterRangeTo);
+                        ? obsQueryResult.FindAll(
+                            s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) &&
+                            oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+
+                        : obsQueryResult.FindAll(
+                            s => float.TryParse(s.Qualifiers[oq.PropertyName], out vn) &&
+                                 vn >= oq.FilterRangeFrom &&
+                                 vn <= oq.FilterRangeTo);
 
                     var filteredSubjectIds = obsQueryResult.Select(o => o.USubjId).Distinct().ToList();
 

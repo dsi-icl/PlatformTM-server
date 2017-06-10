@@ -12,6 +12,8 @@ using MySQL.Data.Entity.Extensions;
 using eTRIKS.Commons.Service.Services.UserManagement;
 using eTRIKS.Commons.Core.Application.AccountManagement;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
+using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
+using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.Configuration;
 using eTRIKS.Commons.Service.DTOs.Explorer;
 using eTRIKS.Commons.Service.Services.HelperService;
@@ -149,7 +151,8 @@ namespace eTRIKS.Commons.WebAPI
             BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.OrdinalValue>();
             BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.NumericalValue>();
             BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.IntervalValue>();
-            
+            BsonClassMap.RegisterClassMap<ObservationQuery>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
