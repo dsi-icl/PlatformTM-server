@@ -59,7 +59,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             {
                 // in the case of an error the file status should be changed to 0
                 _exportService.SetDatasetStatus(datasetId, "", 0);
-                throw;
+                //throw;
             } 
         }
         

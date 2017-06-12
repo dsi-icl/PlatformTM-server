@@ -151,10 +151,11 @@ namespace eTRIKS.Commons.Service.Services
                         writer.WriteLine(features[j] + "," + sb);
                         sb.Clear();
                         i = 0;
+                        writer.Flush();
                         j++;
                     }
                 }
-                writer.Flush();
+               
                 writer.Dispose();
 
 
@@ -316,7 +317,7 @@ namespace eTRIKS.Commons.Service.Services
                                 obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
                                 if (val == null)
                                     obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
-                                row[field.ColumnHeader.ToLower()] = val;
+                                row[field.ColumnHeader.ToLower()] = val ?? "";
                             }
                             subjectObservations.Remove(obs);
                         }
