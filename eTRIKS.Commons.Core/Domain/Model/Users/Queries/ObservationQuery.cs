@@ -36,7 +36,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         }  
     }
 
-    [KnownType(typeof(Query))]
+    //[KnownType(typeof(Query))]
     public class ObservationQuery : Query
     {
         public string TermName { get { return base.QueryObjectName; } set { base.QueryObjectName = value; } } //O3   EntityName  Age/BMI     ObservationName INJECTION SITE PAIN

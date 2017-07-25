@@ -248,7 +248,7 @@ namespace eTRIKS.Commons.Service.Services
                 fileDto.IsStandard = true;
                 dataFile.IsStandard = true;
                 //TODO: depending on the dataset the format for the file should be set
-                //dataFile.Format = "SDTM";
+                dataFile.Format = "SDTM";
                 _fileRepository.Update(dataFile);
                 _dataServiceUnit.Save();
             }
