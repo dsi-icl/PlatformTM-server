@@ -19,6 +19,7 @@ using eTRIKS.Commons.Service.DTOs.Explorer;
 using eTRIKS.Commons.Service.Services.HelperService;
 using eTRIKS.Commons.Service.Services.Loading.AssayData;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;
+using eTRIKS.Commons.Service.Services.OntologyManagement;
 using eTRIKS.Commons.WebAPI.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -114,6 +115,8 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<CheckoutService>();
             services.AddScoped<QueryService>();
             services.AddScoped<CacheService>();
+            services.AddScoped<OLSclient>();
+            services.AddScoped<OLSresultHandler>();
 
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
