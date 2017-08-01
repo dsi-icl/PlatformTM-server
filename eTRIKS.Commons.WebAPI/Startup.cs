@@ -103,7 +103,7 @@ namespace eTRIKS.Commons.WebAPI
             services.AddScoped<DatasetService>();
             services.AddScoped<ExportService>();
             services.AddScoped<FileService>();
-            
+            services.AddScoped<CurationService>();
             services.AddScoped<ProjectService>();
             services.AddScoped<SDTMreader>();
             services.AddScoped<StudyService>();

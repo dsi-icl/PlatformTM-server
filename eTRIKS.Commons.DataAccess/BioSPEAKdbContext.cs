@@ -104,6 +104,15 @@ namespace eTRIKS.Commons.DataAccess
                 return MongoRepository;
             }
 
+            if (typeof(TEntity) == typeof(Core.Domain.Model.Curation.SingleColumn))
+            {
+
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "singleColumns");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+
+
             var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
             _repositories.Add(typeof(TEntity), repository);
 
