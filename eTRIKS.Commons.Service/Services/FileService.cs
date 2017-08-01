@@ -248,7 +248,7 @@ namespace eTRIKS.Commons.Service.Services
                 fileDto.IsStandard = true;
                 dataFile.IsStandard = true;
                 //TODO: depending on the dataset the format for the file should be set
-                //dataFile.Format = "SDTM";
+                dataFile.Format = "SDTM";
                 _fileRepository.Update(dataFile);
                 _dataServiceUnit.Save();
             }
@@ -533,6 +533,14 @@ namespace eTRIKS.Commons.Service.Services
             return Path.Combine(_uploadFileDirectory, "P-" + projectId, subdir);
         }
 
-        
+
+        public FileStream GetFile(int fileId, out string filename)
+        {
+            var file = _fileRepository.Get(fileId);
+            var filePath = Path.Combine(file.Path, file.FileName);
+            filename = file.FileName;
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            return fileStream;
+        }
     }
 }

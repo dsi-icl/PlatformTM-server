@@ -66,7 +66,7 @@ namespace eTRIKS.Commons.Service.Services
         /// <summary>
         /// Retrieves datasetDTO for selected activity including a union of VarDefs and TemplateVariables from the relevant Domain
         /// //TODO: This method should change once users are allowed to add their own Variables
-        //          In this case VarDEFs should take precedence and the issue of adding CVterms to VarDEFs shuold be settled
+        /// In this case VarDEFs should take precedence and the issue of adding CVterms to VarDEFs shuold be settled
         /// </summary>
         /// <param name="datasetId"></param>
         /// <returns></returns>
@@ -194,6 +194,7 @@ namespace eTRIKS.Commons.Service.Services
                     varDef.IsCurated = variableDto.IsCurated;
                     varDef.RoleId = variableDto.RoleId;
                     varDef.ProjectId = datasetDTO.ProjectId;
+                    //varDef.
 
                     varDef.VariableTypeStr = variableDto.varType;
 

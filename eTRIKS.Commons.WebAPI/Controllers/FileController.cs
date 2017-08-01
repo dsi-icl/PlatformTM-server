@@ -154,5 +154,26 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
             return _fileService.GetUploadedFiles(projectId, relativePath);
         }
+
+        [Route("{fileId}/download")]
+        [HttpGet]
+        public async Task<ActionResult> DownloadFile(int fileId)
+        {
+            string filename;
+            var fileStream = _fileService.GetFile(fileId, out filename);
+            if (fileStream == null) return NotFound("cannot file ddlkjaskjh ");
+
+            HttpContext.Response.Clear();
+            Response.ContentType = "application/octet-stream";
+            Response.Headers.Add("content-disposition", "attachment");
+            Response.Headers.Add("x-filename", filename + ".csv");
+            Response.Headers.Add("content-length", fileStream.Length.ToString());
+            Response.Headers.Add("Access-Control-Expose-Headers", "x-filename , content-length, content-disposition");
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            await fileStream.CopyToAsync(HttpContext.Response.Body);
+
+            //fileStream.Close();
+            return new FileStreamResult(fileStream, "text/csv") { FileDownloadName = filename + ".csv" };
+        }
     }
 }

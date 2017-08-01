@@ -360,7 +360,7 @@ namespace eTRIKS.Commons.Service.Services
             if (!di.Exists) return null;
             var filePath = Path.Combine(dirPath, dataset.Name + ".csv");
             StreamWriter writer = File.CreateText(filePath);
-
+                
             writer.WriteLine(result);
 
             writer.Flush();

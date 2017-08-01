@@ -127,14 +127,14 @@ namespace eTRIKS.Commons.Service.Services.Loading.SDTM
 
                 //SET/UPDATE SUBJECT CHARACTERISTICS
 
-                if (descriptor.RefStartDate != null && sdtmSubject.Qualifiers[descriptor?.RefStartDate?.Name] != null)
+                if (descriptor.RefStartDate != null && sdtmSubject.Qualifiers.ContainsKey(descriptor?.RefStartDate?.Name))
                 {
                     DateTime startDate;
                     if (DateTime.TryParse(sdtmSubject.Qualifiers[descriptor.RefStartDate?.Name], out startDate))
                         subject.SubjectStartDate = startDate;
                 }
 
-                if (descriptor.RefEndDate != null && sdtmSubject.Qualifiers[descriptor.RefEndDate?.Name] != null)
+                if (descriptor.RefEndDate != null && sdtmSubject.Qualifiers.ContainsKey(descriptor?.RefEndDate?.Name))
                 {
                     DateTime endDate;
                     if (DateTime.TryParse(sdtmSubject.Qualifiers[descriptor.RefEndDate.Name], out endDate))
