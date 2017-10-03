@@ -106,12 +106,21 @@ namespace eTRIKS.Commons.DataAccess
 
             if (typeof(TEntity) == typeof(Core.Domain.Model.Curation.SingleColumn))
             {
-
-                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "singleColumns");
-                _repositories.Add(typeof(TEntity), mongoRepository);
-                return mongoRepository;
+                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "singleColumns");
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
             }
 
+            if (typeof(TEntity) == typeof(Core.Domain.Model.Curation.SingleRow))
+            {
+                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "singleRows");
+                _repositories.Add(typeof(TEntity), MongoRepository);
+                return MongoRepository;
+            }
 
             var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
             _repositories.Add(typeof(TEntity), repository);

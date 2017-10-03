@@ -3,9 +3,12 @@ using eTRIKS.Commons.Service.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
+using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Core.Domain.Model.Curation;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using eTRIKS.Commons.Core.Domain.Model.Templates;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -14,17 +17,56 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<DataFile, int> _fileRepository;
         private readonly IRepository<SingleColumn, Guid> _singleColumnsRepository;
+        private readonly IRepository<SingleRow, Guid> _singleRawsRepository;
+        //private readonly IRepository<DatasetTemplate, int> _domainTemplate; 
+        private readonly IRepository<DatasetTemplateField, string> _domainTemplateVariavles;
         private readonly FileService _fileService;
+        private readonly IRepository<Dataset, int> _datasetRepository;
 
         public CurationService(IServiceUoW uoW, FileService fileService)
         {
             _dataServiceUnit = uoW;
             _fileRepository = uoW.GetRepository<DataFile, int>();
             _singleColumnsRepository = uoW.GetRepository<SingleColumn, Guid>();
+            _singleRawsRepository = uoW.GetRepository<SingleRow, Guid>();
             _fileService = fileService;
+            _datasetRepository = uoW.GetRepository<Dataset, int>();
+          _domainTemplateVariavles = uoW.GetRepository<DatasetTemplateField, string>();
         }
 
-        public void CsvToSingleColumns(int fileId) 
+        public void CsvToSingleRows(int fileId)
+        {
+           _singleRawsRepository.DeleteMany(d => d.FileId == fileId);
+
+             
+            // File to DATATABLE 
+            var file = _fileRepository.Get(fileId);
+            string filePath = file.Path + "\\" + file.FileName;
+            DataTable dataTable = _fileService.ReadOriginalFile(filePath);
+
+            
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+
+                SingleRow singleRow = new SingleRow();
+                singleRow.FileId = fileId;
+                singleRow.Id = Guid.NewGuid();
+
+                // Dictionary<string,string> dic = new Dictionary<string, string>();
+                singleRow.RowValues = new Dictionary<string, string>();
+                foreach (var col in dataTable.Columns)
+                {
+                    singleRow.RowValues.Add(col.ColumnName, row[col].ToString());
+                }
+                _singleRawsRepository.Insert(singleRow);
+                //singleRow.listofRows.Add(dic);
+            }
+           
+            
+        }
+        
+        public void CsvToSingleColumns(int fileId)
         {
             _singleColumnsRepository.DeleteMany(d => d.colHeader.DataFileId == fileId);
 
@@ -32,7 +74,6 @@ namespace eTRIKS.Commons.Service.Services
             var file = _fileRepository.Get(fileId);
             string filePath = file.Path + "\\" + file.FileName;
             DataTable dataTable = _fileService.ReadOriginalFile(filePath);
-
             foreach (DataColumn column in dataTable.Columns)
             {
                 SingleColumn singlecolumn = new SingleColumn();
@@ -43,6 +84,7 @@ namespace eTRIKS.Commons.Service.Services
                 {
                     singlecolumn.colValues.Add(row[column]);
                 }
+                singlecolumn.colHeader = new HeaderElements();
 
                 // COLUMN HEADER INFORMATION 
                 singlecolumn.colHeader.ColumnName = column.ColumnName;
@@ -81,51 +123,53 @@ namespace eTRIKS.Commons.Service.Services
             }
         }
 
-        public List<CurationDTO> CurationSuggestions(int fileId, string sourceHeader)
+        public List<List<CurationDTO>> GetSuggestions(int fileId)
         {
-            var headerToCheck = _singleColumnsRepository.FindSingle(s => s.colHeader.DataFileId == fileId && s.colHeader.ColumnName == sourceHeader);
-            
-            // check with OLS there is a hit  
-            List<SuggestedMap> suggestions = new List<SuggestedMap>();
-            List<CurationDTO> listOfDto = null;
-           
-            // if OLS has any suggestions we return a list of DTOs. each contains info about each sugestion
-            if (suggestions.ToString().Any())
+            var headersToCheck = _singleRawsRepository.FindAll(s => s.FileId == fileId).First().RowValues.Keys.ToList();
+            List<List<CurationDTO>> listOfListDto = null;
+
+            foreach (var header in headersToCheck)
             {
-                listOfDto = new List<CurationDTO>();
-                foreach (var suggestion in suggestions)
+
+                List<CVterm> suggestions = new List<CVterm>();   // in reality this will  be in another class
+                                                               // if OLS has any suggestions we return a list of DTOs. each contains info about each sugestion
+
+
+                List < CurationDTO > listOfDto = null;
+                
+                // if there uis any suggestion 
+                if (suggestions.ToString().Any())
                 {
+                    listOfDto = new List<CurationDTO>();
+                    foreach (var suggestion in suggestions)
+                    {
+                        var curationDTO = new CurationDTO();
+                        curationDTO.SourceHeader = header;
+                        curationDTO.DataFileId = fileId;
+                        curationDTO.IsMapped = true;
+                        curationDTO.MappedVariable = suggestion.Definition;
+                        curationDTO.MappedVariableSynonym = suggestion.Synonyms;
+                        //  IsIdentifier = suggestion.IsIdentifier,
+                        //  curationDTO.IsTopic = true,
+                        //  IsQualifier = suggestion.IsQualifier,
+                        //  IsUnitRequired = suggestion.IsUnitRequired,
+                        //  IsUnit = suggestion.IsUnit
+                        listOfDto.Add(curationDTO);
+                    }
+                }
+                else
+                {
+                    listOfDto = new List<CurationDTO>();
                     var curationDTO = new CurationDTO()
                     {
-                        DataFileId = fileId,
-                        IsMapped = true,
-                        SourceHeader = suggestion.SourceHeader,
-                        MappedVariable = suggestion.MappedVariable,
-                        MappedVariableSynonym = suggestion.MappedVariableSynonym,
-                        MappedVariableDefinition = suggestion.MappedVariableDefinition,
-                        MappedDomain = suggestion.MappedDomain,
-                        IsIdentifier = suggestion.IsIdentifier,
-                        IsTopic = suggestion.IsTopic,
-                        IsQualifier = suggestion.IsQualifier,
-                        IsUnitRequired = suggestion.IsUnitRequired,
-                        IsUnit = suggestion.IsUnit
+                        IsMapped = false
                     };
                     listOfDto.Add(curationDTO);
                 }
+                listOfListDto.Add(listOfDto);
             }
-            else
-            {
-                listOfDto = new List<CurationDTO>();
-                var curationDTO = new CurationDTO()
-                {
-                    IsMapped = false
-                };
-                listOfDto.Add(curationDTO);
-            }
-            return listOfDto;
+            return listOfListDto;
         }
-
-
-        //End
+        
     }
 }
