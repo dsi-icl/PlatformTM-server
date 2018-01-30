@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
@@ -71,15 +72,47 @@ namespace eTRIKS.Commons.Service.Services
             return subjProperty;
         }
         //public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
-        public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        public async Task<List<Core.Domain.Model.ObservationModel.Observation>> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
         {
-            var assayObservations =
-                _observationRepository.FindObservations(s =>
-                    s.ProjectId == projectId && s.ActivityId == activityId && /*s.SubjectOfObservationName == "SID.7002.551"*/ sampleIds.Contains(s.SubjectOfObservationName),
-                    x => new AssayDataDTO() {FeatureName = x.FeatureName, SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
-                                                         );
 
-            return assayObservations.Cast<AssayDataDTO>().ToList();
+            int start = 0;
+            var assayObservations = new List<Core.Domain.Model.ObservationModel.Observation>();
+            //sampleIds.GetRange(start,start+10<=sampleIds.Count?10:sampleIds.Count-start);
+            var tasks = new List<Task<List<Core.Domain.Model.ObservationModel.Observation>>>();
+            while(start < sampleIds.Count){
+                var count = start + 10 <= sampleIds.Count ? 10 : sampleIds.Count - start;
+                tasks.Add(AssayDataBatchQuery(projectId, activityId, sampleIds, start,count));
+                //var batch =
+                //_observationRepository.FindObservations(s =>
+                                                       // s.ProjectId == projectId && s.ActivityId == activityId &&
+                                                       // sampleIds.GetRange(start, start + 10 <= sampleIds.Count ? 10 : sampleIds.Count - start).Contains(s.SubjectOfObservationName),
+                                                       // x => new AssayDataDTO()
+                                                       // {
+                                                       //     FeatureName = x.FeatureName,
+                                                       //     SubjectOfObservationName = x.SubjectOfObservationName,
+                                                       //     Value = ((NumericalValue)x.ObservedValue).Value
+                                                       // }
+                                                       //).ToList();
+                //assayObservations.AddRange(batch.Cast<AssayDataDTO>());
+                start = start + 10 <= sampleIds.Count ? start + 10 : sampleIds.Count;
+            }
+
+            foreach(var task in await Task.WhenAll(tasks)){
+                assayObservations.AddRange(task);
+            }
+
+
+            return assayObservations;
+                                
+            //return assayObservations;//.Cast<AssayDataDTO>().ToList();
+        }
+
+        public async Task<List<Core.Domain.Model.ObservationModel.Observation>> AssayDataBatchQuery(int projectId, int activityId, List<string> sampleIds, int start, int count){
+            var batch =  await _observationRepository.FindObservations(s =>
+                                                        s.ProjectId == projectId && s.ActivityId == activityId &&
+                                                        sampleIds.GetRange(start,count).Contains(s.SubjectOfObservationName)
+                                                       );
+            return batch;
         }
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
@@ -237,6 +270,9 @@ namespace eTRIKS.Commons.Service.Services
                 queryResult.SubjChars.AddRange(characteristics);
             }
 
+            //IF A REQUESTED OBSERVATION HAS LONGITUDINAL DATA, AUTOMATICALLY ADD A TIMING COLUMN (ASSUMING VISIT AS DEFAULT FOR NOW) SHOULD BE LATER DECIDED BASED ON O3
+            if (queryResult.HasLongitudinalData)
+                combinedQuery.DesignElements.Add(new Query() { QueryFor = nameof(Visit) });
 
             foreach (var deQuery in combinedQuery.DesignElements)
             {
@@ -382,10 +418,16 @@ namespace eTRIKS.Commons.Service.Services
                 //QUERYING FOR OBSERVATIONS
                 foreach (var o3q in o3q_list)
                 {
-                    obsQueryResult.AddRange(o3q.IsOntologyEntry
+                    var _observations = o3q.IsOntologyEntry
                          ? _sdtmRepository.FindAll(s => s.QualifierQualifiers[o3q.TermCategory] == o3q.TermId.ToString() && s.Group == o3q.Group && s.ProjectId == o3q.ProjectId).ToList()
-                         : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList());
+                                          : _sdtmRepository.FindAll(s => s.DBTopicId == o3q.TermId && s.ProjectId == o3q.ProjectId).ToList();
+                    obsQueryResult.AddRange(_observations);
+
+                    if(_observations.Count > queryResult.Subjects.Count)
+                        queryResult.HasLongitudinalData = true;
                 }
+
+
 
                 //FILTERING OBSERVATIONS
                 foreach (var oq in sameO3queries) //AEOCCUR / AESEV
@@ -418,7 +460,8 @@ namespace eTRIKS.Commons.Service.Services
             }
 
             //CASCADE FILTERING OF OBERVATIONS FROM ALL FILTERS ON OBSERVATIONS
-            observations = observations.FindAll(o => ObsFilteredSubjectIds.Contains(o.USubjId));
+            if(queryResult.ObservationsFiltered)
+                observations = observations.FindAll(o => ObsFilteredSubjectIds.Contains(o.USubjId));
             queryResult.Observations = observations;
         }
 
@@ -465,6 +508,8 @@ namespace eTRIKS.Commons.Service.Services
                     Group = dto.Group,
                     IsOntologyEntry = dto.IsOntologyEntry,
                     TermCategory = dto.OntologyEntryCategoryName,
+                    HasLongitudinalData = dto.HasLongitudinalData,
+                    HasTPT = dto.HasTPT,
 
                     ObservationObjectShortName = dto.O3code,
                     DataType = dto.DataType,

@@ -54,6 +54,8 @@ namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
         
         public string ObservationObjectShortName { get; set; }
         public string Group { get; set; }
+        public bool HasLongitudinalData { get; set; }
+        public bool HasTPT { get; set; }
     }
 
     public class GroupedObservationsQuery : ObservationQuery

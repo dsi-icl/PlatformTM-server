@@ -1,50 +1,31 @@
 ﻿<Properties StartupConfiguration="{B4246D3F-ED64-4D5A-B1D3-F4647F5C00CF}|Default">
   <MonoDevelop.Ide.ItemProperties.eTRIKS.Commons.WebAPI PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="eTRIKS.Commons.WebAPI/Startup.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="eTRIKS.Commons.DataAccess/BioSPEAKdbContext.cs">
     <Files>
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/ActivityController.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/DTOs/ActivityDTO.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/DTOs/DatasetDTO.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/DTOs/DataTable.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/DTOs/DataExportObject.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/FileController.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/DatasetController.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/ProjectController.cs" Line="87" Column="13" />
-      <File FileName="eTRIKS.Commons.Service/DTOs/ProjectDTO.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Core/Domain/Model/DatasetModel/Dataset.cs" Line="14" Column="19" />
-      <File FileName="eTRIKS.Commons.Core/Domain/Model/Templates/DatasetTemplate.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/ActivityService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/DatasetService.cs" Line="499" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/UserDatasetController.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/AccountController.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Controllers/DataExplorerController.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/DTOs/Explorer/ObservationRequestDTO.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Core/Domain/Model/ObservationModel/Observation.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/AssayService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/BioSampleService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/CacheService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/CheckoutService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/CVtermService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/DataExplorerService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/ExportService.cs" Line="112" Column="63" />
-      <File FileName="eTRIKS.Commons.Service/Services/FileService.cs" Line="66" Column="45" />
-      <File FileName="eTRIKS.Commons.Service/Services/ObservationService.cs" Line="111" Column="67" />
-      <File FileName="eTRIKS.Commons.Service/Services/ProjectService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/QueryService.cs" Line="77" Column="36" />
-      <File FileName="eTRIKS.Commons.Service/Services/StudyService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/SubjectService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/TemplateService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Service/Services/UserDatasetService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Core/Domain/Model/Users/Datasets/UserDataset.cs" Line="38" Column="24" />
-      <File FileName="eTRIKS.Commons.Service/Services/UserManagement/UserAccountService.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.Core/Domain/Model/DatasetModel/VariableDefinition.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.DataAccess/BioSPEAKdbContext.cs" Line="1" Column="1" />
-      <File FileName="eTRIKS.Commons.WebAPI/Startup.cs" Line="1" Column="1" />
+      <File FileName="eTRIKS.Commons.Service/Services/CheckoutService.cs" Line="149" Column="104" />
+      <File FileName="eTRIKS.Commons.Service/Services/ExportService.cs" Line="287" Column="29" />
+      <File FileName="eTRIKS.Commons.Service/Services/QueryService.cs" Line="79" Column="8" />
+      <File FileName="eTRIKS.Commons.WebAPI/Controllers/ExportController.cs" Line="56" Column="1" />
+      <File FileName="eTRIKS.Commons.Core/Domain/Model/ObservationModel/Observation.cs" Line="22" Column="22" />
+      <File FileName="eTRIKS.Commons.Core/Domain/Model/ObservationModel/ObservedPropertyValue.cs" Line="1" Column="1" />
+      <File FileName="eTRIKS.Commons.Core/Domain/Model/ObservationModel/ObservationDescriptor.cs" Line="1" Column="1" />
+      <File FileName="eTRIKS.Commons.Service/Services/Loading/SDTM/ObservationLoader.cs" Line="27" Column="28" />
+      <File FileName="eTRIKS.Commons.Core/Domain/Model/Users/Queries/ObservationQuery.cs" Line="1" Column="1" />
+      <File FileName="eTRIKS.Commons.Core/Domain/Model/DatasetModel/SDTM/SdtmRow.cs" Line="38" Column="52" />
+      <File FileName="eTRIKS.Commons.WebAPI/appsettings.json" Line="9" Column="52" />
+      <File FileName="eTRIKS.Commons.DataAccess/BioSPEAKdbContext.cs" Line="136" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="/Development/Projects/biospeak-server/eTRIKS.Commons.Service/Services/QueryService.cs" relfile="eTRIKS.Commons.Service/Services/QueryService.cs" line="105" column="1" />
+      <Breakpoint file="/Development/Projects/biospeak-server/eTRIKS.Commons.Service/Services/QueryService.cs" relfile="eTRIKS.Commons.Service/Services/QueryService.cs" line="101" column="1" />
+      <Breakpoint file="/Development/Projects/biospeak-server/eTRIKS.Commons.Service/Services/QueryService.cs" relfile="eTRIKS.Commons.Service/Services/QueryService.cs" line="84" column="1" />
+      <Catchpoint exceptionName="System.NullReferenceException" includeSubclasses="True" />
+      <Catchpoint exceptionName="System.Exception" includeSubclasses="True" />
+      <Catchpoint exceptionName="Microsoft.IdentityModel.Tokens.SecurityTokenInvalidSignatureException" includeSubclasses="True" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MultiItemStartupConfigurations />

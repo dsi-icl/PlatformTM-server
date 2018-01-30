@@ -51,14 +51,14 @@ namespace eTRIKS.Commons.DataAccess.Repositories
             return null;
         }
         
-        public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
+        public async Task<List<TEntity>> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
         {
             if (filterExpression != null)
             {
-                return collection
+                return await collection
                     .Find(filterExpression)
-                    .Project(projectionExpression)
-                    .ToList();
+                    //.Project(projectionExpression)
+                    .ToListAsync();
             }
          
             return null;

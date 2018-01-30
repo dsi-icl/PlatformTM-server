@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Service.Configuration;
 using Microsoft.Extensions.Options;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
 
 namespace eTRIKS.Commons.Service.Services
 {
@@ -102,24 +103,35 @@ namespace eTRIKS.Commons.Service.Services
         
         private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
         {
-            return await Task.Factory.StartNew(() =>
-            {
+            //return await Task.Factory.StartNew(() =>
+            //{
                 var projectId = dataset.ProjectId;
                 var activityId = exportData.Samples.First().AssayId;
 
                 // GET sampleIds, observations, and features
                 var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
-                var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
+                var assayObservations = await _queryService.GetAssayObservations(projectId, activityId, sampleIds);
 
-                var orderObservations = assayObservations.OrderBy(o => o.FeatureName).ThenBy(o => o.SubjectOfObservationName);
+                //var orderObservations = assayObservations.OrderBy(o => o.FeatureName).ThenBy(o => o.SubjectOfObservationName);
                 //////var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
                 //////var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
 
                
-                var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
-                var values = orderObservations.Select(a => a.Value).ToList(); 
-                var samples = orderObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
-                
+                //var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
+                //var values = orderObservations.Select(a => a.Value).ToList(); 
+                //var samples = orderObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
+                var features = new List<string>();
+                var samples = new List<string>();
+                var values = new List<double>();
+
+                //foreach (var observation in orderObservations)
+                //{
+                //    features.Add(observation.FeatureName);
+                //    samples.Add(observation.SubjectOfObservationName);
+                //    values.Add(observation.Value);
+                //}
+                //samples = samples.Distinct().ToList();
+                //features = features.Distinct().ToList();
 
 
                 // create directory and write the data to file
@@ -154,7 +166,7 @@ namespace eTRIKS.Commons.Service.Services
 
 
                 return new FileInfo(filePath);
-            });
+           // });
         }
 
         private async Task<FileInfo> ExportSubjectClinicalTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
@@ -242,20 +254,46 @@ namespace eTRIKS.Commons.Service.Services
                                     o => ((ObservationQuery)field.QueryObject).TermId == o.DBTopicId);
                                 }
 
+                                string val = "";
 
 
                                 //WRITE OBSERVATION INSTANCE TO ROW
-
-                                string val = "";
                                 obs?.Qualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
                                 if (val == null)
                                     obs?.ResultQualifiers.TryGetValue(((ObservationQuery)field.QueryObject).PropertyName, out val);
+
+                                //Write 
+                                //if (val == null)
+                                    //if (((ObservationQuery)field.QueryObject).PropertyName.ToLower().Equals("visit"))
+                                        //val = obs.VisitName;
+                                //if (val==null && ((ObservationQuery)field.QueryObject).PropertyName.EndsWith("DY") && obs.CollectionStudyDay.Number!=null)
+                                //{
+                                //    val = obs.CollectionStudyDay.Number.HasValue ? obs.CollectionStudyDay.Number.ToString() : "";
+                                //    //row[field.ColumnHeader.ToLower()] = val;
+                                //}
+                                
                                 row[field.ColumnHeader.ToLower()] = val ?? "";
+
+
                             }
+                            var visitField = dataset.Fields.Find(f => f.QueryObjectType == nameof(Visit));
+                            if(visitField!=null){
+                                row[visitField.ColumnHeader.ToLower()] = obs.VisitName;
+                            }
+
+                            var timepointField = dataset.Fields.Find(f => f.QueryObject.QueryFor.Equals(nameof(SdtmRow.CollectionStudyTimePoint)));
+                            if (timepointField != null)
+                                row[timepointField.ColumnHeader.ToLower()] = obs.CollectionStudyTimePoint.Name;
+                            
                             subjectObservations.Remove(obs);
                         }
 
                         #endregion
+
+                        #region Write Timing Variables
+
+                        #endregion
+
 
                         datatable.Rows.Add(row);
                     }

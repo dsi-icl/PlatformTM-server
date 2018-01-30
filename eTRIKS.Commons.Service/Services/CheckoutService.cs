@@ -6,6 +6,8 @@ using System.Text;
 using eTRIKS.Commons.Core.Domain.Interfaces;
 using eTRIKS.Commons.Core.Domain.Model;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
+using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using eTRIKS.Commons.Core.Domain.Model.Timing;
 using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.DTOs;
@@ -124,12 +126,43 @@ namespace eTRIKS.Commons.Service.Services
             })); 
 
             //ADD CLINICAL OBSERVATIONS
-            phenoDataset.Fields.AddRange(query.ClinicalObservations.Select(qObj => new DatasetField()
-            {
-                QueryObject = qObj,
-                QueryObjectType = nameof(SdtmRow),
-                ColumnHeader = qObj.ObservationName
-            }));
+            foreach(var co in query.ClinicalObservations){
+                phenoDataset.Fields.Add(new DatasetField()
+                {
+                    QueryObject = co,
+                    QueryObjectType = nameof(SdtmRow),
+                    ColumnHeader = co.ObservationName
+                });
+
+                if(co.HasLongitudinalData){
+                    phenoDataset.Fields.Add(new DatasetField(){
+                        QueryObject = new Query(){QueryFor = nameof(Visit),QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name"},
+                        QueryObjectType = nameof(Visit),
+                        ColumnHeader = "visit"
+                        
+                    });
+                }
+
+                if(co.HasTPT){
+                    phenoDataset.Fields.Add(new DatasetField()
+                   {
+                        QueryObject = new Query() { QueryFor = nameof(SdtmRow.CollectionStudyTimePoint), QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name" },
+                        QueryObjectType = nameof(RelativeTimePoint),
+                        ColumnHeader = "timepoint"
+
+                   }); 
+                }
+            }
+
+
+            //phenoDataset.Fields.AddRange(query.ClinicalObservations.Select(qObj => new DatasetField()
+            //{
+            //    QueryObject = qObj,
+            //    QueryObjectType = nameof(SdtmRow),
+            //    ColumnHeader = qObj.ObservationName
+            //}));
+
+
 
             //ADD GROUPED CLINICAL OBSERVATIONS
             phenoDataset.Fields.AddRange(query.GroupedObservations.Select(gObs => new DatasetField()
