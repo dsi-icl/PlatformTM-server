@@ -537,7 +537,7 @@ namespace eTRIKS.Commons.Service.Services
         public FileStream GetFile(int fileId, out string filename)
         {
             var file = _fileRepository.Get(fileId);
-            var filePath = Path.Combine(file.Path, file.FileName);
+            var filePath = Path.Combine(_uploadFileDirectory,file.Path, file.FileName);
             filename = file.FileName;
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             return fileStream;

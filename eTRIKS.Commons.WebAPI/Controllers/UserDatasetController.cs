@@ -13,7 +13,7 @@ using eTRIKS.Commons.WebAPI.Extensions;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
-    [Route("datasets")]
+    [Route("exports")]
     public class UserDatasetController : Controller
     {
         private readonly UserDatasetService _userDataService;
@@ -25,7 +25,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             _accountService = accountService;
         }
 
-        [HttpGet("user")]
+        [HttpGet]
         public IActionResult GetUserDatasets()
         {
             var userId = User.FindFirst(ClaimTypes.UserData).Value;
@@ -42,7 +42,8 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return !User.Identity.IsAuthenticated ? null : _userDataService.GetUserDataset(datasetId, userId);
         }
 
-        [HttpGet("{datasetId}/delete")]
+        [HttpGet]
+        [Route("{datasetId}/delete")]
         public void DeleteDataset(string datasetId)
         {
             _userDataService.DeleteDataset(datasetId);
