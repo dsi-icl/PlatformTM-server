@@ -81,6 +81,18 @@ namespace eTRIKS.Commons.Service.Services
             return assayObservations.Cast<AssayDataDTO>().ToList();
         }
 
+        public List<AssayDataDTO> GetAssayObservations1(int projectId, int activityId, string sampleIds)
+        {
+            var assayObservations =
+                _observationRepository.FindObservations(s =>
+                        s.ProjectId == projectId && s.ActivityId == activityId && s.SubjectOfObservationName == sampleIds,
+                    x => new AssayDataDTO() { FileId = x.DatafileId, FeatureName = x.FeatureName.ToString(), SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
+                );
+
+            return assayObservations.Cast<AssayDataDTO>().ToList();
+        }
+
+
         ////public List<AssayDataDTO> GetAssayObservationsPaging(int projectId, int activityId, List<string> sampleIds, int page)
         ////{
         ////    var assayObservations =

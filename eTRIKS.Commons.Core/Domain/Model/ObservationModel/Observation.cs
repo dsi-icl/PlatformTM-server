@@ -19,7 +19,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
         /// <summary>
         /// Mapped to the value of the MySQL Study/Sample table primary key (SubjectId or SampleId)
         /// </summary>
-        public string SubjectOfObservationId { get; set; }
+        public int SubjectOfObservationId { get; set; }
 
 
         public string StudyName { get; set; } //CRC305A CRC305B

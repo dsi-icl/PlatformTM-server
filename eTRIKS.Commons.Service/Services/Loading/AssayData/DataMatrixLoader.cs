@@ -45,20 +45,28 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
             return ds;
         }
         // dataset service 
-        public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/)      
+        public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/)
         {
-            _observationRepository.DeleteMany(d=> d.DatasetId == datasetId);
+            // good idea to add studyId to the observation so we filter the observation faster 
+            // modify (obs.SubjectOfObservationId = column.ColumnName;  ) to add SubjectOfObservationId from scos
+
+
+
+            _observationRepository.DeleteMany(d => d.DatasetId == datasetId);
             var dataset = GetActivityDataset(datasetId);
-            var dataFile = _dataFileRepository.Get(fileId); 
+            var dataFile = _dataFileRepository.Get(fileId);
+
+
+
             var filePath = dataFile.Path + "\\" + dataFile.FileName;
 
             var dataTable = _fileService.ReadOriginalFile(filePath);
 
-            var sampleList = _biosampleRepository.FindAll(s => s.DatasetId == datasetId).ToList();
+            var sampleList = _biosampleRepository.FindAll(s => s.StudyId == 65).ToList();
             var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
 
             var obsReadyToInsert = new List<Core.Domain.Model.ObservationModel.Observation>();
-            
+
             foreach (DataRow row in dataTable.Rows)
             {
                 for (int index = 0; index < dataTable.Columns.Count; index++)
@@ -68,36 +76,45 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
                         var column = dataTable.Columns[index];
                         var obs = new Core.Domain.Model.ObservationModel.Observation();
                         // Fill an Observation
-                            var value = new NumericalValue();
-                            value.Value = double.Parse(row[column.ColumnName].ToString());
-                            value.Property = new PropertyDescriptor();
-                            {
-                                value.Property.Description = dataset.Template.Description;
-                                value.Property.ObsClass = dataset.Template.Class;
-                                value.Property.Name = dataset.TemplateId;
-                            }
-                            //   value.Unit = ??
-                            obs.ObservedValue = value;                                                         // Observed Value which includes in it the VALUE and its PROPERTY
+                        var value = new NumericalValue();
+                        value.Value = double.Parse(row[column.ColumnName].ToString());
+                        value.Property = new PropertyDescriptor();
+                        {
+                            value.Property.Description = dataset.Template.Description;
+                            value.Property.ObsClass = dataset.Template.Class;
+                            value.Property.Name = dataset.TemplateId;
+                        }
+                        //   value.Unit = ??
+                        obs.ObservedValue = value;                                                         // Observed Value which includes in it the VALUE and its PROPERTY
 
-                            // ****** FOR NOW WE USE THE FOLLOWING TILL WE HAVE THE FEATURE referencFromHdId ******
-                            obs.SubjectOfObservationName = column.ColumnName;                                  // sample name (HERE IS THE FILE NAME)
-                            obs.SubjectOfObservationId = column.ColumnName;                                    // sampleID     (here is the file name)
-                            // ****** 
+                        // ****** FOR NOW WE USE THE FOLLOWING TILL WE HAVE THE FEATURE referencFromHdId ******
+                        obs.SubjectOfObservationName = column.ColumnName;                                  // sample name (HERE IS THE FILE NAME)
+                                                                                                           // obs.SubjectOfObservationId = column.ColumnName;                                // sampleID     (here is the file name)
+                                                                                                           // previous line should be modified to the following (correct sample Id shopuld be found ) *********************************************
+                        var key = column.ColumnName;                                                                               /*obs.SubjectOfObservationId = */
+                        obs.SubjectOfObservationId = scos.FirstOrDefault(x => x.Key == key).Value.Id;
 
-                            //   obs.SubjectOfObservationName = scos[column.ColumnName].BiosampleStudyId;      // sample Name
-                            //   obs.SubjectOfObservationId = scos[column.ColumnName].Id.ToString();           // sample ID
-                            //   obs.StudyId = scos[column.ColumnName].StudyId;                                // study ID
-                            obs.FeatureName = row[0].ToString();                                               // feature name 
-                            // obs.FeatureId =;  Not implemented yet                                           // feature ID
-                            obs.DatafileId = dataFile.Id;
-                            obs.DatasetId = datasetId;
-                            obs.ActivityId = dataset.ActivityId;
-                            obs.ProjectId = dataset.Activity.ProjectId;
-                            obs.Id = Guid.NewGuid();
-                            
+
+
+                        // ****** 
+
+                        //   obs.SubjectOfObservationName = scos[column.ColumnName].BiosampleStudyId;      // sample Name
+                        //   obs.SubjectOfObservationId = scos[column.ColumnName].Id.ToString();           // sample ID
+                        //   obs.StudyId = scos[column.ColumnName].StudyId;                                // study ID
+                        obs.FeatureName = row[0].ToString();                                               // feature name 
+                                                                                                           // obs.FeatureId =;  Not implemented yet                                           // feature ID
+                        obs.DatafileId = dataFile.Id;
+                        obs.DatasetId = datasetId;
+                        obs.ActivityId = dataset.ActivityId;
+                        obs.ProjectId = dataset.Activity.ProjectId;
+
+
+                        // following newly added *********************************************
+                        obs.StudyId = sampleList.First().StudyId;
+
                         obsReadyToInsert.Add(obs);
-                     //   observationsTotal.Add(obs);
-                     
+                        //   observationsTotal.Add(obs);
+
                         if (obsReadyToInsert.Count % ((dataTable.Columns.Count) - 1) == 0)
                         {
                             _observationRepository.InsertMany(obsReadyToInsert);
@@ -105,7 +122,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
                         }
 
                     }
-               }
+            }
             if (obsReadyToInsert.Count > 0)
             {
                 Debug.WriteLine("Created Observations are NOT Equal to measured values in the file please check!!");
@@ -117,5 +134,6 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
             _dataContext.Save();
             return true;
         }
+
     }
 }

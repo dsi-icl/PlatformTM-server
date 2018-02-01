@@ -9,6 +9,7 @@ using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using System.Text;
 using System.Threading.Tasks;
+using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
 using eTRIKS.Commons.Service.Configuration;
 using Microsoft.Extensions.Options;
@@ -22,14 +23,20 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IServiceUoW _dataServiceUnit;
         private readonly string _downloadFileDirectory;
         private FileStorageSettings ConfigSettings { get; set; }
+        private readonly IRepository<DataFile, int> _dataFileRepository;
+        //private readonly FileService _fileService;
 
-        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings)
+
+
+
+        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings /* , FileService fileService*/)
         {
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _queryService = queryService;
             _dataServiceUnit = uoW;
             ConfigSettings = settings.Value;
             _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
+           // _fileService = fileService;
         }
 
 
@@ -99,8 +106,50 @@ namespace eTRIKS.Commons.Service.Services
                 return new FileInfo(filePath);
             });
         }
-        
-        private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+
+        private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        {
+            return await Task.Factory.StartNew(() =>
+            {
+                var projectId = dataset.ProjectId;
+                var activityId = exportData.Samples.First().AssayId;
+
+                // GET sampleIds, observations, and features
+                var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
+                var sam = sampleIds.First();
+
+                var assayObservations = _queryService.GetAssayObservations1(projectId, activityId, sam);
+
+                // var fId = exportData.Samples.First().DataFileId.Value;
+
+                int fileId = assayObservations.FirstOrDefault().FileId;
+                var file = _dataFileRepository.Get(fileId);
+                string fp = file.Path + "\\" + file.FileName;
+
+
+
+                DataTable dt = null;    // _fileService.ReadOriginalFile(fp);
+
+               
+                //DataTable dt = new DataView(dataTable).ToTable(false, selectedColumns)
+                foreach (DataColumn col in dt.Columns)
+                {
+                    if (sampleIds.Contains(col.ColumnName))
+                    {
+                        dt.Columns.Add(col);
+                    }
+                }
+
+
+                var filePath = DatatableToFile(dt, path, dataset);
+                return new FileInfo(filePath);
+
+            });
+        }
+
+
+
+        private async Task<FileInfo> ExportAssayTable1(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
         {
             return await Task.Factory.StartNew(() =>
             {
