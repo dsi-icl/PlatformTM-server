@@ -1,15 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2005
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eTRIKS.Commons.DataAccess", "eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj", "{BF705262-DF01-44C3-9883-DA2C210E95FA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.DataAccess", "eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj", "{BF705262-DF01-44C3-9883-DA2C210E95FA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eTRIKS.Commons.Core", "eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj", "{3B6536C7-6ACD-4B0D-ADDC-EDC269FFAF99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Core", "eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj", "{3B6536C7-6ACD-4B0D-ADDC-EDC269FFAF99}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eTRIKS.Commons.Service", "eTRIKS.Commons.Service\eTRIKS.Commons.Service.csproj", "{A5868F92-9112-403E-9562-E1F3CED1A07D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.Service", "eTRIKS.Commons.Service\eTRIKS.Commons.Service.csproj", "{A5868F92-9112-403E-9562-E1F3CED1A07D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "eTRIKS.Commons.WebAPI", "eTRIKS.Commons.WebAPI\eTRIKS.Commons.WebAPI.csproj", "{B4246D3F-ED64-4D5A-B1D3-F4647F5C00CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "eTRIKS.Commons.WebAPI", "eTRIKS.Commons.WebAPI\eTRIKS.Commons.WebAPI.csproj", "{B4246D3F-ED64-4D5A-B1D3-F4647F5C00CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +38,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C176D94B-2F52-42F6-B567-EE47D550310F}
+		SolutionGuid = {025A4D02-C674-4A03-AC42-F42E69566C19}
 	EndGlobalSection
 EndGlobal

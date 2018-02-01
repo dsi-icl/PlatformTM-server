@@ -171,7 +171,7 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             Response.Headers.Add("Access-Control-Expose-Headers", "x-filename , content-length, content-disposition");
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             await fileStream.CopyToAsync(HttpContext.Response.Body);
-
+            fileStream.Dispose();
             //fileStream.Close();
             return new FileStreamResult(fileStream, "text/csv") { FileDownloadName = filename + ".csv" };
         }

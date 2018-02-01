@@ -29,6 +29,8 @@ using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Swashbuckle.AspNetCore.Swagger;
+
 
 namespace eTRIKS.Commons.WebAPI
 {
@@ -156,6 +158,11 @@ namespace eTRIKS.Commons.WebAPI
             BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.IntervalValue>();
             BsonClassMap.RegisterClassMap<ObservationQuery>();
 
+			services.AddSwaggerGen(c =>
+			{
+				c.SwaggerDoc("v1", new Info { Title = "BioSPEAK API", Version = "v1" });
+			});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -171,6 +178,15 @@ namespace eTRIKS.Commons.WebAPI
             app.UseApplicationInsightsRequestTelemetry();
 
             app.UseApplicationInsightsExceptionTelemetry();
+
+			// Enable middleware to serve generated Swagger as a JSON endpoint.
+			app.UseSwagger();
+
+			// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+			app.UseSwaggerUI(c =>
+			{
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "BioSPEAK API V1");
+			});
 
             var tokenIssuerOptions = Configuration.GetSection("TokenAuthOptions");
             var signingKey = new RsaSecurityKey(RSAKeyHelper.GenerateKey());

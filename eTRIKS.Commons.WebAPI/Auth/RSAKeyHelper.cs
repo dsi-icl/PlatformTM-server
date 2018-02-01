@@ -12,7 +12,7 @@ namespace eTRIKS.Commons.WebAPI.Auth
     {
         public static RSAParameters GenerateKey()
         {
-            using (var key = new RSACryptoServiceProvider(2048))
+            using (var key = RSA.Create())
             {
                 return key.ExportParameters(true);
             }

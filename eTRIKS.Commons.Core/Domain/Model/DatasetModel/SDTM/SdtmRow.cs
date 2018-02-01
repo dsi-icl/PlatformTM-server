@@ -19,7 +19,7 @@ namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
         public string Class { get; set; }
         public string SubjectId { get; set; }
         public string USubjId { get; set; }
-        public string SampleId { get; set; }
+        public string SampleId { get; set; } 
 
         public string TopicSynonym { get; set; }
         public string Topic { get; set; }

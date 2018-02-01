@@ -57,7 +57,7 @@ namespace eTRIKS.Commons.Service.Services
                 //Property is a collection
                 //Simple for now since there's only one collection in human subject i.e. subjectcharacteristics
                 var obj =((IList)queryProperty.GetValue(subject)).Cast<object>().SingleOrDefault(sc => sc.GetType().GetProperty(query.QueryWhereProperty).GetValue(sc).ToString() == query.QueryWhereValue);
-                subjProperty =obj.GetType().GetProperty(query.QuerySelectProperty).GetValue(obj).ToString();
+                subjProperty = obj?.GetType().GetProperty(query.QuerySelectProperty).GetValue(obj).ToString();
             }
             else
             {
