@@ -109,7 +109,7 @@ namespace eTRIKS.Commons.Service.Services
                 var activityId = exportData.Samples.First().AssayId;
 
                 // GET sampleIds, observations, and features
-                var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
+                var sampleIds = exportData.Samples.OrderBy(s=>s.Id).Select(s => s.Id).ToList();
                 var assayObservations = await _queryService.GetAssayObservations(projectId, activityId, sampleIds);
 
                 //var orderObservations = assayObservations.OrderBy(o => o.FeatureName).ThenBy(o => o.SubjectOfObservationName);
