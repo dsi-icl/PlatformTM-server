@@ -61,12 +61,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return "FAILED to update datasetId";
         }
 
-        [HttpGet]
-        [Route("{datasetId}/templateMap")]
-        public DataTemplateMap GetDatasetTemplateMap(int datasetId)
-        {
-            return  _datasetService.GetTemplateMaps(datasetId);
-        }
+        //[HttpGet]
+        //[Route("{datasetId}/templateMap")]
+        //public DataTemplateMap GetDatasetTemplateMap(int datasetId)
+        //{
+        //    return  _datasetService.GetTemplateMaps(datasetId);
+        //}
 
         
         [HttpGet("{datasetId}/load/files/{fileId}")]
@@ -84,12 +84,12 @@ namespace eTRIKS.Commons.WebAPI.Controllers
 
         //[HttpGet]
         //[Route("api/datasets/{datasetId}/compute/files/{fileId}")]
-        public async Task ComputeFields(int datasetId, int fileId)
-        {
-            //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-            //string path = rawFilesDirectory + studyId;
-            await _datasetService.GenerateComputeVars(datasetId);
-        }
+        //public async Task ComputeFields(int datasetId, int fileId)
+        //{
+        //    //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
+        //    //string path = rawFilesDirectory + studyId;
+        //    await _datasetService.GenerateComputeVars(datasetId);
+        //}
 
         [HttpGet("{datasetId}/loadHDdDdata/{fileId}")]
         public bool LoadHDdDdata(int datasetId, int fileId/*, int referencFromHdId*/ )

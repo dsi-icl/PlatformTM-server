@@ -3,3 +3,5 @@
 /*/obj/
 /*/bin/
 /eTRIKS.Commons.WebAPI_o/
+/App_Data/
+*.userprefs
