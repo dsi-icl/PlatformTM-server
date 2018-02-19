@@ -81,7 +81,7 @@ namespace eTRIKS.Commons.Service.Services
             return assayObservations.Cast<AssayDataDTO>().ToList();
         }
 
-        public List<AssayDataDTO> GetAssayObservations1(int projectId, int activityId, string sampleIds)
+        public List<AssayDataDTO> GetAssayObservationsTest(int projectId, int activityId, string sampleIds) 
         {
             var assayObservations =
                 _observationRepository.FindObservations(s =>

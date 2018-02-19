@@ -24,19 +24,20 @@ namespace eTRIKS.Commons.Service.Services
         private readonly string _downloadFileDirectory;
         private FileStorageSettings ConfigSettings { get; set; }
         private readonly IRepository<DataFile, int> _dataFileRepository;
-        //private readonly FileService _fileService;
+        private readonly FileService _fileService;
 
 
 
 
-        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings /* , FileService fileService*/)
+        public ExportService(IServiceUoW uoW, QueryService queryService, IOptions<FileStorageSettings> settings, FileService fileService)
         {
             _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _queryService = queryService;
             _dataServiceUnit = uoW;
             ConfigSettings = settings.Value;
             _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
-           // _fileService = fileService;
+            _dataFileRepository = uoW.GetRepository<DataFile, int>();
+             _fileService = fileService;
         }
 
 
@@ -68,6 +69,15 @@ namespace eTRIKS.Commons.Service.Services
             }
             if (dataset.Type == "ASSAY")
             {
+                // FOLLOWING using I/O to write the excel file for assay table (mo repository call)
+
+                ////int fileId = getFileId (exportData, dataset, filePath, out List<string> sampleIds);
+                ////var file = _dataFileRepository.Get(fileId);
+                ////string fp = file.Path + "\\" + file.FileName;
+                ////var dt = await ExportAssayTableTest(fp, sampleIds);
+                ////fileInfo = new FileInfo(DatatableToFile(dt, filePath, dataset)); 
+
+
                 fileInfo = await ExportAssayTable(exportData, dataset, filePath);
             }
             if (dataset.Type == "PHENO")
@@ -106,52 +116,44 @@ namespace eTRIKS.Commons.Service.Services
                 return new FileInfo(filePath);
             });
         }
-
-        private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
-        {
-            return await Task.Factory.StartNew(() =>
-            {
-                var projectId = dataset.ProjectId;
-                var activityId = exportData.Samples.First().AssayId;
-
-                // GET sampleIds, observations, and features
-                var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
-                var sam = sampleIds.First();
-
-                var assayObservations = _queryService.GetAssayObservations1(projectId, activityId, sam);
-
-                // var fId = exportData.Samples.First().DataFileId.Value;
-
-                int fileId = assayObservations.FirstOrDefault().FileId;
-                var file = _dataFileRepository.Get(fileId);
-                string fp = file.Path + "\\" + file.FileName;
-
-
-
-                DataTable dt = null;    // _fileService.ReadOriginalFile(fp);
-
-               
-                //DataTable dt = new DataView(dataTable).ToTable(false, selectedColumns)
-                foreach (DataColumn col in dt.Columns)
-                {
-                    if (sampleIds.Contains(col.ColumnName))
-                    {
-                        dt.Columns.Add(col);
-                    }
-                }
-
-
-                var filePath = DatatableToFile(dt, path, dataset);
-                return new FileInfo(filePath);
-
-            });
+        
+        private int getFileId(DataExportObject exportData, UserDataset dataset, string path, out List<string> sampleIds) // FEATURE BY FEATURE  MAIN QUICK
+        {
+            var projectId = dataset.ProjectId;
+            var activityId = exportData.Samples.First().AssayId;
+            sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
+            var assayObservations = _queryService.GetAssayObservationsTest(projectId, activityId, sampleIds.First());
+            return assayObservations.FirstOrDefault().FileId; ;
         }
-
-
-
-        private async Task<FileInfo> ExportAssayTable1(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        
+        private async Task<DataTable> ExportAssayTableTest(string filePath, List<string> sampleIds) // FEATURE BY FEATURE  MAIN QUICK
         {
             return await Task.Factory.StartNew(() =>
+            {
+               DataTable dataTable = _fileService.ReadOriginalFileTEST(filePath, sampleIds);
+                
+                //   dataTable.
+                //var t = dataTable.Columns.CopyTo(dt.Columns)
+                
+                // DataTable dt = new DataView(dataTable).ToTable(false, sampleIds);
+
+                //foreach (DataColumn col in dt.Columns)
+                //{
+                //    if (sampleIds.Contains(col.ColumnName))
+                //    {
+                //        dt.Columns.Add(col);
+                //    }
+                //}
+
+                // var filePath1 = DatatableToFile(dataTable, path, dataset);
+                // return new FileInfo(filePath1);
+                return dataTable;
+            });
+        }
+        
+        private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
+        {
+            return await Task.Factory.StartNew(() =>  
             {
                 var projectId = dataset.ProjectId;
                 var activityId = exportData.Samples.First().AssayId;

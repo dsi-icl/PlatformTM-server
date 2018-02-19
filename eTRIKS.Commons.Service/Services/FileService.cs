@@ -369,12 +369,52 @@ namespace eTRIKS.Commons.Service.Services
 
         #region IO methods
 
+        public DataTable ReadOriginalFileTEST(string filePath, List<string> sampleIds)
+        {
+            string PATH = _uploadFileDirectory + filePath;
+            return readDataFile(PATH/*, sampleIds*/);
+        }
+        private DataTable readDataFileTEST(string filePath, List<string> sampleIds)
+        {
+
+            CsvReader csv = new CsvReader(File.OpenText(filePath));
+            csv.Read();
+            //csv.ReadHeader(); 
+            // List<string> headers = csv.Context.HeaderRecord.ToList();
+
+            // Read csv into datatable
+            DataTable dataTable = new DataTable();
+
+            foreach (string sample in sampleIds)
+            {
+                dataTable.Columns.Add(sample);
+            }
+
+
+            // Import csv
+            while (csv.Read())
+            {
+                DataRow row = dataTable.NewRow();
+
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    row[column.ColumnName] = csv.GetField(column.DataType, column.ColumnName);
+                }
+
+                dataTable.Rows.Add(row);
+            }
+
+            var tt = dataTable;
+            return tt;
+        }
+
+
         public DataTable ReadOriginalFile(string filePath)
         {
             string PATH = _uploadFileDirectory + filePath;
             return readDataFile(PATH);
         }
-        
+
         private DataTable readDataFile(string filePath)
         {
             DataTable dt = new DataTable();
