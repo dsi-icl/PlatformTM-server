@@ -371,7 +371,14 @@ namespace eTRIKS.Commons.Service.Services
         }
         public DataTable GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
         {
-            var samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
+            List<Biosample> samples;
+            if(reqSampleChars == null)
+                samples = _biosampleRepository.FindAll(s => s.AssayId == assayId,
+                new List<string>() {
+                    "Study",
+                    "Subject"}).ToList();
+            else
+                samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
                 new List<string>() {
                     "Study",
                     "Subject","CollectionStudyDay",
