@@ -51,17 +51,37 @@ namespace eTRIKS.Commons.DataAccess.Repositories
             return null;
         }
         
-        public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
+        public async Task<List<TEntity>> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
         {
+            var obs = new List<TEntity>();
+            int i = 0;
             if (filterExpression != null)
             {
-                return collection
-                    .Find(filterExpression)
-                    .Project(projectionExpression)
-                    .ToList();
+                //return await collection
+                //.Find(filterExpression)
+                ////.Project(projectionExpression)
+                //.ToListAsync();
+
+               
+                var options = new FindOptions<TEntity>
+                {
+                    // Get 100 docs at a time
+                    BatchSize = 50000
+                };
+                using (IAsyncCursor<object> cursor = await collection.Find(filterExpression).Project(projectionExpression).ToCursorAsync()){
+                    while (await cursor.MoveNextAsync()){
+                        IEnumerable<object> batch = cursor.Current;
+                        foreach (object document in batch)
+                        {
+                            //obs.Add(document);
+                            i++;
+                        }
+                    }
+                };
+
             }
-         
-            return null;
+
+            return new List<TEntity>(i);;
         }
         
         public async Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null)

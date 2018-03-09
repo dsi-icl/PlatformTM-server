@@ -72,15 +72,52 @@ namespace eTRIKS.Commons.Service.Services
             return subjProperty;
         }
         //public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
-        public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        public async Task<List<Core.Domain.Model.ObservationModel.Observation>> GetAssayObservations(int projectId, int activityId, List<int> sampleIds)
         {
-            var assayObservations =
-                _observationRepository.FindObservations(s =>
-                    s.ProjectId == projectId && s.ActivityId == activityId && /*s.SubjectOfObservationName == "SID.7002.551"*/ sampleIds.Contains(s.SubjectOfObservationName),
-                    x => new AssayDataDTO() {FeatureName = x.FeatureName, SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
-                                                         );
+            int batchSize = 100;
+            int start = 0;
+            int offset;
+            var assayObservations = new List<Core.Domain.Model.ObservationModel.Observation>();
+            //sampleIds.GetRange(start,start+10<=sampleIds.Count?10:sampleIds.Count-start);
+            var tasks = new List<Task<List<Core.Domain.Model.ObservationModel.Observation>>>();
 
-            return assayObservations.Cast<AssayDataDTO>().ToList();
+            while(start < sampleIds.Count){
+                offset = start + batchSize <= sampleIds.Count ? batchSize : sampleIds.Count - start;
+                tasks.Add(AssayDataBatchQuery(projectId, activityId, sampleIds, start,offset));
+                //var batch =
+                //_observationRepository.FindObservations(s =>
+                // s.ProjectId == projectId && s.ActivityId == activityId &&
+                // sampleIds.GetRange(start, start + 10 <= sampleIds.Count ? 10 : sampleIds.Count - start).Contains(s.SubjectOfObservationName),
+                // x => new AssayDataDTO()
+                // {
+                //     FeatureName = x.FeatureName,
+                //     SubjectOfObservationName = x.SubjectOfObservationName,
+                //     Value = ((NumericalValue)x.ObservedValue).Value
+                // }
+                //).ToList();
+                //assayObservations.AddRange(batch.Cast<AssayDataDTO>());
+
+                //start = start + batchSize <= sampleIds.Count ? start + batchSize : sampleIds.Count;
+                start += offset;
+            }
+
+            int res = 0;
+            foreach(var task in await Task.WhenAll(tasks)){
+                res += task.Capacity;
+                //assayObservations.AddRange(task);
+            }
+
+
+            return assayObservations;
+                                
+            //return assayObservations;//.Cast<AssayDataDTO>().ToList();
+        }
+
+        public async Task<List<Core.Domain.Model.ObservationModel.Observation>> AssayDataBatchQuery(int projectId, int activityId, List<int> sampleIds, int start, int count){
+            return await _observationRepository.FindObservations(s =>
+                                                                 sampleIds.GetRange(start,count).Contains(s.SubjectOfObservationId),x=> new AssayDataDTO() {FeatureName = x.FeatureName,SubjectOfObservationId = x.SubjectOfObservationId,Value = ((NumericalValue)x.ObservedValue).Value}
+                                                       );
+            
         }
 
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
