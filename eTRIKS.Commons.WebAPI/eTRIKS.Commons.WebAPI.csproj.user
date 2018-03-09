@@ -7,5 +7,6 @@
       <Variable name="ASPNETCORE_ENVIRONMENT" value="Development" xmlns="" />
     </EnvironmentVariables>
     <LaunchUrl>http://localhost:5000/swagger/#</LaunchUrl>
+    <ApplicationURL>http://localhost:5000/api/v1/</ApplicationURL>
   </PropertyGroup>
 </Project>
