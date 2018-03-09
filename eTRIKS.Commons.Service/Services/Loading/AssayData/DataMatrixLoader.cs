@@ -81,7 +81,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
 
                             // ****** FOR NOW WE USE THE FOLLOWING TILL WE HAVE THE FEATURE referencFromHdId ******
                             obs.SubjectOfObservationName = column.ColumnName;                                  // sample name (HERE IS THE FILE NAME)
-                        //obs.SubjectOfObservationId = column.ColumnName;                                   // sampleID     (here is the file name)
+                            obs.SubjectOfObservationId = column.ColumnName;                                    // sampleID     (here is the file name)
                             // ****** 
 
                             //   obs.SubjectOfObservationName = scos[column.ColumnName].BiosampleStudyId;      // sample Name

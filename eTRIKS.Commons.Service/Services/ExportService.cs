@@ -108,35 +108,24 @@ namespace eTRIKS.Commons.Service.Services
         
         private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, UserDataset dataset, string path) // FEATURE BY FEATURE  MAIN QUICK
         {
-            //return await Task.Factory.StartNew(() =>
-            //{
+            return await Task.Factory.StartNew(() =>
+            {
                 var projectId = dataset.ProjectId;
                 var activityId = exportData.Samples.First().AssayId;
 
                 // GET sampleIds, observations, and features
-                var sampleIds = exportData.Samples.OrderBy(s=>s.Id).Select(s => s.Id).ToList();
-                var assayObservations = await _queryService.GetAssayObservations(projectId, activityId, sampleIds);
+                var sampleIds = exportData.Samples.OrderBy(o => o.BiosampleStudyId).Select(s => s.BiosampleStudyId).ToList();
+                var assayObservations = _queryService.GetAssayObservations(projectId, activityId, sampleIds);
 
-                //var orderObservations = assayObservations.OrderBy(o => o.FeatureName).ThenBy(o => o.SubjectOfObservationName);
+                var orderObservations = assayObservations.OrderBy(o => o.FeatureName).ThenBy(o => o.SubjectOfObservationName);
                 //////var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
                 //////var values = orderObservations.Select(c => ((NumericalValue)c.ObservedValue).Value);
 
                
-                //var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
-                //var values = orderObservations.Select(a => a.Value).ToList(); 
-                //var samples = orderObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
-                var features = new List<string>();
-                var samples = new List<string>();
-                var values = new List<double>();
-
-                //foreach (var observation in orderObservations)
-                //{
-                //    features.Add(observation.FeatureName);
-                //    samples.Add(observation.SubjectOfObservationName);
-                //    values.Add(observation.Value);
-                //}
-                //samples = samples.Distinct().ToList();
-                //features = features.Distinct().ToList();
+                var features = orderObservations.Select(a => a.FeatureName).Distinct().ToList();
+                var values = orderObservations.Select(a => a.Value).ToList(); 
+                var samples = orderObservations.Select(a => a.SubjectOfObservationName).Distinct().ToList(); 
+                
 
 
                 // create directory and write the data to file
@@ -171,7 +160,7 @@ namespace eTRIKS.Commons.Service.Services
 
 
                 return new FileInfo(filePath);
-           // });
+            });
         }
 
         private async Task<DataTable> ExportSubjectClinicalTable(DataExportObject exportData, UserDataset dataset) // FEATURE BY FEATURE  MAIN QUICK

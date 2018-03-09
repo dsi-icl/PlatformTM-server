@@ -27,7 +27,7 @@ namespace eTRIKS.Commons.DataAccess.Repositories
             //dataContext = entities
         }
       
-        public async Task<List<TEntity>> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
+        public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
         {
             throw new NotImplementedException();
         }

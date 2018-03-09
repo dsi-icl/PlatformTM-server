@@ -23,8 +23,6 @@ using eTRIKS.Commons.DataAccess.Extensions;
 using eTRIKS.Commons.DataAccess.Repositories;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Events;
-using MongoDB.Bson;
 
 namespace eTRIKS.Commons.DataAccess
 {
@@ -99,18 +97,8 @@ namespace eTRIKS.Commons.DataAccess
             }
             if (typeof(TEntity) == typeof(Core.Domain.Model.ObservationModel.Observation) )
             {
-                var mongoConnectionUrl = new MongoUrl(_dbsettings.Value.MongoDBconnection);
-                var mongoClientSettings = MongoClientSettings.FromUrl(mongoConnectionUrl);
-                mongoClientSettings.ClusterConfigurator = cb => {
-                    cb.Subscribe<CommandStartedEvent>(e => {
-                        Console.WriteLine($"{e.CommandName} - {e.Command.ToJson()}");
-                    });
-                };
-                var mongoCfgClient = new MongoClient(mongoClientSettings);
-
-
-                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
-                var mongodb = mongoCfgClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
                 var MongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(mongodb, "assayObservation");
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;

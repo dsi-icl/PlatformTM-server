@@ -59,7 +59,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
                     var obs = new Observation();
 
                     obs.FeatureName = row["FEAT"]?.ToString();
-                    //obs.SubjectOfObservationId = row["SPECIMEN"]?.ToString();
+                    obs.SubjectOfObservationId = row["SPECIMEN"]?.ToString();
                     obs.SubjectOfObservationName = row["SPECIMEN"]?.ToString();
                     double val;
                     if(double.TryParse(row["OBSVAL"]?.ToString(), out val))

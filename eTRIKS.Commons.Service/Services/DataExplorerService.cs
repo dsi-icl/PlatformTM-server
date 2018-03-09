@@ -159,7 +159,7 @@ namespace eTRIKS.Commons.Service.Services
 
         public async Task<ClinicalExplorerDTO> GetClinicalObsTree(int projectId)
         {
-            //_cacheRepository.RemoveFromCache(c=>c.ProjectId == projectId);
+           // _cacheRepository.RemoveFromCache(c=>c.ProjectId == projectId);
             var cachedTree = _cacheRepository.GetFromCache(c => c.ProjectId == projectId);
             if (cachedTree != null)
                 return cachedTree;
@@ -232,8 +232,6 @@ namespace eTRIKS.Commons.Service.Services
                     }
                 }
             }
-            //clinicalExplorerDTO.Id = Guid.NewGuid();
-            //_cacheRepository.Save(clinicalExplorerDTO);
             return clinicalExplorerDTO;
         }
 
