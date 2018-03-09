@@ -27,6 +27,7 @@ namespace eTRIKS.Commons.Service.DTOs
         //************************************************************* This is added to create a bool whether the export data has samples init or not ! used in Export service
         public bool IsSampleIncluded { get; set; }
         public bool ObservationsFiltered { get; internal set; }
+        public bool HasLongitudinalData { get; internal set; }
 
         //*************************************************************************************************
         public DataExportObject()

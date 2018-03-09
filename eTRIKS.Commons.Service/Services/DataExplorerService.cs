@@ -369,7 +369,14 @@ namespace eTRIKS.Commons.Service.Services
         }
         public DataTable GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
         {
-            var samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
+            List<Biosample> samples;
+            if(reqSampleChars == null)
+                samples = _biosampleRepository.FindAll(s => s.AssayId == assayId,
+                new List<string>() {
+                    "Study",
+                    "Subject"}).ToList();
+            else
+                samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
                 new List<string>() {
                     "Study",
                     "Subject","CollectionStudyDay",
@@ -665,6 +672,8 @@ namespace eTRIKS.Commons.Service.Services
                     QueryFor = nameof(SdtmRow), //
                     QueryWhereProperty = nameof(SdtmRow.DBTopicId),
                     QueryWhereValue = obsObject.Id.ToString(),
+                    HasLongitudinalData = obsObject.Timings.Any(),
+                    HasTPT = obsObject.Timings.Exists(t=>t.Qualifier.Name.EndsWith("TPT"))
                     //QuerySelectProperty = nameof()
                 }
             };

@@ -52,7 +52,8 @@ namespace eTRIKS.Commons.Service.DTOs.Explorer
         public float FilterRangeTo { get; set; } //the to value selected by user
         public bool IsFiltered { get; set; }
         public string FilterText { get; set; }
-
+        public bool HasLongitudinalData { get; set; }
+        public bool HasTPT { get; set; }
 
         public ObservationRequestDTO()
         {
