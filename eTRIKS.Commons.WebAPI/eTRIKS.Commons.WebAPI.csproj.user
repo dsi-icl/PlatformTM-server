@@ -8,4 +8,7 @@
     </EnvironmentVariables>
     <LaunchUrl>http://localhost:5000/swagger/#</LaunchUrl>
   </PropertyGroup>
+  <PropertyGroup>
+    <NameOfLastUsedPublishProfile>CustomProfile</NameOfLastUsedPublishProfile>
+  </PropertyGroup>
 </Project>
