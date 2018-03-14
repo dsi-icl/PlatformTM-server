@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
+using eTRIKS.Commons.Service.DTOs.Curation;
+using eTRIKS.Commons.Service.Services.Curation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using NuGet.Protocol.Core.v3.RemoteRepositories;
 
 namespace eTRIKS.Commons.WebAPI.Controllers
 {
@@ -44,5 +44,17 @@ namespace eTRIKS.Commons.WebAPI.Controllers
             return _curationService.GetSuggestions(fileId);
 
         }
+
+        ////////[HttpGet("search/{phrase}/")]
+        ////////[AllowAnonymous]
+        ////////public bool SearchMDR(string phrase)
+        ////////{
+        ////////    _curationService.SearchMDR(phrase);
+        ////////    return true;
+        ////////}
+
+
+
     }
 } 
+ 

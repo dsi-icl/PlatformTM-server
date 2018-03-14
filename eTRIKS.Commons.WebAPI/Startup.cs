@@ -16,6 +16,7 @@ using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
 using eTRIKS.Commons.Service.Configuration;
 using eTRIKS.Commons.Service.DTOs.Explorer;
+using eTRIKS.Commons.Service.Services.Curation;
 using eTRIKS.Commons.Service.Services.HelperService;
 using eTRIKS.Commons.Service.Services.Loading.AssayData;
 using eTRIKS.Commons.Service.Services.Loading.SDTM;

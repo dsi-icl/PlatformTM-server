@@ -3,14 +3,17 @@ using eTRIKS.Commons.Service.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
 using eTRIKS.Commons.Core.Domain.Model.Curation;
 using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
 using eTRIKS.Commons.Core.Domain.Model.Templates;
+using eTRIKS.Commons.Service.DTOs.Curation;
 
-namespace eTRIKS.Commons.Service.Services
+namespace eTRIKS.Commons.Service.Services.Curation
 {
     public class CurationService
     {
@@ -18,10 +21,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<DataFile, int> _fileRepository;
         private readonly IRepository<SingleColumn, Guid> _singleColumnsRepository;
         private readonly IRepository<SingleRow, Guid> _singleRawsRepository;
-        //private readonly IRepository<DatasetTemplate, int> _domainTemplate; 
-        private readonly IRepository<DatasetTemplateField, string> _domainTemplateVariavles;
         private readonly FileService _fileService;
-        private readonly IRepository<Dataset, int> _datasetRepository;
 
         public CurationService(IServiceUoW uoW, FileService fileService)
         {
@@ -30,8 +30,6 @@ namespace eTRIKS.Commons.Service.Services
             _singleColumnsRepository = uoW.GetRepository<SingleColumn, Guid>();
             _singleRawsRepository = uoW.GetRepository<SingleRow, Guid>();
             _fileService = fileService;
-            _datasetRepository = uoW.GetRepository<Dataset, int>();
-          _domainTemplateVariavles = uoW.GetRepository<DatasetTemplateField, string>();
         }
 
         public void CsvToSingleRows(int fileId)
@@ -170,6 +168,22 @@ namespace eTRIKS.Commons.Service.Services
             }
             return listOfListDto;
         }
-        
+
+
+        //////public void SearchMDR(string phrase)
+        //////{
+        //////    using (var client = new HttpClient())
+        //////    {
+        //////        client.BaseAddress = new Uri("http://localhost:2342");
+        //////        client.DefaultRequestHeaders.Accept.Clear();
+        //////        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        //////        var response = client.GetAsync("api/ElasticSearch/search").Result;
+        //////        if (response.IsSuccessStatusCode)
+        //////        {
+        //////            string responseString = response.Content.ReadAsStringAsync().Result;
+        //////           // var modelObject = response.Content.ReadAsAsync<Student>().Result;
+        //////        }
+        //////    }
+        //////}
     }
 }
