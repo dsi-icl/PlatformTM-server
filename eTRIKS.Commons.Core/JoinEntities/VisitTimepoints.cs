@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
+﻿using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.JoinEntities
+namespace PlatformTM.Core.JoinEntities
 {
     public class VisitTimepoints
     {

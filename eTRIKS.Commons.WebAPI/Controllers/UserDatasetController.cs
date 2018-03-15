@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
-using eTRIKS.Commons.Service.Services.UserManagement;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using eTRIKS.Commons.WebAPI.Extensions;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Core.Domain.Model.Users.Datasets;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
+using PlatformTM.Services.Services.UserManagement;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("exports")]
     public class UserDatasetController : Controller

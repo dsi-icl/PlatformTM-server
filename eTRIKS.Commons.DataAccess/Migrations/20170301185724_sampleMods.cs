@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace eTRIKS.Commons.DataAccess.Migrations
+namespace PlatformTM.Data.Migrations
 {
     public partial class sampleMods : Migration
     {

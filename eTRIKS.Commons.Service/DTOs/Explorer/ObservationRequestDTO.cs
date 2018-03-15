@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace eTRIKS.Commons.Service.DTOs.Explorer
+namespace PlatformTM.Services.DTOs.Explorer
 {
     public class ObservationRequestDTO
     {

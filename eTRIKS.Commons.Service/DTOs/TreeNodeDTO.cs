@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 
-namespace eTRIKS.Commons.Service.DTOs
+namespace PlatformTM.Services.DTOs
 {
 
     /**

@@ -1,18 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Service.DTOs;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Timing;
+using PlatformTM.Core.Domain.Model.Users.Datasets;
+using PlatformTM.Core.Domain.Model.Users.Queries;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class CheckoutService
     {

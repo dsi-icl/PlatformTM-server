@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace eTRIKS.Commons.Service.Services.Authentication
+namespace PlatformTM.Services.Services.Authentication
 {
     public static class TimeSensitivePassCodeService
     {

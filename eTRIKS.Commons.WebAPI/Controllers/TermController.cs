@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
+﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("terms")]
     public class TermController : Controller

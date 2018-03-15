@@ -1,11 +1,9 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Core.JoinEntities;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.JoinEntities;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Users
+namespace PlatformTM.Core.Domain.Model.Users
 {
     public class User : Identifiable<Guid> 
     {

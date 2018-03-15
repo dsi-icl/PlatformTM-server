@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
+﻿using PlatformTM.Core.Domain.Model.ControlledTerminology;
+using PlatformTM.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.Core.JoinEntities
+namespace PlatformTM.Core.JoinEntities
 {
     public class TemplateFieldDB
     {

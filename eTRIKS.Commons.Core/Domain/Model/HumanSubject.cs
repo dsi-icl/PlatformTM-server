@@ -1,10 +1,10 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DesignElements;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class HumanSubject : Identifiable<string>
     {

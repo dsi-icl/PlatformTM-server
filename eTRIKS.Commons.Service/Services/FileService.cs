@@ -1,26 +1,20 @@
-﻿using System.Collections;
-using System.Diagnostics;
-using CsvHelper;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Service.DTOs;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.JoinEntities;
+using CsvHelper;
 using Microsoft.Extensions.Options;
-using eTRIKS.Commons.Service.Configuration;
-using eTRIKS.Commons.Service.Services.Loading.AssayData;
-using eTRIKS.Commons.Service.Services.Loading.SDTM;
-using Microsoft.IdentityModel.Protocols;
-using Remotion.Linq.Parsing;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.JoinEntities;
+using PlatformTM.Services.Configuration;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services.Loading.AssayData;
+using PlatformTM.Services.Services.Loading.SDTM;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class FileService
     {

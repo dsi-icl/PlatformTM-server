@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model.Users;
 using Microsoft.EntityFrameworkCore;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.Users;
 
-namespace eTRIKS.Commons.DataAccess.Repositories
+namespace PlatformTM.Data.Repositories
 {
     public class UserRepository : GenericRepository<User,Guid>, IUserRepository
     {

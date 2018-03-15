@@ -1,7 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
+namespace PlatformTM.Core.Domain.Model.ControlledTerminology
 {
     public class Dictionary : Identifiable<string>
     {

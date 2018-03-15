@@ -3,17 +3,12 @@
 /******** Services to handle functions on Activity **********/
 /************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Service.DTOs;
-using System.Linq.Expressions;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Services.DTOs;
 
-
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class ActivityService
     {

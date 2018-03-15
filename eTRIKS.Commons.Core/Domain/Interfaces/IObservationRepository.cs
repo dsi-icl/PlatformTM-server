@@ -1,6 +1,6 @@
-﻿using eTRIKS.Commons.Core.Domain.Model;
+﻿using PlatformTM.Core.Domain.Model;
 
-namespace eTRIKS.Commons.Core.Domain.Interfaces
+namespace PlatformTM.Core.Domain.Interfaces
 {
     public interface IObservationRepository : IRepository<SubjectObservation,string>
     {

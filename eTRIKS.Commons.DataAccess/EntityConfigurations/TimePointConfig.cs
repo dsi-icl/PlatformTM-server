@@ -1,10 +1,9 @@
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PlatformTM.Core.Domain.Model.Timing;
+using PlatformTM.Data.Extensions;
 
-namespace eTRIKS.Commons.DataAccess.EntityConfigurations
+namespace PlatformTM.Data.EntityConfigurations
 {
     public class TimePointConfig : EntityTypeConfiguration<TimePoint>
     {

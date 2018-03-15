@@ -1,11 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.IdentityModel.Tokens;
 
-namespace eTRIKS.Commons.WebAPI.Auth
+namespace PlatformTM.API.Auth
 {
     public class TokenAuthOptions
     {

@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
+namespace PlatformTM.Core.Domain.Model.ObservationModel
 {
     public class Observation : Identifiable<Guid>
     {

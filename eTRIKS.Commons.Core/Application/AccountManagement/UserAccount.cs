@@ -1,9 +1,9 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.Users;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Users;
 
-namespace eTRIKS.Commons.Core.Application.AccountManagement
+namespace PlatformTM.Core.Application.AccountManagement
 {
     public class UserAccount : Identifiable<Guid>
     {

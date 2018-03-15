@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
+namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
 {
     public class SdtmSubjectDescriptor : SdtmRowDescriptor
     {

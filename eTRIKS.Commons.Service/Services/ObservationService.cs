@@ -1,15 +1,12 @@
 ﻿using System;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
 using System.Collections.Generic;
 using System.Linq;
-using Observation = eTRIKS.Commons.Core.Domain.Model.Observation;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
-using eTRIKS.Commons.Core.JoinEntities;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.JoinEntities;
+using Observation = PlatformTM.Core.Domain.Model.Observation;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class ObservationService
     {

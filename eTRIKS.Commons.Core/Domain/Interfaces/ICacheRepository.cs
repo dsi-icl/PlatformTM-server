@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
-namespace eTRIKS.Commons.Core.Domain.Interfaces
+namespace PlatformTM.Core.Domain.Interfaces
 {
     public interface ICacheRepository<TEntity> where TEntity : class
     {

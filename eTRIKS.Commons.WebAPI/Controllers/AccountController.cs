@@ -1,14 +1,12 @@
 ﻿using System.Security.Claims;
-using eTRIKS.Commons.Core.Application.AccountManagement;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services.UserManagement;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services.UserManagement;
 
-
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("accounts")]
     public class AccountController : Controller

@@ -1,9 +1,9 @@
-﻿using eTRIKS.Commons.Core.Application.AccountManagement;
-using eTRIKS.Commons.DataAccess.Extensions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PlatformTM.Core.Application.AccountManagement;
+using PlatformTM.Data.Extensions;
 
-namespace eTRIKS.Commons.DataAccess.EntityConfigurations
+namespace PlatformTM.Data.EntityConfigurations
 {
     internal class ClaimConfig : EntityTypeConfiguration<UserClaim>
     {

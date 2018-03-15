@@ -1,16 +1,15 @@
-﻿using eTRIKS.Commons.Core.Application.AccountManagement;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using PlatformTM.Core.Application.AccountManagement;
+using PlatformTM.Core.Domain.Interfaces;
 
-namespace eTRIKS.Commons.Service.Services.UserManagement
+namespace PlatformTM.Services.Services.UserManagement
 {
     public class UserStore : IUserPasswordStore<UserAccount>, IUserClaimStore<UserAccount>
     {

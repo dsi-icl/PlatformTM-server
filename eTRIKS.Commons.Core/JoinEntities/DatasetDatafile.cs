@@ -1,7 +1,7 @@
 ﻿
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel;
 
-namespace eTRIKS.Commons.Core.JoinEntities
+namespace PlatformTM.Core.JoinEntities
 {
     public class DatasetDatafile
     {

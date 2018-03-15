@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class BioSampleService
     {

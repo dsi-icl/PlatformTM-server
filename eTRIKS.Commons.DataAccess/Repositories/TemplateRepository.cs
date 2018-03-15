@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.DataAccess.Repositories
+namespace PlatformTM.Data.Repositories
 {
     public class TemplateRepository
     {

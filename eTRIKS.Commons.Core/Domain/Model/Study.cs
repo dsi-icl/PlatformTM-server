@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.JoinEntities;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.JoinEntities;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class Study : Identifiable<int>
     {

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+﻿using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Service.Services.OntologyManagement
+namespace PlatformTM.Services.Services.OntologyManagement
 {
     public interface IOntologyService
     {

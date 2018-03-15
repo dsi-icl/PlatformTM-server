@@ -1,23 +1,18 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.Users;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Core.JoinEntities;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.DTOs.Explorer;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.Users.Datasets;
+using PlatformTM.Core.Domain.Model.Users.Queries;
+using PlatformTM.Core.JoinEntities;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.DTOs.Explorer;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class ProjectService
     {

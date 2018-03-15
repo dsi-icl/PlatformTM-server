@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model.Base;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.DataAccess.Repositories
+namespace PlatformTM.Data.Repositories
 {
     public class GenericRepository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>

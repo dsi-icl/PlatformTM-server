@@ -1,19 +1,18 @@
-﻿using eTRIKS.Commons.Core.Domain.Interfaces;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.Service.DTOs.Explorer;
 using NuGet.Packaging;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Timing;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.DTOs.Explorer;
 
-
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
 
     public class DataExplorerService

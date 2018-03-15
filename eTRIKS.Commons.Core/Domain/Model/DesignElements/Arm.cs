@@ -1,8 +1,8 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.JoinEntities;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.JoinEntities;
 
-namespace eTRIKS.Commons.Core.Domain.Model.DesignElements
+namespace PlatformTM.Core.Domain.Model.DesignElements
 {
     public class Arm : Identifiable<string>
     {

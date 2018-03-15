@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
+namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
 {
     /*****
      * SDTMENTITY is the generic subject matter than a particular SDTM is collecting observations about

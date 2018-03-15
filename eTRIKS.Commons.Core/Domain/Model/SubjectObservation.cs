@@ -1,9 +1,9 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class SubjectObservation : Identifiable<Guid>
     {

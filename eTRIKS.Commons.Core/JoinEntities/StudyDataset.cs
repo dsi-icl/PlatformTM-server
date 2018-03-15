@@ -1,8 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+﻿using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel;
 
-namespace eTRIKS.Commons.Core.JoinEntities
+namespace PlatformTM.Core.JoinEntities
 {
     public class StudyDataset
     {

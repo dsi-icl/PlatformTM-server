@@ -1,22 +1,15 @@
-﻿using eTRIKS.Commons.Service.DTOs;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens;
+﻿using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
-using System.Security.Principal;
-using System.Text;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Service.Services.UserManagement;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PlatformTM.Services.Services.UserManagement;
 
-namespace eTRIKS.Commons.WebAPI.Auth
+namespace PlatformTM.API.Auth
 {
     public class TokenProviderMiddleware
     {

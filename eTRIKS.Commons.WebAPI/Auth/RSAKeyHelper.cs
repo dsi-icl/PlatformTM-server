@@ -1,12 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-namespace eTRIKS.Commons.WebAPI.Auth
+namespace PlatformTM.API.Auth
 {
     public class RSAKeyHelper
     {

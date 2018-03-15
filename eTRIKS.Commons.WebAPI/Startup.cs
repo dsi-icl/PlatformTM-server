@@ -1,38 +1,35 @@
 ﻿using System;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using eTRIKS.Commons.DataAccess.Configuration;
-using eTRIKS.Commons.Service.Services;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.DataAccess;
-using MySQL.Data.Entity.Extensions;
-using eTRIKS.Commons.Service.Services.UserManagement;
-using eTRIKS.Commons.Core.Application.AccountManagement;
-using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Service.Configuration;
-using eTRIKS.Commons.Service.DTOs.Explorer;
-using eTRIKS.Commons.Service.Services.HelperService;
-using eTRIKS.Commons.Service.Services.Loading.AssayData;
-using eTRIKS.Commons.Service.Services.Loading.SDTM;
-using eTRIKS.Commons.Service.Services.OntologyManagement;
-using eTRIKS.Commons.WebAPI.Auth;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
-using Newtonsoft.Json;
+using MySQL.Data.Entity.Extensions;
 using Newtonsoft.Json.Serialization;
+using PlatformTM.API.Auth;
+using PlatformTM.Core.Application.AccountManagement;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.ObservationModel;
+using PlatformTM.Core.Domain.Model.Users.Queries;
+using PlatformTM.Data;
+using PlatformTM.Data.Configuration;
+using PlatformTM.Services.Configuration;
+using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Services.Services;
+using PlatformTM.Services.Services.HelperService;
+using PlatformTM.Services.Services.Loading.AssayData;
+using PlatformTM.Services.Services.Loading.SDTM;
+using PlatformTM.Services.Services.OntologyManagement;
+using PlatformTM.Services.Services.UserManagement;
 using Swashbuckle.AspNetCore.Swagger;
 
-
-namespace eTRIKS.Commons.WebAPI
+namespace PlatformTM.API
 {
     public class Startup
     {
@@ -150,12 +147,12 @@ namespace eTRIKS.Commons.WebAPI
                      //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
                  });
 
-            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.Observation>();
-            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.ObservedPropertyValue>();
-            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.CategoricalValue>();
-            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.OrdinalValue>();
-            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.NumericalValue>();
-            BsonClassMap.RegisterClassMap<eTRIKS.Commons.Core.Domain.Model.ObservationModel.IntervalValue>();
+            BsonClassMap.RegisterClassMap<Observation>();
+            BsonClassMap.RegisterClassMap<ObservedPropertyValue>();
+            BsonClassMap.RegisterClassMap<CategoricalValue>();
+            BsonClassMap.RegisterClassMap<OrdinalValue>();
+            BsonClassMap.RegisterClassMap<NumericalValue>();
+            BsonClassMap.RegisterClassMap<IntervalValue>();
             BsonClassMap.RegisterClassMap<ObservationQuery>();
 
 			services.AddSwaggerGen(c =>

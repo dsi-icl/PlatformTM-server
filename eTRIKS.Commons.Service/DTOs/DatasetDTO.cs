@@ -2,10 +2,11 @@
 /********   Created By: Dilshan Silva 12-12-2014   **********/
 /********             DTO for Dataset              **********/
 /************************************************************/
+
 using System;
 using System.Collections.Generic;
 
-namespace eTRIKS.Commons.Service.DTOs
+namespace PlatformTM.Services.DTOs
 {
     public class DatasetDTO
     {

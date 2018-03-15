@@ -2,18 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <AssemblyName>eTRIKS.Commons.Service</AssemblyName>
-    <PackageId>eTRIKS.Commons.Service</PackageId>
+    <AssemblyName>PlatformTM.Services</AssemblyName>
+    <PackageId>PlatformTM.Services</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>PlatformTM.Services</RootNamespace>
+    <Authors>Ibrahim Emam&lt;i.emam@imperial.ac.uk&gt;</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj" />
-    <ProjectReference Include="..\eTRIKS.Commons.DataAccess\eTRIKS.Commons.DataAccess.csproj" />
+    <ProjectReference Include="..\eTRIKS.Commons.Core\PlatformTM.Core.csproj" />
+    <ProjectReference Include="..\eTRIKS.Commons.DataAccess\PlatformTM.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

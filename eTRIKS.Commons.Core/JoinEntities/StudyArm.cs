@@ -1,7 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+﻿using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DesignElements;
 
-namespace eTRIKS.Commons.Core.JoinEntities
+namespace PlatformTM.Core.JoinEntities
 {
     public class StudyArm
     {

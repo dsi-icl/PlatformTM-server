@@ -1,4 +1,4 @@
-﻿namespace eTRIKS.Commons.Core.Domain.Model
+﻿namespace PlatformTM.Core.Domain.Model
 {
     //public class AnimalSubject : Subject
     //{

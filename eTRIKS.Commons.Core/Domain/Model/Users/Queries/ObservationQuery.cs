@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
+namespace PlatformTM.Core.Domain.Model.Users.Queries
 {
     public class Query
     {

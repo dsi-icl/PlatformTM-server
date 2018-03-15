@@ -1,9 +1,8 @@
 ﻿using System;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Users;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.Users;
 
-namespace eTRIKS.Commons.Core.JoinEntities
+namespace PlatformTM.Core.JoinEntities
 {
     public class ProjectUser
     {

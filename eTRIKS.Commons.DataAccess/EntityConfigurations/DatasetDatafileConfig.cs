@@ -1,9 +1,9 @@
-﻿using eTRIKS.Commons.Core.JoinEntities;
-using eTRIKS.Commons.DataAccess.Extensions;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PlatformTM.Core.JoinEntities;
+using PlatformTM.Data.Extensions;
 
-namespace eTRIKS.Commons.DataAccess.EntityConfigurations
+namespace PlatformTM.Data.EntityConfigurations
 {
     public class DatasetDatafileConfig : EntityTypeConfiguration<DatasetDatafile>
     {

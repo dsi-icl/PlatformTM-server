@@ -1,17 +1,15 @@
-﻿using eTRIKS.Commons.Core.Application.AccountManagement;
-using eTRIKS.Commons.Core.Domain.Model.Users;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services.Authentication;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
+using PlatformTM.Core.Application.AccountManagement;
+using PlatformTM.Core.Domain.Model.Users;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services.Authentication;
 
-namespace eTRIKS.Commons.Service.Services.UserManagement
+namespace PlatformTM.Services.Services.UserManagement
 {
     public class UserAccountService
     {

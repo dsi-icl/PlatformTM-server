@@ -1,8 +1,8 @@
-﻿using eTRIKS.Commons.Core.Domain.Interfaces;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using PlatformTM.Core.Domain.Interfaces;
 
-namespace eTRIKS.Commons.Core.Application.AccountManagement
+namespace PlatformTM.Core.Application.AccountManagement
 {
     public interface IUserAccountRepository:  IRepository<UserAccount, Guid> 
     {

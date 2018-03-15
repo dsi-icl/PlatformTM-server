@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Application.AccountManagement;
 using Microsoft.EntityFrameworkCore;
+using PlatformTM.Core.Application.AccountManagement;
 
-namespace eTRIKS.Commons.DataAccess.Repositories
+namespace PlatformTM.Data.Repositories
 {
     public class UserAccountRepository : GenericRepository<UserAccount, Guid>, IUserAccountRepository
     {

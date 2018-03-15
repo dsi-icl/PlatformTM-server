@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Principal;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using eTRIKS.Commons.WebAPI.Auth;
-using eTRIKS.Commons.Service.Services.UserManagement;
-using eTRIKS.Commons.Service.DTOs;
+using PlatformTM.API.Auth;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services.UserManagement;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("api/[controller]")]
     public class TokenAuthController : Controller

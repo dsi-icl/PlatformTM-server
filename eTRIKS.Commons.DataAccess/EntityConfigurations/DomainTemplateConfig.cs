@@ -1,9 +1,9 @@
-using eTRIKS.Commons.Core.Domain.Model.Templates;
-using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PlatformTM.Core.Domain.Model.Templates;
+using PlatformTM.Data.Extensions;
 
-namespace eTRIKS.Commons.DataAccess.EntityConfigurations
+namespace PlatformTM.Data.EntityConfigurations
 {
     public class DomainTemplateConfig : EntityTypeConfiguration<DatasetTemplate>
     {

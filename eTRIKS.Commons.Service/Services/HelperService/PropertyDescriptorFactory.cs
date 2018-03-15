@@ -1,6 +1,6 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
+﻿using PlatformTM.Core.Domain.Model.ObservationModel;
 
-namespace eTRIKS.Commons.Service.Services.HelperService
+namespace PlatformTM.Services.Services.HelperService
 {
     public class PropertyDescriptorFactory
     {

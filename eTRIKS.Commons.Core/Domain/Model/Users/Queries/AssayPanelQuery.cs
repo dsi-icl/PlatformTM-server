@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
+namespace PlatformTM.Core.Domain.Model.Users.Queries
 {
     public class AssayPanelQuery
     {

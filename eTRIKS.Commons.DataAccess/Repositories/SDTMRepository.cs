@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 
-namespace eTRIKS.Commons.DataAccess.Repositories
+namespace PlatformTM.Data.Repositories
 {
     public class SDTMRepository : GenericMongoRepository<SdtmRow,Guid>
     {

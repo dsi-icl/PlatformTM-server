@@ -1,8 +1,9 @@
 ﻿using System;
-using eTRIKS.Commons.Core.Domain.Model.Base;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Application.AccountManagement;
-namespace eTRIKS.Commons.Core.Domain.Interfaces
+using PlatformTM.Core.Application.AccountManagement;
+using PlatformTM.Core.Domain.Model.Base;
+
+namespace PlatformTM.Core.Domain.Interfaces
 {
     public interface IServiceUoW : IDisposable
     {

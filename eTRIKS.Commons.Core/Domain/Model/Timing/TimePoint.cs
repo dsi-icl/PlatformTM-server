@@ -1,6 +1,6 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
+﻿using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Timing
+namespace PlatformTM.Core.Domain.Model.Timing
 {
     public abstract class TimePoint : Identifiable<int>
     {

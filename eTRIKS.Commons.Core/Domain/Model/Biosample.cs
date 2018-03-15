@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using eTRIKS.Commons.Core.Domain.Model.Base;
 using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class Biosample : Identifiable<int>
     {

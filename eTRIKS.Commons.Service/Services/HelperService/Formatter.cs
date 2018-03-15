@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Service.DTOs;
+﻿using System.Collections.Generic;
+using PlatformTM.Services.DTOs;
 
-namespace eTRIKS.Commons.Service.Services.HelperService
+namespace PlatformTM.Services.Services.HelperService
 {
     public class Formatter
     {

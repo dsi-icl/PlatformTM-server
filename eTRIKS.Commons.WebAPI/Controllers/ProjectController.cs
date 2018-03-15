@@ -1,17 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
-using eTRIKS.Commons.Service.Services.UserManagement;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using eTRIKS.Commons.WebAPI.Extensions;
-using System.Collections;
 using System.Security.Claims;
-using eTRIKS.Commons.Service.DTOs.Explorer;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Services.Services;
+using PlatformTM.Services.Services.UserManagement;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("projects")]
     public class ProjectController : Controller

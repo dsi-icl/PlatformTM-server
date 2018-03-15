@@ -1,30 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Application.AccountManagement;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.Core.Domain.Model.Users;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Core.JoinEntities;
-using eTRIKS.Commons.DataAccess.Configuration;
-using eTRIKS.Commons.DataAccess.EntityConfigurations;
-using eTRIKS.Commons.DataAccess.Extensions;
-using eTRIKS.Commons.DataAccess.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using PlatformTM.Core.Application.AccountManagement;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.ControlledTerminology;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.Templates;
+using PlatformTM.Core.Domain.Model.Timing;
+using PlatformTM.Core.Domain.Model.Users;
+using PlatformTM.Core.Domain.Model.Users.Datasets;
+using PlatformTM.Core.Domain.Model.Users.Queries;
+using PlatformTM.Core.JoinEntities;
+using PlatformTM.Data.Configuration;
+using PlatformTM.Data.EntityConfigurations;
+using PlatformTM.Data.Extensions;
+using PlatformTM.Data.Repositories;
+using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
-namespace eTRIKS.Commons.DataAccess
+namespace PlatformTM.Data
 {
     public class BioSPEAKdbContext : DbContext, IServiceUoW
     {
@@ -95,7 +96,7 @@ namespace eTRIKS.Commons.DataAccess
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
-            if (typeof(TEntity) == typeof(Core.Domain.Model.ObservationModel.Observation) )
+            if (typeof(TEntity) == typeof(Observation) )
             {
                 var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
@@ -190,7 +191,7 @@ namespace eTRIKS.Commons.DataAccess
             modelBuilder.AddConfiguration<Dataset>(new DatasetConfig());
             modelBuilder.AddConfiguration<DatasetDatafile>(new DatasetDatafileConfig());
 
-            modelBuilder.AddConfiguration<Observation>(new ObservationConfig());
+            modelBuilder.AddConfiguration<PlatformTM.Core.Domain.Model.Observation>(new ObservationConfig());
             modelBuilder.AddConfiguration<ObservationQualifier>(new ObservationQualifiersConfig());
             modelBuilder.AddConfiguration<ObservationSynonym>(new ObservationSynonymConfig());
             modelBuilder.AddConfiguration<ObservationTiming>(new ObservationTimingsConfig());

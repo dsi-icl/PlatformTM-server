@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
+namespace PlatformTM.Core.Domain.Model.ObservationModel
 {
     //EQUIVALENT TO VARIABLE DEFINITION
     //REUSABLE WITHIN A PROJECT

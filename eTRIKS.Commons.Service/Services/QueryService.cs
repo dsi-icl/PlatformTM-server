@@ -3,18 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.DesignElements;
-using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.DTOs.Explorer;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.DesignElements;
+using PlatformTM.Core.Domain.Model.ObservationModel;
+using PlatformTM.Core.Domain.Model.Users.Queries;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.DTOs.Explorer;
+using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class QueryService
     {
@@ -28,7 +27,7 @@ namespace eTRIKS.Commons.Service.Services
         private readonly IRepository<Visit, int> _visitRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-        private readonly IRepository<Core.Domain.Model.ObservationModel.Observation, Guid> _observationRepository;
+        private readonly IRepository<Observation, Guid> _observationRepository;
 
         public QueryService(IServiceUoW uoW)
         {
@@ -42,7 +41,7 @@ namespace eTRIKS.Commons.Service.Services
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-            _observationRepository = uoW.GetRepository<Core.Domain.Model.ObservationModel.Observation, Guid>();
+            _observationRepository = uoW.GetRepository<Observation, Guid>();
 
         }
 

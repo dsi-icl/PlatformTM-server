@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
-using eTRIKS.Commons.Service.DTOs;
-using Observation = eTRIKS.Commons.Core.Domain.Model.ObservationModel.Observation;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.ObservationModel;
+using PlatformTM.Services.DTOs;
+using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
-namespace eTRIKS.Commons.Service.Services.Loading.AssayData
+namespace PlatformTM.Services.Services.Loading.AssayData
 {
     public class HDloader
     {

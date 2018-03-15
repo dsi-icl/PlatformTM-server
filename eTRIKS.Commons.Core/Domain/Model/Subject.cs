@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class Subject
     {

@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Http;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("assays")]
     public class AssayController : Controller

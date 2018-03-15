@@ -1,7 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Service.DTOs
+namespace PlatformTM.Services.DTOs
 {
     public class AssayDefTermsDTO
     {

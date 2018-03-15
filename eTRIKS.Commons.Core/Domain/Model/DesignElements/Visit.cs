@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
+﻿using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Core.Domain.Model.DesignElements
+namespace PlatformTM.Core.Domain.Model.DesignElements
 {
     public class Visit : Identifiable<int>
     {

@@ -1,7 +1,6 @@
-﻿using System.Runtime.Serialization;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
+﻿using PlatformTM.Core.Domain.Model.ControlledTerminology;
 
-namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
+namespace PlatformTM.Core.Domain.Model.ObservationModel
 {
     //THIS WOULD BE MAPPED TO ONE TABLE FOR ALL HIERARCHIES
     public  class ObservedPropertyValue

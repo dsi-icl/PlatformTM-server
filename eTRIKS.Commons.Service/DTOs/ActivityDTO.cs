@@ -2,9 +2,10 @@
 /********   Created By: Dilshan Silva 12-12-2014   **********/
 /********             DTO for Activity             **********/
 /************************************************************/
+
 using System.Collections.Generic;
 
-namespace eTRIKS.Commons.Service.DTOs
+namespace PlatformTM.Services.DTOs
 {
     public class ActivityDTO
     {

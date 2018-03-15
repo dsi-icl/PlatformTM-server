@@ -2,18 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <AssemblyName>eTRIKS.Commons.DataAccess</AssemblyName>
-    <PackageId>eTRIKS.Commons.DataAccess</PackageId>
+    <AssemblyName>PlatformTM.Data</AssemblyName>
+    <PackageId>PlatformTM.Data</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <RootNamespace>PlatformTM.Data</RootNamespace>
+    <Authors>Ibrahim Emam</Authors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\eTRIKS.Commons.Core\eTRIKS.Commons.Core.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="1.1.1" />
@@ -31,6 +29,10 @@
 
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\eTRIKS.Commons.Core\PlatformTM.Core.csproj" />
   </ItemGroup>
 
 </Project>

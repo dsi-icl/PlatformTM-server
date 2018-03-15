@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Net;
-using System.Net.Http;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("studies")]
     public class StudyController : Controller

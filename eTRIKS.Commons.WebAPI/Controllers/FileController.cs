@@ -1,18 +1,15 @@
-﻿using System.Collections;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("files")]
     public class FileController : Controller

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace eTRIKS.Commons.DataAccess.Extensions
+namespace PlatformTM.Data.Extensions
 {
     public abstract class EntityTypeConfiguration<TEntity>
         where TEntity : class

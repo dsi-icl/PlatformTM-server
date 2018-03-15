@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
-namespace eTRIKS.Commons.WebAPI.Extensions
+namespace PlatformTM.API.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {

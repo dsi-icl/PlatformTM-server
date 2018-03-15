@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Core.Domain.Model.ObservationModel;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.ObservationModel;
+using PlatformTM.Services.DTOs;
+using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
-namespace eTRIKS.Commons.Service.Services.Loading.AssayData
+namespace PlatformTM.Services.Services.Loading.AssayData
 {
     public class DataMatrixLoader
     {
 
         private IServiceUoW _dataContext;
-        private readonly IRepository<Core.Domain.Model.ObservationModel.Observation, Guid> _observationRepository;
+        private readonly IRepository<Observation, Guid> _observationRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
         private readonly IRepository<DataFile, int> _dataFileRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
@@ -24,7 +25,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
         public DataMatrixLoader(IServiceUoW uoW, FileService fileService) 
         {
             _dataContext = uoW;
-            _observationRepository = uoW.GetRepository<Core.Domain.Model.ObservationModel.Observation, Guid>();
+            _observationRepository = uoW.GetRepository<Observation, Guid>();
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
            _dataFileRepository = uoW.GetRepository<DataFile, int>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
@@ -57,7 +58,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
             var sampleList = _biosampleRepository.FindAll(s => s.DatasetId == datasetId).ToList();
             var scos = sampleList.ToDictionary(co => co.BiosampleStudyId);
 
-            var obsReadyToInsert = new List<Core.Domain.Model.ObservationModel.Observation>();
+            var obsReadyToInsert = new List<Observation>();
             
             foreach (DataRow row in dataTable.Rows)
             {
@@ -66,7 +67,7 @@ namespace eTRIKS.Commons.Service.Services.Loading.AssayData
                     else
                     {
                         var column = dataTable.Columns[index];
-                        var obs = new Core.Domain.Model.ObservationModel.Observation();
+                        var obs = new Observation();
                         // Fill an Observation
                             var value = new NumericalValue();
                             value.Value = double.Parse(row[column.ColumnName].ToString());

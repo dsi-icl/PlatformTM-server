@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM
+namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
 {
     public class SdtmRowDescriptor
     {

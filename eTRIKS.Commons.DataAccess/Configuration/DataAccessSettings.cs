@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace eTRIKS.Commons.DataAccess.Configuration
+﻿namespace PlatformTM.Data.Configuration
 {
     public class DataAccessSettings
     {

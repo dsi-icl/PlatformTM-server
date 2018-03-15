@@ -1,8 +1,8 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
+﻿using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.ControlledTerminology;
+using PlatformTM.Core.Domain.Model.DatasetModel;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class Assay : Activity
     {

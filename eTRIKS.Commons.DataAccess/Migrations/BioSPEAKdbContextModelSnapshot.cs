@@ -2,10 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-using eTRIKS.Commons.DataAccess;
 
-namespace eTRIKS.Commons.DataAccess.Migrations
+namespace PlatformTM.Data.Migrations
 {
     [DbContext(typeof(BioSPEAKdbContext))]
     partial class BioSPEAKdbContextModelSnapshot : ModelSnapshot

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Users.Datasets;
-using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
+using PlatformTM.Core.Domain.Model.Users.Datasets;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("apps/export")]
     public class ExportController : Controller

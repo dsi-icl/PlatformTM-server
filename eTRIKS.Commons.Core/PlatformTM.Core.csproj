@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <AssemblyName>eTRIKS.Commons.Core</AssemblyName>
-    <PackageId>eTRIKS.Commons.Core</PackageId>
+    <AssemblyName>PlatformTM.Core</AssemblyName>
+    <PackageId>PlatformTM.Core</PackageId>
     <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
     <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <Authors>Ibrahim Emam</Authors>
   </PropertyGroup>
 
   <ItemGroup>

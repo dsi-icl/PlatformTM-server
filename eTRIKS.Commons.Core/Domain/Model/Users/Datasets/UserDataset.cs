@@ -1,10 +1,9 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using eTRIKS.Commons.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
+namespace PlatformTM.Core.Domain.Model.Users.Datasets
 {
     public class UserDataset : Identifiable<Guid>
     {

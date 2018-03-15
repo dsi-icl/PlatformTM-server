@@ -3,15 +3,12 @@
 /********  Services to handle functions on a Study **********/
 /************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text.RegularExpressions;
-using eTRIKS.Commons.Core.Domain.Interfaces;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Service.DTOs;
+using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Services.DTOs;
 
-namespace eTRIKS.Commons.Service.Services
+namespace PlatformTM.Services.Services
 {
     public class StudyService
     {

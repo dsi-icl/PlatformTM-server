@@ -1,9 +1,9 @@
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PlatformTM.Core.Domain.Model.ControlledTerminology;
+using PlatformTM.Data.Extensions;
 
-namespace eTRIKS.Commons.DataAccess.EntityConfigurations
+namespace PlatformTM.Data.EntityConfigurations
 {
     public class DictionaryConfig : EntityTypeConfiguration<Dictionary>
     {

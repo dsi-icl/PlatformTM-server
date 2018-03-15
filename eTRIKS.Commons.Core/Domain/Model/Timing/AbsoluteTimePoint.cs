@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Timing
+namespace PlatformTM.Core.Domain.Model.Timing
 {
     public class AbsoluteTimePoint : TimePoint
     {

@@ -1,9 +1,8 @@
-using System;
-using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.DataAccess.Extensions;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Data.Extensions;
 
-namespace eTRIKS.Commons.DataAccess.EntityConfigurations
+namespace PlatformTM.Data.EntityConfigurations
 {
     public class AssayConfig : EntityTypeConfiguration<Assay>
     {

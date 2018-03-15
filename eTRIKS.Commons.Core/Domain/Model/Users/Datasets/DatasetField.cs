@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
+﻿using PlatformTM.Core.Domain.Model.Users.Queries;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Users.Datasets
+namespace PlatformTM.Core.Domain.Model.Users.Datasets
 {
     public class DatasetField
     {

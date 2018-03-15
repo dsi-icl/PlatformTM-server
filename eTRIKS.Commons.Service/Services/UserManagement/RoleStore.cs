@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Application.AccountManagement;
 using Microsoft.AspNetCore.Identity;
+using PlatformTM.Core.Application.AccountManagement;
 
-namespace eTRIKS.Commons.Service.Services.UserManagement
+namespace PlatformTM.Services.Services.UserManagement
 {
     public class RoleStore : IRoleStore<Role>
     {

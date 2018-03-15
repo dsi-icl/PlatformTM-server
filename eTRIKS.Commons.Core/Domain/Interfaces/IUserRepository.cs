@@ -1,7 +1,8 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Users;
-using System;
+﻿using System;
 using System.Threading.Tasks;
-namespace eTRIKS.Commons.Core.Domain.Interfaces
+using PlatformTM.Core.Domain.Model.Users;
+
+namespace PlatformTM.Core.Domain.Interfaces
 {
     public interface IUserRepository : IRepository<User,Guid>
     {

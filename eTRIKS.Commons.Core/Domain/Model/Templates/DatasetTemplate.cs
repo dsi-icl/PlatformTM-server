@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.Base;
+﻿using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.Base;
 
-
-namespace eTRIKS.Commons.Core.Domain.Model.Templates
+namespace PlatformTM.Core.Domain.Model.Templates
 {
     public class DatasetTemplate : Identifiable<string>
     {

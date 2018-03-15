@@ -1,19 +1,14 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
-using eTRIKS.Commons.Service.Services;
-using System.Collections;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Users.Queries;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.DTOs.Explorer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using eTRIKS.Commons.WebAPI.Extensions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("apps/explore")]
     public class DataExplorerController : Controller

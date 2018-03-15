@@ -1,7 +1,6 @@
-﻿
-using eTRIKS.Commons.Service.Services.OntologyManagement;
+﻿using PlatformTM.Services.Services.OntologyManagement;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     public class OntologyController
     {

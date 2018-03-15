@@ -1,11 +1,10 @@
-﻿using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Service.Services;
-using System;
-using eTRIKS.Commons.Service.DTOs;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("activities")]
     public class ActivityController : Controller

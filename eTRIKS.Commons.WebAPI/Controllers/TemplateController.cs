@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using eTRIKS.Commons.Service.DTOs;
-using eTRIKS.Commons.Service.Services;
 using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("templates")]
     public class TemplateController : Controller

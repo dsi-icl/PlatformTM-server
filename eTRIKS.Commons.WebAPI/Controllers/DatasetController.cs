@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Service.Services;
-using eTRIKS.Commons.Service.DTOs;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Net;
-using eTRIKS.Commons.Service.Services.Loading.AssayData;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Services.DTOs;
+using PlatformTM.Services.Services;
+using PlatformTM.Services.Services.Loading.AssayData;
 
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("datasets")]
     public class DatasetController : Controller

@@ -1,4 +1,4 @@
-﻿namespace eTRIKS.Commons.Service.DTOs
+﻿namespace PlatformTM.Services.DTOs
 {
     public class DirectoryDTO
     {

@@ -1,11 +1,11 @@
 ﻿using System;
-using eTRIKS.Commons.Core.Domain.Model.Base;
 using System.Collections.Generic;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel;
-using eTRIKS.Commons.Core.Domain.Model.Users;
-using eTRIKS.Commons.Core.JoinEntities;
+using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.Users;
+using PlatformTM.Core.JoinEntities;
 
-namespace eTRIKS.Commons.Core.Domain.Model
+namespace PlatformTM.Core.Domain.Model
 {
     public class Project : Identifiable<int>
     {

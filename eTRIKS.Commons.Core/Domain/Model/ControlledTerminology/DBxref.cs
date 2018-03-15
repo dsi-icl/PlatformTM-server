@@ -1,4 +1,4 @@
-﻿namespace eTRIKS.Commons.Core.Domain.Model.ControlledTerminology
+﻿namespace PlatformTM.Core.Domain.Model.ControlledTerminology
 {
     /// <summary>
     /// Should eventually be removed to be replaced by entries in OLS

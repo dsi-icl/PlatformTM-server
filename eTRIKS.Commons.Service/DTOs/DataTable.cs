@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-
-namespace eTRIKS.Commons.Service.DTOs
+namespace PlatformTM.Services.DTOs
 {
     public class DataTable
     {

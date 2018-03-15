@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using eTRIKS.Commons.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Domain.Model.Users.Queries
+namespace PlatformTM.Core.Domain.Model.Users.Queries
 {
     public class CombinedQuery : Identifiable<Guid>
     {

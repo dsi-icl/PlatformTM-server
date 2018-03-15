@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using eTRIKS.Commons.Core.Domain.Model.DatasetModel.SDTM;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
-using eTRIKS.Commons.Service.DTOs;
+using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.Timing;
+using PlatformTM.Services.DTOs;
 
-namespace eTRIKS.Commons.Service.Services.Loading.SDTM
+namespace PlatformTM.Services.Services.Loading.SDTM
 {
     public class SDTMreader
     {

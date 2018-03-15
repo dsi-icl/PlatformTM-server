@@ -1,14 +1,14 @@
-﻿using eTRIKS.Commons.Core.Domain.Model;
-using eTRIKS.Commons.Core.Domain.Model.Timing;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.Timing;
 
-namespace eTRIKS.Commons.Persistence
+namespace PlatformTM.Data.MongoDBSerializers
 {
     public class SubjectObsSerializer : SerializerBase<SubjectObservation>, IBsonDocumentSerializer, IBsonIdProvider
     {

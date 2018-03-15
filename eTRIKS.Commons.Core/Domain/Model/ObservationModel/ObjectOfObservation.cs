@@ -1,8 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using eTRIKS.Commons.Core.Domain.Model.ControlledTerminology;
-using eTRIKS.Commons.Core.Domain.Model.Templates;
+﻿using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.Templates;
 
-namespace eTRIKS.Commons.Core.Domain.Model.ObservationModel
+namespace PlatformTM.Core.Domain.Model.ObservationModel
 {
     public class ObjectOfObservation : Identifiable<int>
     {

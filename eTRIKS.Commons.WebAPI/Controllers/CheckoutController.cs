@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using eTRIKS.Commons.Service.Services;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using PlatformTM.Services.Services;
 
-
-namespace eTRIKS.Commons.WebAPI.Controllers
+namespace PlatformTM.API.Controllers
 {
     [Route("checkout")]
     public class CheckoutController : Controller

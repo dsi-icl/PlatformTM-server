@@ -1,7 +1,7 @@
-﻿using eTRIKS.Commons.Core.Domain.Model.Base;
-using System;
+﻿using System;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace eTRIKS.Commons.Core.Application.AccountManagement
+namespace PlatformTM.Core.Application.AccountManagement
 {
     public class UserClaim : Identifiable<int>
     {
