@@ -32,7 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\eTRIKS.Commons.Core\PlatformTM.Core.csproj" />
+    <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />
   </ItemGroup>
 
 </Project>

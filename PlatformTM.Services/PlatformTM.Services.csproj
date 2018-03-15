@@ -10,12 +10,12 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>PlatformTM.Services</RootNamespace>
-    <Authors>Ibrahim Emam&lt;i.emam@imperial.ac.uk&gt;</Authors>
+    <Authors>Ibrahim Emam</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\eTRIKS.Commons.Core\PlatformTM.Core.csproj" />
-    <ProjectReference Include="..\eTRIKS.Commons.DataAccess\PlatformTM.Data.csproj" />
+    <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />
+    <ProjectReference Include="..\PlatformTM.Data\PlatformTM.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,9 +30,4 @@
     <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Condition=" '$(EnableDefaultCompileItems)' == 'true' " Update="DTOs\DataTemplateMap.cs">
-      <IncludeInPackage>false</IncludeInPackage>
-    </Compile>
-  </ItemGroup>
 </Project>

@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\eTRIKS.Commons.Core\PlatformTM.Core.csproj" />
-    <ProjectReference Include="..\eTRIKS.Commons.Service\PlatformTM.Services.csproj" />
+    <ProjectReference Include="..\PlatformTM.Services\PlatformTM.Services.csproj" />
+    <ProjectReference Include="..\PlatformTM.Data\PlatformTM.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
