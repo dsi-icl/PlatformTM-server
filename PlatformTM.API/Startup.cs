@@ -157,7 +157,7 @@ namespace PlatformTM.API
 
 			services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1", new Info { Title = "BioSPEAK API", Version = "v1" });
+				c.SwaggerDoc("v1", new Info { Title = "PlatformTM API", Version = "v1" });
 			});
 
         }
@@ -182,7 +182,7 @@ namespace PlatformTM.API
 			// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
 			app.UseSwaggerUI(c =>
 			{
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "BioSPEAK API V1");
+				c.SwaggerEndpoint("/swagger/v1/swagger.json", "PlatformTM API V1");
 			});
 
             var tokenIssuerOptions = Configuration.GetSection("TokenAuthOptions");

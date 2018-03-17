@@ -3,24 +3,26 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformTM.Core", "PlatformTM.Core\PlatformTM.Core.csproj", "{F36C7331-8941-42FA-B0E9-33ECC6450A7E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformTM.Core", "PlatformTM.Core\PlatformTM.Core.csproj", "{F36C7331-8941-42FA-B0E9-33ECC6450A7E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformTM.Data", "PlatformTM.Data\PlatformTM.Data.csproj", "{CA936ECC-11D4-4EE5-945E-2B626340DB6E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformTM.Data", "PlatformTM.Data\PlatformTM.Data.csproj", "{CA936ECC-11D4-4EE5-945E-2B626340DB6E}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F36C7331-8941-42FA-B0E9-33ECC6450A7E} = {F36C7331-8941-42FA-B0E9-33ECC6450A7E}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformTM.Services", "PlatformTM.Services\PlatformTM.Services.csproj", "{A5D4EB6C-C25E-44DD-A63E-EAF800F33A3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformTM.Services", "PlatformTM.Services\PlatformTM.Services.csproj", "{A5D4EB6C-C25E-44DD-A63E-EAF800F33A3A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CA936ECC-11D4-4EE5-945E-2B626340DB6E} = {CA936ECC-11D4-4EE5-945E-2B626340DB6E}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlatformTM.API", "PlatformTM.API\PlatformTM.API.csproj", "{BD5FE3AD-8877-4143-A56E-BE3C5B22BEF1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlatformTM.API", "PlatformTM.API\PlatformTM.API.csproj", "{BD5FE3AD-8877-4143-A56E-BE3C5B22BEF1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F36C7331-8941-42FA-B0E9-33ECC6450A7E} = {F36C7331-8941-42FA-B0E9-33ECC6450A7E}
 		{A5D4EB6C-C25E-44DD-A63E-EAF800F33A3A} = {A5D4EB6C-C25E-44DD-A63E-EAF800F33A3A}
 		{CA936ECC-11D4-4EE5-945E-2B626340DB6E} = {CA936ECC-11D4-4EE5-945E-2B626340DB6E}
 	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{C09FDF7E-9F7A-4836-A033-45735D1D3791}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{BD5FE3AD-8877-4143-A56E-BE3C5B22BEF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD5FE3AD-8877-4143-A56E-BE3C5B22BEF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD5FE3AD-8877-4143-A56E-BE3C5B22BEF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C09FDF7E-9F7A-4836-A033-45735D1D3791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C09FDF7E-9F7A-4836-A033-45735D1D3791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C09FDF7E-9F7A-4836-A033-45735D1D3791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C09FDF7E-9F7A-4836-A033-45735D1D3791}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
