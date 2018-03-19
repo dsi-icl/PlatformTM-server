@@ -88,8 +88,8 @@ namespace PlatformTM.API
 
 
 
-            services.AddDbContext<BioSPEAKdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
-            services.AddScoped<IServiceUoW, BioSPEAKdbContext>();
+            services.AddDbContext<PlatormTMdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
+            services.AddScoped<IServiceUoW, PlatormTMdbContext>();
             
 
             services.AddIdentity<UserAccount, Role>()
@@ -164,7 +164,7 @@ namespace PlatformTM.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, BioSPEAKdbContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, PlatormTMdbContext context)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();

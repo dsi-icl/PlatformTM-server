@@ -23,16 +23,19 @@
     <PackageReference Include="SapientGuardian.EntityFrameworkCore.MySql" Version="7.1.18" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="2.1.2" />
     <PackageReference Include="MongoDB.Driver" Version="2.4.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.1.0-preview4-final" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.0" />
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Migrations\20170130100001_Initial.cs" />
+  </ItemGroup>
 </Project>
