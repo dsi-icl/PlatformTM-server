@@ -513,8 +513,10 @@ namespace PlatformTM.Services.Services
                 //we could be adding more than one column per observation if requested more than one qaulifier
                 {
                     var allQualifiers = subjObs.ResultQualifiers;
-                    allQualifiers.AddRange(subjObs.Qualifiers);
-                    allQualifiers.AddRange(subjObs.TimingQualifiers);
+                    foreach (var subjObsQualifier in subjObs.Qualifiers)
+                        allQualifiers.Add(subjObsQualifier.Key,subjObsQualifier.Value);
+                    foreach (var subjObsTimingQualifier in subjObs.TimingQualifiers)
+                        allQualifiers.Add(subjObsTimingQualifier.Key, subjObsTimingQualifier.Value);
 
                     row["subjectId"] = subjObs.USubjId;
                     row["study"] = subjObs.StudyId;
