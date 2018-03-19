@@ -27,7 +27,7 @@ using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
 namespace PlatformTM.Data
 {
-    public class PlatormTMdbContext : DbContext, IServiceUoW
+    public class PlatformTMdbContext : DbContext, IServiceUoW
     {
         private readonly IOptions<DataAccessSettings> _dbsettings;
         //private readonly IDataContext _dataContext;
@@ -41,7 +41,7 @@ namespace PlatformTM.Data
         private bool _disposed;
 
 
-        public PlatormTMdbContext(DbContextOptions<PlatormTMdbContext> options, IOptions<DataAccessSettings> settings) : base(options){
+        public PlatformTMdbContext(DbContextOptions<PlatformTMdbContext> options, IOptions<DataAccessSettings> settings) : base(options){
             _dbsettings = settings;
             _repositories = new Dictionary<Type, object>();
             _cacheRepositories = new Dictionary<Type,object>();

@@ -39,15 +39,13 @@ namespace PlatformTM.API
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
-                //.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsEnvironment("Development"))
             {
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
-               
-
             }
 
             builder.AddEnvironmentVariables();
@@ -88,8 +86,8 @@ namespace PlatformTM.API
 
 
 
-            services.AddDbContext<PlatormTMdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
-            services.AddScoped<IServiceUoW, PlatormTMdbContext>();
+            services.AddDbContext<PlatformTMdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
+            services.AddScoped<IServiceUoW, PlatformTMdbContext>();
             
 
             services.AddIdentity<UserAccount, Role>()
@@ -164,7 +162,7 @@ namespace PlatformTM.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, PlatormTMdbContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, PlatformTMdbContext context)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
