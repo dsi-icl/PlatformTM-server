@@ -15,7 +15,7 @@ namespace PlatformTM.Data.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Application.AccountManagement.UserAccount", b =>
+            modelBuilder.Entity("PlatformTM.Core.Application.AccountManagement.UserAccount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -46,7 +46,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("UserAccounts");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Application.AccountManagement.UserClaim", b =>
+            modelBuilder.Entity("PlatformTM.Core.Application.AccountManagement.UserClaim", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -65,7 +65,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("UserAccountClaims");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Activity", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Activity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,7 +89,7 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator<string>("Discriminator").HasValue("Activity");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Biosample", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Biosample", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -134,7 +134,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("BioSamples");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Characteristic", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Characteristic", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +176,7 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator<string>("Discriminator");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.CharacteristicFeature", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -207,7 +207,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("CharacteristicObjects");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -244,7 +244,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("CVterms");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.DB", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.DB", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -272,7 +272,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Dbs");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dbxref", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.Dbxref", b =>
                 {
                     b.Property<string>("OID")
                         .ValueGeneratedOnAdd()
@@ -296,7 +296,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("DBxreferences");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.Dictionary", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -319,7 +319,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Dictionaries");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -352,7 +352,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("DataFiles");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -375,7 +375,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Datasets");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -441,7 +441,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("VariableDefinitions");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableReference", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.VariableReference", b =>
                 {
                     b.Property<int>("VariableDefinitionId")
                         .HasColumnName("VariableId");
@@ -462,7 +462,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("VariableReferences");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DesignElements.Arm", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DesignElements.Arm", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -482,7 +482,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Arms");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DesignElements.Visit", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DesignElements.Visit", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -509,7 +509,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Visits");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.HumanSubject", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.HumanSubject", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -546,7 +546,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Subjects");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Observation", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Observation", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -601,7 +601,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Observations");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Project", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Project", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -628,7 +628,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Projects");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Study", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Study", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -653,7 +653,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Studies");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplate", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Templates.DatasetTemplate", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -682,7 +682,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("DomainTemplates");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplateField", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Templates.DatasetTemplateField", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -742,7 +742,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("DomainTemplateVariables");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Timing.TimePoint", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Timing.TimePoint", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -766,7 +766,7 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator<string>("Discriminator");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Users.User", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Users.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -784,7 +784,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.DatasetDatafile", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.DatasetDatafile", b =>
                 {
                     b.Property<int>("DatasetId");
 
@@ -797,7 +797,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Dataset_DataFiles");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ObservationQualifier", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ObservationQualifier", b =>
                 {
                     b.Property<int>("ObservationId");
 
@@ -810,7 +810,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Observation_Qualfiers");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ObservationSynonym", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ObservationSynonym", b =>
                 {
                     b.Property<int>("ObservationId");
 
@@ -823,7 +823,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Observation_Synonyms");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ObservationTiming", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ObservationTiming", b =>
                 {
                     b.Property<int>("ObservationId");
 
@@ -836,7 +836,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Observation_Timings");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ProjectUser", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ProjectUser", b =>
                 {
                     b.Property<int>("ProjectId");
 
@@ -849,7 +849,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Project_Users");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.StudyArm", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.StudyArm", b =>
                 {
                     b.Property<string>("ArmId");
 
@@ -862,7 +862,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Study_Arms");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.StudyDataset", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.StudyDataset", b =>
                 {
                     b.Property<int>("DatasetId");
 
@@ -875,7 +875,7 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("Study_Datasets");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.TemplateFieldDB", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.TemplateFieldDB", b =>
                 {
                     b.Property<string>("TemplateFieldId");
 
@@ -888,9 +888,9 @@ namespace PlatformTM.Data.Migrations
                     b.ToTable("TemplateField_TermSource");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Assay", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Assay", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Activity");
+                    b.HasBaseType("PlatformTM.Core.Domain.Model.Activity");
 
                     b.Property<string>("DesignTypeId");
 
@@ -917,9 +917,9 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator().HasValue("Assay");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.SampleCharacteristic", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.SampleCharacteristic", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Characteristic");
+                    b.HasBaseType("PlatformTM.Core.Domain.Model.Characteristic");
 
                     b.Property<int>("SampleId");
 
@@ -930,9 +930,9 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator().HasValue("SampleCharacteristic");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.SubjectCharacteristic", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.SubjectCharacteristic", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Characteristic");
+                    b.HasBaseType("PlatformTM.Core.Domain.Model.Characteristic");
 
                     b.Property<string>("SubjectId");
 
@@ -943,9 +943,9 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator().HasValue("SubjectCharacteristic");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Timing.AbsoluteTimePoint", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Timing.AbsoluteTimePoint", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Timing.TimePoint");
+                    b.HasBaseType("PlatformTM.Core.Domain.Model.Timing.TimePoint");
 
                     b.Property<DateTime>("DateTime");
 
@@ -954,9 +954,9 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator().HasValue("AbsoluteTimePoint");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Timing.RelativeTimePoint", b =>
                 {
-                    b.HasBaseType("eTRIKS.Commons.Core.Domain.Model.Timing.TimePoint");
+                    b.HasBaseType("PlatformTM.Core.Domain.Model.Timing.TimePoint");
 
                     b.Property<int?>("ReferenceTimePointId");
 
@@ -967,437 +967,437 @@ namespace PlatformTM.Data.Migrations
                     b.HasDiscriminator().HasValue("RelativeTimePoint");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Application.AccountManagement.UserAccount", b =>
+            modelBuilder.Entity("PlatformTM.Core.Application.AccountManagement.UserAccount", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Users.User", "User")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Application.AccountManagement.UserClaim", b =>
+            modelBuilder.Entity("PlatformTM.Core.Application.AccountManagement.UserClaim", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Application.AccountManagement.UserAccount", "User")
+                    b.HasOne("PlatformTM.Core.Application.AccountManagement.UserAccount", "User")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Activity", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Activity", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany("Activities")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Biosample", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Biosample", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Assay", "Assay")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Assay", "Assay")
                         .WithMany("Biosamples")
                         .HasForeignKey("AssayId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", "CollectionStudyDay")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Timing.RelativeTimePoint", "CollectionStudyDay")
                         .WithMany()
                         .HasForeignKey("CollectionStudyDayId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", "CollectionStudyTimePoint")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Timing.RelativeTimePoint", "CollectionStudyTimePoint")
                         .WithMany()
                         .HasForeignKey("CollectionStudyTimePointId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithMany()
                         .HasForeignKey("DatasetId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Study", "Study")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
                         .WithMany()
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.HumanSubject", "Subject")
+                    b.HasOne("PlatformTM.Core.Domain.Model.HumanSubject", "Subject")
                         .WithMany()
                         .HasForeignKey("SubjectId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DesignElements.Visit", "Visit")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DesignElements.Visit", "Visit")
                         .WithMany()
                         .HasForeignKey("VisitId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Characteristic", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Characteristic", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledValue")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledValue")
                         .WithMany()
                         .HasForeignKey("CVtermId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", "CharacteristicFeature")
+                    b.HasOne("PlatformTM.Core.Domain.Model.CharacteristicFeature", "CharacteristicFeature")
                         .WithMany()
                         .HasForeignKey("CharacteristicFeatureId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Characteristic", "DatafileId")
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.Characteristic", "DatafileId")
                         .HasConstraintName("FK_Characteristic_DataFile");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Characteristic", "DatasetId")
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.Characteristic", "DatasetId")
                         .HasConstraintName("FK_Characteristic_Dataset")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.CharacteristicFeature", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.CharacteristicFeature", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Activity", "Activity")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Activity", "Activity")
                         .WithMany()
                         .HasForeignKey("ActivityId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
                         .WithMany()
                         .HasForeignKey("CVtermId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "Dictionary")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.Dictionary", "Dictionary")
                         .WithMany("Terms")
                         .HasForeignKey("DictionaryId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dbxref", "Xref")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.Dbxref", "Xref")
                         .WithMany()
                         .HasForeignKey("XrefId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dbxref", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.Dbxref", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.DB", "DB")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.DB", "DB")
                         .WithMany()
                         .HasForeignKey("DBId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.ControlledTerminology.Dictionary", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dbxref", "Xref")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.Dbxref", "Xref")
                         .WithMany()
                         .HasForeignKey("XrefId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany("DataFiles")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Activity", "Activity")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Activity", "Activity")
                         .WithMany("Datasets")
                         .HasForeignKey("ActivityId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplate", "Template")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Templates.DatasetTemplate", "Template")
                         .WithMany()
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.DB", "CVTermReferenceSource")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.DB", "CVTermReferenceSource")
                         .WithMany()
                         .HasForeignKey("CVTermReferenceSourceId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "CVtermDictionary")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.Dictionary", "CVtermDictionary")
                         .WithMany()
                         .HasForeignKey("CVtermDictionaryId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "Role")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "Role")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "RoleId");
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "RoleId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "VariableType")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "VariableType")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "VariableTypeId");
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "VariableTypeId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableReference", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.VariableReference", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithMany("Variables")
                         .HasForeignKey("DatasetId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "VariableDefinition")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "VariableDefinition")
                         .WithMany()
                         .HasForeignKey("VariableDefinitionId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.DesignElements.Visit", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.DesignElements.Visit", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", "StudyDay")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Timing.RelativeTimePoint", "StudyDay")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.DesignElements.Visit", "StudyDayId")
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.DesignElements.Visit", "StudyDayId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Study", "Study")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
                         .WithMany("Visits")
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.HumanSubject", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.HumanSubject", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.HumanSubject", "DatasetId")
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.HumanSubject", "DatasetId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DesignElements.Arm", "StudyArm")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DesignElements.Arm", "StudyArm")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.HumanSubject", "StudyArmId");
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.HumanSubject", "StudyArmId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Study", "Study")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
                         .WithMany("Subjects")
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Observation", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Observation", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Observation", "ControlledTermId");
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.Observation", "ControlledTermId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
                         .WithMany()
                         .HasForeignKey("DatafileId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithMany()
                         .HasForeignKey("DatasetId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "DefaultQualifier")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "DefaultQualifier")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Observation", "DefaultQualifierId")
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.Observation", "DefaultQualifierId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "TopicVariable")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "TopicVariable")
                         .WithOne()
-                        .HasForeignKey("eTRIKS.Commons.Core.Domain.Model.Observation", "TopicVariableId")
+                        .HasForeignKey("PlatformTM.Core.Domain.Model.Observation", "TopicVariableId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Project", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Project", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Users.User", "Owner")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Users.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Study", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Study", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany("Studies")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplateField", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Templates.DatasetTemplateField", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "ControlledVocabulary")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.Dictionary", "ControlledVocabulary")
                         .WithMany()
                         .HasForeignKey("ControlledVocabularyId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.Dictionary", "QualifiersDictionary")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.Dictionary", "QualifiersDictionary")
                         .WithMany()
                         .HasForeignKey("QualifiersDictionaryId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "Role")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "Role")
                         .WithMany()
                         .HasForeignKey("RoleId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplate", "Template")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Templates.DatasetTemplate", "Template")
                         .WithMany("Fields")
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "Usage")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "Usage")
                         .WithMany()
                         .HasForeignKey("UsageId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Timing.TimePoint", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Timing.TimePoint", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DesignElements.Visit")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DesignElements.Visit")
                         .WithMany("TimePoints")
                         .HasForeignKey("VisitId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.DatasetDatafile", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.DatasetDatafile", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
                         .WithMany("Datasets")
                         .HasForeignKey("DatafileId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithMany("DataFiles")
                         .HasForeignKey("DatasetId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ObservationQualifier", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ObservationQualifier", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Observation", "Observation")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Observation", "Observation")
                         .WithMany("Qualifiers")
                         .HasForeignKey("ObservationId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "Qualifier")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "Qualifier")
                         .WithMany()
                         .HasForeignKey("QualifierId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ObservationSynonym", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ObservationSynonym", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Observation", "Observation")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Observation", "Observation")
                         .WithMany("Synonyms")
                         .HasForeignKey("ObservationId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "Qualifier")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "Qualifier")
                         .WithMany()
                         .HasForeignKey("QualifierId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ObservationTiming", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ObservationTiming", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Observation", "Observation")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Observation", "Observation")
                         .WithMany("Timings")
                         .HasForeignKey("ObservationId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.VariableDefinition", "Qualifier")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "Qualifier")
                         .WithMany()
                         .HasForeignKey("QualifierId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.ProjectUser", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.ProjectUser", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Project", "Project")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
                         .WithMany("Users")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Users.User", "User")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Users.User", "User")
                         .WithMany("AffiliatedProjects")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.StudyArm", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.StudyArm", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DesignElements.Arm", "Arm")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DesignElements.Arm", "Arm")
                         .WithMany("Studies")
                         .HasForeignKey("ArmId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Study", "Study")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
                         .WithMany("Arms")
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.StudyDataset", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.StudyDataset", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
+                    b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
                         .WithMany("Studies")
                         .HasForeignKey("DatasetId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Study", "Study")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
                         .WithMany("Datasets")
                         .HasForeignKey("StudyId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.JoinEntities.TemplateFieldDB", b =>
+            modelBuilder.Entity("PlatformTM.Core.JoinEntities.TemplateFieldDB", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Templates.DatasetTemplateField", "TemplateField")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Templates.DatasetTemplateField", "TemplateField")
                         .WithMany("FieldTermSources")
                         .HasForeignKey("TemplateFieldId")
                         .HasConstraintName("FK_TemplateField_TermSource")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.DB", "TermSource")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.DB", "TermSource")
                         .WithMany()
                         .HasForeignKey("TermSourceId")
                         .HasConstraintName("FK_TermSource_TemplateField")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Assay", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Assay", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "DesignType")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "DesignType")
                         .WithMany()
                         .HasForeignKey("DesignTypeId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "MeasurementType")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "MeasurementType")
                         .WithMany()
                         .HasForeignKey("MeasurementTypeId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "TechnologyPlatform")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "TechnologyPlatform")
                         .WithMany()
                         .HasForeignKey("TechnologyPlatformId");
 
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.ControlledTerminology.CVterm", "TechnologyType")
+                    b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "TechnologyType")
                         .WithMany()
                         .HasForeignKey("TechnologyTypeId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.SampleCharacteristic", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.SampleCharacteristic", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Biosample", "Sample")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Biosample", "Sample")
                         .WithMany("SampleCharacteristics")
                         .HasForeignKey("SampleId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.SubjectCharacteristic", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.SubjectCharacteristic", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.HumanSubject", "Subject")
+                    b.HasOne("PlatformTM.Core.Domain.Model.HumanSubject", "Subject")
                         .WithMany("SubjectCharacteristics")
                         .HasForeignKey("SubjectId");
                 });
 
-            modelBuilder.Entity("eTRIKS.Commons.Core.Domain.Model.Timing.RelativeTimePoint", b =>
+            modelBuilder.Entity("PlatformTM.Core.Domain.Model.Timing.RelativeTimePoint", b =>
                 {
-                    b.HasOne("eTRIKS.Commons.Core.Domain.Model.Timing.TimePoint", "ReferenceTimePoint")
+                    b.HasOne("PlatformTM.Core.Domain.Model.Timing.TimePoint", "ReferenceTimePoint")
                         .WithMany()
                         .HasForeignKey("ReferenceTimePointId");
                 });

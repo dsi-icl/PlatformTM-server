@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -38,8 +39,8 @@ namespace PlatformTM.API
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                //.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsEnvironment("Development"))
             {
@@ -163,7 +164,7 @@ namespace PlatformTM.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, BioSPEAKdbContext context)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -195,6 +196,7 @@ namespace PlatformTM.API
                 SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.RsaSha256Signature),
             };
 
+            context.Database.Migrate();
 
             //Token Generation
             app.UseMiddleware<TokenProviderMiddleware>(Options.Create(options));
@@ -219,6 +221,7 @@ namespace PlatformTM.API
             //app.UseStaticFiles();
 
             app.UseMvc();
+
         }
     }
 }
