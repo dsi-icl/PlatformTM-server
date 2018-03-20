@@ -4,5 +4,6 @@
     {
         public string MongoDBconnection { get; set; }
         public string noSQLDatabaseName { get; set; }
+        public string DBinitDirectory { get; set; }
     }
 }

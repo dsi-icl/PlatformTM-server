@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PlatformTM.Data;
-using PlatformTM.Services.Services;
 
 namespace PlatformTM.API
 {
@@ -18,14 +17,18 @@ namespace PlatformTM.API
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
-            
+
+            if(EnvironmentName.Development != Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"))
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
                 try
                 {
                     var dbContext = services.GetRequiredService<PlatformTMdbContext>();
-                    dbContext.InitDB();
+                        dbContext.InitDB();
+                    var dbInitializer = services.GetRequiredService<Data.DbInitializer>();
+                        dbInitializer.SeedDB();
+
                 }
                 catch (Exception ex)
                 {

@@ -128,10 +128,7 @@ namespace PlatformTM.Data
             _cacheRepositories.Add(typeof(TEntity), cacheRepository);
             return cacheRepository;
         }
-        public void Register<TEntity, TPrimaryKey>(IRepository<TEntity, TPrimaryKey> repository) where TEntity : Identifiable<TPrimaryKey>, IEntity<TPrimaryKey>
-        {
-            _repositories.Add(typeof(TEntity), repository);
-        }
+
         public string Save()
         {
             try
@@ -167,7 +164,6 @@ namespace PlatformTM.Data
         {
             base.OnModelCreating(modelBuilder);
 
-
             modelBuilder.AddConfiguration<UserAccount>(new AccountConfig());
             modelBuilder.AddConfiguration<Activity>(new ActivityConfig());
             modelBuilder.AddConfiguration<Arm>(new ArmConfig());
@@ -177,7 +173,6 @@ namespace PlatformTM.Data
             modelBuilder.AddConfiguration<Characteristic>(new CharacteristicConfig());
             modelBuilder.AddConfiguration<CharacteristicFeature>(new CharacteristicObjectConfig());
             modelBuilder.AddConfiguration<UserClaim>(new ClaimConfig());
-
 
 
             modelBuilder.AddConfiguration<DatasetTemplate>(new DomainTemplateConfig());
@@ -217,15 +212,6 @@ namespace PlatformTM.Data
 
             modelBuilder.AddConfiguration<Visit>(new VisitConfig());
 
-           
-
-            
-
-
-            
-           
-           
-
         }
 
         public Task<int> SaveChangesAsync()
@@ -236,7 +222,6 @@ namespace PlatformTM.Data
             }
             catch (Exception e)
             {
-                //tran.Dispose();
                 while (e.InnerException != null)
                     e = e.InnerException;
                 throw e;
@@ -251,9 +236,7 @@ namespace PlatformTM.Data
 
         private void WaitForDBInit()
         {
-            //var connection = new MySqlConnection(connectionString);
             int retries = 1;
-
             while (retries < 7)
             {
                 try
