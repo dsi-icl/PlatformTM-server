@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
+using MySql.Data.MySqlClient;
 using MySQL.Data.Entity.Extensions;
 using Newtonsoft.Json.Serialization;
 using PlatformTM.API.Auth;
@@ -51,6 +53,7 @@ namespace PlatformTM.API
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
         }
+
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
@@ -138,7 +141,6 @@ namespace PlatformTM.API
                                  .Build();
                 config.Filters.Add(new AuthorizeFilter(policy));
             })
-            //services.AddMvc();
             .AddJsonOptions(opts =>
                  {
                      // Force Camel Case to JSON
@@ -162,7 +164,7 @@ namespace PlatformTM.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, PlatformTMdbContext context)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -184,6 +186,7 @@ namespace PlatformTM.API
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "PlatformTM API V1");
 			});
 
+            //Token Generation
             var tokenIssuerOptions = Configuration.GetSection("TokenAuthOptions");
             var signingKey = new RsaSecurityKey(RSAKeyHelper.GenerateKey());
             var options = new TokenAuthOptions()
@@ -193,10 +196,6 @@ namespace PlatformTM.API
                 Endpoint = tokenIssuerOptions["Endpoint"],
                 SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.RsaSha256Signature),
             };
-
-            context.Database.Migrate();
-
-            //Token Generation
             app.UseMiddleware<TokenProviderMiddleware>(Options.Create(options));
 
             //Token Bearer Validation 
@@ -215,11 +214,55 @@ namespace PlatformTM.API
 
             app.UseIdentity();
 
-            // Configure the HTTP request pipeline.
-            //app.UseStaticFiles();
+
+            WaitForDBInit(Configuration.GetSection("DBSettings")["MySQLconn"]);
+            Initialize(app.ApplicationServices);
 
             app.UseMvc();
 
+        }
+
+        public static void Initialize(IServiceProvider service)
+        {
+            using (var serviceScope = service.CreateScope())
+            {
+                var scopeServiceProvider = serviceScope.ServiceProvider;
+                var db = scopeServiceProvider.GetService<PlatformTMdbContext>();
+                db.Database.Migrate();
+
+                //await LoadTemplates(db);
+            }
+        }
+
+        // Try to connect to the db with exponential backoff on fail.
+        private static void WaitForDBInit(string connectionString)
+        {
+            var connection = new MySqlConnection(connectionString);
+            int retries = 1;
+            while (retries < 7)
+            {
+                try
+                {
+                    Console.WriteLine("Connecting to db. Trial: {0}", retries);
+                    connection.Open();
+                    connection.Close();
+                    break;
+                }
+                catch (MySqlException)
+                {
+                    Thread.Sleep((int)Math.Pow(2, retries) * 1000);
+                    retries++;
+                }
+            }
+        }
+
+        static async System.Threading.Tasks.Task LoadTemplates(PlatformTMdbContext context)
+        {
+            //if (context.Any())
+            //    return;
+            //var race = new Race { Name = "Ironman World Championship 2017", Location = "Kona, Hawaii", Date = new DateTime(2017, 10, 14, 7, 0, 0) };
+            //context.Add(race);
+            //await context.SaveChangesAsync();
         }
     }
 }
