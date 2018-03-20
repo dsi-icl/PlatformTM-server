@@ -127,6 +127,7 @@ namespace PlatformTM.API
             services.AddScoped<ObservationLoader>();
 
             services.AddScoped<Formatter>();
+            services.AddSingleton<Data.DbInitializer>();
 
             services.AddAuthorization(auth =>
             {
