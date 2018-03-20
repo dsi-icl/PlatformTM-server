@@ -171,6 +171,7 @@ namespace PlatformTM.API
 
             app.UseCors("CorsPolicy");
 
+            if(env.IsDevelopment())
             app.UseDeveloperExceptionPage();
 
             app.UseApplicationInsightsRequestTelemetry();
@@ -183,7 +184,7 @@ namespace PlatformTM.API
 			// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
 			app.UseSwaggerUI(c =>
 			{
-				c.SwaggerEndpoint("/swagger/v1/swagger.json", "PlatformTM API V1");
+				c.SwaggerEndpoint("/api/v1/swagger/v1/swagger.json", "PlatformTM API V1");
 			});
 
             //Token Generation
@@ -256,13 +257,13 @@ namespace PlatformTM.API
             }
         }
 
-        static async System.Threading.Tasks.Task LoadTemplates(PlatformTMdbContext context)
-        {
-            //if (context.Any())
-            //    return;
-            //var race = new Race { Name = "Ironman World Championship 2017", Location = "Kona, Hawaii", Date = new DateTime(2017, 10, 14, 7, 0, 0) };
-            //context.Add(race);
-            //await context.SaveChangesAsync();
-        }
+        //static async System.Threading.Tasks.Task LoadTemplates(PlatformTMdbContext context)
+        //{
+        //    //if (context.Any())
+        //    //    return;
+        //    //var race = new Race { Name = "Ironman World Championship 2017", Location = "Kona, Hawaii", Date = new DateTime(2017, 10, 14, 7, 0, 0) };
+        //    //context.Add(race);
+        //    //await context.SaveChangesAsync();
+        //}
     }
 }
