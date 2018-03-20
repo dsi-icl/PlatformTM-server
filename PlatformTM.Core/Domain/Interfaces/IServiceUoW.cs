@@ -20,5 +20,7 @@ namespace PlatformTM.Core.Domain.Interfaces
         Task<int> SaveChangesAsync();
 
         ICacheRepository<TEntity> GetCacheRepository<TEntity>() where TEntity : class;
+
+        void InitDB();
     }
 }

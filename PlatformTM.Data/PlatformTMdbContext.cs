@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MySql.Data.MySqlClient;
 using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
@@ -238,6 +240,34 @@ namespace PlatformTM.Data
                 while (e.InnerException != null)
                     e = e.InnerException;
                 throw e;
+            }
+        }
+
+        public void InitDB()
+        {
+            WaitForDBInit();
+            Database.Migrate();
+        }
+
+        private void WaitForDBInit()
+        {
+            //var connection = new MySqlConnection(connectionString);
+            int retries = 1;
+
+            while (retries < 7)
+            {
+                try
+                {
+                    Console.WriteLine("Connecting to db. Trial: {0}", retries);
+                    Database.OpenConnection();
+                    Database.CloseConnection();
+                    break;
+                }
+                catch (MySqlException)
+                {
+                    Thread.Sleep((int)Math.Pow(2, retries) * 1000);
+                    retries++;
+                }
             }
         }
     }
