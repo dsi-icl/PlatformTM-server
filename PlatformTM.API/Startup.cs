@@ -216,55 +216,8 @@ namespace PlatformTM.API
 
             app.UseIdentity();
 
-
-            //WaitForDBInit(Configuration.GetSection("DBSettings")["MySQLconn"]);
-            //Initialize(app.ApplicationServices);
-
             app.UseMvc();
 
         }
-
-        //public static void Initialize(IServiceProvider service)
-        //{
-        //    using (var serviceScope = service.CreateScope())
-        //    {
-        //        var scopeServiceProvider = serviceScope.ServiceProvider;
-        //        var dbContext = scopeServiceProvider.GetService<PlatformTMdbContext>();
-        //        dbContext.InitDB();
-        //        //dbContext.Database.Migrate();
-        //        //await LoadTemplates(dbContext);
-        //    }
-        //}
-
-        // Try to connect to the db with exponential backoff on fail.
-        //private static void WaitForDBInit(string connectionString)
-        //{
-        //    var connection = new MySqlConnection(connectionString);
-        //    int retries = 1;
-        //    while (retries < 7)
-        //    {
-        //        try
-        //        {
-        //            Console.WriteLine("Connecting to db. Trial: {0}", retries);
-        //            connection.Open();
-        //            connection.Close();
-        //            break;
-        //        }
-        //        catch (MySqlException)
-        //        {
-        //            Thread.Sleep((int)Math.Pow(2, retries) * 1000);
-        //            retries++;
-        //        }
-        //    }
-        //}
-
-        //static async Task LoadTemplates(PlatformTMdbContext context)
-        //{
-            //if (context.Any())
-            //    return;
-            //var race = new Race { Name = "Ironman World Championship 2017", Location = "Kona, Hawaii", Date = new DateTime(2017, 10, 14, 7, 0, 0) };
-            //context.Add(race);
-            //await context.SaveChangesAsync();
-        //}
     }
 }
