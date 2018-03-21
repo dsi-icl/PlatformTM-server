@@ -8,7 +8,7 @@ using PlatformTM.Data;
 namespace PlatformTM.Data.Migrations
 {
     [DbContext(typeof(PlatformTMdbContext))]
-    [Migration("20180319152239_Initial")]
+    [Migration("20180321023741_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -173,11 +173,9 @@ namespace PlatformTM.Data.Migrations
 
                     b.HasIndex("CharacteristicFeatureId");
 
-                    b.HasIndex("DatafileId")
-                        .IsUnique();
+                    b.HasIndex("DatafileId");
 
-                    b.HasIndex("DatasetId")
-                        .IsUnique();
+                    b.HasIndex("DatasetId");
 
                     b.ToTable("Characteristics");
 
@@ -442,11 +440,9 @@ namespace PlatformTM.Data.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("RoleId")
-                        .IsUnique();
+                    b.HasIndex("RoleId");
 
-                    b.HasIndex("VariableTypeId")
-                        .IsUnique();
+                    b.HasIndex("VariableTypeId");
 
                     b.ToTable("VariableDefinitions");
                 });
@@ -548,14 +544,11 @@ namespace PlatformTM.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DatafileId")
-                        .IsUnique();
+                    b.HasIndex("DatafileId");
 
-                    b.HasIndex("DatasetId")
-                        .IsUnique();
+                    b.HasIndex("DatasetId");
 
-                    b.HasIndex("StudyArmId")
-                        .IsUnique();
+                    b.HasIndex("StudyArmId");
 
                     b.HasIndex("StudyId");
 
@@ -599,20 +592,17 @@ namespace PlatformTM.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ControlledTermId")
-                        .IsUnique();
+                    b.HasIndex("ControlledTermId");
 
                     b.HasIndex("DatafileId");
 
                     b.HasIndex("DatasetId");
 
-                    b.HasIndex("DefaultQualifierId")
-                        .IsUnique();
+                    b.HasIndex("DefaultQualifierId");
 
                     b.HasIndex("ProjectId");
 
-                    b.HasIndex("TopicVariableId")
-                        .IsUnique();
+                    b.HasIndex("TopicVariableId");
 
                     b.ToTable("Observations");
                 });
@@ -1056,13 +1046,13 @@ namespace PlatformTM.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.Characteristic", "DatafileId")
+                        .WithMany()
+                        .HasForeignKey("DatafileId")
                         .HasConstraintName("FK_Characteristic_DataFile");
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.Characteristic", "DatasetId")
+                        .WithMany()
+                        .HasForeignKey("DatasetId")
                         .HasConstraintName("FK_Characteristic_Dataset")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
@@ -1147,12 +1137,12 @@ namespace PlatformTM.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "Role")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "RoleId");
+                        .WithMany()
+                        .HasForeignKey("RoleId");
 
                     b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "VariableType")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "VariableTypeId");
+                        .WithMany()
+                        .HasForeignKey("VariableTypeId");
                 });
 
             modelBuilder.Entity("PlatformTM.Core.Domain.Model.DatasetModel.VariableReference", b =>
@@ -1184,18 +1174,18 @@ namespace PlatformTM.Data.Migrations
             modelBuilder.Entity("PlatformTM.Core.Domain.Model.HumanSubject", b =>
                 {
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", "SourceDataFile")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.HumanSubject", "DatafileId")
+                        .WithMany()
+                        .HasForeignKey("DatafileId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.Dataset", "Dataset")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.HumanSubject", "DatasetId")
+                        .WithMany()
+                        .HasForeignKey("DatasetId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DesignElements.Arm", "StudyArm")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.HumanSubject", "StudyArmId");
+                        .WithMany()
+                        .HasForeignKey("StudyArmId");
 
                     b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
                         .WithMany("Subjects")
@@ -1206,8 +1196,8 @@ namespace PlatformTM.Data.Migrations
             modelBuilder.Entity("PlatformTM.Core.Domain.Model.Observation", b =>
                 {
                     b.HasOne("PlatformTM.Core.Domain.Model.ControlledTerminology.CVterm", "ControlledTerm")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.Observation", "ControlledTermId");
+                        .WithMany()
+                        .HasForeignKey("ControlledTermId");
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.DataFile", "Datafile")
                         .WithMany()
@@ -1218,8 +1208,8 @@ namespace PlatformTM.Data.Migrations
                         .HasForeignKey("DatasetId");
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "DefaultQualifier")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.Observation", "DefaultQualifierId")
+                        .WithMany()
+                        .HasForeignKey("DefaultQualifierId")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("PlatformTM.Core.Domain.Model.Project", "Project")
@@ -1227,8 +1217,8 @@ namespace PlatformTM.Data.Migrations
                         .HasForeignKey("ProjectId");
 
                     b.HasOne("PlatformTM.Core.Domain.Model.DatasetModel.VariableDefinition", "TopicVariable")
-                        .WithOne()
-                        .HasForeignKey("PlatformTM.Core.Domain.Model.Observation", "TopicVariableId")
+                        .WithMany()
+                        .HasForeignKey("TopicVariableId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

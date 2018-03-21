@@ -1088,14 +1088,12 @@ namespace PlatformTM.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Characteristics_DatafileId",
                 table: "Characteristics",
-                column: "DatafileId",
-                unique: true);
+                column: "DatafileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Characteristics_DatasetId",
                 table: "Characteristics",
-                column: "DatasetId",
-                unique: true);
+                column: "DatasetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Characteristics_SampleId",
@@ -1175,14 +1173,12 @@ namespace PlatformTM.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_VariableDefinitions_RoleId",
                 table: "VariableDefinitions",
-                column: "RoleId",
-                unique: true);
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VariableDefinitions_VariableTypeId",
                 table: "VariableDefinitions",
-                column: "VariableTypeId",
-                unique: true);
+                column: "VariableTypeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VariableReferences_ActivityDatasetId",
@@ -1203,20 +1199,17 @@ namespace PlatformTM.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_DatafileId",
                 table: "Subjects",
-                column: "DatafileId",
-                unique: true);
+                column: "DatafileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_DatasetId",
                 table: "Subjects",
-                column: "DatasetId",
-                unique: true);
+                column: "DatasetId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_StudyArmId",
                 table: "Subjects",
-                column: "StudyArmId",
-                unique: true);
+                column: "StudyArmId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Subjects_StudyId",
@@ -1226,8 +1219,7 @@ namespace PlatformTM.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Observations_ControlledTermId",
                 table: "Observations",
-                column: "ControlledTermId",
-                unique: true);
+                column: "ControlledTermId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Observations_DatafileId",
@@ -1242,8 +1234,7 @@ namespace PlatformTM.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Observations_DefaultQualifierId",
                 table: "Observations",
-                column: "DefaultQualifierId",
-                unique: true);
+                column: "DefaultQualifierId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Observations_ProjectId",
@@ -1253,8 +1244,7 @@ namespace PlatformTM.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Observations_TopicVariableId",
                 table: "Observations",
-                column: "TopicVariableId",
-                unique: true);
+                column: "TopicVariableId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_OwnerId",
