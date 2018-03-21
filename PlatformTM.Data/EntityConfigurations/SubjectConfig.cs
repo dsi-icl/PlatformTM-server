@@ -16,8 +16,8 @@ namespace PlatformTM.Data.EntityConfigurations
 
             // Relationships
             builder.HasOne(t => t.StudyArm)
-                .WithOne()
-                .HasForeignKey<HumanSubject>(t => t.StudyArmId);
+                   .WithMany()
+                   .HasForeignKey(t => t.StudyArmId);
 
             builder.HasOne(t => t.Study)
                .WithMany(s=>s.Subjects)
@@ -25,14 +25,14 @@ namespace PlatformTM.Data.EntityConfigurations
                .HasForeignKey(t => t.StudyId);
 
             builder.HasOne(t => t.Dataset)
-               .WithOne()
-               .IsRequired()
-               .HasForeignKey<HumanSubject>(t => t.DatasetId);
+                   .WithMany()
+                   .IsRequired()
+                   .HasForeignKey(t => t.DatasetId);
 
             builder.HasOne(t => t.SourceDataFile)
-               .WithOne()
-               .IsRequired()
-               .HasForeignKey<HumanSubject>(t => t.DatafileId);
+                   .WithMany()
+                   .IsRequired()
+                   .HasForeignKey(t => t.DatafileId);
         }
     }
 }

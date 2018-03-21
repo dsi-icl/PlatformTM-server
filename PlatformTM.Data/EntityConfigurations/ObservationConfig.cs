@@ -18,19 +18,19 @@ namespace PlatformTM.Data.EntityConfigurations
 
             // Relationships
             builder.HasOne(t => t.ControlledTerm)
-                .WithOne()
-            .HasForeignKey<Observation>(t => t.ControlledTermId);
+                .WithMany()
+                .HasForeignKey(t => t.ControlledTermId);
 
             builder.HasOne(t => t.TopicVariable)
-                .WithOne()
+                .WithMany()
                 .IsRequired()
-            .HasForeignKey<Observation>(t => t.TopicVariableId);
+                .HasForeignKey(t => t.TopicVariableId);
 
             builder
                 .HasOne(t => t.DefaultQualifier)
-                .WithOne()
+                .WithMany()
                 .IsRequired()
-                .HasForeignKey<Observation>(t => t.DefaultQualifierId);
+                .HasForeignKey(t => t.DefaultQualifierId);
         }
     }
 }

@@ -21,14 +21,14 @@ namespace PlatformTM.Data.EntityConfigurations
                 .HasMaxLength(2000);
 
             builder.HasOne(p => p.Dataset)
-                .WithOne()
+                .WithMany()
                 .HasConstraintName("FK_Characteristic_Dataset")
-                .HasForeignKey<Characteristic>(k => k.DatasetId);
+                .HasForeignKey(k => k.DatasetId);
 
             builder.HasOne(p => p.Datafile)
-                .WithOne()
-                .HasConstraintName("FK_Characteristic_DataFile")
-                .HasForeignKey<Characteristic>(k => k.DatafileId);
+                   .WithMany()
+                   .HasConstraintName("FK_Characteristic_DataFile")
+                   .HasForeignKey(k => k.DatafileId);
 
             builder
             .HasDiscriminator<string>("Discriminator")
