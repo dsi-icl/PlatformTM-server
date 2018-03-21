@@ -1,10 +1,8 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -13,8 +11,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
-using MySql.Data.MySqlClient;
-using MySQL.Data.Entity.Extensions;
 using Newtonsoft.Json.Serialization;
 using PlatformTM.API.Auth;
 using PlatformTM.Core.Application.AccountManagement;
@@ -37,22 +33,27 @@ namespace PlatformTM.API
 {
     public class Startup
     {
-        private IConfigurationRoot Configuration { get; }
-        public Startup(IHostingEnvironment env)
+        private IConfiguration Configuration { get; }
+        //public Startup(IHostingEnvironment env)
+        //{
+        //    var builder = new ConfigurationBuilder()
+        //        .SetBasePath(env.ContentRootPath)
+        //        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        //        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+        //    if (env.IsEnvironment("Development"))
+        //    {
+        //        // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
+        //        builder.AddApplicationInsightsSettings(developerMode: true);
+        //    }
+
+        //    builder.AddEnvironmentVariables();
+        //    Configuration = builder.Build();
+        //}
+
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsEnvironment("Development"))
-            {
-                // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
-                builder.AddApplicationInsightsSettings(developerMode: true);
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -87,16 +88,14 @@ namespace PlatformTM.API
             BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
             BsonClassMap.RegisterClassMap<MissingValue>();
 
-
-
-
-            services.AddDbContext<PlatformTMdbContext>(x => x.UseMySQL(Configuration.GetSection("DBSettings")["MySQLconn"]));
+            services.AddDbContext<PlatformTMdbContext>(x => x.UseMySql(Configuration.GetSection("DBSettings")["MySQLconn"]));
             services.AddScoped<IServiceUoW, PlatformTMdbContext>();
-            
 
-            services.AddIdentity<UserAccount, Role>()
-                .AddUserStore<UserStore>()
-                .AddRoleStore<RoleStore>();
+            services.AddIdentity<UserAccount, Role>();
+            services.AddSingleton<IUserStore<UserAccount>, UserStore>();
+            services.AddSingleton<IRoleStore<Role>, RoleStore>();
+                //.AddUserStore<UserStore>()
+                //.AddRoleStore<RoleStore>();
 
             services.AddScoped<ActivityService>();
             services.AddScoped<AssayService>();
@@ -135,6 +134,29 @@ namespace PlatformTM.API
                     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser().Build());
             });
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddJwtBearer(options =>
+            //    {
+            //        //options.IssuerSigningKey = signingKey,
+            //        //options.Audience = tokenIssuerOptions["Audience"],
+            //        //options.ClaimsIssuer = tokenIssuerOptions["Issuer"],
+            //        //ValidateIssuerSigningKey = true,
+            //        //ValidateLifetime = true,
+            //        //ClockSkew = TimeSpan.FromMinutes(0)
+            //    });
+
+            services.AddAuthentication()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidIssuer = Configuration["TokenAuthOptions:Issuer"],
+                        ValidAudience = Configuration["TokenAuthOptions:Issuer"],
+                        IssuerSigningKey = new RsaSecurityKey(RSAKeyHelper.GenerateKey())
+                    };
+                });
 
             services.AddMvc(config =>
             {
@@ -174,11 +196,11 @@ namespace PlatformTM.API
             app.UseCors("CorsPolicy");
 
             if(env.IsDevelopment())
-            app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
 
-            app.UseApplicationInsightsRequestTelemetry();
+            //app.UseApplicationInsightsRequestTelemetry();
 
-            app.UseApplicationInsightsExceptionTelemetry();
+            //app.UseApplicationInsightsExceptionTelemetry();
 
 			// Enable middleware to serve generated Swagger as a JSON endpoint.
 			app.UseSwagger();
@@ -202,20 +224,20 @@ namespace PlatformTM.API
             app.UseMiddleware<TokenProviderMiddleware>(Options.Create(options));
 
             //Token Bearer Validation 
-            app.UseJwtBearerAuthentication(new JwtBearerOptions
-            {
-                TokenValidationParameters =
-                {
-                    IssuerSigningKey = signingKey,
-                    ValidAudience = tokenIssuerOptions["Audience"],
-                    ValidIssuer = tokenIssuerOptions["Issuer"],
-                    ValidateIssuerSigningKey = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.FromMinutes(0)
-                }
-            });
+            //app.UseJwtBearerAuthentication(new JwtBearerOptions
+            //{
+            //    TokenValidationParameters =
+            //    {
+            //        IssuerSigningKey = signingKey,
+            //        ValidAudience = tokenIssuerOptions["Audience"],
+            //        ValidIssuer = tokenIssuerOptions["Issuer"],
+            //        ValidateIssuerSigningKey = true,
+            //        ValidateLifetime = true,
+            //        ClockSkew = TimeSpan.FromMinutes(0)
+            //    }
+            //});
 
-            app.UseIdentity();
+            app.UseAuthentication();
 
             app.UseMvc();
 
