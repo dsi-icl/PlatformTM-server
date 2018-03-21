@@ -66,12 +66,12 @@ namespace PlatformTM.Data.EntityConfigurations
                .HasForeignKey(t => t.ProjectId);
 
             builder.HasOne(t => t.Role)
-                .WithOne()
-                .HasForeignKey<VariableDefinition>(t => t.RoleId);
+                   .WithMany()
+                   .HasForeignKey(t => t.RoleId);
 
             builder.HasOne(t => t.VariableType)
-               .WithOne()
-               .HasForeignKey<VariableDefinition>(t => t.VariableTypeId);
+                   .WithMany()
+                   .HasForeignKey(t => t.VariableTypeId);
         }
     }
 }
