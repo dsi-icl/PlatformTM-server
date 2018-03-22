@@ -20,4 +20,5 @@ RUN dotnet publish -c Release -o /app
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
+COPY dbinit /app/app_data
 ENTRYPOINT ["dotnet", "PlatformTM.API.dll"]

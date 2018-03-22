@@ -1,1 +1,5 @@
 /.vs/
+/.idea/
+/bin/
+/obj/
+*.gitignore
