@@ -60,34 +60,11 @@ namespace PlatformTM.Data.Repositories
                     .Project(projectionExpression)
                     .ToList();
 
-            //if (filterExpression != null)
-            //    return collection
-            //         .AsQueryable()
-            //         .Where(filterExpression)
-            //         .Select(projectionExpression)
-            //         .ToList();
-              }
+            }
               
             return null;
         }
-
-
-        ////public List<object> FindObservationsPaging(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null, Expression<Func<TEntity, object>> features = null , Expression<Func<TEntity, object>> samples = null, int? page = null, int? pageSize = null)
-        ////{
-        ////    if (filterExpression != null)
-        ////        return collection   
-        ////                          .AsQueryable()
-        ////                          .Where(filterExpression)
-        ////                          .OrderBy(features)
-        ////                          .ThenBy(samples)
-        ////                          .Select(projectionExpression)
-        ////                          .Skip((page.Value - 1) * pageSize.Value)
-        ////                          .Take(pageSize.Value)
-        ////                          .ToList();
-        ////    return null;
-        ////}
-
-
+        
         public async Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null)
         {
             var filterDoc = new BsonDocument();

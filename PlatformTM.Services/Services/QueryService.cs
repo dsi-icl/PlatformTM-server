@@ -80,33 +80,7 @@ namespace PlatformTM.Services.Services
                   );
             return assayObservations.Cast<AssayDataDTO>().ToList();
         }
-
-        public List<AssayDataDTO> GetAssayObservationsTest(int projectId, int activityId, string sampleIds) 
-        {
-            var assayObservations =
-                _observationRepository.FindObservations(s =>
-                        s.ProjectId == projectId && s.ActivityId == activityId && s.SubjectOfObservationName == sampleIds,
-                    x => new AssayDataDTO() { FileId = x.DatafileId, FeatureName = x.FeatureName.ToString(), SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
-                );
-
-            return assayObservations.Cast<AssayDataDTO>().ToList();
-        }
-
-
-        ////public List<AssayDataDTO> GetAssayObservationsPaging(int projectId, int activityId, List<string> sampleIds, int page)
-        ////{
-        ////    var assayObservations =
-        ////        _observationRepository.FindObservationsPaging(
-        ////            s => s.ProjectId == projectId && s.ActivityId == activityId && sampleIds.Contains(s.SubjectOfObservationName),
-        ////            x => new AssayDataDTO() { FeatureName = x.FeatureName, SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value },
-        ////            h => h.ProjectId,
-        ////            m => m.ActivityId,
-        ////            page,
-        ////            61536
-        ////        );
-        ////    return assayObservations.Cast<AssayDataDTO>().ToList();
-        ////}
-
+        
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
         {
             CombinedQuery cQuery = new CombinedQuery();
