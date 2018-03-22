@@ -362,12 +362,13 @@ namespace PlatformTM.Services.Services
         }
 
         #region IO methods
+        
 
         public DataTable ReadOriginalFile(string filePath)
         {
             return readDataFile(Path.Combine(_uploadFileDirectory,filePath));
         }
-        
+
         private DataTable readDataFile(string filePath)
         {
             DataTable dt = new DataTable();

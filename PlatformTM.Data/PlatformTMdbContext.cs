@@ -106,7 +106,6 @@ namespace PlatformTM.Data
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
-
             var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
             _repositories.Add(typeof(TEntity), repository);
 

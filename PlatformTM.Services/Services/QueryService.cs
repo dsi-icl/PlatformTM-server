@@ -70,18 +70,17 @@ namespace PlatformTM.Services.Services
             }
             return subjProperty;
         }
-        //public List<Core.Domain.Model.ObservationModel.Observation> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
-        public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
-        {
-            var assayObservations =
-                _observationRepository.FindObservations(s =>
-                    s.ProjectId == projectId && s.ActivityId == activityId && /*s.SubjectOfObservationName == "SID.7002.551"*/ sampleIds.Contains(s.SubjectOfObservationName),
-                    x => new AssayDataDTO() {FeatureName = x.FeatureName, SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
-                                                         );
 
+       public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        {
+            var assayObservations = 
+                _observationRepository.FindObservations(s =>
+                    s.ProjectId == projectId && s.ActivityId == activityId && sampleIds.Contains(s.SubjectOfObservationName),
+                    x => new AssayDataDTO() { FeatureName = x.FeatureName, SubjectOfObservationName = x.SubjectOfObservationName, Value = ((NumericalValue)x.ObservedValue).Value }
+                  );
             return assayObservations.Cast<AssayDataDTO>().ToList();
         }
-
+        
         public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
         {
             CombinedQuery cQuery = new CombinedQuery();

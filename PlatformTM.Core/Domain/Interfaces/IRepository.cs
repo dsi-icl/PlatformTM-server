@@ -39,8 +39,7 @@ namespace PlatformTM.Core.Domain.Interfaces
 
        
         List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null);
-       
-
+        
         Task<List<TEntity>> FindAllAsync(IList<object> filterFields = null, IList<object> projectionFields = null);
           
 
