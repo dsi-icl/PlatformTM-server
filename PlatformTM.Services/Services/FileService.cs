@@ -365,8 +365,7 @@ namespace PlatformTM.Services.Services
 
         public DataTable ReadOriginalFile(string filePath)
         {
-            string PATH = _uploadFileDirectory + filePath;
-            return readDataFile(PATH);
+            return readDataFile(Path.Combine(_uploadFileDirectory,filePath));
         }
         
         private DataTable readDataFile(string filePath)
