@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  platformtm.api:
-    image: platformtm
-    build:
-      context: .
-      dockerfile: PlatformTM.API/Dockerfile
