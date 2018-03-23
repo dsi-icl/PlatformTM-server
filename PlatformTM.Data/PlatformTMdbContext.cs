@@ -164,7 +164,7 @@ namespace PlatformTM.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.AddConfiguration<UserAccount>(new AccountConfig());
-            modelBuilder.AddConfiguration<Activity>(new ActivityConfig());
+            modelBuilder.AddConfiguration<Core.Domain.Model.Activity>(new ActivityConfig());
             modelBuilder.AddConfiguration<Arm>(new ArmConfig());
             modelBuilder.AddConfiguration<Assay>(new AssayConfig());
 

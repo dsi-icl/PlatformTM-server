@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -62,36 +63,40 @@ namespace PlatformTM.API.Auth
                     msg = "Invalid username or password"
                 };
                 await context.Response.WriteAsync(JsonConvert.SerializeObject(result, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() }));    
-            }
-            var identity = await _accountService.GetClaimsPrincipleForUser(appUser);
-            var userData = _accountService.GetUserInfo(identity.FindFirstValue(ClaimTypes.NameIdentifier)).Result;
-           
-            var now = DateTime.UtcNow;
-            
-            //Generate Token
-            var jwtHandler = new JwtSecurityTokenHandler();
-            var securityToken = jwtHandler.CreateToken(new SecurityTokenDescriptor
-            {
-                Issuer = _options.Issuer,
-                Audience = _options.Audience,
-                SigningCredentials = _options.SigningCredentials,
-                Subject = (ClaimsIdentity)identity.Identity,
-                NotBefore = now,   
-                Expires = now.Add(_options.ExpiresSpan)
-            });
-            var encodedToken = jwtHandler.WriteToken(securityToken);
+            }else{
+                var identity = await _accountService.GetClaimsPrincipleForUser(appUser);
+                var userData = _accountService.GetUserInfo(identity.FindFirstValue(ClaimTypes.NameIdentifier)).Result;
 
-            var response = new
-            {
-                access_token = encodedToken,
-                token_result = "success",
-                user = userData,
-                expires_in = (int)_options.ExpiresSpan.TotalSeconds
-            };
-            // Serialize and return the response
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver()}));
-            //return new OkObjectResult(response);
+                var now = DateTime.UtcNow;
+
+                var _issuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.HmacSecretKey));
+
+                //Generate Token
+                var jwtHandler = new JwtSecurityTokenHandler();
+                var jws = jwtHandler.CreateEncodedJwt(new SecurityTokenDescriptor
+                {
+                    Issuer = _options.Issuer,
+                    IssuedAt = now,
+                    NotBefore = now,
+                    Audience = _options.Audience,
+                    SigningCredentials = new SigningCredentials(_issuerSigningKey, SecurityAlgorithms.HmacSha256),
+                    Subject = ((ClaimsIdentity)identity.Identity),
+                    Expires = now.Add(_options.ExpiresSpan)
+                });
+
+                var response = new
+                {
+                    access_token = jws,
+                    token_result = "success",
+                    user = userData,
+                    expires_in = (int)_options.ExpiresSpan.TotalMinutes
+                };
+                // Serialize and return the response
+                context.Response.ContentType = "application/json";
+                await context.Response.WriteAsync(JsonConvert.SerializeObject(response, new JsonSerializerSettings { Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() }));
+                //return new OkObjectResult(response);
+            }
+
         }
     }
 }

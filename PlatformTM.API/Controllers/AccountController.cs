@@ -39,8 +39,8 @@ namespace PlatformTM.API.Controllers
                 //_logger.LogInformation(3, "User created a new account with password.");
                 //return RedirectToAction(nameof(HomeController.Index), "Home");
 
-                var psk = await _userAccountService.GetUserPsk(userDTO);
-                return Ok(new { PSK = psk });
+                //var psk = await _userAccountService.GetUserPsk(userDTO);
+                return Ok();
             }
             return GetErrorResult(result);
             
