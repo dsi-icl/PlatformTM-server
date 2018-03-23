@@ -79,6 +79,7 @@ namespace PlatformTM.Services.Services.UserManagement
             //var claims = cp.Claims.ToList();
             //claims.Add(new Claim(ClaimTypes.UserData, userAccount.UserId.ToString()));
             //cp.Claims = claims;
+            //OR CALL GetClaimsForUser
             return cp;
         }
 

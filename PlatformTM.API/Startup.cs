@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
 using Newtonsoft.Json.Serialization;
@@ -34,22 +32,6 @@ namespace PlatformTM.API
     public class Startup
     {
         private IConfiguration Configuration { get; }
-        //public Startup(IHostingEnvironment env)
-        //{
-        //    var builder = new ConfigurationBuilder()
-        //        .SetBasePath(env.ContentRootPath)
-        //        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-        //        .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-        //    if (env.IsEnvironment("Development"))
-        //    {
-        //        // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
-        //        builder.AddApplicationInsightsSettings(developerMode: true);
-        //    }
-
-        //    builder.AddEnvironmentVariables();
-        //    Configuration = builder.Build();
-        //}
 
         public Startup(IConfiguration configuration)
         {
@@ -58,7 +40,6 @@ namespace PlatformTM.API
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
@@ -68,34 +49,50 @@ namespace PlatformTM.API
                     .AllowCredentials());
             });
             services.AddOptions();
-            services.AddApplicationInsightsTelemetry(Configuration);
 
-            services.AddAuthorization(options =>
+            services.AddIdentity<UserAccount, Role>()
+               .AddUserStore<UserStore>()
+               .AddRoleStore<RoleStore>();
+
+            services.AddAuthentication(o=>o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(cfg =>{
+                    //CHANGE TO TRUE FOR PRODUCTION
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.SaveToken = true;
+                    cfg.TokenValidationParameters = new TokenValidationParameters(){
+                        ValidIssuer = Configuration["TokenAuthOptions:Issuer"],
+                        ValidAudience = Configuration["TokenAuthOptions:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["TokenAuthOptions:HmacSecretKey"]))
+                    };
+                });
+
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy(
+            //        "CanAccessAdminArea",
+            //        policyBuilder => policyBuilder.RequireRole("ADMIN", "OWNER"));
+            //    options.AddPolicy(
+            //       "CanImportData",
+            //       policyBuilder => policyBuilder.RequireClaim("CanImportData"));
+            //});
+
+            services.AddAuthorization(auth =>
             {
-                options.AddPolicy(
-                    "CanAccessAdminArea",
-                    policyBuilder => policyBuilder.RequireRole("ADMIN", "OWNER"));
-                options.AddPolicy(
-                   "CanImportData",
-                   policyBuilder => policyBuilder.RequireClaim("CanImportData"));
+                auth.AddPolicy("Bearer", policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                });
             });
+
 
             services.Configure<DataAccessSettings>(Configuration.GetSection("DBSettings"));
             services.Configure<FileStorageSettings>(Configuration.GetSection("FileStorageSettings"));
+            services.Configure<TokenAuthOptions>(Configuration.GetSection("TokenAuthOptions"));
 
-            BsonClassMap.RegisterClassMap<ObservationNode>();
-            BsonClassMap.RegisterClassMap<GroupNode>();
-            BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
-            BsonClassMap.RegisterClassMap<MissingValue>();
-
+            #region DI Registration
             services.AddDbContext<PlatformTMdbContext>(x => x.UseMySql(Configuration.GetSection("DBSettings")["MySQLconn"]));
             services.AddScoped<IServiceUoW, PlatformTMdbContext>();
-
-            services.AddIdentity<UserAccount, Role>();
-            services.AddSingleton<IUserStore<UserAccount>, UserStore>();
-            services.AddSingleton<IRoleStore<Role>, RoleStore>();
-                //.AddUserStore<UserStore>()
-                //.AddRoleStore<RoleStore>();
 
             services.AddScoped<ActivityService>();
             services.AddScoped<AssayService>();
@@ -127,51 +124,13 @@ namespace PlatformTM.API
 
             services.AddScoped<Formatter>();
             services.AddSingleton<Data.DbInitializer>();
+            #endregion
 
-            services.AddAuthorization(auth =>
-            {
-                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
-                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
-                    .RequireAuthenticatedUser().Build());
-            });
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddJwtBearer(options =>
-            //    {
-            //        //options.IssuerSigningKey = signingKey,
-            //        //options.Audience = tokenIssuerOptions["Audience"],
-            //        //options.ClaimsIssuer = tokenIssuerOptions["Issuer"],
-            //        //ValidateIssuerSigningKey = true,
-            //        //ValidateLifetime = true,
-            //        //ClockSkew = TimeSpan.FromMinutes(0)
-            //    });
-
-            services.AddAuthentication()
-                .AddJwtBearer(cfg =>
-                {
-                    cfg.RequireHttpsMetadata = false;
-                    cfg.SaveToken = true;
-                    cfg.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidIssuer = Configuration["TokenAuthOptions:Issuer"],
-                        ValidAudience = Configuration["TokenAuthOptions:Issuer"],
-                        IssuerSigningKey = new RsaSecurityKey(RSAKeyHelper.GenerateKey())
-                    };
-                });
-
-            services.AddMvc(config =>
-            {
-                var policy = new AuthorizationPolicyBuilder()
-                                 .RequireAuthenticatedUser()
-                                 .Build();
-                config.Filters.Add(new AuthorizeFilter(policy));
-            })
-            .AddJsonOptions(opts =>
-                 {
-                     // Force Camel Case to JSON
-                     opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                     //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
-                 });
-
+            #region MongoDB Class Mapppings
+            BsonClassMap.RegisterClassMap<ObservationNode>();
+            BsonClassMap.RegisterClassMap<GroupNode>();
+            BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
+            BsonClassMap.RegisterClassMap<MissingValue>();
             BsonClassMap.RegisterClassMap<Observation>();
             BsonClassMap.RegisterClassMap<ObservedPropertyValue>();
             BsonClassMap.RegisterClassMap<CategoricalValue>();
@@ -179,6 +138,19 @@ namespace PlatformTM.API
             BsonClassMap.RegisterClassMap<NumericalValue>();
             BsonClassMap.RegisterClassMap<IntervalValue>();
             BsonClassMap.RegisterClassMap<ObservationQuery>();
+            #endregion
+
+            services.AddMvc(config =>
+            {
+                //add a global filter so that requests are Authorized by default
+                config.Filters.Add(new AuthorizeFilter("Bearer"));
+            })
+            .AddJsonOptions(opts =>{
+                // Force Camel Case to JSON
+                opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+            });
+
 
 			services.AddSwaggerGen(c =>
 			{
@@ -187,55 +159,26 @@ namespace PlatformTM.API
 
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UsePathBase("/api/v1/");
 
             app.UseCors("CorsPolicy");
 
             if(env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
-            //app.UseApplicationInsightsRequestTelemetry();
-
-            //app.UseApplicationInsightsExceptionTelemetry();
-
 			// Enable middleware to serve generated Swagger as a JSON endpoint.
-			app.UseSwagger();
-
-			// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
-			app.UseSwaggerUI(c =>
-			{
-				c.SwaggerEndpoint("/api/v1/swagger/v1/swagger.json", "PlatformTM API V1");
-			});
+            app.UseSwagger()
+               .UseSwaggerUI(c=> {
+                c.SwaggerEndpoint("/api/v1/swagger/v1/swagger.json", "PlatformTM API V1");
+               });
 
             //Token Generation
-            var tokenIssuerOptions = Configuration.GetSection("TokenAuthOptions");
-            var signingKey = new RsaSecurityKey(RSAKeyHelper.GenerateKey());
-            var options = new TokenAuthOptions()
-            {
-                Audience = tokenIssuerOptions["Audience"],
-                Issuer = tokenIssuerOptions["Issuer"],
-                Endpoint = tokenIssuerOptions["Endpoint"],
-                SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.RsaSha256Signature),
-            };
-            app.UseMiddleware<TokenProviderMiddleware>(Options.Create(options));
-
-            //Token Bearer Validation 
-            //app.UseJwtBearerAuthentication(new JwtBearerOptions
-            //{
-            //    TokenValidationParameters =
-            //    {
-            //        IssuerSigningKey = signingKey,
-            //        ValidAudience = tokenIssuerOptions["Audience"],
-            //        ValidIssuer = tokenIssuerOptions["Issuer"],
-            //        ValidateIssuerSigningKey = true,
-            //        ValidateLifetime = true,
-            //        ClockSkew = TimeSpan.FromMinutes(0)
-            //    }
-            //});
+            app.UseMiddleware<TokenProviderMiddleware>();
 
             app.UseAuthentication();
 

@@ -55,11 +55,11 @@ namespace PlatformTM.API.Controllers
                 var fileInfo = await _exportService.CreateFileForDataset(dataset, filePath);
                 _exportService.SetDatasetStatus(datasetId, fileInfo.FullName, 2);
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 // in the case of an error the file status should be changed to 0
-                _exportService.SetDatasetStatus(datasetId, "", 0);
-                //throw;
+                _exportService.SetDatasetStatus(datasetId, "", 3);
+                throw e;
             } 
         }
         
