@@ -43,7 +43,7 @@ namespace PlatformTM.Services.Services.UserManagement
             {
                 userAccount.Claims.Add(new UserClaim() { ClaimType = "FirstName", ClaimValue = userDTO.FirstName });
                 userAccount.Claims.Add(new UserClaim() { ClaimType = ClaimTypes.UserData, ClaimValue = userAccount.User.Id.ToString()});
-                return await _userManager.CreateAsync(userAccount, userDTO.Password);
+                return  await _userManager.CreateAsync(userAccount, userDTO.Password);
             }
             catch (Exception e)
             {

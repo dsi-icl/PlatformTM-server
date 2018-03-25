@@ -32,13 +32,13 @@ namespace PlatformTM.Services.Services.UserManagement
         public Task<string> GetUserIdAsync(UserAccount account, CancellationToken cancellationToken)
         {
             if (account == null)
-                throw new ArgumentNullException("UserAccount");
+                throw new ArgumentNullException(nameof(account));
             return Task.FromResult<string>(account.Id.ToString());
         }
         public Task<string> GetUserNameAsync(UserAccount account, CancellationToken cancellationToken)
         {
             if (account == null)
-                throw new ArgumentNullException("UserAccount");
+                throw new ArgumentNullException(nameof(account));
             return Task.FromResult<string>(account.UserName);
         }
         public Task SetUserNameAsync(UserAccount user, string userName, CancellationToken cancellationToken)
@@ -55,12 +55,12 @@ namespace PlatformTM.Services.Services.UserManagement
             user.UserName = normalizedName;
             return Task.FromResult(true);
         }
-        public Task<IdentityResult> CreateAsync(UserAccount userAccount, CancellationToken cancellationToken)
+        public async Task<IdentityResult> CreateAsync(UserAccount userAccount, CancellationToken cancellationToken)
         {
             _userRepository.Insert(userAccount.User);
             _accountRepository.Insert(userAccount);
-            _unitOfWork.SaveChangesAsync();
-            return Task.FromResult(IdentityResult.Success);
+            var res = await _unitOfWork.SaveChangesAsync();
+            return res > 0 ? IdentityResult.Success : IdentityResult.Failed();
         }
         public async Task<IdentityResult> UpdateAsync(UserAccount user, CancellationToken cancellationToken)
         {
@@ -224,8 +224,6 @@ namespace PlatformTM.Services.Services.UserManagement
         //        throw new ArgumentNullException("user");
         //    return Task.FromResult<bool>(!string.IsNullOrWhiteSpace(user.Account.PasswordHash));
         //}
-
-
 
         //private Account GetAccount(UserAccount userAccount)
         //{

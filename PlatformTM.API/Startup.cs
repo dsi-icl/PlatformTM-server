@@ -50,9 +50,7 @@ namespace PlatformTM.API
             });
             services.AddOptions();
 
-            services.AddIdentity<UserAccount, Role>()
-               .AddUserStore<UserStore>()
-               .AddRoleStore<RoleStore>();
+
 
             services.AddAuthentication(o=>o.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(cfg =>{
@@ -139,6 +137,10 @@ namespace PlatformTM.API
             BsonClassMap.RegisterClassMap<IntervalValue>();
             BsonClassMap.RegisterClassMap<ObservationQuery>();
             #endregion
+
+            services.AddIdentity<UserAccount, Role>()
+               .AddUserStore<UserStore>()
+               .AddRoleStore<RoleStore>();
 
             services.AddMvc(config =>
             {
