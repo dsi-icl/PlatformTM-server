@@ -51,17 +51,15 @@ namespace PlatformTM.Services.Services
             string filePath;
             DataTable dataTable;
             bool success;
+            filePath = Path.Combine(file.Path, file.FileName);
+            dataTable = ReadOriginalFile(filePath);
             switch (file.Format)
             {
                 case "SDTM":
-                    filePath = file.Path + "\\" + file.FileName;
-                    dataTable = ReadOriginalFile(filePath);
                     var sdtmLoader = new SDTMloader(_dataServiceUnit);
                     success = sdtmLoader.LoadSDTM(datasetId, fileId, dataTable);
                     return success;
                 case "ADTM":
-                    filePath = file.Path + "\\" + file.FileName;
-                    dataTable = ReadOriginalFile(filePath);
                     var hdDataloader = new HDloader(_dataServiceUnit);
                     success = hdDataloader.LoadHDdata(datasetId, fileId, dataTable);
                     return success;
