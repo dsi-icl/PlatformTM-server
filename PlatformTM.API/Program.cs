@@ -11,14 +11,6 @@ namespace PlatformTM.API
     {
         public static void Main(string[] args)
         {
-            //var host = new WebHostBuilder()
-            //    .UseKestrel()
-            //    .UseContentRoot(Directory.GetCurrentDirectory())
-            //    .UseIISIntegration()
-            //    .UseStartup<Startup>()
-            //    .Build();
-            //host.Run();
-
             var host = BuildWebHost(args);
 
             if (EnvironmentName.Development != Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"))
@@ -31,7 +23,6 @@ namespace PlatformTM.API
                         dbContext.InitDB();
                         var dbInitializer = services.GetRequiredService<Data.DbInitializer>();
                         dbInitializer.SeedDB();
-
                     }
                     catch (Exception ex)
                     {

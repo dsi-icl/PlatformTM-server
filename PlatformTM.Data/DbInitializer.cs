@@ -13,8 +13,8 @@ namespace PlatformTM.Data
     public class DbInitializer
     {
         private IServiceUoW _db;
-        private readonly IRepository<DatasetTemplate, string> _desriptorRepository;
-        private readonly IRepository<Dictionary, string> _dictRepository;
+        private  IRepository<DatasetTemplate, string> _desriptorRepository;
+        private  IRepository<Dictionary, string> _dictRepository;
         private readonly List<string> _includeFields = new List<string>() { "Fields" };
         private readonly List<string> _includeDictionary = new List<string>() { "Fields.ControlledVocabulary" };
         private readonly List<string> _includeTermsXrefDB = new List<string>() { "Terms.Xref.DB", "Xref.DB" };
@@ -28,8 +28,6 @@ namespace PlatformTM.Data
         public DbInitializer(IServiceUoW uoW, IOptions<DataAccessSettings> settings)
         {
             _db = uoW;
-            _desriptorRepository = uoW.GetRepository<DatasetTemplate, string>();
-            _dictRepository = uoW.GetRepository<Dictionary, string>();
             _ConfigSettings = settings.Value;
             _JSONDir = _ConfigSettings.DBinitDirectory;
             Directory.CreateDirectory(_JSONDir);
@@ -48,6 +46,7 @@ namespace PlatformTM.Data
 
             List<Dictionary> dicts = JsonConvert.DeserializeObject<List<Dictionary>>(reader.ReadToEnd());
 
+            _dictRepository = _db.GetRepository<Dictionary, string>();
             _dictRepository.InsertMany(dicts);
 
             _db.Save();
@@ -61,6 +60,7 @@ namespace PlatformTM.Data
 
             List<DatasetTemplate> templates = JsonConvert.DeserializeObject<List<DatasetTemplate>>(reader.ReadToEnd());
 
+            _desriptorRepository = _db.GetRepository<DatasetTemplate, string>();
             _desriptorRepository.InsertMany(templates);
 
             _db.Save();

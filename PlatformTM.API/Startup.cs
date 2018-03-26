@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -89,7 +90,9 @@ namespace PlatformTM.API
             services.Configure<TokenAuthOptions>(Configuration.GetSection("TokenAuthOptions"));
 
             #region DI Registration
-            services.AddDbContext<PlatformTMdbContext>(x => x.UseMySql(Configuration.GetSection("DBSettings")["MySQLconn"]));
+            services.AddDbContext<PlatformTMdbContext>
+                    (x => x.UseMySql(Configuration.GetSection("DBSettings")["MySQLconn"], sqlOptions =>{
+                         sqlOptions.EnableRetryOnFailure(7, System.TimeSpan.FromSeconds(5), null);}));
             services.AddScoped<IServiceUoW, PlatformTMdbContext>();
 
             services.AddScoped<ActivityService>();
@@ -121,7 +124,7 @@ namespace PlatformTM.API
             services.AddScoped<ObservationLoader>();
 
             services.AddScoped<Formatter>();
-            services.AddSingleton<Data.DbInitializer>();
+            services.AddScoped<Data.DbInitializer>();
             #endregion
 
             #region MongoDB Class Mapppings
@@ -139,8 +142,8 @@ namespace PlatformTM.API
             #endregion
 
             services.AddIdentity<UserAccount, Role>()
-               .AddUserStore<UserStore>()
-               .AddRoleStore<RoleStore>();
+            .AddUserStore<UserStore>()
+            .AddRoleStore<RoleStore>();
 
             services.AddMvc(config =>
             {
@@ -180,7 +183,7 @@ namespace PlatformTM.API
                });
 
             //Token Generation
-            app.UseMiddleware<TokenProviderMiddleware>();
+            //app.UseMiddleware<TokenProviderMiddleware>();
 
             app.UseAuthentication();
 

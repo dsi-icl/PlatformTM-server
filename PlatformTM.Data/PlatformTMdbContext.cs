@@ -161,6 +161,9 @@ namespace PlatformTM.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            WaitForDBInit();
+
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.AddConfiguration<UserAccount>(new AccountConfig());
@@ -235,14 +238,15 @@ namespace PlatformTM.Data
 
         private void WaitForDBInit()
         {
+            var con = new MySqlConnection(_dbsettings.Value.MySQLconn);
             int retries = 1;
             while (retries < 7)
             {
                 try
                 {
                     Console.WriteLine("Connecting to db. Trial: {0}", retries);
-                    Database.OpenConnection();
-                    Database.CloseConnection();
+                    con.Open();
+                    con.Close();
                     break;
                 }
                 catch (MySqlException)
