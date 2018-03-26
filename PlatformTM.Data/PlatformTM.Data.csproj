@@ -14,31 +14,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    
-    
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.0.1" />
-    
-    
-   <!-- <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />-->
-
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
-   
-
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="5.2.1" />
     <PackageReference Include="MongoDB.Driver" Version="2.5.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.0" />
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Migrations\20170130100001_Initial.cs" />
   </ItemGroup>
 </Project>
