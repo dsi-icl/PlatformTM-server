@@ -31,4 +31,9 @@
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Services\OntologyManagement\BioPortalClient.cs" />
+    <Compile Remove="Services\OntologyManagement\IOntologyService.cs" />
+    <Compile Remove="Services\OntologyManagement\OLSclient.cs" />
+  </ItemGroup>
 </Project>

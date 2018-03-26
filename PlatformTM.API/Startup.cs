@@ -24,7 +24,6 @@ using PlatformTM.Services.Services;
 using PlatformTM.Services.Services.HelperService;
 using PlatformTM.Services.Services.Loading.AssayData;
 using PlatformTM.Services.Services.Loading.SDTM;
-using PlatformTM.Services.Services.OntologyManagement;
 using PlatformTM.Services.Services.UserManagement;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -114,8 +113,6 @@ namespace PlatformTM.API
             services.AddScoped<CheckoutService>();
             services.AddScoped<QueryService>();
             services.AddScoped<CacheService>();
-            services.AddScoped<OLSclient>();
-            services.AddScoped<OLSresultHandler>();
 
             services.AddScoped<SubjectLoader>();
             services.AddScoped<BioSampleLoader>();
@@ -125,6 +122,7 @@ namespace PlatformTM.API
 
             services.AddScoped<Formatter>();
             services.AddScoped<Data.DbInitializer>();
+            services.AddScoped<JwtProvider>();
             #endregion
 
             #region MongoDB Class Mapppings
@@ -181,9 +179,6 @@ namespace PlatformTM.API
                .UseSwaggerUI(c=> {
                 c.SwaggerEndpoint("/api/v1/swagger/v1/swagger.json", "PlatformTM API V1");
                });
-
-            //Token Generation
-            //app.UseMiddleware<TokenProviderMiddleware>();
 
             app.UseAuthentication();
 
