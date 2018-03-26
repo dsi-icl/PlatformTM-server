@@ -27,7 +27,7 @@ namespace PlatformTM.API.Controllers
         public IEnumerable<ProjectDTO> Get()
         {
             var userId = User.FindFirst(ClaimTypes.UserData).Value;
-            return !User.Identity.IsAuthenticated ? null : _projectService.GetProjects(userId);
+            return !User.Identity.IsAuthenticated ? null :  _projectService.GetProjects(userId);
         }
 
         [HttpGet("accession/{projectId}", Name = "GetProjectByAcc")]
