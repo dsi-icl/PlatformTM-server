@@ -2,6 +2,7 @@
 
 namespace PlatformTM.Services.DTOs
 {
+    //TODO: Change this to AssayDescriptorDTO 
     public class AssayDTO
     {
         public int Id { get; set; }

@@ -21,12 +21,20 @@ namespace PlatformTM.Data.EntityConfigurations
 
             builder
                 .Property(t => t.Id).HasColumnName("DataFileId");
+            builder
+                .Property(t => t.ParentDirectoryId).HasColumnName("ParentId");
+            
 
             // Relationships
             builder.HasOne(t => t.Project)
                 .WithMany(s => s.DataFiles)
                 .IsRequired()
                 .HasForeignKey(t => t.ProjectId);
+
+            builder.HasOne(t => t.ParentDirectory)
+                   .WithMany()
+                   .HasForeignKey(t=>t.ParentDirectoryId);
+
 
             /*CONSIDER PUTTING THIS BACK WITH M-2-M RELATIONSHIP IS SUPPORTED*/
             //builder.HasMany(t => t.Datasets)

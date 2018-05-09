@@ -2,7 +2,7 @@
 {
     public class DirectoryDTO
     {
-        public string name { get; set; }
-        public string currentDir { get; set; }
+        public string FolderName { get; set; }
+        public int ParentFolderId { get; set; }
     }
 }

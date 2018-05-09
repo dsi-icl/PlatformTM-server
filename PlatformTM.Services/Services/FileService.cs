@@ -73,9 +73,14 @@ namespace PlatformTM.Services.Services
             
         }
 
-        public List<FileDTO> GetUploadedFiles(int projectId,string path)
+        public List<FileDTO> GetUploadedFiles(int projectId,int pathId)
         {
-            var files = _fileRepository.FindAll(f => f.ProjectId == projectId && f.Path.Equals(path));
+            List<DataFile> files;
+            if (pathId == 0)
+                files = _fileRepository.FindAll(f => f.ProjectId == projectId && f.ParentDirectoryId == null).ToList();
+            else
+                files = _fileRepository.FindAll(f=> f.ProjectId == projectId && f.ParentDirectoryId == pathId).ToList();
+            
             return files.Select(file => new FileDTO
             {
                 FileName = file.FileName,
@@ -91,27 +96,29 @@ namespace PlatformTM.Services.Services
             }).ToList();
         }
 
-        public DirectoryInfo AddDirectory(int projectId, string newDir)
+        //TODO: Update to reflect the new parentDirectoryId
+        public DataFile CreateFolder(int projectId, string folderName, int parentFolderId)
         {
-            if (Directory.Exists(newDir))
-                return new DirectoryInfo(newDir);
+            //if (Directory.Exists(newDir))
+                //return new DirectoryInfo(newDir);
 
-            var di = Directory.CreateDirectory(newDir);
+            //var di = Directory.CreateDirectory(newDir);
 
             var project = _projectRepository.FindSingle(p => p.Id == projectId);
             if(project ==null)
                 return null;
 
             var file = new DataFile();
-            file.FileName = di.Name;
+            file.FileName = folderName;
             //file.Path = di.FullName.Substring(di.FullName.IndexOf(projectId));
-            file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf("P-"+projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
-            file.DateAdded = di.CreationTime.ToString("D");
+            //file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf("P-"+projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
+            //file.DateAdded = di.CreationTime.ToString("D");
             file.IsDirectory = true;
             file.ProjectId = project.Id;
+            if (parentFolderId != 0) file.ParentDirectoryId = parentFolderId;
 
             _fileRepository.Insert(file);
-            return _dataServiceUnit.Save().Equals("CREATED") ? di : null;
+            return _dataServiceUnit.Save().Equals("CREATED") ? file : null;
         }
 
         public void DeleteFile(int fileId)
@@ -127,11 +134,12 @@ namespace PlatformTM.Services.Services
             //TODO:IF selectFile.State != LOADED, success is still false. Will not be able to delete file
             //if (success)
             //{
-       
-            string path = Path.Combine(_uploadFileDirectory, selectFile.Path, selectFile.FileName);
+
+            //string path = Path.Combine(_uploadFileDirectory, selectFile.Path, selectFile.FileName);
+            var filepath = Path.Combine(GetFullPath(selectFile.ProjectId), selectFile.FileName);
             try
             {
-                File.Delete(path);
+                File.Delete(filepath);
                 _fileRepository.Remove(selectFile);
                 _dataServiceUnit.Save();
             }
@@ -143,12 +151,20 @@ namespace PlatformTM.Services.Services
                         
         }
 
-        public DataFile AddOrUpdateFile(int projectId, FileInfo fi)
+        public DataFile AddOrUpdateFile(int projectId, FileInfo fi, int dirId)
         {
             if (fi == null)
                 return null;
-            var filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
-            var file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.ProjectId == projectId);
+            DataFile file;
+            //var filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
+            //var file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.ProjectId == projectId);
+            if(dirId==0){
+                file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.ProjectId == projectId && d.ParentDirectoryId == null);
+            }
+            else
+
+                file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.ProjectId == projectId && d.ParentDirectoryId == dirId);
+
             if (file == null)
             {
                 var project = _projectRepository.FindSingle(p => p.Id == projectId);
@@ -159,9 +175,10 @@ namespace PlatformTM.Services.Services
                     FileName = fi.Name,
                     DateAdded = fi.CreationTime.ToString("d") + " " + fi.CreationTime.ToString("t"),
                     State = "NEW",
-                    Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
+                    //Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
                     IsDirectory = false,
                     ProjectId = project.Id,
+                    ParentDirectoryId = dirId
                 };
                 _fileRepository.Insert(file);
             }
@@ -185,9 +202,9 @@ namespace PlatformTM.Services.Services
         {
 
             var file = _fileRepository.Get(fileId);
-            var filePath = Path.Combine(file.Path, file.FileName);
-
-            var dataTable = ReadOriginalFile(filePath);
+            //var filePath = Path.Combine(file.Path, file.FileName);
+            var filePath = GetFullPath(file.ProjectId);
+            var dataTable = readDataFile(Path.Combine(filePath,file.FileName));
 
             if (dataTable.Rows.Count > 1000)
                 dataTable.Rows.RemoveRange(100, dataTable.Rows.Count - 100);
@@ -343,7 +360,7 @@ namespace PlatformTM.Services.Services
                 sdtmTable.TableName = dsName;
                 //Write new transformed to file 
                 var fileInfo = WriteDataFile(dataFile.Path, sdtmTable);
-                standardFile = AddOrUpdateFile(dataFile.ProjectId, fileInfo);
+                //standardFile = AddOrUpdateFile(dataFile.ProjectId, fileInfo);
 
                 //Update dataset
                 //STUPID EF 1.1
@@ -520,16 +537,17 @@ namespace PlatformTM.Services.Services
             return dto;
         }
 
-        public string GetFullPath(string projectId, string subdir)
+        public string GetFullPath(int projectId)
         {
-            return Path.Combine(_uploadFileDirectory, "P-" + projectId, subdir);
+            //var subdirs = subdir.Split('$');
+            return Path.Combine(_uploadFileDirectory, "P-" + projectId);
         }
 
-
+        //TODO: to update...to be tested
         public FileStream GetFile(int fileId, out string filename)
         {
             var file = _fileRepository.Get(fileId);
-            var filePath = Path.Combine(_uploadFileDirectory,file.Path, file.FileName);
+            var filePath = Path.Combine(GetFullPath(file.ProjectId), file.FileName);
             filename = file.FileName;
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             return fileStream;

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services;
 
@@ -16,13 +17,13 @@ namespace PlatformTM.API.Controllers
     {
         private readonly FileService _fileService;
         private readonly DatasetService _datasetService;
-        private IHostingEnvironment _environment;
+        //private IHostingEnvironment _environment;
 
         public FileController(FileService fileService, DatasetService datasetService, IHostingEnvironment env)
         {
             _fileService = fileService;
             _datasetService = datasetService;
-            _environment = env;
+            //_environment = env;
         }
 
         [HttpGet("{fileId}")]
@@ -92,11 +93,11 @@ namespace PlatformTM.API.Controllers
         }
 
         [HttpPost("projects/{projectId}/createdir")]
-        public List<string> CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
+        public DataFile CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
-            var fullpath = _fileService.GetFullPath(projectId.ToString(), dir.name);
-            var diInfo =    _fileService.AddDirectory(projectId, fullpath);
-            return diInfo?.GetDirectories().Select(d => d.Name).ToList();
+            //var fullpath = _fileService.GetFullPath(projectId.ToString(), dir.name);
+            var folderInfo =    _fileService.CreateFolder(projectId, dir.FolderName,dir.ParentFolderId);
+            return folderInfo;
         }
 
         [HttpGet]
@@ -106,14 +107,15 @@ namespace PlatformTM.API.Controllers
             return _fileService.GetDirectories(projectId);
         }
 
-        [HttpPost("projects/{projectId}/upload/{dir?}")]
-        public async Task<IActionResult> UploadFile(int projectId,  string dir = "")
+        [HttpPost("projects/{projectId}/upload/{dirId?}")]
+        public async Task<IActionResult> UploadFile(int projectId,  int dirId)
         {
             try
             {
-                var path = _fileService.GetFullPath(projectId.ToString(), dir);
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
+                var path = _fileService.GetFullPath(projectId);
+                //if (!Directory.Exists(path))
+                    //Directory.CreateDirectory(path);
+
 
                 if (Request.ContentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
@@ -125,7 +127,7 @@ namespace PlatformTM.API.Controllers
                             
                     }
                     var fi = new FileInfo(Path.Combine(path, file.FileName));
-                    _fileService.AddOrUpdateFile(projectId, fi);
+                    _fileService.AddOrUpdateFile(projectId, fi, dirId);
                     return Ok();
                 }
                 return BadRequest($"Expected a multipart request, but got '{Request.ContentType}'");
@@ -136,8 +138,8 @@ namespace PlatformTM.API.Controllers
             }
         }
 
-        [HttpGet("projects/{projectId}/uploadedFiles/{subdir?}")]
-        public  List<FileDTO> GetUploadedFiles(int projectId,string subdir="")
+        [HttpGet("projects/{projectId}/uploadedFiles/{dirId?}")]
+        public  List<FileDTO> GetUploadedFiles(int projectId,int dirId)
         {
             //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
             //string path = rawFilesDirectory + projectId;
@@ -145,11 +147,11 @@ namespace PlatformTM.API.Controllers
             //if (!Directory.Exists(path)) Directory.CreateDirectory(path);
             //if(subdir != "")
             //    relativePath = relativePath + "\\" + subdir.Replace('_','\\');
-            string relativePath = Path.Combine("P-" + projectId, subdir?.Replace('_', '\\'));
+            //string relativePath = Path.Combine("P-" + projectId, subdir?.Replace('_', '\\'));
             //_fileService.GetFullPath(projectId.ToString(), subdir?.Replace('_', '\\'));
             //    _fileService.GetProjectPath()
 
-            return _fileService.GetUploadedFiles(projectId, relativePath);
+            return _fileService.GetUploadedFiles(projectId, dirId);
         }
 
         [Route("{fileId}/download")]

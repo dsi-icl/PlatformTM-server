@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
 using PlatformTM.Core.Domain.Model.Users.Queries;
@@ -22,6 +23,7 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
+        private readonly IRepository<Dataset, int> _datasetRepository;
 
 
         private IServiceUoW uoW;
@@ -35,6 +37,7 @@ namespace PlatformTM.Services.Services
             _assayRepository = uoW.GetRepository<Assay, int>();
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _datasetRepository = uoW.GetRepository<Dataset, int>();
         }
 
         public ProjectDTO GetProjectById(int projectId)
@@ -63,6 +66,7 @@ namespace PlatformTM.Services.Services
                 {
                    "Studies.Project",
                     "Studies.Arms.Arm",
+                    "Studies.Subjects",
                     "Activities",
                     "Users.User"
                 });
@@ -74,6 +78,9 @@ namespace PlatformTM.Services.Services
                 Accession = project.Accession,
                 Type = project.Type,
                 Id = project.Id,
+                StudyCount = project.Studies.Count,
+                CohortCount = project.Studies.Sum(s => s.Arms.Count),
+                SubjectCount = project.Studies.Sum(s => s.Subjects.Count),
                 Users = project.Users?
                     .Select(u => u.User) //STUPID EF1.1
                     .Select(u => new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
@@ -96,21 +103,22 @@ namespace PlatformTM.Services.Services
             //var ownusers.Add(proj);
             return dto;
         }
-    
-        public ProjectDTO AddProject(ProjectDTO projectDto, string ownerId)
+
+		public ProjectDTO AddProject(ProjectDTO projectDto, string ownerId)
         {
             var name = projectDto.Name;
             string novowels = Regex.Replace(name, "(?<!^)[aouieyAOUIEY]", "");
-            var accession = "P-" + novowels.Substring(0,3).ToUpper();
+            //var accession = "P-" + novowels.Substring(0,3).ToUpper();
 
-            var pExist = _projectRepository.FindSingle(p => p.Accession == accession);
-            if (pExist != null)
-            {
-                if (novowels.Length > 3)
-                    accession = "P-" + (novowels.Substring(0, 2) + novowels[3]).ToUpper();
-                else
-                    accession = accession + "01";
-            }
+            //var pExist = _projectRepository.FindSingle(p => p.Accession == accession);
+            //if (pExist != null)
+            //{
+            //    if (novowels.Length > 3)
+            //        accession = "P-" + (novowels.Substring(0, 2) + novowels[3]).ToUpper();
+            //    else
+            //        accession = accession + "01";
+            //}
+            var accession = RandomString(5);
             var project = new Project()
             {
                 Name = projectDto.Name,
@@ -126,6 +134,8 @@ namespace PlatformTM.Services.Services
             //project.Users = new List<User>() {owner};
             project.Users.Add(new ProjectUser() {ProjectId = projectDto.Id,UserId = Guid.Parse(ownerId) });
             project = _projectRepository.Insert(project);
+
+
             if (!uoW.Save().Equals("CREATED")) return null;
             projectDto.Id = project.Id;
             projectDto.Accession = project.Accession;
@@ -223,6 +233,76 @@ namespace PlatformTM.Services.Services
                 
             }).ToList();
             return users;
+        }
+
+        public List<DatasetVM> GetProjectClinicalDatasets(int projectId)
+        {
+            IEnumerable<Activity> Activities;
+            Activities = _activityRepository.FindAll(
+                d => (d.ProjectId == projectId && typeof(Activity)==d.GetType()),
+                    new List<string>(){
+                        "Datasets.Template",
+                        "Datasets.DataFiles.Datafile"
+                    }
+                );
+            var datasets = Activities.SelectMany(a => a.Datasets).Select(d=> new DatasetVM(){
+                Id = d.Id,
+                Name = d.Template.Domain,
+                Files = d.DataFiles.Select(df => new FileVM(){
+                    Id = df.DatafileId,
+                    FileName = df.Datafile.FileName,
+                    DataType = df.Datafile.DataType,
+                    DateLastModified = df.Datafile.LastModified
+                }).ToList()
+            }).ToList();
+
+            return datasets;
+        }
+
+        public List<AssayVM> GetProjectAssayDatasets(int projectId)
+        {
+            var assays = _assayRepository.FindAll(
+                d => (d.ProjectId == projectId && typeof(Assay) == d.GetType()),
+                    new List<string>(){
+                        "Datasets.Template",
+                        "TechnologyType",
+                        "TechnologyPlatform",
+                        "MeasurementType",
+                        "Datasets.DataFiles.Datafile"
+                    }
+                );
+
+            var assayVMs = assays.Select(a => new AssayVM()
+            {
+                Id = a.Id,
+                Name = a.Name,
+                Platform = a.TechnologyPlatform?.Name,
+                Technology = a.TechnologyType?.Name,
+                Type = a.MeasurementType?.Name,
+                Datasets = a.Datasets.Select(d => new DatasetVM()
+                {
+                    Id = d.Id,
+                    Name = d.Template.Domain,
+                    Files = d.DataFiles.Select(df => new FileVM()
+                    {
+                        Id = df.DatafileId,
+                        FileName = df.Datafile.FileName,
+                        DataType = df.Datafile.DataType,
+                        DateLastModified = df.Datafile.LastModified
+                    }).ToList()
+                }).ToList()
+            }).ToList();
+
+            return assayVMs;
+        }
+
+
+        public static string RandomString(int length)
+        {
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

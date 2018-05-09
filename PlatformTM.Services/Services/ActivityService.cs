@@ -14,14 +14,14 @@ namespace PlatformTM.Services.Services
     {
         private readonly IRepository<Activity, int> _activityRepository;
         private readonly IServiceUoW _activityServiceUnit;
-        private readonly DatasetService _datasetService;
+        private readonly DatasetDescriptorService _datasetDescriptorService;
 
 
-        public ActivityService(IServiceUoW uoW, DatasetService datasetService)
+        public ActivityService(IServiceUoW uoW, DatasetDescriptorService datasetService)
         {
             _activityServiceUnit = uoW;
             _activityRepository = uoW.GetRepository<Activity, int>();
-            _datasetService = datasetService;
+            _datasetDescriptorService = datasetService;
         }
 
         public ActivityDTO GetActivity(int activityId)
@@ -42,7 +42,7 @@ namespace PlatformTM.Services.Services
 
             foreach (var ds in activity.Datasets)
             {
-                DatasetDTO dst = _datasetService.GetActivityDatasetDTO(ds.Id);
+                DatasetDTO dst = _datasetDescriptorService.GetActivityDatasetDTO(ds.Id);
                 activityDTO.datasets.Add(dst);
             }
             return activityDTO;
@@ -56,7 +56,7 @@ namespace PlatformTM.Services.Services
             foreach (var datasetDto in activityDTO.datasets)
             {
                 datasetDto.ProjectId = activityDTO.ProjectId;
-                var dataset = _datasetService.CreateDataset(datasetDto);
+                var dataset = _datasetDescriptorService.CreateDataset(datasetDto);
                 activity.Datasets.Add(dataset);
             }
 
@@ -80,13 +80,13 @@ namespace PlatformTM.Services.Services
                 if (datasetDto.IsNew)
                 {
                     datasetDto.ProjectId = activityDTO.ProjectId;
-                    var dataset = _datasetService.CreateDataset(datasetDto);
+                    var dataset = _datasetDescriptorService.CreateDataset(datasetDto);
                     
                     activityToUpdate.Datasets.Add(dataset);
                     _activityRepository.Update(activityToUpdate);
                 }
                 else
-                    _datasetService.UpdateDataset(datasetDto);                
+                    _datasetDescriptorService.UpdateDataset(datasetDto);                
             }
             return _activityServiceUnit.Save();
         }

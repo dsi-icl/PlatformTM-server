@@ -46,7 +46,9 @@ namespace PlatformTM.API
                     builder => builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .AllowCredentials());
+                    .AllowCredentials()
+                                  .WithExposedHeaders("Content-Disposition"));
+                
             });
             services.AddOptions();
 
@@ -100,6 +102,7 @@ namespace PlatformTM.API
             services.AddScoped<CVtermService>();
             services.AddScoped<DataExplorerService>();
             services.AddScoped<DatasetService>();
+            services.AddScoped<DatasetDescriptorService>();
             services.AddScoped<ExportService>();
             services.AddScoped<FileService>();
 

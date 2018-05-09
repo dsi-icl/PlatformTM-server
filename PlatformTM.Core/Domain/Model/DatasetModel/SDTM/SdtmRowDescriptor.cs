@@ -61,6 +61,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
         public SdtmMedDRADescriptors MedDRAvariables { get; set; }
 
 
+        public List<VariableDefinition> MandatoryFields { get; set; }
 
 
 

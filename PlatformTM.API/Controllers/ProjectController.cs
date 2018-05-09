@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Services.DTOs;
@@ -56,6 +57,28 @@ namespace PlatformTM.API.Controllers
                 return null;
             return _projectService.GetProjectSavedDatasets(projectId, userId);
 
+        }
+
+        [HttpGet("{projectId}/datasets/clinical")]
+        [AllowAnonymous]
+        public IActionResult GetProjectClinicalDatasets(int projectId)
+        {
+            //var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            //if (!User.Identity.IsAuthenticated)
+                //return new UnauthorizedResult();
+            var result = _projectService.GetProjectClinicalDatasets(projectId);
+            return new OkObjectResult(result);
+        }
+
+        [HttpGet("{projectId}/datasets/assays")]
+        [AllowAnonymous]
+        public IActionResult GetProjectAssayDatasets(int projectId)
+        {
+            //var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            //if (!User.Identity.IsAuthenticated)
+                //return new UnauthorizedResult();
+            var result = _projectService.GetProjectAssayDatasets(projectId);
+            return new OkObjectResult(result);
         }
 
         [HttpGet("{projectId}/queries")]
