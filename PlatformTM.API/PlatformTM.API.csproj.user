@@ -6,6 +6,6 @@
     <ApplicationURL>http://localhost:5000/</ApplicationURL>
   </PropertyGroup>
   <PropertyGroup>
-    <NameOfLastUsedPublishProfile>CustomProfile</NameOfLastUsedPublishProfile>
+    <NameOfLastUsedPublishProfile>ftp</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

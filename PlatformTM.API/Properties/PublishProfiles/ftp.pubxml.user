@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAIrGsG1qlE06lVO+4S+M0CQAAAAACAAAAAAAQZgAAAAEAACAAAAAfjWGmxiuc1v4anqwFt3VOTzvbDNhVeiW49uYG0IDnZwAAAAAOgAAAAAIAACAAAAAkfYW3cM1p7JRaFh/2EkntwGljkypf4k+wUTOCi1V2ISAAAAC1e3OmcRk31qjQBppsZzUAhE2BYhi+X6CQS3Nj+VG2QUAAAAAJGnqGqjH/m9aTgGB0Puh/G6IofJec+H7ObuBFuKUsk3RYRAN2BAh0P94fLExcnqggv/A2x+bwl4+5i5cvV4DO</EncryptedPassword>
+    <_PublishTargetUrl>ftp://146.169.32.103/api/v1</_PublishTargetUrl>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="appsettings.Development.json">
+      <publishTime>04/30/2018 13:32:18</publishTime>
+    </File>
+    <File Include="appsettings.Docker.json">
+      <publishTime>04/30/2018 13:32:18</publishTime>
+    </File>
+    <File Include="appsettings.json">
+      <publishTime>04/30/2018 13:32:18</publishTime>
+    </File>
+    <File Include="CsvHelper.dll">
+      <publishTime>03/15/2018 12:25:56</publishTime>
+    </File>
+    <File Include="DnsClient.dll">
+      <publishTime>05/01/2017 09:09:22</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Logging.dll">
+      <publishTime>02/08/2018 22:16:40</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Protocols.dll">
+      <publishTime>02/08/2018 22:17:02</publishTime>
+    </File>
+    <File Include="Microsoft.IdentityModel.Tokens.dll">
+      <publishTime>02/08/2018 22:16:44</publishTime>
+    </File>
+    <File Include="MongoDB.Bson.dll">
+      <publishTime>12/12/2017 15:32:14</publishTime>
+    </File>
+    <File Include="MongoDB.Driver.Core.dll">
+      <publishTime>12/12/2017 15:32:16</publishTime>
+    </File>
+    <File Include="MongoDB.Driver.dll">
+      <publishTime>12/12/2017 15:32:16</publishTime>
+    </File>
+    <File Include="MySqlConnector.dll">
+      <publishTime>11/24/2017 12:34:00</publishTime>
+    </File>
+    <File Include="Newtonsoft.Json.dll">
+      <publishTime>02/18/2018 09:44:54</publishTime>
+    </File>
+    <File Include="PlatformTM.API.deps.json">
+      <publishTime>05/02/2018 19:23:40</publishTime>
+    </File>
+    <File Include="PlatformTM.API.dll">
+      <publishTime>05/02/2018 19:23:38</publishTime>
+    </File>
+    <File Include="PlatformTM.API.pdb">
+      <publishTime>05/02/2018 19:23:38</publishTime>
+    </File>
+    <File Include="PlatformTM.API.PrecompiledViews.dll">
+      <publishTime>05/02/2018 19:23:39</publishTime>
+    </File>
+    <File Include="PlatformTM.API.PrecompiledViews.pdb">
+      <publishTime>05/02/2018 19:23:39</publishTime>
+    </File>
+    <File Include="PlatformTM.API.runtimeconfig.json">
+      <publishTime>05/02/2018 19:23:40</publishTime>
+    </File>
+    <File Include="PlatformTM.Core.dll">
+      <publishTime>05/02/2018 18:41:34</publishTime>
+    </File>
+    <File Include="PlatformTM.Core.pdb">
+      <publishTime>05/02/2018 18:41:34</publishTime>
+    </File>
+    <File Include="PlatformTM.Data.dll">
+      <publishTime>05/02/2018 18:41:35</publishTime>
+    </File>
+    <File Include="PlatformTM.Data.pdb">
+      <publishTime>05/02/2018 18:41:35</publishTime>
+    </File>
+    <File Include="PlatformTM.Services.dll">
+      <publishTime>05/02/2018 18:41:36</publishTime>
+    </File>
+    <File Include="PlatformTM.Services.pdb">
+      <publishTime>05/02/2018 18:41:36</publishTime>
+    </File>
+    <File Include="Pomelo.EntityFrameworkCore.MySql.dll">
+      <publishTime>11/25/2017 05:13:20</publishTime>
+    </File>
+    <File Include="Pomelo.JsonObject.dll">
+      <publishTime>03/07/2017 20:39:04</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.dll">
+      <publishTime>03/12/2018 07:41:08</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.Swagger.dll">
+      <publishTime>03/12/2018 07:41:14</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.SwaggerGen.dll">
+      <publishTime>03/12/2018 07:41:16</publishTime>
+    </File>
+    <File Include="Swashbuckle.AspNetCore.SwaggerUI.dll">
+      <publishTime>03/12/2018 07:41:18</publishTime>
+    </File>
+    <File Include="System.IdentityModel.Tokens.Jwt.dll">
+      <publishTime>02/08/2018 22:16:52</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>05/02/2018 19:23:40</publishTime>
+    </File>
+  </ItemGroup>
+</Project>
