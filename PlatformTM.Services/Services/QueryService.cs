@@ -213,7 +213,9 @@ namespace PlatformTM.Services.Services
             _getObservations(combinedQuery, ref queryResult);
 
 
-            //QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
+            #region QUERY FOR SUBJECT CHARACTERISITIC (e.g. AGE)
+
+			HashSet<string> scFilteredSubjectIds = new HashSet<string>();
             foreach (var subjCharQuery in combinedQuery.SubjectCharacteristics)
             {
                 var characteristics = _subjectCharacteristicRepository.FindAll(
@@ -230,14 +232,27 @@ namespace PlatformTM.Services.Services
                         : characteristics.FindAll(sc =>
                             int.Parse(sc.VerbatimValue) >= subjCharQuery.FilterRangeFrom &&
                             int.Parse(sc.VerbatimValue) <= subjCharQuery.FilterRangeTo);
+
+
+					var filteredSubjectIds = characteristics.Select(o => o.SubjectId).Distinct().ToList();
+					if (!scFilteredSubjectIds.Any()) scFilteredSubjectIds.UnionWith(filteredSubjectIds);
+
+					scFilteredSubjectIds.IntersectWith(filteredSubjectIds);
+                    queryResult.SubjCharsFiltered = true;
                 }
 
                 //ADD TO EXPORT DATA 
                 queryResult.SubjChars.AddRange(characteristics);
             }
+			//CASCADE FILTERING OF OBERVATIONS FROM ALL FILTERS ON OBSERVATIONS
+			if (queryResult.SubjCharsFiltered)
+				queryResult.SubjChars = queryResult.SubjChars.FindAll(o => scFilteredSubjectIds.Contains(o.SubjectId));
 
-            //IF A REQUESTED OBSERVATION HAS LONGITUDINAL DATA, AUTOMATICALLY ADD A TIMING COLUMN (ASSUMING VISIT AS DEFAULT FOR NOW) SHOULD BE LATER DECIDED BASED ON O3
-            if (queryResult.HasLongitudinalData)
+            #endregion
+
+
+			//IF A REQUESTED OBSERVATION HAS LONGITUDINAL DATA, AUTOMATICALLY ADD A TIMING COLUMN (ASSUMING VISIT AS DEFAULT FOR NOW) SHOULD BE LATER DECIDED BASED ON O3
+			if (queryResult.HasLongitudinalData)
                 combinedQuery.DesignElements.Add(new Query() { QueryFor = nameof(Visit) });
 
             foreach (var deQuery in combinedQuery.DesignElements)
@@ -335,24 +350,6 @@ namespace PlatformTM.Services.Services
             return queryResult;
         }
 
-        public CombinedQuery CreateSingleAssayCombinedQuery(CombinedQuery cQuery, AssayPanelQuery apQuery)
-        {
-            var singleAssayCombinedQuery = new CombinedQuery
-            {
-                ProjectId = cQuery.ProjectId,
-                ClinicalObservations = cQuery.ClinicalObservations,
-                DesignElements = cQuery.DesignElements,
-                GroupedObservations = cQuery.GroupedObservations,
-                SubjectCharacteristics = cQuery.SubjectCharacteristics,
-                UserId = cQuery.UserId,
-                Id = Guid.NewGuid()
-            };
-            singleAssayCombinedQuery.AssayPanels.Add(apQuery);
-            _combinedQueryRepository.Insert(singleAssayCombinedQuery);
-
-            return singleAssayCombinedQuery;
-        }
-
         private void _getObservations(CombinedQuery combinedQuery, ref DataExportObject queryResult)
         {
             List<SdtmRow> observations = new List<SdtmRow>();
@@ -429,6 +426,24 @@ namespace PlatformTM.Services.Services
             if(queryResult.ObservationsFiltered)
                 observations = observations.FindAll(o => ObsFilteredSubjectIds.Contains(o.USubjId));
             queryResult.Observations = observations;
+        }
+
+		public CombinedQuery CreateSingleAssayCombinedQuery(CombinedQuery cQuery, AssayPanelQuery apQuery)
+        {
+            var singleAssayCombinedQuery = new CombinedQuery
+            {
+                ProjectId = cQuery.ProjectId,
+                ClinicalObservations = cQuery.ClinicalObservations,
+                DesignElements = cQuery.DesignElements,
+                GroupedObservations = cQuery.GroupedObservations,
+                SubjectCharacteristics = cQuery.SubjectCharacteristics,
+                UserId = cQuery.UserId,
+                Id = Guid.NewGuid()
+            };
+            singleAssayCombinedQuery.AssayPanels.Add(apQuery);
+            _combinedQueryRepository.Insert(singleAssayCombinedQuery);
+
+            return singleAssayCombinedQuery;
         }
 
         public static CombinedQueryDTO GetcQueryDTO(CombinedQuery cQuery)

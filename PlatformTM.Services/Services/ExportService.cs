@@ -114,7 +114,7 @@ namespace PlatformTM.Services.Services
                     ColumnHeader = co.ObservationName
                 });
 
-                if(co.HasLongitudinalData){
+				if(co.HasLongitudinalData && !phenoDataset.Fields.Exists(f=>f.ColumnHeader=="visit")){
                     phenoDataset.Fields.Add(new DatasetField(){
                         QueryObject = new Query(){QueryFor = nameof(Visit),QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name"},
                         QueryObjectType = nameof(Visit),
@@ -123,7 +123,7 @@ namespace PlatformTM.Services.Services
                     });
                 }
 
-                if(co.HasTPT){
+				if(co.HasTPT && !phenoDataset.Fields.Exists(f => f.ColumnHeader == "timepoint")){
                     phenoDataset.Fields.Add(new DatasetField()
                    {
                         QueryObject = new Query() { QueryFor = nameof(SdtmRow.CollectionStudyTimePoint), QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name" },
@@ -309,12 +309,12 @@ namespace PlatformTM.Services.Services
                             var visitField = fileDefinition.Fields.Find(f => f.QueryObjectType == nameof(Visit));
                             if (visitField != null)
                             {
-                                row[visitField.ColumnHeader.ToLower()] = obs.VisitName;
+                                row[visitField.ColumnHeader.ToLower()] = obs?.VisitName;
                             }
 
                             var timepointField = fileDefinition.Fields.Find(f => f.QueryObject.QueryFor.Equals(nameof(SdtmRow.CollectionStudyTimePoint)));
                             if (timepointField != null)
-                                row[timepointField.ColumnHeader.ToLower()] = obs.CollectionStudyTimePoint.Name;
+                                row[timepointField.ColumnHeader.ToLower()] = obs?.CollectionStudyTimePoint.Name;
 
                             subjectObservations.Remove(obs);
                         }
