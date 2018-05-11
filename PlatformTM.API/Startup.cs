@@ -111,7 +111,7 @@ namespace PlatformTM.API
             services.AddScoped<StudyService>();
             
             services.AddScoped<TemplateService>();
-            services.AddScoped<UserDatasetService>();
+            services.AddScoped<AnalysisDatasetService>();
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
             services.AddScoped<QueryService>();

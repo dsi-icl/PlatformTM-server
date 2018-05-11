@@ -20,7 +20,6 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Activity, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-        private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
@@ -32,7 +31,6 @@ namespace PlatformTM.Services.Services
         {
             this.uoW = uoW;
             _projectRepository = uoW.GetRepository<Project, int>();
-            _userDatasetRepository = uoW.GetRepository<UserDataset, Guid>();
             _activityRepository = uoW.GetRepository<Activity, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
@@ -213,13 +211,6 @@ namespace PlatformTM.Services.Services
             return dtoQueries;
         }
 
-        public List<UserDatasetDTO> GetProjectSavedDatasets(int projectId, string UserId)
-        {
-            List<UserDataset> datasets = _userDatasetRepository.FindAll(
-                d => d.OwnerId == UserId.ToString() && d.ProjectId == projectId ).ToList();
-            return datasets.OrderBy(d => d.ProjectId).ThenBy(d => d.QueryId).Select(UserDatasetService.WriteDTO).ToList();
-        }
-
         public List<UserDTO> GetProjectUsers(int projectId)
         {
             var project = _projectRepository.FindSingle(p => p.Id == projectId,
@@ -282,7 +273,7 @@ namespace PlatformTM.Services.Services
                 Datasets = a.Datasets.Select(d => new DatasetVM()
                 {
                     Id = d.Id,
-                    Name = d.Template.Domain,
+					Name = d.Template.Code == "BS"?"Samples Annotation":d.Template.Domain,
                     Files = d.DataFiles.Select(df => new FileVM()
                     {
                         Id = df.DatafileId,

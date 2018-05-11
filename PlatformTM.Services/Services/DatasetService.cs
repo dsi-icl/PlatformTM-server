@@ -171,23 +171,20 @@ namespace PlatformTM.Services.Services
                 dataTable.TableName = descriptor.Activity.Name + "-" + descriptor.Template.Domain;
             else
                 dataTable.TableName = descriptor.Template.Domain;
+			
             await Task.Run(() => {
-                
-
-                foreach (var field in descriptor.Variables.OrderBy(vr => vr.OrderNumber).Select(v => v.VariableDefinition))
-                {
-                    dataTable.Columns.Add(field.Name, typeof(string));
-                }
-
+				foreach (var field in descriptor.Variables.OrderBy(vr => vr.OrderNumber).Select(v => v.VariableDefinition))
+				{
+					dataTable.Columns.Add(field.Name, typeof(string));
+				}
                 try
                 {
-                    foreach (var sdtmrow in sdtmRows)
-                    {
-                        if (sdtmrow.DomainCode == null) continue;
-                        var row = SDTMreader.WriteSDTMrow(sdtmrow, dataTable, sdtmRowDescriptor);
-                        dataTable.Rows.Add(row);
-                    }
-
+					foreach (var sdtmrow in sdtmRows)
+					{
+						if (sdtmrow.DomainCode == null) continue;
+						var row = SDTMreader.WriteSDTMrow(sdtmrow, dataTable, sdtmRowDescriptor);
+						dataTable.Rows.Add(row);
+					}
                 }
                 catch (Exception e)
                 {
@@ -195,7 +192,7 @@ namespace PlatformTM.Services.Services
                 }
             });
 
-                return dataTable;
+            return dataTable;
         }
 
         public async Task GenerateComputeVars(int datasetId)
@@ -294,7 +291,8 @@ namespace PlatformTM.Services.Services
                 });
             return ds;
         }
-        private double ComputeAggregate(IGrouping<string, SdtmRow> rows, string func, string aggVar)
+        
+		private double ComputeAggregate(IGrouping<string, SdtmRow> rows, string func, string aggVar)
         {
             double n;
             switch (func)

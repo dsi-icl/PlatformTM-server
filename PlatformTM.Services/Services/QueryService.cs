@@ -71,7 +71,7 @@ namespace PlatformTM.Services.Services
             return subjProperty;
         }
 
-       public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
+        public List<AssayDataDTO> GetAssayObservations(int projectId, int activityId, List<string> sampleIds)
         {
             var assayObservations = 
                 _observationRepository.FindObservations(s =>
@@ -508,6 +508,11 @@ namespace PlatformTM.Services.Services
             }
             return query;
         }
+
+		public CombinedQuery GetQuery(string queryId){
+			var query = _combinedQueryRepository.FindSingle(c => c.Id == Guid.Parse(queryId));
+			return query;
+		}
 
         private static ObservationRequestDTO GetDTOforQuery(Query query)
         {

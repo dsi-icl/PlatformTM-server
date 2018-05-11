@@ -35,5 +35,12 @@
     <Compile Remove="Services\OntologyManagement\BioPortalClient.cs" />
     <Compile Remove="Services\OntologyManagement\IOntologyService.cs" />
     <Compile Remove="Services\OntologyManagement\OLSclient.cs" />
+    <Compile Remove="DTOs\AnalysisDataset.cs" />
+    <Compile Remove="DTOs\Export\ExportFileVM.cs" />
+    <Compile Remove="DTOs\UserDatasetDTO.cs" />
+    <Compile Remove="DTOs\TreeNodeDTO.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DTOs\Export\" />
   </ItemGroup>
 </Project>

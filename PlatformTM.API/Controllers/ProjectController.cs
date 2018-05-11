@@ -49,16 +49,6 @@ namespace PlatformTM.API.Controllers
             return _projectService.GetProjectActivities(projectId);
         }
 
-        [HttpGet("{projectId}/datasets")]
-        public List<UserDatasetDTO> GetUserProjectDatasets(int projectId)
-        {
-            var userId = User.FindFirst(ClaimTypes.UserData).Value;
-            if (!User.Identity.IsAuthenticated)
-                return null;
-            return _projectService.GetProjectSavedDatasets(projectId, userId);
-
-        }
-
         [HttpGet("{projectId}/datasets/clinical")]
         [AllowAnonymous]
         public IActionResult GetProjectClinicalDatasets(int projectId)

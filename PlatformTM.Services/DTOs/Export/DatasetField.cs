@@ -1,6 +1,6 @@
 ﻿using PlatformTM.Core.Domain.Model.Users.Queries;
 
-namespace PlatformTM.Core.Domain.Model.Users.Datasets
+namespace PlatformTM.Services.DTOs.Export
 {
     public class DatasetField
     {
@@ -14,22 +14,13 @@ namespace PlatformTM.Core.Domain.Model.Users.Datasets
             {
                 if (QueryObject != null)
                 {
-                    //if (QueryObjectType == nameof(SubjectCharacteristic))
-                    //    return "SubjectCharacteristics" + QueryObject.QueryObjectName + "";
-                    ////********************************************************************************************************************************************************
-
-                    //if (QueryObjectType == nameof(SampleCharacteristic))
-                    //    return "SampleCharacteristics" + QueryObject.QueryObjectName + "";
-                    ////********************************************************************************************************************************************************
                     if (QueryObject is ObservationQuery)
                     {
                         return ((ObservationQuery)QueryObject).TermName + (((ObservationQuery)QueryObject).PropertyLabel != null ? "" + ((ObservationQuery)QueryObject).PropertyLabel + "" : "");
 
                     }
                     return QueryObject.QueryFor + "[" + QueryObject.QuerySelectProperty + "]";
-
                 }
-                    
                 return _name;
             }
             set { _name = value; }
@@ -38,7 +29,6 @@ namespace PlatformTM.Core.Domain.Model.Users.Datasets
 
         public DatasetField()
         {
-            //QueryObjects = new List<ObservationQuery>();
             ColumnHeader = FieldName;
         }
     }

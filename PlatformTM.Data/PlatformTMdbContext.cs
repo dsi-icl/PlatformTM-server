@@ -83,11 +83,19 @@ namespace PlatformTM.Data
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
-            if (typeof(TEntity) == typeof(UserDataset))
+            if (typeof(TEntity) == typeof(ExportFile))
             {
                 //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
-                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"userDatasets");
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"exportFiles");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+			if (typeof(TEntity) == typeof(AnalysisDataset))
+            {
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "analysisDatasets");
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }

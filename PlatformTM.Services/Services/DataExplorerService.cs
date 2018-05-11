@@ -116,7 +116,7 @@ namespace PlatformTM.Services.Services
             for (int i = 0; i < observations.Count; i++)
             {
                 obsRequest.O3 += observations[i].O3 + (i + 1 < observations.Count ? " & " : "");
-                obsRequest.O3code += observations[i].O3variable + "(" + observations[i].O3id + ")" + (i + 1 < observations.Count ? "_" : "");
+                obsRequest.O3code += observations[i].O3variable + "_" + observations[i].O3id + "_" + (i + 1 < observations.Count ? "_" : "");
             }
             //HACK FOR AE OCCUR ASSUMING THAT ONLY AE MedDRA terms can be grouped for now
             obsRequest.QO2 = "AEOCCUR";//should be the default qualifier 
@@ -573,6 +573,7 @@ namespace PlatformTM.Services.Services
                 //var matchedEvents = events.FindAll(s => s.QualifierQualifiers[obsreq.OntologyEntryCategoryName] == obsreq.OntologyEntryValue && s.Group == obsreq?.Group).ToList();
 
                 if (!matchedEvents.Any()) continue;
+
                 matchedEvents.FindAll(c => !c.Qualifiers.ContainsKey("AEOCCUR")).ForEach(m => m.Qualifiers.Add("AEOCCUR", "Y"));
 
                 var subjectIdsEventOccured = matchedEvents.Select(e => e.USubjId).Distinct().ToList();
@@ -602,15 +603,15 @@ namespace PlatformTM.Services.Services
                 appendedEvents.AddRange(noOccurEvents);
 
 
-                foreach (var row in matchedEvents)
-                {
-                    _sdtmRepository.Update(row);
+                //foreach (var row in matchedEvents)
+                //{
+                //    _sdtmRepository.Update(row);
 
-                }
-                foreach (var row in noOccurEvents)
-                {
-                    _sdtmRepository.Insert(row);
-                }
+                //}
+                //foreach (var row in noOccurEvents)
+                //{
+                //    _sdtmRepository.Insert(row);
+                //}
             }
 
             #endregion

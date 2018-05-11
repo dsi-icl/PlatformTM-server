@@ -539,7 +539,6 @@ namespace PlatformTM.Services.Services
 
         public string GetFullPath(int projectId)
         {
-            //var subdirs = subdir.Split('$');
             return Path.Combine(_uploadFileDirectory, "P-" + projectId);
         }
 

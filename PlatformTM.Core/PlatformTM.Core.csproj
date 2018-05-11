@@ -16,4 +16,7 @@
    
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Domain\Model\Users\Datasets\ExportFieldDefinition.cs" />
+  </ItemGroup>
 </Project>
