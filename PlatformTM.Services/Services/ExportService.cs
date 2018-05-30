@@ -19,7 +19,7 @@ namespace PlatformTM.Services.Services
 {
     public class ExportService
     {
-		private readonly IRepository<ExportFile, Guid> _exportFileRepository;
+        private readonly IRepository<ExportFile, Guid> _exportFileRepository;
         private readonly QueryService _queryService;
         private readonly IServiceUoW _dataServiceUnit;
         private readonly string _downloadFileDirectory;
@@ -30,52 +30,52 @@ namespace PlatformTM.Services.Services
             _exportFileRepository = uoW.GetRepository<ExportFile, Guid>();
             _queryService = queryService;
             _dataServiceUnit = uoW;         
-			ConfigSettings = settings.Value;
+            ConfigSettings = settings.Value;
             _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
         }
         
 
 
         //EXPORT FILE
-		public async Task<FileInfo> ExportFile(string fileId, string userId)
+        public async Task<FileInfo> ExportFile(string fileId, string userId)
         {
-			var exportFile = _exportFileRepository.FindSingle(f => f.Id == Guid.Parse(fileId));
-			exportFile.FileStatus = 1;
-			var dnPath = Path.Combine(_getUserDirectory(userId),exportFile.Id + ".csv");
-			exportFile.ExportFileURI = dnPath;
+            var exportFile = _exportFileRepository.FindSingle(f => f.Id == Guid.Parse(fileId));
+            exportFile.FileStatus = 1;
+            var dnPath = Path.Combine(_getUserDirectory(userId),exportFile.Id + ".csv");
+            exportFile.ExportFileURI = dnPath;
 
-			_exportFileRepository.Update(exportFile);
+            _exportFileRepository.Update(exportFile);
 
-			var query = _queryService.GetQuery(exportFile.QueryId);
-			var exportData = _queryService.GetQueryResult(Guid.Parse(exportFile.QueryId));
+            var query = _queryService.GetQuery(exportFile.QueryId);
+            var exportData = _queryService.GetQueryResult(Guid.Parse(exportFile.QueryId));
 
 
             FileInfo fileInfo = null;
             DataTable dt = new DataTable();
 
-			if (exportFile.ContentType == "ASSAY")
+            if (exportFile.ContentType == "ASSAY")
             {
-				var fileDefinition = GetSubjectFileDefinition(query);
-				fileInfo = await ExportAssayTable(exportData, fileDefinition, exportFile.ExportFileURI);
+                var fileDefinition = GetSubjectFileDefinition(query);
+                fileInfo = await ExportAssayTable(exportData, fileDefinition, exportFile.ExportFileURI);
                 return fileInfo;
             }
-			if (exportFile.ContentType == "BIOSAMPLES")
+            if (exportFile.ContentType == "BIOSAMPLES")
             {
-				var fileDefinition = GetSampleFileDefinition(query);
-				dt = await ExportSampleTable(exportData, fileDefinition);
+                var fileDefinition = GetSampleFileDefinition(query);
+                dt = await ExportSampleTable(exportData, fileDefinition);
             }
-			if (exportFile.ContentType == "PHENO")
+            if (exportFile.ContentType == "PHENO")
             {
-				var fileDefinition = GetSubjectFileDefinition(query);
-				dt = await ExportSubjectClinicalTable(exportData, fileDefinition);
+                var fileDefinition = GetSubjectFileDefinition(query);
+                dt = await ExportSubjectClinicalTable(exportData, fileDefinition);
             }
 
-			DatatableToFile(dt, exportFile.ExportFileURI);
-			SetDatasetStatus(fileId, 2);
-			return new FileInfo(exportFile.ExportFileURI);
+            DatatableToFile(dt, exportFile.ExportFileURI);
+            SetDatasetStatus(fileId, 2);
+            return new FileInfo(exportFile.ExportFileURI);
         }
         
-		private ExportFileDefinition GetSubjectFileDefinition(CombinedQuery query)
+        private ExportFileDefinition GetSubjectFileDefinition(CombinedQuery query)
         {
             var phenoDataset = new ExportFileDefinition()
             {
@@ -84,6 +84,9 @@ namespace PlatformTM.Services.Services
                 Name = "Subjects",
                 QueryId = query.Id
             };
+
+            bool _hasLongitudinalData = false,_hasTpt = false;
+
 
             //ADD SUBJECTID &  STUDYID DATAFIELD
             phenoDataset.Fields.Add(CreateSubjectIdField());
@@ -114,36 +117,13 @@ namespace PlatformTM.Services.Services
                     ColumnHeader = co.ObservationName
                 });
 
-				if(co.HasLongitudinalData && !phenoDataset.Fields.Exists(f=>f.ColumnHeader=="visit")){
-                    phenoDataset.Fields.Add(new DatasetField(){
-                        QueryObject = new Query(){QueryFor = nameof(Visit),QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name"},
-                        QueryObjectType = nameof(Visit),
-                        ColumnHeader = "visit"
-                        
-                    });
-                }
-
-				if(co.HasTPT && !phenoDataset.Fields.Exists(f => f.ColumnHeader == "timepoint")){
-                    phenoDataset.Fields.Add(new DatasetField()
-                   {
-                        QueryObject = new Query() { QueryFor = nameof(SdtmRow.CollectionStudyTimePoint), QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name" },
-                        QueryObjectType = nameof(RelativeTimePoint),
-                        ColumnHeader = "timepoint"
-
-                   }); 
-                }
+                if (co.HasLongitudinalData)
+                    _hasLongitudinalData = true;
+                if (co.HasTPT)
+                    _hasTpt = true;
             }
 
-
-            //phenoDataset.Fields.AddRange(query.ClinicalObservations.Select(qObj => new DatasetField()
-            //{
-            //    QueryObject = qObj,
-            //    QueryObjectType = nameof(SdtmRow),
-            //    ColumnHeader = qObj.ObservationName
-            //}));
-
-
-
+         
             //ADD GROUPED CLINICAL OBSERVATIONS
             phenoDataset.Fields.AddRange(query.GroupedObservations.Select(gObs => new DatasetField()
             {
@@ -152,19 +132,42 @@ namespace PlatformTM.Services.Services
                 ColumnHeader = gObs.ObservationName
             }));
 
+            //ADD longitudinal data columns
+            if (_hasLongitudinalData && !phenoDataset.Fields.Exists(f => f.ColumnHeader == "visit"))
+            {
+                phenoDataset.Fields.Add(new DatasetField()
+                {
+                    QueryObject = new Query() { QueryFor = nameof(Visit), QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name" },
+                    QueryObjectType = nameof(Visit),
+                    ColumnHeader = "visit"
+
+                });
+            }
+
+            if (_hasTpt && !phenoDataset.Fields.Exists(f => f.ColumnHeader == "timepoint"))
+            {
+                phenoDataset.Fields.Add(new DatasetField()
+                {
+                    QueryObject = new Query() { QueryFor = nameof(SdtmRow.CollectionStudyTimePoint), QueryFrom = nameof(SdtmRow), QuerySelectProperty = "Name" },
+                    QueryObjectType = nameof(RelativeTimePoint),
+                    ColumnHeader = "timepoint"
+
+                });
+            }
+
             return phenoDataset;
         }
 
-		private ExportFileDefinition GetSampleFileDefinition(CombinedQuery query)
+        private ExportFileDefinition GetSampleFileDefinition(CombinedQuery query)
         {
-			AssayPanelQuery assayPanelQuery = query.AssayPanels.Single();
+            AssayPanelQuery assayPanelQuery = query.AssayPanels.Single();
             // This is for the subject to sample mapping
             var assaySampleDataset = new ExportFileDefinition
             {
                 ProjectId = query.ProjectId,
                 ContentType = "BIOSAMPLES",
                 Name = assayPanelQuery.AssayName + " Samples",
-				QueryId = query.Id
+                QueryId = query.Id
             };
             //CREATE DATAFIELDS
 
@@ -186,28 +189,28 @@ namespace PlatformTM.Services.Services
             return assaySampleDataset;
         }
 
-		private ExportFileDefinition GetAssayDataFileDefinition(CombinedQuery query)
+        private ExportFileDefinition GetAssayDataFileDefinition(CombinedQuery query)
         {         
-			AssayPanelQuery assayPanelQuery = query.AssayPanels.Single();
-			var assayPanelDataset = new ExportFileDefinition
-			{
-				ProjectId = query.ProjectId,
+            AssayPanelQuery assayPanelQuery = query.AssayPanels.Single();
+            var assayPanelDataset = new ExportFileDefinition
+            {
+                ProjectId = query.ProjectId,
                 ContentType = "ASSAY",
                 Name = assayPanelQuery.AssayName + " Data File",
-				QueryId = query.Id
+                QueryId = query.Id
             }; 
             return assayPanelDataset;
         }
        
 
-		private async Task<DataTable> ExportSubjectClinicalTable(DataExportObject exportData, ExportFileDefinition fileDefinition) // FEATURE BY FEATURE  MAIN QUICK
+        private async Task<DataTable> ExportSubjectClinicalTable(DataExportObject exportData, ExportFileDefinition fileDefinition) // FEATURE BY FEATURE  MAIN QUICK
         {
             return await Task.Factory.StartNew(() =>
             {
 
                 #region Create Table Columns
                 var datatable = new DataTable();
-				datatable.TableName = fileDefinition.Name;
+                datatable.TableName = fileDefinition.Name;
 
                 foreach (var field in fileDefinition.Fields)
                 {
@@ -307,14 +310,15 @@ namespace PlatformTM.Services.Services
 
                             }
                             var visitField = fileDefinition.Fields.Find(f => f.QueryObjectType == nameof(Visit));
-                            if (visitField != null)
+                            if (visitField != null && obs!=null)
                             {
-                                row[visitField.ColumnHeader.ToLower()] = obs?.VisitName;
+                                row[visitField.ColumnHeader.ToLower()] = obs?.VisitName ?? "";
                             }
 
-                            var timepointField = fileDefinition.Fields.Find(f => f.QueryObject.QueryFor.Equals(nameof(SdtmRow.CollectionStudyTimePoint)));
-                            if (timepointField != null)
-                                row[timepointField.ColumnHeader.ToLower()] = obs?.CollectionStudyTimePoint.Name;
+                            var timepointField = fileDefinition.Fields.FirstOrDefault(f => f.QueryObject.QueryFor != null &&
+                                                                                      f.QueryObject.QueryFor.Equals(nameof(SdtmRow.CollectionStudyTimePoint)));
+                            if (timepointField != null && obs != null)
+                                row[timepointField.ColumnHeader.ToLower()] = obs?.CollectionStudyTimePoint.Name ?? "";
 
                             subjectObservations.Remove(obs);
                         }
@@ -334,38 +338,38 @@ namespace PlatformTM.Services.Services
             });
         }
 
-		private async Task<DataTable> ExportSampleTable(DataExportObject exportData, ExportFileDefinition fileDefinition) // FEATURE BY FEATURE  MAIN QUICK
+        private async Task<DataTable> ExportSampleTable(DataExportObject exportData, ExportFileDefinition fileDefinition) // FEATURE BY FEATURE  MAIN QUICK
         {
             return await Task.Factory.StartNew(() =>
             {
               
                 var datatable = new DataTable();
-				datatable.TableName = fileDefinition.Name;
+                datatable.TableName = fileDefinition.Name;
                 foreach (var field in fileDefinition.Fields)
                 {
                     datatable.Columns.Add(field.ColumnHeader.ToLower());
                 }
 
-				foreach (var biosample in exportData.Samples)
-				{
-					var row = datatable.NewRow();
+                foreach (var biosample in exportData.Samples)
+                {
+                    var row = datatable.NewRow();
 
-					row["subjectid"] = biosample.Subject.UniqueSubjectId;
-					row["sampleid"] = biosample.BiosampleStudyId;
+                    row["subjectid"] = biosample.Subject.UniqueSubjectId;
+                    row["sampleid"] = biosample.BiosampleStudyId;
 
-					foreach (var samplePropField in fileDefinition.Fields)
-					{
-						var charVal = _queryService.GetSubjectOrSampleProperty(biosample, samplePropField.QueryObject);
-						if (charVal != null)
-							row[samplePropField.ColumnHeader.ToLower()] = charVal;
-					}
-					datatable.Rows.Add(row);
-				}
+                    foreach (var samplePropField in fileDefinition.Fields)
+                    {
+                        var charVal = _queryService.GetSubjectOrSampleProperty(biosample, samplePropField.QueryObject);
+                        if (charVal != null)
+                            row[samplePropField.ColumnHeader.ToLower()] = charVal;
+                    }
+                    datatable.Rows.Add(row);
+                }
                 return datatable;
             });
         }
         
-		private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, ExportFileDefinition fileDefinition, string filePath) // FEATURE BY FEATURE  MAIN QUICK
+        private async Task<FileInfo> ExportAssayTable(DataExportObject exportData, ExportFileDefinition fileDefinition, string filePath) // FEATURE BY FEATURE  MAIN QUICK
         {
             return await Task.Factory.StartNew(() =>
             {
@@ -415,7 +419,7 @@ namespace PlatformTM.Services.Services
             });
         }
 
-		public void SetDatasetStatus(string datasetId, int status)
+        public void SetDatasetStatus(string datasetId, int status)
         {
             var exportFile = _exportFileRepository.FindSingle(d => d.Id == Guid.Parse(datasetId));
             exportFile.FileStatus = status;
@@ -429,7 +433,7 @@ namespace PlatformTM.Services.Services
             return status;
         }
         
-		private string DatatableToFile(DataTable dtTable, string filePath)
+        private string DatatableToFile(DataTable dtTable, string filePath)
         {
             // datatable to string
             StringBuilder result = new StringBuilder();
@@ -444,7 +448,7 @@ namespace PlatformTM.Services.Services
                 {
                     foreach (DataColumn column in dtTable.Columns)
                     {
-                        result.Append(row[column].ToString() + ',');
+                        result.Append(row[column]?.ToString() + ',');
                     }
                     result.Append("\r\n");
                 }
@@ -459,18 +463,18 @@ namespace PlatformTM.Services.Services
         }
         
         //GET EXPORT FILE
-		public FileStream DownloadDataset(string fileId, out string filename)
+        public FileStream DownloadDataset(string fileId, out string filename)
         {
-			var exportFile = _exportFileRepository.FindSingle(d => d.Id == Guid.Parse(fileId));
-			filename = exportFile.Name;
+            var exportFile = _exportFileRepository.FindSingle(d => d.Id == Guid.Parse(fileId));
+            filename = exportFile.Name;
 
-			if (exportFile.FileStatus != 2) return null;
-			var filePath = exportFile.ExportFileURI;
+            if (exportFile.FileStatus != 2) return null;
+            var filePath = exportFile.ExportFileURI;
             var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             return fileStream;
         }
 
-		private DatasetField CreateSubjectIdField()
+        private DatasetField CreateSubjectIdField()
         {
             return new DatasetField()
             {
@@ -523,7 +527,7 @@ namespace PlatformTM.Services.Services
             };
         }
 
-		private string _getUserDirectory(string userId)
+        private string _getUserDirectory(string userId)
         {
             string dirPath = Path.Combine(_downloadFileDirectory, "USER-" + userId);
             Directory.CreateDirectory(dirPath);

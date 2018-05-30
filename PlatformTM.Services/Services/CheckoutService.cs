@@ -98,7 +98,7 @@ namespace PlatformTM.Services.Services
 			var exportFiles = new List<ExportFile>();
 
             //WHAT IF NO SUBJECT CHARACTERSITICS ADDED?
-            if (query.SubjectCharacteristics.Any() || query.DesignElements.Any())
+			if (query.SubjectCharacteristics.Any() || query.DesignElements.Any() || query.ClinicalObservations.Any())
             {
                 var phenoFile = new ExportFile
                 {

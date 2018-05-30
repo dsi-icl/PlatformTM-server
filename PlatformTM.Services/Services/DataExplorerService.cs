@@ -307,24 +307,28 @@ namespace PlatformTM.Services.Services
         #region Crossfilter data methods
         public Hashtable GetObservationsData(int projectId, List<ObservationRequestDTO> reqObservations)
         {
-            var sdtmObservations = getObservations(reqObservations, projectId);
+            var sdtmObservations = _getObservations(reqObservations, projectId);
 
             var subjFindings = sdtmObservations.FindAll(s => s.Class.ToLower() == "findings").ToList();
             var subjEvents = sdtmObservations.FindAll(s => s.Class.ToLower() == "events").ToList();
 
-            var findingsTable = getFindingsDataTable(subjFindings, reqObservations.Where(r => r.IsFinding).ToList());
-            var eventsTable = getEventsDataTable(subjEvents, reqObservations.Where(r => r.IsEvent).ToList());
+            //var findingsTable = getFindingsDataTable(subjFindings, reqObservations.Where(r => r.IsFinding).ToList());
+            //var eventsTable = getEventsDataTable(subjEvents, reqObservations.Where(r => r.IsEvent).ToList());
+            //var findingsColsList = findingsTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+            //var eventsColsList = eventsTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
+            //var findings = _getFindingsJson(subjFindings, reqObservations.Where(r => r.IsFinding).ToList());
+            //var events = _getEventsJson(subjEvents, reqObservations.Where(r => r.IsEvent).ToList());
 
-            var findingsColsList = findingsTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-            var eventsColsList = eventsTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-            var result = new Hashtable
-            {
-                {"findingsTbl", findingsTable.Rows},
-                {"eventsTbl", eventsTable.Rows},
-                {"findingsTblHeader", findingsColsList},
-                {"eventsTblHeader", eventsColsList}
-            };
-            return result;
+            var clinicalData = _getClinicalDataJson(sdtmObservations, reqObservations);
+            //var result = new Hashtable
+            //{
+            //    {"findingsTbl", findings["data"]},
+            //    {"eventsTbl", events["data"]},
+            //    {"findingsTblHeader", findings["keys"]},
+            //    {"eventsTblHeader", events["keys"]}
+            //};
+
+            return clinicalData;
         }
         public DataTable GetSubjectData(int projectId, List<ObservationRequestDTO> reqObservations)
         {
@@ -431,7 +435,7 @@ namespace PlatformTM.Services.Services
 
         #region Private helper methods
 
-        private List<SdtmRow> getObservations(List<ObservationRequestDTO> obsRequests, int projectId)
+        private List<SdtmRow> _getObservations(List<ObservationRequestDTO> obsRequests, int projectId)
         {
             List<SdtmRow> sdtmObservations = new List<SdtmRow>();
 
@@ -480,8 +484,191 @@ namespace PlatformTM.Services.Services
             return sdtmObservations;
         }
 
+        private Hashtable _getFindingsJson(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations){
+            var header = new HashSet<string>();
+            header.Add("subjectId");
+            foreach (var r in reqObservations.Where(r => findings.Select(f => f.DBTopicId).Contains(r.O3id)))
+                header.Add(r.Name);
 
-        private DataTable getFindingsDataTable(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations)
+            header.Add("visit");
+            header.Add("timepoint");
+
+            var output = new List<Hashtable>();
+            
+            var subjectIds = findings.Select(s => s.USubjId).Distinct().ToList();
+            foreach(var subjectId in subjectIds){
+                var subjectObservations = findings.FindAll(f => f.USubjId == subjectId);
+                var subjdata = new Hashtable();
+                subjdata.Add("subjectId", subjectId);
+                
+                foreach(var req in reqObservations){
+
+                    var reqSubjObservations = subjectObservations.FindAll(o => o.DBTopicId == req.O3id).ToList();
+                    var qualifiers = reqSubjObservations.SelectMany(o => o.ResultQualifiers).ToList();
+                    qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.Qualifiers));
+                    qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
+                        
+                    var values = qualifiers.FindAll(kv => kv.Key == req.QO2)?.Select(k => k.Value)?.ToList();
+                    if (values != null && values[0] != ""){
+                        values = values.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+                        subjdata.Add(req.Name, values);
+                        //subjdata.Add(req.Name, values.OrderByDescending(v => v));
+                    }
+                }
+                subjdata.Add("visit", "");// = subjVisitTPT.Key.Visit;//subjObs.VisitName;
+                subjdata.Add("timepoint", "");//row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
+
+                output.Add(subjdata);
+          
+            }
+            return new Hashtable {
+                {"data", output},
+                {"keys", header}
+            };
+        }
+
+        private Hashtable _getClinicalDataJson(List<SdtmRow> observations, IList<ObservationRequestDTO> reqObservations){
+            var keys = new HashSet<string>();
+            var data = new List<Hashtable>();
+            var result = new Hashtable {
+                {"data", data},
+                {"keys", keys}
+            };
+
+            if (!observations.Any())
+                return result;
+
+            keys.Add("subjectId");
+            foreach (var r in reqObservations.Where(r => observations.FindAll(s => s.Class.ToLower() == "findings")
+                                                    .Select(f => f.DBTopicId).Contains(r.O3id)))
+                keys.Add(r.Name);
+            
+            foreach (var r2 in reqObservations.Where(r => observations.FindAll(s => s.Class.ToLower() == "events")
+                                                     .Select(f => f.DBTopicId)
+                                                     .Any(i => r.TermIds.Contains(i))))
+                keys.Add(r2.Name);
+
+            var subjectIds = observations.Select(s => s.USubjId).Distinct().ToList();
+
+            ///
+            if (reqObservations.Where(r => r.QO2 == "AEOCCUR").ToList().Count > 0)
+            {
+                var projectId = observations.First().ProjectId;
+                subjectIds = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).Select(s => s.UniqueSubjectId).Distinct().ToList();
+            }
+            ///
+
+            foreach (var subjectId in subjectIds)
+            {
+                var subjectObservations = observations.FindAll(f => f.USubjId == subjectId);
+                var subjdata = new Hashtable();
+                subjdata.Add("subjectId", subjectId);
+
+                //FINDINGS
+                foreach (var req in reqObservations.Where(r => r.IsFinding))
+                {
+
+                    var reqSubjObservations = subjectObservations.FindAll(o => o.DBTopicId == req.O3id).ToList();
+
+                    var qualifiers = reqSubjObservations.SelectMany(o => o.ResultQualifiers).ToList();
+                    qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.Qualifiers));
+                    qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
+
+                    var values = qualifiers.FindAll(kv => kv.Key == req.QO2)?.Select(k => k.Value)?.ToList();
+
+                    if (values != null && values.Count != 0)
+                    {
+                        values = values.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+                        subjdata.Add(req.Name, values);
+                        //subjdata.Add(req.Name, values.OrderByDescending(v => v));
+                    }
+                }
+
+                //EVENTS
+                foreach (var req in reqObservations.Where(r => r.IsEvent))
+                {
+
+                    var reqSubjObservations = subjectObservations.FindAll(e => req.TermIds.Contains(e.DBTopicId));
+
+                    var qualifiers = reqSubjObservations.SelectMany(o => o.Qualifiers).ToList();
+                    qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
+
+                    var values = qualifiers.FindAll(kv => kv.Key == req.QO2)?.Select(k => k.Value)?.ToList();
+
+                    if (values != null && values.Count != 0)
+                        subjdata.Add(req.Name, values);
+
+                    if (values.Count == 0 && req.QO2 == "AEOCCUR")
+                        subjdata.Add(req.Name, new List<string>() { "N" });
+                }
+                //subjdata.Add("visit", "");// = subjVisitTPT.Key.Visit;//subjObs.VisitName;
+                //subjdata.Add("timepoint", "");//row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
+
+                data.Add(subjdata);
+
+            }
+
+
+            return result;
+            
+        }
+
+
+        private Hashtable _getEventsJson(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations){
+            
+            var keys = new HashSet<string>();
+            var data = new List<Hashtable>();
+            var result = new Hashtable {
+                {"data", data},
+                {"keys", keys}
+            };
+
+            if (!events.Any())
+                return result;
+
+            keys.Add("subjectId");
+            foreach (var r2 in reqObservations.Where(r => events.Select(f => f.DBTopicId).Any(i => r.TermIds.Contains(i))))
+                keys.Add(r2.Name);
+
+            //keys.Add("visit");
+            //keys.Add("timepoint");
+
+            var subjectIds = events.Select(s => s.USubjId).Distinct().ToList();
+
+            if(reqObservations.Where(r => r.QO2 == "AEOCCUR").ToList().Count > 0){
+                var projectId = events.First().ProjectId;
+                subjectIds = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).Select(s=>s.UniqueSubjectId).Distinct().ToList();
+            }
+
+            foreach (var subjectId in subjectIds)
+            {
+                var subjectObservations = events.FindAll(f => f.USubjId == subjectId);
+                var subjdata = new Hashtable();
+                subjdata.Add("subjectId", subjectId);
+
+                foreach (var req in reqObservations)
+                {
+
+                    var reqSubjObservations = subjectObservations.FindAll(e => req.TermIds.Contains(e.DBTopicId));
+
+                    var qualifiers = reqSubjObservations.SelectMany(o => o.Qualifiers).ToList();
+                    qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
+                    var values = qualifiers.FindAll(kv => kv.Key == req.QO2)?.Select(k => k.Value)?.ToList();
+
+                    if (values != null && values.Count!=0)
+                        subjdata.Add(req.Name, values);
+                   
+                    if(values.Count==0 && req.QO2 == "AEOCCUR")
+                        subjdata.Add(req.Name, new List<string>(){"N"});
+                }
+
+                data.Add(subjdata);
+
+            }
+            return result;
+        }
+
+        private DataTable _getFindingsDataTable(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations)
         {
             #region Build Table columns
             var datatable = new DataTable();
@@ -495,6 +682,7 @@ namespace PlatformTM.Services.Services
             datatable.Columns.Add("timepoint");
             #endregion
 
+
             #region Group observations by unique key
             var findingsBySubjectVisitTime = findings //The unique combination that would make one row
                 .GroupBy(ob => new
@@ -506,6 +694,7 @@ namespace PlatformTM.Services.Services
                 });
             #endregion
 
+            ///START OLD
             foreach (var subjVisitTPT in findingsBySubjectVisitTime)
             {
                 var row = datatable.NewRow();
@@ -514,7 +703,7 @@ namespace PlatformTM.Services.Services
                 {
                     var allQualifiers = subjObs.ResultQualifiers;
                     foreach (var subjObsQualifier in subjObs.Qualifiers)
-                        allQualifiers.Add(subjObsQualifier.Key,subjObsQualifier.Value);
+                        allQualifiers.Add(subjObsQualifier.Key, subjObsQualifier.Value);
                     foreach (var subjObsTimingQualifier in subjObs.TimingQualifiers)
                         allQualifiers.Add(subjObsTimingQualifier.Key, subjObsTimingQualifier.Value);
 
@@ -524,13 +713,11 @@ namespace PlatformTM.Services.Services
                     {
                         //TODO: assumption to be validated that visits/timepoints are study and dont differ between observations or studies of the same project
                         string val;
-                        if(allQualifiers.TryGetValue(obsreq.QO2, out val))
-                            row[obsreq.Name] = val ;
+                        if (allQualifiers.TryGetValue(obsreq.QO2, out val))
+                            row[obsreq.Name] = val;
                         else row[obsreq.Name] = "";
                     }
 
-
-                    //row["studyday"]
                     row["visit"] = subjVisitTPT.Key.Visit;//subjObs.VisitName;
                     row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
                 }
@@ -540,7 +727,7 @@ namespace PlatformTM.Services.Services
             return datatable;
         }
 
-        private DataTable getEventsDataTable(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations)
+        private DataTable _getEventsDataTable(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations)
         {
             if (!events.Any())
                 return new DataTable();
@@ -674,7 +861,7 @@ namespace PlatformTM.Services.Services
                     QueryFor = nameof(SdtmRow), //
                     QueryWhereProperty = nameof(SdtmRow.DBTopicId),
                     QueryWhereValue = obsObject.Id.ToString(),
-                    HasLongitudinalData = obsObject.Timings.Any(),
+                    HasLongitudinalData = obsObject.Timings.Any(),//WRONG...not specific to O3
                     HasTPT = obsObject.Timings.Exists(t=>t.Qualifier.Name.EndsWith("TPT"))
                     //QuerySelectProperty = nameof()
                 }

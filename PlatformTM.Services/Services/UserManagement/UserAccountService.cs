@@ -95,6 +95,11 @@ namespace PlatformTM.Services.Services.UserManagement
             return result;
         }
 
+		//public async Task<SignInResult> SignOut(){
+		//	var result = await _signInManager.SignOutAsync();
+
+		//}
+
         public async Task<bool> CheckUser(UserDTO userDTO)
         {
             var user = await _userManager.FindByNameAsync(userDTO.Username);

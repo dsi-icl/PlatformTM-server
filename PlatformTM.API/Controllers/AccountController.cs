@@ -47,6 +47,12 @@ namespace PlatformTM.API.Controllers
             
         }
 
+		[HttpGet("logout")]
+		[AllowAnonymous]
+		public IActionResult Logout(){
+			return new SignOutResult();
+		}
+
         [HttpGet("currentuser")]
         public ActionResult GetCurrentUser()
         {
