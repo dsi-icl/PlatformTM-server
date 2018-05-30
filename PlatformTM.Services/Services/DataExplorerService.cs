@@ -27,7 +27,6 @@ namespace PlatformTM.Services.Services
         private readonly IServiceUoW _dataContext;
 
         private readonly QueryService _queryService;
-        //private readonly CacheService _cacheService;
 
 
 
@@ -42,9 +41,9 @@ namespace PlatformTM.Services.Services
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
 
             _cacheRepository = uoW.GetCacheRepository<ClinicalExplorerDTO>();
-
+    
             _queryService = queryService;
-            //_cacheService = cacheService;
+        
         }
 
         #region Observation Browser methods
@@ -115,7 +114,7 @@ namespace PlatformTM.Services.Services
 
             for (int i = 0; i < observations.Count; i++)
             {
-                obsRequest.O3 += observations[i].O3 + (i + 1 < observations.Count ? " & " : "");
+                obsRequest.O3 += "("+observations[i].O3+")" + (i + 1 < observations.Count ? " or " : "");
                 obsRequest.O3code += observations[i].O3variable + "_" + observations[i].O3id + "_" + (i + 1 < observations.Count ? "_" : "");
             }
             //HACK FOR AE OCCUR ASSUMING THAT ONLY AE MedDRA terms can be grouped for now
@@ -1097,6 +1096,7 @@ namespace PlatformTM.Services.Services
                 Id = obsId,
                 Code = gcode + "_" + PTs.Key,
                 Name = PTs.Key.ToLower(),
+                IsSelectable = true,
                 DefaultObservation = new ObservationRequestDTO()
                 {
                     O3 = PTs.Key,

@@ -263,7 +263,8 @@ namespace PlatformTM.Services.Services
                                 var query = (ObservationQuery)field.QueryObject;
                                 if (query.IsOntologyEntry)
                                     obs = subjectObservations.FirstOrDefault(
-                                   o => ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[query.TermCategory]);
+                                        o => o.QualifierQualifiers.ContainsKey(query.TermCategory)
+                                                && ((ObservationQuery)field.QueryObject).TermId.ToString() == o.QualifierQualifiers[query.TermCategory]);
 
                                 //GROUP OF OBSERVATIONS
                                 else if (field.QueryObject.GetType() == typeof(GroupedObservationsQuery))
@@ -318,7 +319,7 @@ namespace PlatformTM.Services.Services
                             var timepointField = fileDefinition.Fields.FirstOrDefault(f => f.QueryObject.QueryFor != null &&
                                                                                       f.QueryObject.QueryFor.Equals(nameof(SdtmRow.CollectionStudyTimePoint)));
                             if (timepointField != null && obs != null)
-                                row[timepointField.ColumnHeader.ToLower()] = obs?.CollectionStudyTimePoint.Name ?? "";
+                                row[timepointField.ColumnHeader.ToLower()] = obs?.CollectionStudyTimePoint?.Name ?? "";
 
                             subjectObservations.Remove(obs);
                         }
