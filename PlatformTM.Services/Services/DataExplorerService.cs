@@ -114,7 +114,7 @@ namespace PlatformTM.Services.Services
 
             for (int i = 0; i < observations.Count; i++)
             {
-                obsRequest.O3 += "("+observations[i].O3+")" + (i + 1 < observations.Count ? " or " : "");
+                obsRequest.O3 += observations[i].O3 + (i + 1 < observations.Count ? " or " : "");
                 obsRequest.O3code += observations[i].O3variable + "_" + observations[i].O3id + "_" + (i + 1 < observations.Count ? "_" : "");
             }
             //HACK FOR AE OCCUR ASSUMING THAT ONLY AE MedDRA terms can be grouped for now
@@ -128,11 +128,22 @@ namespace PlatformTM.Services.Services
 
             //TODO: BIG TODO when switiching to descriptors to only add qualifiers that have values for the group
             //for now all the qualifiers are assumed to be the same for all observations in the group and listed whehter there would be data available for them or not
-            int fobsid = observations.First().TermIds.First();
-            var observation = _observationRepository.FindSingle(o => o.Id == fobsid,
+
+          
+            Observation observation;
+
+            if(observations.First().TermIds.Any()){
+                observation = _observationRepository.FindSingle(o => o.Id == observations.First().TermIds.First(),
                 new List<string>() {
                     "Qualifiers.Qualifier"
                 });
+            }else{
+                observation = _observationRepository.FindAll(o => o.ControlledTermStr == observations.First().O3,
+                new List<string>() {
+                    "Qualifiers.Qualifier"
+                })?.FirstOrDefault();
+            }
+
             var reqs = observation.Qualifiers.Select(variableDefinition => new ObservationRequestDTO()
             {
 
@@ -589,6 +600,14 @@ namespace PlatformTM.Services.Services
 
                     var reqSubjObservations = subjectObservations.FindAll(e => req.TermIds.Contains(e.DBTopicId));
 
+                    if(req.QO2 == "AEOCCUR"){
+                        if (reqSubjObservations.Any())
+                            subjdata.Add(req.Name, reqSubjObservations.Select(c => "Y").ToList());
+                        else
+                            subjdata.Add(req.Name, new List<string>() { "N" });
+                        continue;
+                    }
+
                     var qualifiers = reqSubjObservations.SelectMany(o => o.Qualifiers).ToList();
                     qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
 
@@ -596,9 +615,7 @@ namespace PlatformTM.Services.Services
 
                     if (values != null && values.Count != 0)
                         subjdata.Add(req.Name, values);
-
-                    if (values.Count == 0 && req.QO2 == "AEOCCUR")
-                        subjdata.Add(req.Name, new List<string>() { "N" });
+  
                 }
                 //subjdata.Add("visit", "");// = subjVisitTPT.Key.Visit;//subjObs.VisitName;
                 //subjdata.Add("timepoint", "");//row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
@@ -659,6 +676,7 @@ namespace PlatformTM.Services.Services
                    
                     if(values.Count==0 && req.QO2 == "AEOCCUR")
                         subjdata.Add(req.Name, new List<string>(){"N"});
+                    
                 }
 
                 data.Add(subjdata);
