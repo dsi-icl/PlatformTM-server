@@ -44,8 +44,9 @@ namespace PlatformTM.Services.Services
             return new ProjectDTO()
             {
                 Name = project.Name,
-                Title = project.Description,
-                Accession = project.Accession
+                Title = project.Title,
+                Accession = project.Accession,
+                Desc = project.Description
             };
         }
         

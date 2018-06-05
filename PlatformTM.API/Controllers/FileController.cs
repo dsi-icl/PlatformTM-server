@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services;
+using PlatformTM.Services.ViewModels;
 
 namespace PlatformTM.API.Controllers
 {
@@ -26,10 +27,10 @@ namespace PlatformTM.API.Controllers
             //_environment = env;
         }
 
-        [HttpGet("{fileId}")]
+        [HttpGet("{fileId}", Name = "GetFileById")]
         public FileDTO GetFile(int fileId)
         {
-            return _fileService.GetFileDTO(fileId);
+            return _fileService.GetFile(fileId);
         }
 
         [HttpGet]
@@ -46,7 +47,7 @@ namespace PlatformTM.API.Controllers
         [Route("{fileId}/progress")]
         public IActionResult GetLoadingProgress(int fileId)
         {
-            var progressDTO = _fileService.GetFileDTO(fileId);
+            var progressDTO = _fileService.GetFile(fileId);
             return new OkObjectResult(progressDTO);
         }
 
@@ -92,16 +93,15 @@ namespace PlatformTM.API.Controllers
             return _fileService.MatchFileToTemplate(datasetId, fileId);
         }
 
-        [HttpPost("projects/{projectId}/createdir")]
-        public DataFile CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
+        [HttpPost("projects/{projectId}/folder/create")]
+        public IActionResult CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
         {
-            //var fullpath = _fileService.GetFullPath(projectId.ToString(), dir.name);
-            var folderInfo =    _fileService.CreateFolder(projectId, dir.FolderName,dir.ParentFolderId);
-            return folderInfo;
+            var folderInfo =    _fileService.CreateFolder(projectId, dir);
+            return new CreatedAtRouteResult("GetFileById", new { fileId = folderInfo.Id }, folderInfo);
         }
 
         [HttpGet]
-        [Route("projects/{projectId}/directories")]
+        [Route("projects/{projectId}/drive/directories")]
         public List<string> GetDirectories(int projectId)
         {
             return _fileService.GetDirectories(projectId);
@@ -138,20 +138,10 @@ namespace PlatformTM.API.Controllers
             }
         }
 
-        [HttpGet("projects/{projectId}/uploadedFiles/{dirId?}")]
-        public  List<FileDTO> GetUploadedFiles(int projectId,int dirId)
+        [HttpGet("projects/{projectId}/drive/{dirId?}")]
+        public  DriveVM GetUploadedFiles(int projectId,int dirId)
         {
-            //string rawFilesDirectory = ConfigurationManager.AppSettings["FileDirectory"];
-            //string path = rawFilesDirectory + projectId;
-            //string relativePath = "P-"+projectId; 
-            //if (!Directory.Exists(path)) Directory.CreateDirectory(path);
-            //if(subdir != "")
-            //    relativePath = relativePath + "\\" + subdir.Replace('_','\\');
-            //string relativePath = Path.Combine("P-" + projectId, subdir?.Replace('_', '\\'));
-            //_fileService.GetFullPath(projectId.ToString(), subdir?.Replace('_', '\\'));
-            //    _fileService.GetProjectPath()
-
-            return _fileService.GetUploadedFiles(projectId, dirId);
+            return _fileService.GetFiles(projectId, dirId);
         }
 
         [Route("{fileId}/download")]

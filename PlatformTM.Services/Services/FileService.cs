@@ -13,6 +13,7 @@ using PlatformTM.Services.Configuration;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services.Loading.AssayData;
 using PlatformTM.Services.Services.Loading.SDTM;
+using PlatformTM.Services.ViewModels;
 
 namespace PlatformTM.Services.Services
 {
@@ -28,7 +29,6 @@ namespace PlatformTM.Services.Services
         private readonly string _downloadFileDirectory;
 
 
-        //private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Observation, int> _observationRepository;
 
         public FileService(IServiceUoW uoW, IOptions<FileStorageSettings> settings)
@@ -67,37 +67,48 @@ namespace PlatformTM.Services.Services
             return false;
         }
 
-        public void GetLoadingProgress(int fileId, int datasetId)
+        public DriveVM GetFiles(int projectId, int folderId)
         {
-            var file = _fileRepository.Get(fileId);
-            
-        }
+            List<DataFile> contents;
+            DataFile folder;
 
-        public List<FileDTO> GetUploadedFiles(int projectId,int pathId)
-        {
-            List<DataFile> files;
-            if (pathId == 0)
-                files = _fileRepository.FindAll(f => f.ProjectId == projectId && f.ParentDirectoryId == null).ToList();
-            else
-                files = _fileRepository.FindAll(f=> f.ProjectId == projectId && f.ParentDirectoryId == pathId).ToList();
-            
-            return files.Select(file => new FileDTO
+            if (folderId == 0)
             {
-                FileName = file.FileName,
-                dateAdded = file.DateAdded,
-                dateLastModified = file.LastModified ?? file.DateAdded,
-                icon = "",
-                IsDirectory = file.IsDirectory,
-                IsLoaded = file.IsLoadedToDB,
-                selected = false,
-                state = file.State,
-                DataFileId = file.Id,
-                path = file.Path
+                contents = _fileRepository.FindAll(f => f.ProjectId == projectId && f.FolderId == null,
+                                                new List<string>() { "Folder" }).ToList();
+                folder = null;
+
+            }
+
+            else
+            {
+                contents = _fileRepository.FindAll(f => f.ProjectId == projectId && f.FolderId == folderId).ToList();
+                folder = _fileRepository.FindSingle(f => f.ProjectId == projectId && f.Id == folderId,
+                                                    new List<string>() { "Folder" });
+            }
+
+            var folders = new List<DataFile>();
+
+            while (folder != null){
+                folders.Add(folder);
+                folder = folder.Folder; 
+            }
+
+        
+            folders.Reverse();
+            var dirsDTO = folders.Select(d => new FileDTO()
+            {
+                FileName = d.FileName,
+                DataFileId = d.Id,
+                IsDirectory = d.IsDirectory
             }).ToList();
+
+
+            var filesDTO =  contents.Select(GetDTO).ToList();
+            return new DriveVM() {Files = filesDTO, folders= dirsDTO };
         }
 
-        //TODO: Update to reflect the new parentDirectoryId
-        public DataFile CreateFolder(int projectId, string folderName, int parentFolderId)
+        public DataFile CreateFolder(int projectId, DirectoryDTO folder)
         {
             //if (Directory.Exists(newDir))
                 //return new DirectoryInfo(newDir);
@@ -105,17 +116,16 @@ namespace PlatformTM.Services.Services
             //var di = Directory.CreateDirectory(newDir);
 
             var project = _projectRepository.FindSingle(p => p.Id == projectId);
-            if(project ==null)
+            if(project ==null || folder.Name=="" || folder.Name==null)
                 return null;
 
             var file = new DataFile();
-            file.FileName = folderName;
-            //file.Path = di.FullName.Substring(di.FullName.IndexOf(projectId));
-            //file.Path = di.Parent.FullName.Substring(di.Parent.FullName.IndexOf("P-"+projectId));//file.Path.Substring(0,file.Path.LastIndexOf("\\\"))
-            //file.DateAdded = di.CreationTime.ToString("D");
+            file.FileName = folder.Name;
+         
+            file.DateAdded = DateTime.Now.ToString("D");
             file.IsDirectory = true;
             file.ProjectId = project.Id;
-            if (parentFolderId != 0) file.ParentDirectoryId = parentFolderId;
+            if (folder.ParentFolderId != 0) file.FolderId = folder.ParentFolderId;
 
             _fileRepository.Insert(file);
             return _dataServiceUnit.Save().Equals("CREATED") ? file : null;
@@ -159,11 +169,11 @@ namespace PlatformTM.Services.Services
             //var filePath = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-"+projectId));
             //var file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.Path.Equals(filePath) && d.ProjectId == projectId);
             if(dirId==0){
-                file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.ProjectId == projectId && d.ParentDirectoryId == null);
+                file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.ProjectId == projectId && d.FolderId == null);
             }
             else
 
-                file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.ProjectId == projectId && d.ParentDirectoryId == dirId);
+                file = _fileRepository.FindSingle(d => d.FileName.Equals(fi.Name) && d.ProjectId == projectId && d.FolderId == dirId);
 
             if (file == null)
             {
@@ -178,7 +188,7 @@ namespace PlatformTM.Services.Services
                     //Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
                     IsDirectory = false,
                     ProjectId = project.Id,
-                    ParentDirectoryId = dirId
+                    FolderId = dirId
                 };
                 _fileRepository.Insert(file);
             }
@@ -198,11 +208,23 @@ namespace PlatformTM.Services.Services
             return dirs?.Select(d => d.FileName).ToList();
         }
 
-        public DataTable GetFilePreview(int fileId)
+        public FileContentVM GetFilePreview(int fileId)
         {
 
-            var file = _fileRepository.Get(fileId);
-            //var filePath = Path.Combine(file.Path, file.FileName);
+            var file = _fileRepository.FindSingle(f=>f.Id == fileId, new List<string>() { "Folder" });
+
+            var folder = file.Folder;
+
+            var folders = new List<DataFile>();
+            while (folder != null)
+            {
+                folders.Add(folder);
+                folder = folder.Folder;
+            }
+            folders.Reverse();
+            var foldersDTO = folders.Select(GetDTO).ToList();
+
+
             var filePath = GetFullPath(file.ProjectId);
             var dataTable = readDataFile(Path.Combine(filePath,file.FileName));
 
@@ -213,14 +235,21 @@ namespace PlatformTM.Services.Services
                 dataTable.Columns.RemoveRange(100, dataTable.Columns.Count - 100);
             dataTable.TableName = file.FileName;
 
-            return dataTable;
+            var vM = new FileContentVM
+            {
+                Folders = foldersDTO,
+                Data = dataTable,
+                File = GetDTO(file)
+            };
+
+            return vM;
         }
 
         public FileDTO MatchFileToTemplate(int datasetId, int fileId)
         {
-            var dataFile = _fileRepository.Get(fileId);
-            var filePath = Path.Combine(dataFile.Path, dataFile.FileName);
-            var colHeaders = getFileColHeaders(filePath);
+            var file = _fileRepository.Get(fileId);
+            var filePath = GetFullPath(file.ProjectId);
+            var colHeaders = getFileColHeaders(Path.Combine(filePath, file.FileName));
 
            
             var dataset = _datasetRepository.FindSingle(d => d.Id == datasetId,
@@ -231,9 +260,9 @@ namespace PlatformTM.Services.Services
 
             var fileDto = new FileDTO
             {
-                FileName = dataFile.FileName,
+                FileName = file.FileName,
                 columnHeaders = colHeaders,
-                DataFileId = dataFile.Id,
+                DataFileId = file.Id,
                 templateMatched = headers.All(header => varNames.Contains(header))
             };
 
@@ -255,10 +284,10 @@ namespace PlatformTM.Services.Services
             {
                 fileDto.percentMatched = 100;
                 fileDto.IsStandard = true;
-                dataFile.IsStandard = true;
+                file.IsStandard = true;
                 //TODO: depending on the dataset the format for the file should be set
-                dataFile.Format = "SDTM";
-                _fileRepository.Update(dataFile);
+                file.Format = "SDTM";
+                _fileRepository.Update(file);
                 _dataServiceUnit.Save();
             }
 
@@ -443,9 +472,8 @@ namespace PlatformTM.Services.Services
 
         public List<Dictionary<string, string>> getFileColHeaders(string filePath)
         {
-            //Parse header of the file
-            string PATH = _uploadFileDirectory + filePath;// + studyId + "\\" + fileName;
-            StreamReader reader = File.OpenText(PATH);
+           
+            StreamReader reader = File.OpenText(filePath);
             string firstline = reader.ReadLine();
 
             string[] header = null;
@@ -511,14 +539,23 @@ namespace PlatformTM.Services.Services
          */
        
 
-        public FileDTO GetFileDTO(int fileId)
+        public FileDTO GetFile(int fileId)
         {
             var file = _fileRepository.Get(fileId);
             int ploaded;
 
+            var dto = GetDTO(file);
+            if (file.State == "LOADED")
+                dto.PercentLoaded = 100;
+            else if (int.TryParse(file.State, out ploaded))
+                dto.PercentLoaded = ploaded;
+            return dto;
+        }
+
+        private FileDTO GetDTO(DataFile file){
             var dto = new FileDTO()
             {
-              FileName = file.FileName,
+                FileName = file.FileName,
                 dateAdded = file.DateAdded,
                 dateLastModified = file.LastModified ?? file.DateAdded,
                 icon = "",
@@ -526,14 +563,9 @@ namespace PlatformTM.Services.Services
                 selected = false,
                 state = file.State,
                 DataFileId = file.Id,
-                path = file.Path
-        };
-            if (file.State == "LOADED")
-                dto.PercentLoaded = 100;
-            else if (int.TryParse(file.State, out ploaded))
-                dto.PercentLoaded = ploaded;
-
-
+                FolderId = file.FolderId,
+                IsLoaded = file.IsLoadedToDB
+            };
             return dto;
         }
 

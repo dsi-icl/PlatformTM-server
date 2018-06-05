@@ -22,7 +22,7 @@ namespace PlatformTM.Data.EntityConfigurations
             builder
                 .Property(t => t.Id).HasColumnName("DataFileId");
             builder
-                .Property(t => t.ParentDirectoryId).HasColumnName("ParentId");
+                .Property(t => t.FolderId).HasColumnName("ParentId");
             
 
             // Relationships
@@ -31,9 +31,9 @@ namespace PlatformTM.Data.EntityConfigurations
                 .IsRequired()
                 .HasForeignKey(t => t.ProjectId);
 
-            builder.HasOne(t => t.ParentDirectory)
+            builder.HasOne(t => t.Folder)
                    .WithMany()
-                   .HasForeignKey(t=>t.ParentDirectoryId);
+                   .HasForeignKey(t=>t.FolderId);
 
 
             /*CONSIDER PUTTING THIS BACK WITH M-2-M RELATIONSHIP IS SUPPORTED*/

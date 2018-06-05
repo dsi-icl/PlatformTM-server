@@ -154,6 +154,7 @@ namespace PlatformTM.API
             .AddJsonOptions(opts =>{
                 // Force Camel Case to JSON
                 opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                opts.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             });
 

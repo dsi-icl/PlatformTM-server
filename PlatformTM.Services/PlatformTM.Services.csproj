@@ -42,5 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DTOs\Export\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
 </Project>
