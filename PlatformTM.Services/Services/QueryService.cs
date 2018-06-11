@@ -81,13 +81,13 @@ namespace PlatformTM.Services.Services
             return assayObservations.Cast<AssayDataDTO>().ToList();
         }
         
-        public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId, int projectId)
+        public CombinedQuery SaveQuery(CombinedQueryDTO cdto, string userId)
         {
             CombinedQuery cQuery = new CombinedQuery();
 
             cQuery.Name = cdto.Name;
             cQuery.UserId = Guid.Parse(userId);
-            cQuery.ProjectId = projectId;
+            cQuery.ProjectId = cdto.ProjectId;
             cQuery.Id = Guid.NewGuid();
             cQuery.IsSavedByUser = cdto.IsSavedByUser;
 
@@ -165,22 +165,31 @@ namespace PlatformTM.Services.Services
             return dtoQueries;
         }
 
-        public CombinedQueryDTO GetSavedCombinedQuery(int projectId, string userId, string queryId)
+        public List<CombinedQueryDTO> GetProjectSavedQueries(int projectId, string userId)
+        {
+            var userQueries = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId)
+            && d.ProjectId == projectId
+            && d.IsSavedByUser).ToList();
+            var dtoQueries = userQueries.Select(QueryService.GetcQueryDTO).ToList();
+            return dtoQueries;
+        }
+
+        public CombinedQueryDTO GetSavedCombinedQuery(string userId, string queryId)
         {
             //FOR VALIDATION check if user is indeed the owner of this query
-            if (queryId == "new")
-                return _getNewCqueryForProject(projectId);
+
             var query = _combinedQueryRepository.FindSingle(c => c.Id == Guid.Parse(queryId));
             var queryDto = GetcQueryDTO(query);
             if (queryDto == null) throw new ArgumentNullException(nameof(queryDto));
             return queryDto.UserId == userId ? queryDto : null;
         }
 
-        private CombinedQueryDTO _getNewCqueryForProject(int projectId)
+        public CombinedQueryDTO GetNewCqueryForProject(int projectId, string userId)
         {
             var dto = new CombinedQueryDTO();
             var assays = _assayRepository.FindAll(a => a.ProjectId == projectId).ToList();
             dto.IsSavedByUser = false;
+            dto.ProjectId = projectId;
 
             //if (assays.Count == 0)
             //    return null;
@@ -192,6 +201,7 @@ namespace PlatformTM.Services.Services
                     AssayName = assay.Name
                 };
                 dto.AssayPanelRequests.Add(apanel.AssayId,apanel);
+                dto.UserId = userId;
             }
             return dto;
         }
@@ -397,29 +407,42 @@ namespace PlatformTM.Services.Services
                 {
                     if (!oq.IsFiltered) continue;
 
-                    //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
-                    obsQueryResult.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
+                    //HACK FOR AEOCCUR 'Y' FILTERING
+                    if(oq.PropertyName != "AEOCCUR"){
+                        //HACK FOR FINDINGS SHOULD GO AWAY IN THE NEW OBSERVATION MODEL
+                        obsQueryResult.ForEach(o => o.Qualifiers = o.ResultQualifiers.Union(o.Qualifiers).ToDictionary(p => p.Key, p => p.Value));
 
-                    string v = null;
-                    float vn;
-                    obsQueryResult = oq.DataType == "string"
-                        ? obsQueryResult.FindAll(
-                            s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) &&
-                            oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
+                        string v = null;
+                        float vn;
+                        obsQueryResult = oq.DataType == "string"
+                            ? obsQueryResult.FindAll(
+                                s => s.Qualifiers.TryGetValue(oq.PropertyName, out v) &&
+                                oq.FilterExactValues.Contains(s.Qualifiers[oq.PropertyName]))
 
-                        : obsQueryResult.FindAll(
-                            s => float.TryParse(s.Qualifiers[oq.PropertyName], out vn) &&
-                                 vn >= oq.FilterRangeFrom &&
-                                 vn <= oq.FilterRangeTo);
+                            : obsQueryResult.FindAll(
+                                s => float.TryParse(s.Qualifiers[oq.PropertyName], out vn) &&
+                                     vn >= oq.FilterRangeFrom &&
+                                     vn <= oq.FilterRangeTo);
+                    }
 
                     var filteredSubjectIds = obsQueryResult.Select(o => o.USubjId).Distinct().ToList();
+                    if(oq.PropertyName == "AEOCCUR" && oq.FilterExactValues.All(f => f == "N")){
+                        //Need to do A ~ B where A is al project subjects and B is the subjects with AEOCCUR=Y i.e. the ones 
+                        //that are returned with the query in obsQueryResult
+                        var allSubjIds = queryResult.Subjects.Select(s => s.UniqueSubjectId).ToList();
+                        filteredSubjectIds = allSubjIds.Except(filteredSubjectIds).ToList();
+                        //Create fake observations for subjects withOUT the AE (i.e. AEOCCUR = 'N'
+                        obsQueryResult = GetFakeAEoccurN(filteredSubjectIds, obsQueryResult.First());
+                    }
 
+                    //fill it in first if first round
                     if (!ObsFilteredSubjectIds.Any()) ObsFilteredSubjectIds.UnionWith(filteredSubjectIds);
 
+                    //maintain the intersection of all filters applies across all requested observations
                     ObsFilteredSubjectIds.IntersectWith(filteredSubjectIds);
                     queryResult.ObservationsFiltered = true;
                 }
-                observations.AddRange(obsQueryResult);
+                observations.AddRange(obsQueryResult);//will be filtered later by the combined ObsFilteredSubjectIds below
             }
 
             //CASCADE FILTERING OF OBERVATIONS FROM ALL FILTERS ON OBSERVATIONS
@@ -428,6 +451,26 @@ namespace PlatformTM.Services.Services
             queryResult.Observations = observations;
         }
 
+        private List<SdtmRow> GetFakeAEoccurN(List<string> subjectIds,SdtmRow yAE){
+            return subjectIds.Select(subj => new SdtmRow()
+            {
+                USubjId = subj,
+                //StudyId = subj.Study.Name,
+                //Topic = obsreq.O3,
+                //DBTopicId = termId,//obsreq.TermIds[0],
+                //Id = Guid.NewGuid(),
+                ActivityId = yAE.ActivityId,
+                DatasetId = yAE.DatasetId,
+                DatafileId = yAE.DatafileId,
+                ProjectId = yAE.ProjectId,
+                ProjectAccession = yAE.ProjectAccession,
+                Class = yAE.Class,
+                Group = yAE.Group,
+                TopicControlledTerm = yAE.TopicControlledTerm,
+                QualifierQualifiers = yAE.QualifierQualifiers,
+                Qualifiers = new Dictionary<string, string>() { { "AEOCCUR", "N" } }
+            }).ToList();
+        }
 		public CombinedQuery CreateSingleAssayCombinedQuery(CombinedQuery cQuery, AssayPanelQuery apQuery)
         {
             var singleAssayCombinedQuery = new CombinedQuery
@@ -453,6 +496,7 @@ namespace PlatformTM.Services.Services
             dto.Name = cQuery.Name;
             dto.UserId = cQuery.UserId.ToString();
             dto.ObsRequests = new List<ObservationRequestDTO>();
+            dto.ProjectId = cQuery.ProjectId;
             foreach (var oq in cQuery.ClinicalObservations.Union(cQuery.GroupedObservations))
             {
                 dto.ObsRequests.Add(GetDTOforQuery(oq));

@@ -24,69 +24,39 @@ namespace PlatformTM.API.Controllers
             _projectService = projectService;
         }
 
-        [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
-        public IActionResult GetSubjectCharacteristics(int projectId)
-        {
-            var subjChars = _explorerService.GetSubjectCharacteristics(projectId);
-            if (subjChars != null)
-                return Ok(subjChars);
-            return NotFound();
-        }
-        
-        [HttpPost("projects/{projectId}/saveQuery")]
-        public IActionResult SaveQuery(int projectId, [FromBody] CombinedQueryDTO cdto )
-       {
-          var userId = User.FindFirst(ClaimTypes.UserData).Value;
-          var savedQuery =  _queryService.SaveQuery(cdto, userId, projectId);
-            
-            if (savedQuery != null)
-                return new CreatedAtRouteResult("GetSavedQuery", new { projectId = projectId, queryId = savedQuery.Id.ToString() }, savedQuery);
-            
-            return new StatusCodeResult(StatusCodes.Status409Conflict);
-       }
-
-
-        [HttpGet("projects/{projectId}/queries/{queryId}", Name = "GetSavedQuery")]
-        public IActionResult GetSavedQuery(int projectId, string queryId)
-        {
-            var userId = User.FindFirst(ClaimTypes.UserData).Value;
-            if (!User.Identity.IsAuthenticated)
-                return Unauthorized();
-            var query = _queryService.GetSavedCombinedQuery(projectId, userId,queryId);
-            if(query != null)
-                return Ok(query);
+        [HttpGet("projects/{projectId}/assaysinit")]
+        public async Task<IActionResult> GetAssayDataAsync(int projectId){
+            var data = await _explorerService.GetInitAssayData(projectId);
+            if (data != null)
+                return Ok(data);
             return NotFound();
         }
 
-        [HttpGet("projects/{projectId}/queries/browse", Name = "")]
-        public IActionResult GetSavedQueries(int projectId) 
+        [HttpGet("projects/{projectId}/subjectsinit")]
+        public async Task<IActionResult> GetSubjDataAsync(int projectId)
         {
-            var userId = User.FindFirst(ClaimTypes.UserData).Value;
-            if (!User.Identity.IsAuthenticated)
-                return Unauthorized();
-            var queries = _projectService.GetProjectSavedQueries(projectId, userId);
-            if (queries != null)
-                return Ok(queries);
+            var data = await _explorerService.GetInitSubjectData(projectId);
+            if (data != null)
+                return Ok(data);
             return NotFound();
         }
+        //[HttpGet("projects/{projectId}/subjcharacteristics/browse")]
+        //public async Task<IActionResult> GetSubjectCharacteristicsAsync(int projectId)
+        //{
+        //    var subjChars = await _explorerService.GetSubjectCharacteristics(projectId);
+        //    if (subjChars != null)
+        //        return Ok(subjChars);
+        //    return NotFound();
+        //}
 
-        /*
-        [Route("projects/{projectId}/UpdateQueries")]
-        [HttpGet]
-        //public IEnumerable<CombinedQueryDTO> Get()
-        public List<CombinedQuery> UpdateQueries(CombinedQueryDTO cdto, int projectId)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            if (!User.Identity.IsAuthenticated)
-                return null;
-            return _explorerService.UpdateQueries(cdto, projectId, userId);
-        }
-        */
          
         [HttpPost("projects/{projectId}/subjects/search")]
-        public  DataTable GetSubjectData(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
+        public  async Task<IActionResult> GetSubjectDataAsync(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {
-            return  _explorerService.GetSubjectData(projectId, requestedSCs);
+            var data = await _explorerService.GetSubjectData(projectId, requestedSCs);
+            if (data != null)
+                return Ok(data);
+            return NotFound();
         }
 
         [HttpPost("projects/{projectId}/observations/clinical/search")]
@@ -107,21 +77,21 @@ namespace PlatformTM.API.Controllers
         }
 
         [HttpGet("projects/{projectId}/observations/clinical/browse")]
-        public async Task<ClinicalExplorerDTO> GetClinicalTree(int projectId)
+        public async Task<ClinicalExplorerDTO> GetClinicalTreeAsync(int projectId)
         {
             return await _explorerService.GetClinicalObsTree(projectId);
         }
 
         [HttpGet("projects/{projectId}/assays/browse")]
-        public List<AssayBrowserDTO> GetAssays(int projectId)
+        public async Task<List<AssayBrowserDTO>> GetAssaysAsync(int projectId)
         {
-            return _explorerService.GetProjectAssays(projectId);
+            return await _explorerService.GetProjectAssays(projectId);
         }
 
         [HttpPost("projects/{projectId}/assays/{assayId}/samples/search")]
-        public DataTable GetAssaySamples(int projectId, int assayId, [FromBody] List<ObservationRequestDTO> characteristics)
+        public async Task<Hashtable> GetAssaySamplesAsync(int projectId, int assayId, [FromBody] List<ObservationRequestDTO> characteristics)
         {
-            return _explorerService.GetSampleDataForAssay(assayId, characteristics);
+            return await _explorerService.GetSampleDataForAssay(assayId, characteristics);
         }
     }
 }

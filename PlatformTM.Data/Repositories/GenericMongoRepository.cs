@@ -263,6 +263,9 @@ namespace PlatformTM.Data.Repositories
             throw new NotImplementedException();
         }
 
-
+        public Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null, Expression<Func<TEntity, bool>> projectionExpression = null)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

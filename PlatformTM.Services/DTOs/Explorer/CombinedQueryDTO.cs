@@ -12,6 +12,8 @@ namespace PlatformTM.Services.DTOs.Explorer
         public bool IsSavedByUser { get; set; }
 
         public string UserId { get; set; }
+        public int ProjectId { get; set; }
+
         public CombinedQueryDTO()
         {
             SubjCharRequests = new List<ObservationRequestDTO>();

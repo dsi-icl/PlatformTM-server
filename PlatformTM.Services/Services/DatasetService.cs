@@ -203,7 +203,7 @@ namespace PlatformTM.Services.Services
 
             //GET THE DATASET DATA
             List<SdtmRow> observationData = await _sdtmRepository.FindAllAsync(
-                  d => d.DatasetId == datasetId && d.ProjectAccession.Equals(dataset.Activity.Project.Accession));
+                d => d.DatasetId == datasetId && d.ProjectAccession.Equals(dataset.Activity.Project.Accession),new List<string>(){});
 
             
            //1- Do ROW BASED VARIABLES 

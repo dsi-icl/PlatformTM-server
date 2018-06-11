@@ -203,14 +203,7 @@ namespace PlatformTM.Services.Services
             }).ToList();
         }
 
-        public List<CombinedQueryDTO> GetProjectSavedQueries(int projectId, string userId)
-        {
-            var userQueries = _combinedQueryRepository.FindAll(d => d.UserId == Guid.Parse(userId) 
-            && d.ProjectId == projectId
-            && d.IsSavedByUser).ToList();
-            var dtoQueries = userQueries.Select(QueryService.GetcQueryDTO).ToList();
-            return dtoQueries;
-        }
+
 
         public List<UserDTO> GetProjectUsers(int projectId)
         {

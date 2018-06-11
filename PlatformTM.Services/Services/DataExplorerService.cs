@@ -24,10 +24,40 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly ICacheRepository<ClinicalExplorerDTO> _cacheRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
+
+
         private readonly IServiceUoW _dataContext;
 
         private readonly QueryService _queryService;
 
+
+        #region initMethods
+
+        public async Task<Hashtable> GetInitAssayData(int projectId)
+        {
+            var assayTask = GetProjectAssays(projectId);
+            var xfdataTask = GetAllAssaySamples(projectId);
+            var assays = await assayTask;
+            var XFdata = await xfdataTask;
+
+
+            var ExplorerAssaysVM = new Hashtable();
+            ExplorerAssaysVM.Add("assays", assays);
+            ExplorerAssaysVM.Add("xfdata", XFdata);
+            return ExplorerAssaysVM;
+
+        }
+
+        public async Task<SubjectExplorerDTO> GetInitSubjectData(int projectId){
+            var subjChars = GetSubjectCharacteristics(projectId);
+            var xfData = GetSubjectData(projectId);
+            var result = await subjChars;
+            SubjectExplorerDTO subjectExplorerDTO = await xfData;
+            result.Xfdata = subjectExplorerDTO.Xfdata;
+            return result;
+        }
+
+        #endregion
 
 
         public DataExplorerService(IServiceUoW uoW, QueryService queryService)
@@ -41,18 +71,18 @@ namespace PlatformTM.Services.Services
             _biosampleRepository = uoW.GetRepository<Biosample, int>();
 
             _cacheRepository = uoW.GetCacheRepository<ClinicalExplorerDTO>();
-    
+
             _queryService = queryService;
-        
+
         }
 
         #region Observation Browser methods
-        public SubjectExplorerDTO GetSubjectCharacteristics(int projectId)
+        public async Task<SubjectExplorerDTO> GetSubjectCharacteristics(int projectId)
         {
             var subjectExplorerDTO = new SubjectExplorerDTO();
 
             var subjChars = new List<ObservationRequestDTO>();
-            var SCs = _characObjRepository.FindAll(sco => sco.ProjectId == projectId && sco.Domain == "DM").ToList();
+            var SCs = await _characObjRepository.FindAllAsync(sco => sco.ProjectId == projectId && sco.Domain == "DM");
 
             subjChars = SCs.Select(sc => new ObservationRequestDTO()
             {
@@ -70,8 +100,8 @@ namespace PlatformTM.Services.Services
 
             }).ToList();
 
-            subjectExplorerDTO.Characteristics = subjChars.FindAll(s=>s.DataType != "dateTime");
-            subjectExplorerDTO.Timings = subjChars.FindAll(s => s.DataType == "dateTime");
+            subjectExplorerDTO.scs = subjChars.FindAll(s => s.DataType != "dateTime");
+            subjectExplorerDTO.tps = subjChars.FindAll(s => s.DataType == "dateTime");
 
             var armSC = new ObservationRequestDTO()
             {
@@ -101,8 +131,8 @@ namespace PlatformTM.Services.Services
                 QO2 = "Name",
                 ProjectId = projectId
             };
-            subjectExplorerDTO.DesignElements.Add(armSC);
-            subjectExplorerDTO.DesignElements.Add(studySC);
+            subjectExplorerDTO.des.Add(armSC);
+            subjectExplorerDTO.des.Add(studySC);
 
             return subjectExplorerDTO;
         }
@@ -129,15 +159,18 @@ namespace PlatformTM.Services.Services
             //TODO: BIG TODO when switiching to descriptors to only add qualifiers that have values for the group
             //for now all the qualifiers are assumed to be the same for all observations in the group and listed whehter there would be data available for them or not
 
-          
+
             Observation observation;
 
-            if(observations.First().TermIds.Any()){
+            if (observations.First().TermIds.Any())
+            {
                 observation = _observationRepository.FindSingle(o => o.Id == observations.First().TermIds.First(),
                 new List<string>() {
                     "Qualifiers.Qualifier"
                 });
-            }else{
+            }
+            else
+            {
                 observation = _observationRepository.FindAll(o => o.ControlledTermStr == observations.First().O3,
                 new List<string>() {
                     "Qualifiers.Qualifier"
@@ -168,7 +201,7 @@ namespace PlatformTM.Services.Services
 
         public async Task<ClinicalExplorerDTO> GetClinicalObsTree(int projectId)
         {
-           // _cacheRepository.RemoveFromCache(c=>c.ProjectId == projectId);
+            // _cacheRepository.RemoveFromCache(c=>c.ProjectId == projectId);
             var cachedTree = _cacheRepository.GetFromCache(c => c.ProjectId == projectId);
             if (cachedTree != null)
                 return cachedTree;
@@ -213,7 +246,7 @@ namespace PlatformTM.Services.Services
 
 
                     //Group by category
-                    var groupedByCategory = domainGroup.GroupBy(x => x.Group).OrderByDescending(g=>g.Key);
+                    var groupedByCategory = domainGroup.GroupBy(x => x.Group).OrderByDescending(g => g.Key);
                     int i = 0;
                     foreach (var catGroup in groupedByCategory)
                     {
@@ -244,13 +277,13 @@ namespace PlatformTM.Services.Services
             return clinicalExplorerDTO;
         }
 
-        public List<AssayBrowserDTO> GetProjectAssays(int projectId)
+        public async Task<List<AssayBrowserDTO>> GetProjectAssays(int projectId)
         {
-            var assays = _assayRepository.FindAll(a => a.ProjectId == projectId, new List<string>(){
+            var assays = await _assayRepository.FindAllAsync(a => a.ProjectId == projectId, new List<string>(){
                     "MeasurementType",
                     "TechnologyPlatform",
                     "TechnologyType",
-                }).ToList();
+                });
 
             if (assays.Count == 0)
                 return null;
@@ -269,7 +302,7 @@ namespace PlatformTM.Services.Services
                 };
 
                 //ADD Subject Characteristic Features queries
-                var SCs = _characObjRepository.FindAll(sco => sco.ActivityId == assay.Id).ToList();
+                var SCs = await _characObjRepository.FindAllAsync(sco => sco.ActivityId == assay.Id);
 
                 assayDTO.SampleCharacteristics = SCs.Select(sc => new ObservationRequestDTO()
                 {
@@ -312,6 +345,9 @@ namespace PlatformTM.Services.Services
             }
             return projectAssays;
         }
+
+
+
         #endregion
 
         #region Crossfilter data methods
@@ -340,60 +376,105 @@ namespace PlatformTM.Services.Services
 
             return clinicalData;
         }
-        public DataTable GetSubjectData(int projectId, List<ObservationRequestDTO> reqObservations)
+
+        public async Task<SubjectExplorerDTO> GetSubjectData(int projectId, List<ObservationRequestDTO> reqObservations=null)
         {
-            var subjects = _subjectRepository.FindAll(
+            var subjects = await _subjectRepository.FindAllAsync(
                 s => s.Study.ProjectId == projectId,
                 new List<string>()
                 {   "SubjectCharacteristics.CharacteristicFeature",
                     "StudyArm",
                     "Study"
-                }).ToList();
+                });
 
-            var subjectTable = new DataTable();
+            var dto = new SubjectExplorerDTO();
 
-            //ADD TABLE COLUMNS
+            //var subjectTable = new DataTable();
+            var xfdata = dto.Xfdata;
+
+            //ADD keys
             if (reqObservations != null)
                 foreach (var queryTerm in reqObservations)
-                    subjectTable.Columns.Add(queryTerm.Name.ToLower());
+                    dto.AddKey(queryTerm.Name.ToLower());
+                    //subjectTable.Columns.Add(queryTerm.Name.ToLower());
 
             //ITERATE THROUGH SUBJECTS ADDING EACH REQUESTED QUERY TERM AS A COLUMN VALUE
             foreach (var subject in subjects)
             {
-                var row = subjectTable.NewRow();
-                row["subjectId"] = subject.UniqueSubjectId;
+                var subjdata = new Hashtable();
+                subjdata.Add("subjectId", subject.UniqueSubjectId);
+                dto.AddDataItem(subjdata);
 
-                if (reqObservations != null)
-                    foreach (var requestDto in reqObservations)
-                    {
-                        if (requestDto.QueryFrom != nameof(HumanSubject))
-                            continue;
-
-                        var subjProperty = _queryService.GetSubjectOrSampleProperty(subject,_queryService.GetQueryFromQueryDTO(requestDto));
-
-                      
-                        if (subjProperty == null) continue;
-                        row[requestDto.Name] = subjProperty;
-                    }
-
-                subjectTable.Rows.Add(row);
+                if (reqObservations == null) continue;
+                foreach (var requestDto in reqObservations){
+                    if (requestDto.QueryFrom != nameof(HumanSubject)) continue;
+                    var subjProperty = _queryService.GetSubjectOrSampleProperty(subject, _queryService.GetQueryFromQueryDTO(requestDto));
+                    if (subjProperty == null) continue;
+                    subjdata.Add(requestDto.Name, subjProperty);
+                }
             }
-            return subjectTable;
+            return dto;
         }
-        public DataTable GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
+
+        public async Task<Dictionary<string, Hashtable>> GetAllAssaySamples(int projectId)
+        {
+            
+            var assayResults = new Dictionary<string, Hashtable>();
+
+            var samples = await _biosampleRepository.FindAllAsync(s => s.Study.ProjectId == projectId, new List<string>(){"Subject"});
+
+            var assaySamplesByAssay = samples.GroupBy(s => s.AssayId);
+
+            foreach(var assay in assaySamplesByAssay){
+                var keys = new HashSet<string>{"subjectId","sampleId"};
+                var data = new List<Hashtable>();
+                var result = new Hashtable {
+                    {"data", data},
+                    {"keys", keys}
+                };
+                assayResults.Add(assay.Key.ToString(),result);
+
+
+                //Add sampleIds as array
+                //var samplesPerSubject = samples.FindAll(s=>s.AssayId == assay.Key).GroupBy(s => s.Subject);
+                //foreach (var subjectSamples in samplesPerSubject)
+                //{
+                //    if (subjectSamples.Key == null)
+                //        continue;
+                //    var subject = subjectSamples.Key;
+                //    var subjdata = new Hashtable();
+                //    subjdata.Add("subjectId", subject?.UniqueSubjectId);
+                //    subjdata.Add("sampleId", subjectSamples.Select(s => s.Id).ToList());
+                //    data.Add(subjdata);
+                //}
+
+                //var samplesPerSubject = samples.FindAll(s => s.AssayId == assay.Key).GroupBy(s => s.Subject);
+                foreach (var sample in assay)
+                {
+                    if (sample.Subject == null) continue;
+                    var sampledata = new Hashtable();
+                    sampledata.Add("subjectId", sample.Subject?.UniqueSubjectId);
+                    sampledata.Add("sampleId", sample.BiosampleStudyId);
+                    data.Add(sampledata);
+                }
+            }
+
+
+            return assayResults;
+        }
+
+        public async Task<Hashtable> GetSampleDataForAssay(int assayId, List<ObservationRequestDTO> reqSampleChars)
         {
             List<Biosample> samples;
-            if(reqSampleChars == null)
-                samples = _biosampleRepository.FindAll(s => s.AssayId == assayId,
-                new List<string>() {
-                    "Study",
-                    "Subject"}).ToList();
+            if (reqSampleChars == null)
+                samples = await _biosampleRepository.FindAllAsync(s => s.AssayId == assayId,
+                new List<string>() {"Study","Subject"});
             else
-                samples = _biosampleRepository.FindAll(s => s.AssayId == assayId, 
+                samples = await _biosampleRepository.FindAllAsync(s => s.AssayId == assayId,
                 new List<string>() {
                     "Study",
                     "Subject","CollectionStudyDay",
-                    "SampleCharacteristics" }).ToList();
+                    "SampleCharacteristics" });
 
 
             //var sampleTimePoints = _biosampleRepository.FindAll(s => s.AssayId == assayId,
@@ -405,40 +486,99 @@ namespace PlatformTM.Services.Services
             //    biosample.CollectionStudyDay = sampleTimePoints.Find(s => s.Id == biosample.Id).CollectionStudyDay;
             //}
 
-            var sampleTable = new DataTable();
-            sampleTable.Columns.Add("subjectId");
-            sampleTable.Columns.Add("studyId");
-            sampleTable.Columns.Add("sampleId");
+            //var sampleTable = new DataTable();
+            //sampleTable.Columns.Add("subjectId");
+            //sampleTable.Columns.Add("studyId");
+            //sampleTable.Columns.Add("sampleId");
 
+            //if (reqSampleChars != null)
+            //{
+            //    reqSampleChars = reqSampleChars.FindAll(r => r.IsSampleCharacteristic && r.ActivityId == assayId);
+            //    foreach (var column in reqSampleChars)
+            //        sampleTable.Columns.Add(column.Name.ToLower());
+            //}
+
+            //Create object
+            var keys = new HashSet<string>{"subjectId","sampleId"};
+            var data = new List<Hashtable>();
+            var result = new Hashtable {{"data", data},{"keys", keys}};
+
+            //Add requested obs Keys
             if (reqSampleChars != null)
             {
                 reqSampleChars = reqSampleChars.FindAll(r => r.IsSampleCharacteristic && r.ActivityId == assayId);
-                foreach (var column in reqSampleChars)
-                    sampleTable.Columns.Add(column.Name.ToLower());
+                foreach (var sc in reqSampleChars)
+                    keys.Add(sc.Name.ToLower());
             }
 
+            //Populate samples as array
+            //var samplesPerSubject = samples.GroupBy(s => s.Subject);
+            //foreach (var subjectSamples in samplesPerSubject)
+            //{
+            //    if (subjectSamples.Key == null)
+            //        continue;
+            //    var subject = subjectSamples.Key;
+            //    var subjdata = new Hashtable();
+            //    subjdata.Add("subjectId", subject?.UniqueSubjectId);
+            //    subjdata.Add("sampleId", subjectSamples.Select(s => s.Id).ToList());
+            //    if (reqSampleChars != null)
+            //    {
+            //        foreach (var requestDto in reqSampleChars)
+            //        {
+            //            if (requestDto.QueryFrom != nameof(Biosample))
+            //                continue;
+            //            var sampleProperties = subjectSamples.Select(s => _queryService.GetSubjectOrSampleProperty(s, _queryService.GetQueryFromQueryDTO(requestDto)))?.ToList();
+            //            //subjectSamples.ToList().ForEach(s=>_queryService.GetSubjectOrSampleProperty(s, _queryService.GetQueryFromQueryDTO(requestDto)));
+            //            if (sampleProperties == null) continue;
+            //            subjdata.Add(requestDto.Name, sampleProperties);
+            //        }
+            //    }
+            //    data.Add(subjdata);
+            //}
+
+            //Populate each sample to a separate row
             foreach (var sample in samples)
             {
-                var row = sampleTable.NewRow();
-                row["subjectId"] = sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing";
-                row["studyId"] = sample.Study.Name;
-                row["sampleId"] = sample.BiosampleStudyId;
+                if (sample.Subject == null) continue;
+                var sampledata = new Hashtable();
+                sampledata.Add("subjectId", sample.Subject?.UniqueSubjectId);
+                sampledata.Add("sampleId", sample.BiosampleStudyId);
 
-                //if assay has time series include the timing dimension by default
+                if (reqSampleChars == null) continue;
+                foreach (var requestDto in reqSampleChars)
+                {
+                    if (requestDto.QueryFrom != nameof(Biosample))continue;
+                    var sampleProperty = _queryService.GetSubjectOrSampleProperty(sample, _queryService.GetQueryFromQueryDTO(requestDto));
+                    if (sampleProperty == null) continue;
+                    sampledata.Add(requestDto.Name,sampleProperty);
+                }
+                       
 
-                if (reqSampleChars != null)
-                    foreach (var requestDto in reqSampleChars)
-                    {
-                        if (requestDto.QueryFrom != nameof(Biosample))
-                            continue;
-                        var sampleProperty = _queryService.GetSubjectOrSampleProperty(sample, _queryService.GetQueryFromQueryDTO(requestDto));
-                        if (sampleProperty == null) continue;
-                        row[requestDto.Name] = sampleProperty;
-                    }
-                sampleTable.Rows.Add(row);
+                data.Add(sampledata);
             }
 
-            return sampleTable;
+            //foreach (var sample in samples)
+            //{
+            //    var row = sampleTable.NewRow();
+            //    row["subjectId"] = sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing";
+            //    row["studyId"] = sample.Study.Name;
+            //    row["sampleId"] = sample.BiosampleStudyId;
+
+            //    //if assay has time series include the timing dimension by default
+
+            //    if (reqSampleChars != null)
+            //        foreach (var requestDto in reqSampleChars)
+            //        {
+            //            if (requestDto.QueryFrom != nameof(Biosample))
+            //                continue;
+            //            var sampleProperty = _queryService.GetSubjectOrSampleProperty(sample, _queryService.GetQueryFromQueryDTO(requestDto));
+            //            if (sampleProperty == null) continue;
+            //            row[requestDto.Name] = sampleProperty;
+            //        }
+            //    sampleTable.Rows.Add(row);
+            //}
+
+            return result;
 
         }
         #endregion
@@ -494,7 +634,8 @@ namespace PlatformTM.Services.Services
             return sdtmObservations;
         }
 
-        private Hashtable _getFindingsJson(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations){
+        private Hashtable _getFindingsJson(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations)
+        {
             var header = new HashSet<string>();
             header.Add("subjectId");
             foreach (var r in reqObservations.Where(r => findings.Select(f => f.DBTopicId).Contains(r.O3id)))
@@ -504,22 +645,25 @@ namespace PlatformTM.Services.Services
             header.Add("timepoint");
 
             var output = new List<Hashtable>();
-            
+
             var subjectIds = findings.Select(s => s.USubjId).Distinct().ToList();
-            foreach(var subjectId in subjectIds){
+            foreach (var subjectId in subjectIds)
+            {
                 var subjectObservations = findings.FindAll(f => f.USubjId == subjectId);
                 var subjdata = new Hashtable();
                 subjdata.Add("subjectId", subjectId);
-                
-                foreach(var req in reqObservations){
+
+                foreach (var req in reqObservations)
+                {
 
                     var reqSubjObservations = subjectObservations.FindAll(o => o.DBTopicId == req.O3id).ToList();
                     var qualifiers = reqSubjObservations.SelectMany(o => o.ResultQualifiers).ToList();
                     qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.Qualifiers));
                     qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
-                        
+
                     var values = qualifiers.FindAll(kv => kv.Key == req.QO2)?.Select(k => k.Value)?.ToList();
-                    if (values != null && values[0] != ""){
+                    if (values != null && values[0] != "")
+                    {
                         values = values.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
                         subjdata.Add(req.Name, values);
                         //subjdata.Add(req.Name, values.OrderByDescending(v => v));
@@ -529,7 +673,7 @@ namespace PlatformTM.Services.Services
                 subjdata.Add("timepoint", "");//row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
 
                 output.Add(subjdata);
-          
+
             }
             return new Hashtable {
                 {"data", output},
@@ -537,7 +681,8 @@ namespace PlatformTM.Services.Services
             };
         }
 
-        private Hashtable _getClinicalDataJson(List<SdtmRow> observations, IList<ObservationRequestDTO> reqObservations){
+        private Hashtable _getClinicalDataJson(List<SdtmRow> observations, IList<ObservationRequestDTO> reqObservations)
+        {
             var keys = new HashSet<string>();
             var data = new List<Hashtable>();
             var result = new Hashtable {
@@ -552,7 +697,7 @@ namespace PlatformTM.Services.Services
             foreach (var r in reqObservations.Where(r => observations.FindAll(s => s.Class.ToLower() == "findings")
                                                     .Select(f => f.DBTopicId).Contains(r.O3id)))
                 keys.Add(r.Name);
-            
+
             foreach (var r2 in reqObservations.Where(r => observations.FindAll(s => s.Class.ToLower() == "events")
                                                      .Select(f => f.DBTopicId)
                                                      .Any(i => r.TermIds.Contains(i))))
@@ -600,7 +745,8 @@ namespace PlatformTM.Services.Services
 
                     var reqSubjObservations = subjectObservations.FindAll(e => req.TermIds.Contains(e.DBTopicId));
 
-                    if(req.QO2 == "AEOCCUR"){
+                    if (req.QO2 == "AEOCCUR")
+                    {
                         if (reqSubjObservations.Any())
                             subjdata.Add(req.Name, reqSubjObservations.Select(c => "Y").ToList());
                         else
@@ -615,7 +761,7 @@ namespace PlatformTM.Services.Services
 
                     if (values != null && values.Count != 0)
                         subjdata.Add(req.Name, values);
-  
+
                 }
                 //subjdata.Add("visit", "");// = subjVisitTPT.Key.Visit;//subjObs.VisitName;
                 //subjdata.Add("timepoint", "");//row["timepoint"] = subjVisitTPT.Key.Timepoint;//subjObs.ObsStudyTimePoint == null ? "" : subjObs.ObsStudyTimePoint.Name;
@@ -626,12 +772,13 @@ namespace PlatformTM.Services.Services
 
 
             return result;
-            
+
         }
 
 
-        private Hashtable _getEventsJson(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations){
-            
+        private Hashtable _getEventsJson(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations)
+        {
+
             var keys = new HashSet<string>();
             var data = new List<Hashtable>();
             var result = new Hashtable {
@@ -651,9 +798,10 @@ namespace PlatformTM.Services.Services
 
             var subjectIds = events.Select(s => s.USubjId).Distinct().ToList();
 
-            if(reqObservations.Where(r => r.QO2 == "AEOCCUR").ToList().Count > 0){
+            if (reqObservations.Where(r => r.QO2 == "AEOCCUR").ToList().Count > 0)
+            {
                 var projectId = events.First().ProjectId;
-                subjectIds = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).Select(s=>s.UniqueSubjectId).Distinct().ToList();
+                subjectIds = _subjectRepository.FindAll(s => s.Study.ProjectId == projectId).Select(s => s.UniqueSubjectId).Distinct().ToList();
             }
 
             foreach (var subjectId in subjectIds)
@@ -671,12 +819,12 @@ namespace PlatformTM.Services.Services
                     qualifiers.AddRange(reqSubjObservations.SelectMany(o => o.TimingQualifiers));
                     var values = qualifiers.FindAll(kv => kv.Key == req.QO2)?.Select(k => k.Value)?.ToList();
 
-                    if (values != null && values.Count!=0)
+                    if (values != null && values.Count != 0)
                         subjdata.Add(req.Name, values);
-                   
-                    if(values.Count==0 && req.QO2 == "AEOCCUR")
-                        subjdata.Add(req.Name, new List<string>(){"N"});
-                    
+
+                    if (values.Count == 0 && req.QO2 == "AEOCCUR")
+                        subjdata.Add(req.Name, new List<string>() { "N" });
+
                 }
 
                 data.Add(subjdata);
@@ -865,7 +1013,7 @@ namespace PlatformTM.Services.Services
                 {
                     O3 = obsObject.ControlledTermStr,
                     O3id = obsObject.Id,
-                    O3code = obsObject.Group!=null?(obsObject.Group+"_"+obsObject.Name).ToLower(): obsObject.Name.ToLower(),
+                    O3code = obsObject.Group != null ? (obsObject.Group + "_" + obsObject.Name).ToLower() : obsObject.Name.ToLower(),
                     QO2 = obsObject.DefaultQualifier.Name,
                     QO2id = obsObject.DefaultQualifier.Id,
                     DataType = obsObject.DefaultQualifier.DataType,
@@ -879,7 +1027,7 @@ namespace PlatformTM.Services.Services
                     QueryWhereProperty = nameof(SdtmRow.DBTopicId),
                     QueryWhereValue = obsObject.Id.ToString(),
                     HasLongitudinalData = obsObject.Timings.Any(),//WRONG...not specific to O3
-                    HasTPT = obsObject.Timings.Exists(t=>t.Qualifier.Name.EndsWith("TPT"))
+                    HasTPT = obsObject.Timings.Exists(t => t.Qualifier.Name.EndsWith("TPT"))
                     //QuerySelectProperty = nameof()
                 }
             };
@@ -1049,7 +1197,7 @@ namespace PlatformTM.Services.Services
 
         }
 
-        public List<ObservationRequestDTO> GetObsQualifierRequests(int projectId,ObservationRequestDTO obsreq)
+        public List<ObservationRequestDTO> GetObsQualifierRequests(int projectId, ObservationRequestDTO obsreq)
         {
             List<ObservationRequestDTO> obsRequests;
             if (obsreq.IsOntologyEntry)

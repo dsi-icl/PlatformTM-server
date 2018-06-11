@@ -20,7 +20,6 @@ namespace PlatformTM.API.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.UserData).Value;
 			var exportFiles = _checkoutService.GetCheckoutResults(cartId, userId);
-            //var datasets = _checkoutService.CreateCheckoutDatasets(cartId,userId);
 			if (exportFiles != null)
 				return Ok(exportFiles);
             return NotFound();

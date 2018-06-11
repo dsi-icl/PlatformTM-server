@@ -71,15 +71,6 @@ namespace PlatformTM.API.Controllers
             return new OkObjectResult(result);
         }
 
-        [HttpGet("{projectId}/queries")]
-        public List<CombinedQueryDTO> GetUserSavedQueries(int projectId)
-        {
-            var userId = User.FindFirst(ClaimTypes.UserData).Value;
-            if (!User.Identity.IsAuthenticated)
-                return null;
-            return _projectService.GetProjectSavedQueries(projectId, userId);
-
-        }
 
         [HttpGet("{projectId}/users")]
         public IActionResult GetProjectUsers(int projectId)

@@ -146,6 +146,9 @@ namespace PlatformTM.API
             .AddUserStore<UserStore>()
             .AddRoleStore<RoleStore>();
 
+            services.AddResponseCompression(options => {
+                options.EnableForHttps = true;
+            });
             services.AddMvc(config =>
             {
                 //add a global filter so that requests are Authorized by default
@@ -173,6 +176,7 @@ namespace PlatformTM.API
 
             app.UsePathBase("/api/v1/");
 
+            app.UseResponseCompression();
             app.UseCors("CorsPolicy");
 
             if(env.IsDevelopment())
