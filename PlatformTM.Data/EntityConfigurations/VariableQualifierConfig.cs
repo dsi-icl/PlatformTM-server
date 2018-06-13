@@ -17,14 +17,16 @@ namespace PlatformTM.Data.EntityConfigurations
 
             builder
                 .HasOne(dd => dd.Variable)
-                .WithMany(d => d.VariableQualifiers)
-                .HasForeignKey(dd => dd.VariableId);
+                .WithMany(d => d.Qualifiers)
+                .HasForeignKey(dd => dd.VariableId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder
                 .HasOne(dd => dd.Qualifier)
-                .WithMany()
-                .HasForeignKey(dd => dd.QualifierId);
-                
+                .WithMany(d => d.QualifiedVariables)
+                .HasForeignKey(dd => dd.QualifierId)
+                .OnDelete(DeleteBehavior.Restrict);
+               
         }
     }
 }

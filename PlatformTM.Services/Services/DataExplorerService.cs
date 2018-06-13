@@ -24,11 +24,22 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly ICacheRepository<ClinicalExplorerDTO> _cacheRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
-
-
         private readonly IServiceUoW _dataContext;
-
         private readonly QueryService _queryService;
+
+        public DataExplorerService(IServiceUoW uoW, QueryService queryService)
+        {
+            _dataContext = uoW;
+            _observationRepository = uoW.GetRepository<Observation, int>();
+            _subjectRepository = uoW.GetRepository<HumanSubject, string>();
+            _characObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
+            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _assayRepository = uoW.GetRepository<Assay, int>();
+            _biosampleRepository = uoW.GetRepository<Biosample, int>();
+            _cacheRepository = uoW.GetCacheRepository<ClinicalExplorerDTO>();
+            _queryService = queryService;
+
+        }
 
 
         #region initMethods
@@ -60,23 +71,8 @@ namespace PlatformTM.Services.Services
         #endregion
 
 
-        public DataExplorerService(IServiceUoW uoW, QueryService queryService)
-        {
-            _dataContext = uoW;
-            _observationRepository = uoW.GetRepository<Observation, int>();
-            _subjectRepository = uoW.GetRepository<HumanSubject, string>();
-            _characObjRepository = uoW.GetRepository<CharacteristicFeature, int>();
-            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
-            _assayRepository = uoW.GetRepository<Assay, int>();
-            _biosampleRepository = uoW.GetRepository<Biosample, int>();
-
-            _cacheRepository = uoW.GetCacheRepository<ClinicalExplorerDTO>();
-
-            _queryService = queryService;
-
-        }
-
         #region Observation Browser methods
+
         public async Task<SubjectExplorerDTO> GetSubjectCharacteristics(int projectId)
         {
             var subjectExplorerDTO = new SubjectExplorerDTO();
@@ -346,8 +342,6 @@ namespace PlatformTM.Services.Services
             return projectAssays;
         }
 
-
-
         #endregion
 
         #region Crossfilter data methods
@@ -358,21 +352,7 @@ namespace PlatformTM.Services.Services
             var subjFindings = sdtmObservations.FindAll(s => s.Class.ToLower() == "findings").ToList();
             var subjEvents = sdtmObservations.FindAll(s => s.Class.ToLower() == "events").ToList();
 
-            //var findingsTable = getFindingsDataTable(subjFindings, reqObservations.Where(r => r.IsFinding).ToList());
-            //var eventsTable = getEventsDataTable(subjEvents, reqObservations.Where(r => r.IsEvent).ToList());
-            //var findingsColsList = findingsTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-            //var eventsColsList = eventsTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName).ToList();
-            //var findings = _getFindingsJson(subjFindings, reqObservations.Where(r => r.IsFinding).ToList());
-            //var events = _getEventsJson(subjEvents, reqObservations.Where(r => r.IsEvent).ToList());
-
             var clinicalData = _getClinicalDataJson(sdtmObservations, reqObservations);
-            //var result = new Hashtable
-            //{
-            //    {"findingsTbl", findings["data"]},
-            //    {"eventsTbl", events["data"]},
-            //    {"findingsTblHeader", findings["keys"]},
-            //    {"eventsTblHeader", events["keys"]}
-            //};
 
             return clinicalData;
         }
@@ -476,28 +456,6 @@ namespace PlatformTM.Services.Services
                     "Subject","CollectionStudyDay",
                     "SampleCharacteristics" });
 
-
-            //var sampleTimePoints = _biosampleRepository.FindAll(s => s.AssayId == assayId,
-            //    new List<string>() {
-            //        "CollectionStudyDay" }).ToList();
-
-            //foreach (var biosample in samples)
-            //{
-            //    biosample.CollectionStudyDay = sampleTimePoints.Find(s => s.Id == biosample.Id).CollectionStudyDay;
-            //}
-
-            //var sampleTable = new DataTable();
-            //sampleTable.Columns.Add("subjectId");
-            //sampleTable.Columns.Add("studyId");
-            //sampleTable.Columns.Add("sampleId");
-
-            //if (reqSampleChars != null)
-            //{
-            //    reqSampleChars = reqSampleChars.FindAll(r => r.IsSampleCharacteristic && r.ActivityId == assayId);
-            //    foreach (var column in reqSampleChars)
-            //        sampleTable.Columns.Add(column.Name.ToLower());
-            //}
-
             //Create object
             var keys = new HashSet<string>{"subjectId","sampleId"};
             var data = new List<Hashtable>();
@@ -511,30 +469,6 @@ namespace PlatformTM.Services.Services
                     keys.Add(sc.Name.ToLower());
             }
 
-            //Populate samples as array
-            //var samplesPerSubject = samples.GroupBy(s => s.Subject);
-            //foreach (var subjectSamples in samplesPerSubject)
-            //{
-            //    if (subjectSamples.Key == null)
-            //        continue;
-            //    var subject = subjectSamples.Key;
-            //    var subjdata = new Hashtable();
-            //    subjdata.Add("subjectId", subject?.UniqueSubjectId);
-            //    subjdata.Add("sampleId", subjectSamples.Select(s => s.Id).ToList());
-            //    if (reqSampleChars != null)
-            //    {
-            //        foreach (var requestDto in reqSampleChars)
-            //        {
-            //            if (requestDto.QueryFrom != nameof(Biosample))
-            //                continue;
-            //            var sampleProperties = subjectSamples.Select(s => _queryService.GetSubjectOrSampleProperty(s, _queryService.GetQueryFromQueryDTO(requestDto)))?.ToList();
-            //            //subjectSamples.ToList().ForEach(s=>_queryService.GetSubjectOrSampleProperty(s, _queryService.GetQueryFromQueryDTO(requestDto)));
-            //            if (sampleProperties == null) continue;
-            //            subjdata.Add(requestDto.Name, sampleProperties);
-            //        }
-            //    }
-            //    data.Add(subjdata);
-            //}
 
             //Populate each sample to a separate row
             foreach (var sample in samples)
@@ -556,27 +490,6 @@ namespace PlatformTM.Services.Services
 
                 data.Add(sampledata);
             }
-
-            //foreach (var sample in samples)
-            //{
-            //    var row = sampleTable.NewRow();
-            //    row["subjectId"] = sample.Subject != null ? sample.Subject.UniqueSubjectId : "missing";
-            //    row["studyId"] = sample.Study.Name;
-            //    row["sampleId"] = sample.BiosampleStudyId;
-
-            //    //if assay has time series include the timing dimension by default
-
-            //    if (reqSampleChars != null)
-            //        foreach (var requestDto in reqSampleChars)
-            //        {
-            //            if (requestDto.QueryFrom != nameof(Biosample))
-            //                continue;
-            //            var sampleProperty = _queryService.GetSubjectOrSampleProperty(sample, _queryService.GetQueryFromQueryDTO(requestDto));
-            //            if (sampleProperty == null) continue;
-            //            row[requestDto.Name] = sampleProperty;
-            //        }
-            //    sampleTable.Rows.Add(row);
-            //}
 
             return result;
 
@@ -774,7 +687,6 @@ namespace PlatformTM.Services.Services
             return result;
 
         }
-
 
         private Hashtable _getEventsJson(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations)
         {

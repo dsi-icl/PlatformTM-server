@@ -11,7 +11,7 @@ namespace PlatformTM.API
     {
         public static void Main(string[] args)
         {
-            var host = BuildWebHost(args);
+            var host = CreateWebHostBuilder(args).Build();
 
             if (EnvironmentName.Development != Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"))
                 using (var scope = host.Services.CreateScope())
@@ -33,11 +33,10 @@ namespace PlatformTM.API
             host.Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                    .UseDefaultServiceProvider(options =>
-                                              options.ValidateScopes = false)
-                    .Build();
+                                              options.ValidateScopes = false);
     }
 }

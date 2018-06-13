@@ -219,6 +219,7 @@ namespace PlatformTM.Data
 
             modelBuilder.AddConfiguration<VariableDefinition>(new VariableDefConfig());
             modelBuilder.AddConfiguration<VariableReference>(new VariableRefConfig());
+            modelBuilder.AddConfiguration(new VariableQualifierConfig());
 
             modelBuilder.AddConfiguration<Visit>(new VisitConfig());
 

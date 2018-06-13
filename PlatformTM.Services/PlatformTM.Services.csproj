@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>PlatformTM.Services</AssemblyName>
     <PackageId>PlatformTM.Services</PackageId>
     <AssertTargetFallback>$(AssertTargetFallback);dnxcore50</AssertTargetFallback>
@@ -20,26 +20,9 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="7.1.0" />
-<!--    <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.0.3" />-->
-<!--    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.0.2" />-->
-<!--    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.2" />-->
-<!--    <PackageReference Include="System.Collections.NonGeneric" Version="4.3.0" />-->
-<!--    <PackageReference Include="System.Linq" Version="4.3.0" />-->
-<!--    <PackageReference Include="System.Runtime" Version="4.3.0" />-->
-<!--    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />-->
-<!--    <PackageReference Include="System.Runtime.Serialization.Formatters" Version="4.3.0" />-->
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
+<!--    <PackageReference Include="Microsoft.AspNetCore.App" />  -->
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Services\OntologyManagement\BioPortalClient.cs" />
-    <Compile Remove="Services\OntologyManagement\IOntologyService.cs" />
-    <Compile Remove="Services\OntologyManagement\OLSclient.cs" />
-    <Compile Remove="DTOs\AnalysisDataset.cs" />
-    <Compile Remove="DTOs\Export\ExportFileVM.cs" />
-    <Compile Remove="DTOs\UserDatasetDTO.cs" />
-    <Compile Remove="DTOs\TreeNodeDTO.cs" />
-  </ItemGroup>
   <ItemGroup>
     <Folder Include="DTOs\Export\" />
     <Folder Include="ViewModels\" />
