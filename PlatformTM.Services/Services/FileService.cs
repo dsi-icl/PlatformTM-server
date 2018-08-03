@@ -13,6 +13,7 @@ using PlatformTM.Services.Configuration;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services.Loading.AssayData;
 using PlatformTM.Services.Services.Loading.SDTM;
+using PlatformTM.Core.Domain.Model.Templates;
 
 namespace PlatformTM.Services.Services
 {
@@ -22,7 +23,7 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<DataFile, int> _fileRepository;
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
-        
+        private readonly IRepository<DatasetTemplateField, string> _varRepository;
         private FileStorageSettings ConfigSettings { get; set; }
         private readonly string _uploadFileDirectory;
         private readonly string _downloadFileDirectory;
@@ -42,7 +43,22 @@ namespace PlatformTM.Services.Services
             _uploadFileDirectory = ConfigSettings.UploadFileDirectory;
             _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
             _observationRepository = uoW.GetRepository<Observation, int>();
+            _varRepository = uoW.GetRepository<DatasetTemplateField, string>();  
         }
+
+        public string GetVariableDescription(string var)    // for MDR
+        {
+            var f = _varRepository.FindAll(x => x.Name == var).FirstOrDefault();
+            string ff = null;
+            if (f != null)
+            {
+                ff = f.Description;
+            }
+
+             //ff = f.Description;
+            return ff;
+        }
+
 
         public bool LoadFile(int fileId, int datasetId)
         {

@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.Users;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
 using PlatformTM.Core.Domain.Model.Users.Queries;
 using PlatformTM.Core.JoinEntities;
@@ -22,7 +23,7 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<UserDataset, Guid> _userDatasetRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
-
+        private readonly IRepository<User, Guid> _userRepository; 
 
         private IServiceUoW uoW;
 
@@ -35,7 +36,22 @@ namespace PlatformTM.Services.Services
             _assayRepository = uoW.GetRepository<Assay, int>();
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+            _userRepository = uoW.GetRepository<User, Guid>();
         }
+
+
+        public string AddUserToProject(int projectId, string email)
+        {
+            var project = _projectRepository.Get(projectId);
+            var userToAdd = _userRepository.FindSingle(s => s.Email == email);
+            if (userToAdd != null)
+            {
+                project.Users.Add(new ProjectUser() { ProjectId = project.Id, UserId = userToAdd.Id });
+            }
+            
+            return uoW.Save();
+        }
+
 
         public ProjectDTO GetProjectById(int projectId)
         {
@@ -143,7 +159,7 @@ namespace PlatformTM.Services.Services
             _projectRepository.Update(projectToUpdate);
             return uoW.Save();
         }
-
+        
         public IEnumerable<ProjectDTO> GetProjects(string userId)
         {
             var guidUserID = Guid.Parse(userId);

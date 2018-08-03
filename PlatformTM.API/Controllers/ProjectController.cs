@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Services.DTOs;
@@ -22,6 +23,23 @@ namespace PlatformTM.API.Controllers
             _projectService = projectService;
             _accountService = accountService;
         }
+
+        [HttpGet("{projectId}/{email}")]
+        [AllowAnonymous]
+        public bool AddUserToProject(int projectId, string email)
+        {
+            try
+            {
+                _projectService.AddUserToProject(projectId, email);
+                return true;
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        }
+
 
         [HttpGet]
         public IEnumerable<ProjectDTO> Get()
@@ -118,5 +136,10 @@ namespace PlatformTM.API.Controllers
                 return new BadRequestObjectResult(e.Message);
             }
         }
+
+       
+
+
+         
     }
 }

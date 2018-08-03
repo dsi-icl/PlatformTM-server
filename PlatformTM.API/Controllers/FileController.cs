@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PlatformTM.API.Controllers
 {
@@ -29,6 +30,15 @@ namespace PlatformTM.API.Controllers
         public FileDTO GetFile(int fileId)
         {
             return _fileService.GetFileDTO(fileId);
+        }
+
+        [HttpGet("GetVariableDescription/{var}")]
+        [AllowAnonymous]
+        public string getVariableDiscription( string var) 
+        {           
+            
+           var st =  _fileService.GetVariableDescription(var); 
+            return st;
         }
 
         [HttpGet]
