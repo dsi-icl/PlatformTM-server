@@ -247,23 +247,23 @@ namespace PlatformTM.Data
 
         private void WaitForDBInit()
         {
-            var con = new MySqlConnection(_dbsettings.Value.MySQLconn);
-            int retries = 1;
-            while (retries < 7)
-            {
-                try
-                {
-                    Console.WriteLine("Connecting to db. Trial: {0}", retries);
-                    con.Open();
-                    con.Close();
-                    break;
-                }
-                catch (MySqlException)
-                {
-                    Thread.Sleep((int)Math.Pow(2, retries) * 1000);
-                    retries++;
-                }
-            }
+            //var con = new MySqlConnection(_dbsettings.Value.MySQLconn);
+            //int retries = 1;
+            //while (retries < 7)
+            //{
+                //try
+                //{
+                //    Console.WriteLine("Connecting to db. Trial: {0}", retries);
+                //    con.Open();
+                //    con.Close();
+                //    break;
+                //}
+                //catch (MySqlException)
+                //{
+                //    Thread.Sleep((int)Math.Pow(2, retries) * 1000);
+                //    retries++;
+                //}
+            //}
         }
     }
 }

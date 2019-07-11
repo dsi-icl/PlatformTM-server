@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="7.1.0" />
-<!--    <PackageReference Include="Microsoft.AspNetCore.App" />  -->
+    <PackageReference Include="CsvHelper" Version="7.1.1" />
+    <PackageReference Include="Sendgrid" Version="9.10.0" />
   </ItemGroup>
 
   <ItemGroup>

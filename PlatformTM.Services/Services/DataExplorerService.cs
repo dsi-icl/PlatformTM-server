@@ -270,6 +270,13 @@ namespace PlatformTM.Services.Services
                     }
                 }
             }
+            if (cachedTree == null)
+            {
+                cachedTree = clinicalExplorerDTO;
+                cachedTree.Id = Guid.NewGuid();
+                _cacheRepository.Save(cachedTree);
+            }
+
             return clinicalExplorerDTO;
         }
 

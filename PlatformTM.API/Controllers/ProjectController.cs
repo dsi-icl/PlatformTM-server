@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -90,7 +91,7 @@ namespace PlatformTM.API.Controllers
 
         
         [HttpPost]
-        public IActionResult AddProject([FromBody] ProjectDTO projectDTO)
+        public async Task<IActionResult> AddProject([FromBody] ProjectDTO projectDTO)
         {
             ProjectDTO addedProject = null;
 
@@ -100,8 +101,13 @@ namespace PlatformTM.API.Controllers
 
             var userId = User.FindFirst(ClaimTypes.UserData).Value;
             addedProject = _projectService.AddProject(projectDTO,userId);
+            if (addedProject == null)
+                return new StatusCodeResult(StatusCodes.Status409Conflict);
 
-            if (addedProject != null)
+            var accountId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var res = await _accountService.AddUserRole("all", projectDTO.Id, accountId);
+
+            if (addedProject != null && res.Succeeded)
                 return new CreatedAtRouteResult("GetProjectByAcc", new { projectId = addedProject.Id }, addedProject);
    
             return new StatusCodeResult(StatusCodes.Status409Conflict);

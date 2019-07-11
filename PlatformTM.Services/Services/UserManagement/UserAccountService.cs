@@ -58,6 +58,10 @@ namespace PlatformTM.Services.Services.UserManagement
             return await _userManager.CheckPasswordAsync(user, password) ? user : null;
         }
 
+        public async Task<UserAccount> FindByIdAsync(string userId){
+            return await _userManager.FindByIdAsync(userId);
+        }
+
         public async Task<UserDTO> GetUserInfo(string userId)
         {
             var useraccount = await _userManager.FindByIdAsync(userId);
@@ -83,22 +87,47 @@ namespace PlatformTM.Services.Services.UserManagement
             return cp;
         }
 
-        public async Task<List<Claim>> GetClaimsForUser(UserAccount userAccount)
+        public async Task<List<string>> GetClaimsForUser(string userId)
         {
+            var userAccount = await _userManager.FindByIdAsync(userId);
+            if (userAccount == null)
+                return null;
             var claims = await _userManager.GetClaimsAsync(userAccount);
-            return claims.ToList();
+
+            var permissions = claims.ToList().FindAll(c => c.Type == ClaimTypes.Role)?.Select(r=>r.Value);
+            return permissions?.ToList();
         }
 
-        public async Task<SignInResult> SignIn(UserDTO userDTO)
+        public async Task<IdentityResult> AddUserRole(string rights, int projectId, string userId)
         {
-            SignInResult result = await _signInManager.PasswordSignInAsync(userDTO.Username, userDTO.Password, false, false);
-            return result;
+            if(rights == "all")
+            {
+                var userAccount = await _userManager.FindByIdAsync(userId);
+                if (userAccount == null)
+                    return IdentityResult.Failed();
+
+                var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Role, "can-manage-" + projectId), 
+                    new Claim(ClaimTypes.Role, "can-manage-etl-" + projectId),
+                    new Claim(ClaimTypes.Role, "can-manage-drive-" + projectId)
+
+                };
+                return await _userManager.AddClaimsAsync(userAccount,claims);
+
+            }
+            return IdentityResult.Failed();
         }
 
-		//public async Task<SignInResult> SignOut(){
-		//	var result = await _signInManager.SignOutAsync();
+        public async Task SignInAsync(UserAccount user, bool isPersistent)
+        {
+            await _signInManager.SignInAsync(user, isPersistent: false);
+        }
 
-		//}
+        public async Task<SignInResult> Login(string email, string password, bool rememberme=false, bool lockout=false){
+            return await _signInManager.PasswordSignInAsync(email, password, rememberme, lockout);
+
+        }
 
         public async Task<bool> CheckUser(UserDTO userDTO)
         {
@@ -118,6 +147,15 @@ namespace PlatformTM.Services.Services.UserManagement
                 psk = user.PSK;
             }
             return psk;
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(UserAccount user){
+            
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(UserAccount user, string token){
+           return await _userManager.ConfirmEmailAsync(user, token);
         }
     }
 }

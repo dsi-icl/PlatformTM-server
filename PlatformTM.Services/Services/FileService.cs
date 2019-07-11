@@ -432,7 +432,7 @@ namespace PlatformTM.Services.Services
 
             foreach (string field in header)
             {
-                dt.Columns.Add(field.Replace("\"", ""), typeof(string));
+                dt.Columns.Add(field.Replace("\"", "").Replace(" ",""), typeof(string));
             }
 
             while (true)

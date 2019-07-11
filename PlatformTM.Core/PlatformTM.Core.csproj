@@ -16,4 +16,8 @@
 <!--   <PackageReference Include="Microsoft.AspNetCore.App" />-->
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Domain\Model\DatasetModel\ISATAB\" />
+    <Folder Include="Domain\Model\DatasetModel\New Folder\" />
+  </ItemGroup>
 </Project>

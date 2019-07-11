@@ -26,9 +26,9 @@ namespace PlatformTM.Services.Services
         public async Task GenerateAndCacheClinicalDTO(int projectId)
         {
             _cacheRepository.RemoveFromCache(c=> c.ProjectId==projectId);
-            var cTree = await _explorerService.GetClinicalObsTree(projectId);
-            cTree.Id = Guid.NewGuid();
-            _cacheRepository.Save(cTree);
+            //var cTree = await _explorerService.GetClinicalObsTree(projectId);
+            //cTree.Id = Guid.NewGuid();
+            //_cacheRepository.Save(cTree);
         }
     }
 }

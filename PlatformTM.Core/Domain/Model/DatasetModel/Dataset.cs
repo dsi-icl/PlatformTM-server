@@ -12,7 +12,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         public string TemplateId { get; set; }
         public Activity Activity { get; private set; }
         public DatasetTemplate Template { get; set; }
-        public ICollection<VariableReference> Variables { get;  set; }
+        public ICollection<VariableReference> Variables { get; set; }
 
 
         //public ICollection<Study> Studies { get; set; }
@@ -20,7 +20,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         /*Consider putting this back when support for many-tp-many relationship is available*/
         //public ICollection<DataFile> DataFiles { get; set; }
         public ICollection<DatasetDatafile> DataFiles { get; set; }
-        
+
         //public ICollection<DataFile> StandardDataFiles { get; set; }
         public string State { get; set; }
 
@@ -35,4 +35,38 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
             //if(DataFiles.Contains())
         }
     }
+
+    public abstract class FieldConstruct
+    {
+        public List<Field> Fields { get; set; }
+
+    }
+
+    public class Field
+    {
+
+    }
+
+    public class CodedTextFG : FieldConstruct
+    {
+        public Field Value { get; set; }
+        public Field Code { get; set; }
+        public Field Terminology { get; set; }
+    }
+
+    public class ObsrvationDataset  
+    {
+        public CodedTextFG Topic { get; set; }
+        public List<FieldConstruct> ObservedProprties { get; set; }
+        public void AddObservedProperty()
+        {
+            var f = new CodedTextFG();
+            f.Code = new Field();
+            f.Value = new Field();
+            f.Terminology = new Field();
+            ObservedProprties.Add(f);
+
+        }
+    }
+
 }

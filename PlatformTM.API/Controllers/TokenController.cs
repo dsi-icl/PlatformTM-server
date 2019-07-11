@@ -29,9 +29,14 @@ namespace PlatformTM.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTokenAsync(CredentialsViewModel loginCredentials)
+        public async Task<IActionResult> GetTokenAsync(CredentialsViewModel credentialsVM)
         {
-            var user = Authenticate(loginCredentials).Result;
+            var user = Authenticate(credentialsVM).Result;
+
+            var signInResult = await _accountService.Login(credentialsVM.Username, credentialsVM.Password);
+            if(!signInResult.Succeeded){
+                return StatusCode(403,"Account not confirmed");
+            }
 
             if (user == null)
                 return new UnauthorizedResult();

@@ -113,8 +113,8 @@ namespace PlatformTM.API.Controllers
             try
             {
                 var path = _fileService.GetFullPath(projectId);
-                //if (!Directory.Exists(path))
-                    //Directory.CreateDirectory(path);
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
 
 
                 if (Request.ContentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) >= 0)
@@ -141,6 +141,7 @@ namespace PlatformTM.API.Controllers
         [HttpGet("projects/{projectId}/drive/{dirId?}")]
         public  DriveVM GetUploadedFiles(int projectId,int dirId)
         {
+            //Check here for permissions
             return _fileService.GetFiles(projectId, dirId);
         }
 
