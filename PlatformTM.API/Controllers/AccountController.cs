@@ -70,7 +70,7 @@ namespace PlatformTM.API.Controllers
                 return new NotFoundObjectResult("User id " + userId + "not found");
             }
             var result = await _userAccountService.ConfirmEmailAsync(user, code);
-            return new RedirectResult("http://localhost:63342/platformtm-web/app/#/verified");
+            return new RedirectResult("/app/#/verified");
         }
 
         //[HttpPost]
