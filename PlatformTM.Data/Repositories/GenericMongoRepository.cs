@@ -42,7 +42,7 @@ namespace PlatformTM.Data.Repositories
            
         }
 
-        public async Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null)
+        public async Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, List<string> includeProperties = null, Expression<Func<TEntity, bool>> projectionExpression = null)
         {
             if (filterExpression != null)
                 return await collection
@@ -50,7 +50,8 @@ namespace PlatformTM.Data.Repositories
                     .ToListAsync();
             return null;
         }
-        
+  
+
         public List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null)
         {
             if (filterExpression != null)

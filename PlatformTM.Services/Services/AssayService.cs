@@ -12,16 +12,16 @@ namespace PlatformTM.Services.Services
         private readonly IRepository<Biosample, int> _bioSampleRepository;
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Assay, int> _assayRepository;
-        private readonly DatasetService _datasetService;
+        private readonly DatasetDescriptorService _datasetDescriptorService;
         private readonly IServiceUoW _dataContext;
 
-        public AssayService(IServiceUoW uoW, DatasetService datasetService)
+        public AssayService(IServiceUoW uoW, DatasetDescriptorService datasetService)
         {
             _dataContext = uoW;
             _bioSampleRepository = uoW.GetRepository<Biosample, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
-            _datasetService = datasetService;
+            _datasetDescriptorService = datasetService;
         }
 
         /**
@@ -52,7 +52,7 @@ namespace PlatformTM.Services.Services
             assayDTO.Design = assay.DesignType?.Id;
 
 
-            foreach (var dst in assay.Datasets.Select(ds => _datasetService.GetActivityDatasetDTO(ds.Id)))
+            foreach (var dst in assay.Datasets.Select(ds => _datasetDescriptorService.GetActivityDatasetDTO(ds.Id)))
             {
                 //TODO: convert to enums or CVterms
                 if (dst.Class == "Assay Samples")
@@ -83,15 +83,15 @@ namespace PlatformTM.Services.Services
             if (assayDto.FeaturesDataset != null) assayDto.FeaturesDataset.ProjectId = assayDto.ProjectId;
             if (assayDto.ObservationsDataset != null) assayDto.ObservationsDataset.ProjectId = assayDto.ProjectId;
 
-            var BSdataset = _datasetService.CreateDataset(assayDto.SamplesDataset);
+            var BSdataset = _datasetDescriptorService.CreateDataset(assayDto.SamplesDataset);
             if (BSdataset != null)
                 assay.Datasets.Add(BSdataset);
 
-            var FEdataset = _datasetService.CreateDataset(assayDto.FeaturesDataset);
+            var FEdataset = _datasetDescriptorService.CreateDataset(assayDto.FeaturesDataset);
             if (FEdataset != null)
                 assay.Datasets.Add(FEdataset);
 
-            var OBdataset = _datasetService.CreateDataset(assayDto.ObservationsDataset);
+            var OBdataset = _datasetDescriptorService.CreateDataset(assayDto.ObservationsDataset);
             if (OBdataset != null)
                 assay.Datasets.Add(OBdataset);
 
@@ -130,12 +130,12 @@ namespace PlatformTM.Services.Services
                 datasetDto.ProjectId = assayDTO.ProjectId;
                 if (datasetDto.IsNew)
                 {
-                    var dataset = _datasetService.CreateDataset(datasetDto);
+                    var dataset = _datasetDescriptorService.CreateDataset(datasetDto);
                     assayToUpdate.Datasets.Add(dataset);
                     _assayRepository.Update(assayToUpdate);
                 }
                 else
-                    _datasetService.UpdateDataset(datasetDto);
+                    _datasetDescriptorService.UpdateDataset(datasetDto);
             }
             return _dataContext.Save();
         }

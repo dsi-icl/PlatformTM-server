@@ -20,6 +20,14 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
         public VariableDefinition TopicSynonymVariable { get; set; } //--TEST //--MODIFY
         public VariableDefinition TopicCVtermVariable { get; set; } //--LOINC // --DECOD
 
+        public ObservationModel.NumericMeasureQF OriginalMeasurmentResult;
+        public ObservationModel.NumericMeasureQF StandardMeasurmentResult;
+        public ObservationModel.CodedQualifiedField Topic;
+
+
+        //List<VariableDefinition> FeatureProperties;
+
+
         public VariableDefinition GroupVariable { get; set; } //--CAT
         public VariableDefinition SubgroupVariable { get; set; } //--SCAT
 
@@ -61,6 +69,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
         public SdtmMedDRADescriptors MedDRAvariables { get; set; }
 
 
+        public List<VariableDefinition> MandatoryFields { get; set; }
 
 
 

@@ -1,8 +1,10 @@
-﻿namespace PlatformTM.Services.DTOs
+﻿using System;
+
+namespace PlatformTM.Services.DTOs
 {
     public class DirectoryDTO
     {
-        public string name { get; set; }
-        public string currentDir { get; set; }
+        public string Name { get; set; }
+        public int? ParentFolderId { get; set; }
     }
 }

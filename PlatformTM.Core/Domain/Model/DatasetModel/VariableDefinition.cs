@@ -71,7 +71,8 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         /// Other Fields that qualify information in this field
         /// </summary>
         /// <example>Value Unit | Value High Range | Value Low Range | </example>
-        public List<VariableQualifier> VariableQualifiers { get; set; }
+        public List<VariableQualifier> Qualifiers { get; set; }
+        public List<VariableQualifier> QualifiedVariables { get; set; }
 
         public string ComputedVarExpression { get; set; }
 

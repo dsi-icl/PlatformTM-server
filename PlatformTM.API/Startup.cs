@@ -46,7 +46,8 @@ namespace PlatformTM.API
                     builder => builder.AllowAnyOrigin()
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .AllowCredentials());
+                    .AllowCredentials().WithExposedHeaders("Content-Disposition"));
+                
             });
             services.AddOptions();
 
@@ -87,6 +88,7 @@ namespace PlatformTM.API
             services.Configure<DataAccessSettings>(Configuration.GetSection("DBSettings"));
             services.Configure<FileStorageSettings>(Configuration.GetSection("FileStorageSettings"));
             services.Configure<TokenAuthOptions>(Configuration.GetSection("TokenAuthOptions"));
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             #region DI Registration
             services.AddDbContext<PlatformTMdbContext>
@@ -100,6 +102,7 @@ namespace PlatformTM.API
             services.AddScoped<CVtermService>();
             services.AddScoped<DataExplorerService>();
             services.AddScoped<DatasetService>();
+            services.AddScoped<DatasetDescriptorService>();
             services.AddScoped<ExportService>();
             services.AddScoped<FileService>();
 
@@ -108,7 +111,7 @@ namespace PlatformTM.API
             services.AddScoped<StudyService>();
             
             services.AddScoped<TemplateService>();
-            services.AddScoped<UserDatasetService>();
+            services.AddScoped<AnalysisDatasetService>();
             services.AddScoped<UserAccountService>();
             services.AddScoped<CheckoutService>();
             services.AddScoped<QueryService>();
@@ -123,6 +126,7 @@ namespace PlatformTM.API
             services.AddScoped<Formatter>();
             services.AddScoped<Data.DbInitializer>();
             services.AddScoped<JwtProvider>();
+            services.AddScoped<EmailService>();
             #endregion
 
             #region MongoDB Class Mapppings
@@ -139,10 +143,17 @@ namespace PlatformTM.API
             BsonClassMap.RegisterClassMap<ObservationQuery>();
             #endregion
 
-            services.AddIdentity<UserAccount, Role>()
+            services.AddIdentity<UserAccount, Role>(config =>
+            {
+                config.SignIn.RequireConfirmedEmail = false;
+            })
             .AddUserStore<UserStore>()
-            .AddRoleStore<RoleStore>();
+            .AddRoleStore<RoleStore>()
+            .AddDefaultTokenProviders();
 
+            services.AddResponseCompression(options => {
+                options.EnableForHttps = true;
+            });
             services.AddMvc(config =>
             {
                 //add a global filter so that requests are Authorized by default
@@ -151,6 +162,7 @@ namespace PlatformTM.API
             .AddJsonOptions(opts =>{
                 // Force Camel Case to JSON
                 opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                opts.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             });
 
@@ -169,6 +181,7 @@ namespace PlatformTM.API
 
             app.UsePathBase("/api/v1/");
 
+            app.UseResponseCompression();
             app.UseCors("CorsPolicy");
 
             if(env.IsDevelopment())

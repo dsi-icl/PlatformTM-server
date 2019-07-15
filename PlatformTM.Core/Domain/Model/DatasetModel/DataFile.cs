@@ -14,6 +14,9 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         public string State { get; set; }
         public Project Project { get; set; }
         public int ProjectId { get; set; }
+
+        public DataFile Folder { get; set; }
+        public int? FolderId { get; set; }
         /*Consider putting this back when support for many-tp-many relationship is available*/
         //public ICollection<Dataset> Datasets { get; set; }
 

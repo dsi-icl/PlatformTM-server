@@ -83,11 +83,19 @@ namespace PlatformTM.Data
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
-            if (typeof(TEntity) == typeof(UserDataset))
+            if (typeof(TEntity) == typeof(ExportFile))
             {
                 //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
-                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"userDatasets");
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb,"exportFiles");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+			if (typeof(TEntity) == typeof(AnalysisDataset))
+            {
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "analysisDatasets");
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
@@ -211,6 +219,7 @@ namespace PlatformTM.Data
 
             modelBuilder.AddConfiguration<VariableDefinition>(new VariableDefConfig());
             modelBuilder.AddConfiguration<VariableReference>(new VariableRefConfig());
+            modelBuilder.AddConfiguration(new VariableQualifierConfig());
 
             modelBuilder.AddConfiguration<Visit>(new VisitConfig());
 
@@ -238,23 +247,23 @@ namespace PlatformTM.Data
 
         private void WaitForDBInit()
         {
-            var con = new MySqlConnection(_dbsettings.Value.MySQLconn);
-            int retries = 1;
-            while (retries < 7)
-            {
-                try
-                {
-                    Console.WriteLine("Connecting to db. Trial: {0}", retries);
-                    con.Open();
-                    con.Close();
-                    break;
-                }
-                catch (MySqlException)
-                {
-                    Thread.Sleep((int)Math.Pow(2, retries) * 1000);
-                    retries++;
-                }
-            }
+            //var con = new MySqlConnection(_dbsettings.Value.MySQLconn);
+            //int retries = 1;
+            //while (retries < 7)
+            //{
+                //try
+                //{
+                //    Console.WriteLine("Connecting to db. Trial: {0}", retries);
+                //    con.Open();
+                //    con.Close();
+                //    break;
+                //}
+                //catch (MySqlException)
+                //{
+                //    Thread.Sleep((int)Math.Pow(2, retries) * 1000);
+                //    retries++;
+                //}
+            //}
         }
     }
 }

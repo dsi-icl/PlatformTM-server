@@ -219,5 +219,113 @@ namespace PlatformTM.Services.Services.Loading.SDTM
             }
             return sdtmrow;
         }
+
+        public static DataRow WriteSDTMrow(SdtmRow sdtmrow, DataTable datatable, SdtmRowDescriptor descriptor){
+            var row = datatable.NewRow();
+
+            foreach (DataColumn column in datatable.Columns)
+            {
+                var colName = column.ColumnName;
+                //var value = tableRow[column].ToString();
+
+                if (colName == descriptor.StudyIdentifierVariable.Name)
+                {
+                    //"STUDYID":
+                    row[column] = sdtmrow.StudyId ?? "";
+                }
+                else if (colName == descriptor.DomainVariable.Name)
+                {
+                    //DOMAIN
+                    row[column] = sdtmrow.DomainCode ?? "";
+                }
+                else if (colName == descriptor.SubjIdVariable?.Name)
+                {
+                    //SUBJID
+                    row[column] = sdtmrow.SubjectId ?? "";
+                }
+                else if (colName == descriptor.UniqueSubjIdVariable.Name)
+                {
+                    //USUBJID
+                    row[column] = sdtmrow.USubjId ?? "";
+                }
+                else if (colName == descriptor.SampleIdVariable?.Name)
+                {
+                    //--REFID
+                    row[column] = sdtmrow.SampleId ?? "";
+                }
+                else if (colName == descriptor.TopicVariable?.Name)
+                {
+                    //--TESTCD // --TERM // --TRT
+                    row[column] = sdtmrow.Topic ?? "";
+                }
+                else if (colName == descriptor.TopicSynonymVariable?.Name)
+                {
+                    //--TEST // --MODIFY
+                    row[column] = sdtmrow.TopicSynonym ?? "";
+                }
+                else if (colName == descriptor.TopicCVtermVariable?.Name)
+                {
+                    //--LOINC --DECODE
+                    row[column] = sdtmrow.TopicControlledTerm ?? "";
+                }
+                else if (colName == descriptor.GroupVariable?.Name)
+                {
+                    //--CAT
+                    row[column] = sdtmrow.Group ?? "";
+                }
+                else if (colName == descriptor.SubgroupVariable?.Name)
+                {
+                    //--SCAT
+                    row[column] = sdtmrow.Subgroup ?? "";
+                }
+                else if (descriptor.QualifierVariables.Select(v => v.Name).Contains(colName))
+                {
+                    //RECORD QUALIFIERS
+                    var val = sdtmrow.Qualifiers.FirstOrDefault(c => c.Key == colName).Value;
+                    row[column] = val ?? "";
+                }
+                else if (descriptor.ResultVariables.Select(v => v.Name).Contains(colName))
+                {
+                    //RESULT QUALIFIERS
+                    var val = sdtmrow.ResultQualifiers.FirstOrDefault(c => c.Key == colName).Value;
+                    row[column] = val ?? "";
+                }
+                else if (descriptor.SynonymVariables.Select(v => v.Name).Contains(colName))
+                {
+                    //SYNOYMS
+                    var val = sdtmrow.QualifierSynonyms.FirstOrDefault(c => c.Key == colName).Value;
+                    row[column] = val ?? "";
+                }
+                else if (descriptor.VariableQualifierVariables.Select(v => v.Name).Contains(colName))
+                {
+                    //VARIABLE QUALIFIERS
+                    var val = sdtmrow.QualifierQualifiers.FirstOrDefault(c => c.Key == colName).Value;
+                    row[column] = val ?? "";
+                }
+                else if (descriptor.TimeVariables.Select(v => v.Name).Contains(colName))
+                {
+                    //VISIT
+                    var val = sdtmrow.TimingQualifiers.FirstOrDefault(c => c.Key == colName).Value;
+                    row[column] = val ?? "";
+                }
+                else if (descriptor.DurationVariable?.Name == colName)
+                {
+                    //--DUR
+                    row[column] = sdtmrow.Duration;
+                }
+
+                else if (sdtmrow.Leftovers.ContainsKey(colName))
+                {
+                    var val = sdtmrow.Leftovers.FirstOrDefault(c => c.Key == colName).Value;
+                    row[column] = val ?? "";
+                }
+
+                else
+                    row[column] = "";
+                //TODO: else if(column is not mandatory add it and set null)
+                //else throw new Exception("Unknown column. Cannot find value for it.");column in descriptor
+            }
+            return row;
+        }
     }
 }

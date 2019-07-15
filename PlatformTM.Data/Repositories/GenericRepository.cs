@@ -65,6 +65,19 @@ namespace PlatformTM.Data.Repositories
             return query[0].ToList<TEntity>();
         }
 
+        public Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null, Expression<Func<TEntity, bool>> projectionExpression = null)
+        {
+            IQueryable<TEntity>[] query = { Entities };
+
+            includeProperties?.ForEach(i =>
+                query[0] = query[0].Include(i));
+
+            if (filter != null)
+                query[0] = query[0].Where(filter);
+
+            return query[0].ToListAsync<TEntity>();
+        }
+
         public Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null)
         {
             throw new NotImplementedException();
@@ -179,5 +192,7 @@ namespace PlatformTM.Data.Repositories
         {
             throw new NotImplementedException();
         }
+
+
     }
 }

@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services;
+using PlatformTM.Services.Services.HelperService;
 using PlatformTM.Services.Services.Loading.AssayData;
 
 namespace PlatformTM.API.Controllers
@@ -10,27 +13,34 @@ namespace PlatformTM.API.Controllers
     [Route("datasets")]
     public class DatasetController : Controller
     {
+        private readonly DatasetDescriptorService _datasetDescriptorService;
         private readonly DatasetService _datasetService;
         private readonly DataMatrixLoader _dataMatrixLoader;
+        private readonly FileService _fileService;
 
-        public DatasetController(DatasetService datasetService, DataMatrixLoader dataMatrixLoader) 
+        public DatasetController(DatasetDescriptorService descriptorService,
+                                 DatasetService datasetservice,
+                                 FileService fileService,
+                                 DataMatrixLoader dataMatrixLoader) 
         {
-            _datasetService = datasetService;
+            _datasetDescriptorService = descriptorService;
+            _datasetService = datasetservice;
             _dataMatrixLoader = dataMatrixLoader;
+            _fileService = fileService;
         }
 
 
         [HttpGet("{datasetId}", Name = "GetDatasetById")]
         public DatasetDTO GetActivityDataset(int datasetId)
         {
-            return _datasetService.GetActivityDatasetDTO(datasetId);
+            return _datasetDescriptorService.GetActivityDatasetDTO(datasetId);
         }
 
 
         [HttpPost]
         public IActionResult AddDataset([FromBody] DatasetDTO datasetDTO)
         {
-            var addedDataset = _datasetService.addDataset(datasetDTO);
+            var addedDataset = _datasetDescriptorService.addDataset(datasetDTO);
             if (addedDataset != null)
             {
                 return new CreatedAtActionResult("GET", "GetDatasetById", new { datasetId = addedDataset.Id }, addedDataset);
@@ -52,17 +62,9 @@ namespace PlatformTM.API.Controllers
         public string UpdateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
         {
             if (datasetDTO.Id == datasetId)
-                return _datasetService.UpdateDataset(datasetDTO);
+                return _datasetDescriptorService.UpdateDataset(datasetDTO);
             return "FAILED to update datasetId";
         }
-
-        //[HttpGet]
-        //[Route("{datasetId}/templateMap")]
-        //public DataTemplateMap GetDatasetTemplateMap(int datasetId)
-        //{
-        //    return  _datasetService.GetTemplateMaps(datasetId);
-        //}
-
         
         [HttpGet("{datasetId}/load/files/{fileId}")]
         public async Task<bool> LoadDataset(int datasetId, int fileId)
@@ -75,6 +77,27 @@ namespace PlatformTM.API.Controllers
         {
             _datasetService.UnloadDataset(datasetId,fileId);
             return Ok();
+        }
+
+        [HttpGet("{datasetId}/download")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DownloadDataset(int datasetId){
+            var datatable = await _datasetService.ConsolidateDataset(datasetId);
+
+            byte[] outputBuffer = null;
+
+            using (MemoryStream tempStream = new MemoryStream())
+            {
+                using (StreamWriter writer = new StreamWriter(tempStream))
+                {
+                    IOhelper.WriteDataTable(datatable, writer, true);
+                }
+
+                outputBuffer = tempStream.ToArray();
+            }
+            //Response.Headers.Add("Content-Disposition", "inline; filename="+datatable.TableName + ".csv");
+            return File(outputBuffer, "text/csv", datatable.TableName+".csv");
+
         }
 
         //[HttpGet]

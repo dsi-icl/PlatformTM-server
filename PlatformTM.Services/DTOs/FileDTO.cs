@@ -13,6 +13,7 @@ namespace PlatformTM.Services.DTOs
         public string state { get; set; }
 
         public List<Dictionary<string, string>> columnHeaders { get; set; }
+        public int? FolderId { get; set; }
 
         public bool templateMatched { get; set; }
 

@@ -35,7 +35,9 @@ namespace PlatformTM.Core.Domain.Interfaces
                                     int? page = null,
                                     int? pageSize = null);
 
-        Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null);
+        //Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, bool>> projectionExpression = null);
+
+        Task<List<TEntity>> FindAllAsync(Expression<Func<TEntity, bool>> filter = null, List<string> includeProperties = null, Expression<Func<TEntity, bool>> projectionExpression = null);
 
        
         List<object> FindObservations(Expression<Func<TEntity, bool>> filterExpression = null, Expression<Func<TEntity, object>> projectionExpression = null);

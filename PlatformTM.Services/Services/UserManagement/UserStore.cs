@@ -11,7 +11,7 @@ using PlatformTM.Core.Domain.Interfaces;
 
 namespace PlatformTM.Services.Services.UserManagement
 {
-    public class UserStore : IUserPasswordStore<UserAccount>, IUserClaimStore<UserAccount>
+    public class UserStore : IUserPasswordStore<UserAccount>, IUserClaimStore<UserAccount>, IUserSecurityStampStore<UserAccount>, IUserEmailStore<UserAccount>
     {
         private readonly IServiceUoW _unitOfWork;
         private readonly IUserRepository _userRepository;
@@ -90,10 +90,12 @@ namespace PlatformTM.Services.Services.UserManagement
         }
         public async Task<UserAccount> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return await _accountRepository.FindByUserNameAsync(normalizedUserName);
+
+                        return await _accountRepository.FindByUserNameAsync(normalizedUserName);
         }
 
     
+        //Password Methods
         public Task SetPasswordHashAsync(UserAccount account, string passwordHash, CancellationToken cancellationToken)
         {
             account.PasswordHash = passwordHash;
@@ -111,7 +113,7 @@ namespace PlatformTM.Services.Services.UserManagement
         }
 
 
-
+        //Claims Methods
         public Task<IList<Claim>> GetClaimsAsync(UserAccount userAccount, CancellationToken cancellationToken)
         {
             var account = _accountRepository.FindSingle(a=>a.UserName == userAccount.UserName, new List<string>() {"Claims"});
@@ -153,95 +155,117 @@ namespace PlatformTM.Services.Services.UserManagement
         }
 
 
+        //Security Stamp Methods
+        public Task SetSecurityStampAsync(UserAccount user, string stamp, CancellationToken cancellationToken)
+        {
+            user.SecurityStamp = stamp;
+            return Task.FromResult(0);
+        }
+        public Task<string> GetSecurityStampAsync(UserAccount user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.SecurityStamp);
+        }
+
+
+
+
+        public Task SetEmailAsync(UserAccount userAccount, string email, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (userAccount == null)
+            {
+                throw new ArgumentNullException(nameof(userAccount));
+            }
+            userAccount.User.Email = email;
+            return Task.CompletedTask;
+        }
+
+        public Task<string> GetEmailAsync(UserAccount userAccount, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (userAccount == null)
+            {
+                throw new ArgumentNullException(nameof(userAccount));
+            }
+            return Task.FromResult(userAccount.User.Email);
+        }
+
+        public Task<bool> GetEmailConfirmedAsync(UserAccount user, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            return Task.FromResult(user.EmailConfirmed);
+        }
+
+        public Task SetEmailConfirmedAsync(UserAccount user, bool confirmed, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+        
+            user.EmailConfirmed = confirmed;
+            return Task.CompletedTask;
+        }
+
+        public async Task<UserAccount> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            var account = await _accountRepository.FindAsync(u => u.User.Email == normalizedEmail);
+            return account;
+
+        }
+
+        public Task<string> GetNormalizedEmailAsync(UserAccount userAccount, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (userAccount == null)
+            {
+                throw new ArgumentNullException(nameof(userAccount));
+            }
+            return Task.FromResult(userAccount.User.Email);
+        }
+
+        public Task SetNormalizedEmailAsync(UserAccount userAccount, string normalizedEmail, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (userAccount == null)
+            {
+                throw new ArgumentNullException(nameof(userAccount));
+            }
+            //userAccount.User.NormalizedEmail = normalizedEmail;
+            return Task.CompletedTask;
+        }
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
         protected virtual void Dispose(bool disposing)
         {
             if (_disposed) return;
             if (disposing)
                 //handle.Dispose();
-            _disposed = true;
+                _disposed = true;
         }
 
-        //public void Dispose()
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //public Task CreateAsync(UserAccount userAccount)
-        //{
-        //    _userRepository.Insert(userAccount.Account.User);
-        //    _accountRepository.Insert(userAccount.Account);
-        //    return _unitOfWork.SaveChangesAsync();
-        //}
+        protected void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
+        }
 
-        //public Task DeleteAsync(UserAccount user)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public void Dispose()
-        //{
-        //    //DI takes care of that
-        //}
-
-        //public async Task<UserAccount> FindByIdAsync(Guid userId)
-        //{
-        //    Account appUser = await _accountRepository.GetAsync(userId);
-        //    return appUser != null ? new UserAccount(appUser) : null;
-        //}
-
-        //public async Task<UserAccount> FindByNameAsync(string userName)
-        //{
-        //    Account appuser = await _accountRepository.FindByUserNameAsync(userName);
-        //    return appuser!=null ? new UserAccount(appuser) : null;
-        //}
-
-        //public Task UpdateAsync(UserAccount user)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //public Task SetPasswordHashAsync(UserAccount user, string passwordHash)
-        //{
-        //    user.Account.PasswordHash = passwordHash;
-        //    return Task.FromResult(0);
-        //}
-
-        //public Task<string> GetPasswordHashAsync(UserAccount user)
-        //{
-        //    if (user == null)
-        //        throw new ArgumentNullException("user");
-        //    return Task.FromResult<string>(user.Account.PasswordHash);
-        //}
-
-        //public Task<bool> HasPasswordAsync(UserAccount user)
-        //{
-        //    if (user == null)
-        //        throw new ArgumentNullException("user");
-        //    return Task.FromResult<bool>(!string.IsNullOrWhiteSpace(user.Account.PasswordHash));
-        //}
-
-        //private Account GetAccount(UserAccount userAccount)
-        //{
-        //    return new Account()
-        //    {
-        //        AdminApproved = userAccount.AdminApproved,
-        //        JoinDate = userAccount.JoinDate,
-        //        PasswordHash = userAccount.PasswordHash,
-        //        UserName = userAccount.UserName,
-        //        PSK = userAccount.PSK,
-        //        SecurityStamp = userAccount.SecurityStamp,
-        //        EmailConfirmed = userAccount.EmailConfirmed,
-        //        TwoFactorEnabled = userAccount.TwoFactorEnabled,
-        //        UserId = userAccount.UserId,
-        //        Claims = userAccount.Claims,
-        //        User = userAccount.User
-        //    };
-        //}
-        
     }
 }
