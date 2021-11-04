@@ -36,7 +36,8 @@ namespace PlatformTM.Data.EntityConfigurations
             builder
              .HasDiscriminator<string>("Discriminator")
             .HasValue<Activity>("Activity")
-            .HasValue<Assay>("Assay");
+            .HasValue<Assay>("Assay")
+            .HasValue<SubjectRecording>("SubjectRecording");
         }
     }
 }

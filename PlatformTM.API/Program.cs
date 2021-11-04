@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PlatformTM.Data;
 
@@ -13,7 +14,7 @@ namespace PlatformTM.API
         {
             var host = CreateWebHostBuilder(args).Build();
 
-            if (EnvironmentName.Development != Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"))
+            if (Environments.Development != Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"))
                 using (var scope = host.Services.CreateScope())
                 {
                     var services = scope.ServiceProvider;

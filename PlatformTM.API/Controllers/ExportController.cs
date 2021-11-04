@@ -3,8 +3,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MySql.Data.MySqlClient;
-using PlatformTM.Core.Domain.Model.Users.Datasets;
 using PlatformTM.Services.Services;
 
 namespace PlatformTM.API.Controllers

@@ -18,13 +18,12 @@ namespace PlatformTM.API.Controllers
     {
         private readonly FileService _fileService;
         private readonly DatasetService _datasetService;
-        //private IHostingEnvironment _environment;
 
-        public FileController(FileService fileService, DatasetService datasetService, IHostingEnvironment env)
+        public FileController(FileService fileService, DatasetService datasetService)
         {
             _fileService = fileService;
             _datasetService = datasetService;
-            //_environment = env;
+          
         }
 
         [HttpGet("{fileId}", Name = "GetFileById")]

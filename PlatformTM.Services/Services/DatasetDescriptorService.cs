@@ -3,15 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 using PlatformTM.Core.Domain.Interfaces;
-using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
-using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.Templates;
-using PlatformTM.Core.Domain.Model.Timing;
-using PlatformTM.Core.JoinEntities;
 using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services.Loading.AssayData;
-using PlatformTM.Services.Services.Loading.SDTM;
 namespace PlatformTM.Services.Services
 {
     public class DatasetDescriptorService
@@ -19,21 +13,11 @@ namespace PlatformTM.Services.Services
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<Dataset, int> _datasetRepository;
         private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
-        private readonly IRepository<DataFile, int> _dataFileRepository;
-        private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
-
-        private readonly IRepository<Observation, int> _observationRepository;
-        private readonly CacheService _cacheService;
         public DatasetDescriptorService(IServiceUoW uoW, CacheService cacheService)
         {
             _dataServiceUnit = uoW;
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
-            _dataFileRepository = uoW.GetRepository<DataFile, int>();
-            _observationRepository = uoW.GetRepository<Observation, int>();
-            _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
-
-            _cacheService = cacheService;
         }
 
         /// <summary>

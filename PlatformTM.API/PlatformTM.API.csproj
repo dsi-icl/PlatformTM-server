@@ -1,18 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <PreserveCompilationContext>true</PreserveCompilationContext>
     <AssemblyName>PlatformTM.API</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>PlatformTM.API</PackageId>
     <AssertTargetFallback>$(AssertTargetFallback);dnxcore50</AssertTargetFallback>
-    <RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>
+    <!--<RuntimeFrameworkVersion>2.0.0</RuntimeFrameworkVersion>-->
     <RootNamespace>PlatformTM.API</RootNamespace>
     <DockerComposeProjectPath>../docker-compose.dcproj</DockerComposeProjectPath>
         <UserSecretsId>98241d1e-431b-46cc-88b4-ddd827abd192</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <None Remove="Microsoft.Extensions.Logging.Console" />
+    <None Remove="Newtonsoft.Json" />
+    <None Remove="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+  </ItemGroup>
   <ItemGroup>
     <None Update="wwwroot\**\*">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
@@ -25,9 +31,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.2.4" />
+    <!--<PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.5" />-->
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.14.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.1.20" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.20" />
   </ItemGroup>
 
   <!--<ItemGroup>

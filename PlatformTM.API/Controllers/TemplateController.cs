@@ -15,6 +15,12 @@ namespace PlatformTM.API.Controllers
             _templateService = templateService;
         }
 
+        [HttpGet("subject")]
+        public IEnumerable<DatasetDTO> GetSubjectTemplates()
+        {
+            return _templateService.GetSubjectTemplates();
+        }
+
         [HttpGet("clinical")]
         public IEnumerable<DatasetDTO> Get()
         {

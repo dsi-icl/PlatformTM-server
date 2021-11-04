@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MySql.Data.MySqlClient;
 using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;

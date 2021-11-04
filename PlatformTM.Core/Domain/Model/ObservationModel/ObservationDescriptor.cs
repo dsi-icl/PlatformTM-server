@@ -64,9 +64,9 @@ namespace PlatformTM.Core.Domain.Model.ObservationModel
     //    public int ProjectId { get; set; }
     //}
 
-    
-    
-    
+
+
+
     //TODO: TemporalQualifiers such as
     //DURATION, ELAPSED_TIME, INTERVAL
 
@@ -77,7 +77,7 @@ namespace PlatformTM.Core.Domain.Model.ObservationModel
     public enum DescriptorType
     {
         FeatureDescriptor, //Properties ABOUT the feature (e.g. findings:Reason not done, status , )
-        ObservedPropertyDescriptor, 
+        ObservedPropertyDescriptor,
         DefObservedPropDescriptor,
         SubjectDescriptor,
         SampleDescriptor,
@@ -94,7 +94,76 @@ namespace PlatformTM.Core.Domain.Model.ObservationModel
         AnatomicalLocation
     }
 
+    public  class Observable{}
+    public class Property : Observable { }
+    public class Feature :Observable{
+        public List<Observable> observableProperties { get; set; }
+        public string Name
+        {
+            get; set;
+        }
+    }
+    public class ObservationFeature : Observable
+    {
+        //This is can be temp and it can headache
+        //if its temperature then i get the result from the observation object that corresponds
+        //to temp... obs.foi=temp or obs.foi=headache the only difference is temp is a feature with
+        //no other properties IT IS the PROPERTY of a feature that in OUR context is not really the
+        //main feature of Interest ... 
+        //yeb2a el foi is of a type that can be either a property or a feature==> hence observable
+        //tab lama el obs.foi is of temp yeb2a it's instantiated ... it is an Observable Feature Of Interest
+        //but it is not a Feature that has properties ...malhash Feature...heya el feature
+    }
+
+    //class ObservableEntity : ObservableFeature { }
+
+    public class ObservationPhenomenon {
+        public Feature Feature { get; set; }
+        public Property Property { get; set; }
+    }
 
 
+    
+    //class Feature : Observable { }
+    class Observatio
+    {
+        public ObservationPhenomenon Phenomenon;
+        //Property ObservedProperty { get; set; }
+        //Observablfee observedEntity { get; set; }
+        Observable FeatureOfInterest { get; set; }
+
+        public void test()
+        {
+            Observatio obHO = new Observatio();
+            Feature headache = new Feature(); //OR FIND
+            Property occurence = new Property(); //OR FIND
+            headache.observableProperties.Add(occurence);
+
+            obHO.FeatureOfInterest = headache;
+
+            obHO.Phenomenon.Feature = headache;
+            obHO.Phenomenon.Property = occurence;
+
+            Observatio obTemp = new Observatio();
+            Feature person = new Feature(); //OR find
+            Property temp = new Property(); //OR FIND
+            //malhash properties;
+
+            obTemp.Phenomenon.Feature= person;
+            //obTemp.observedProperty = temp;
+            obTemp.FeatureOfInterest = temp;
+
+
+            //This is to simulate a list of object-of-observations (FeaturesOfInterest) retrieved from DB
+            var features = new List<Observable>();
+            features.Add(headache);
+            features.Add(temp);
+
+            obHO.FeatureOfInterest = features[0];
+            obTemp.FeatureOfInterest = features[1];
+        }
+
+        
+    }
 
 }

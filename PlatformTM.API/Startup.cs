@@ -1,16 +1,16 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson.Serialization;
-using Newtonsoft.Json.Serialization;
 using PlatformTM.API.Auth;
 using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Interfaces;
@@ -26,16 +26,20 @@ using PlatformTM.Services.Services.Loading.AssayData;
 using PlatformTM.Services.Services.Loading.SDTM;
 using PlatformTM.Services.Services.UserManagement;
 using Swashbuckle.AspNetCore.Swagger;
+using Newtonsoft.Json.Serialization;
+using Microsoft.OpenApi.Models;
 
 namespace PlatformTM.API
 {
     public class Startup
     {
         private IConfiguration Configuration { get; }
+        private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Configuration = configuration;
+            _env = env;
         }
 
         public void ConfigureServices(IServiceCollection services)
@@ -43,7 +47,7 @@ namespace PlatformTM.API
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
+                    builder => builder.SetIsOriginAllowed(origin => true)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials().WithExposedHeaders("Content-Disposition"));
@@ -154,37 +158,57 @@ namespace PlatformTM.API
             services.AddResponseCompression(options => {
                 options.EnableForHttps = true;
             });
+
+            services.AddControllers().AddNewtonsoftJson();
+
             services.AddMvc(config =>
             {
                 //add a global filter so that requests are Authorized by default
                 config.Filters.Add(new AuthorizeFilter("Bearer"));
-            })
-            .AddJsonOptions(opts =>{
+            }).AddNewtonsoftJson
+            (opts =>{
                 // Force Camel Case to JSON
-                opts.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                opts.SerializerSettings.ContractResolver = new  CamelCasePropertyNamesContractResolver();
                 opts.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
                 //opts.SerializerSettings.TypeNameHandling = TypeNameHandling.Auto;
             });
 
-
-			services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(c =>
 			{
-				c.SwaggerDoc("v1", new Info { Title = "PlatformTM API", Version = "v1" });
+				c.SwaggerDoc("v1", new OpenApiInfo { Title = "PlatformTM API", Version = "v1" });
 			});
+
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.AddConfiguration(Configuration.GetSection("Logging"));
+                loggingBuilder.AddConsole();
+                loggingBuilder.AddDebug();
+            });
 
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            
 
             app.UsePathBase("/api/v1/");
 
             app.UseResponseCompression();
+
+            app.UseRouting();
             app.UseCors("CorsPolicy");
 
-            if(env.IsDevelopment())
+            app.UseAuthentication();
+            //app.UseAuthorization();
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers();
+            });
+
+
+            
+
+            if(_env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
 			// Enable middleware to serve generated Swagger as a JSON endpoint.
@@ -193,9 +217,8 @@ namespace PlatformTM.API
                 c.SwaggerEndpoint("/api/v1/swagger/v1/swagger.json", "PlatformTM API V1");
                });
 
-            app.UseAuthentication();
 
-            app.UseMvc();
+            //app.UseMvc();
 
         }
     }

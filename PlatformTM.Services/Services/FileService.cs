@@ -51,8 +51,8 @@ namespace PlatformTM.Services.Services
             string filePath;
             DataTable dataTable;
             bool success;
-            filePath = Path.Combine(file.Path, file.FileName);
-            dataTable = ReadOriginalFile(filePath);
+            filePath = GetFullPath(file.ProjectId);
+            dataTable = readDataFile(Path.Combine(filePath, file.FileName));
             switch (file.Format)
             {
                 case "SDTM":
