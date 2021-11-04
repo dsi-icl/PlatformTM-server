@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PlatformTM.Core.Domain.Model;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.DTOs.Explorer;
 using PlatformTM.Services.Services;
@@ -44,10 +45,28 @@ namespace PlatformTM.API.Controllers
             return _projectService.GetProjectById(projectId);
         }
 
-        [HttpGet("{projectId}/activities")]
+        [HttpGet("{projectId}/allactivities")]
         public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
         {
-            return _projectService.GetProjectActivities(projectId);
+            return _projectService.GetActivities(projectId, null);
+        }
+
+        [HttpGet("{projectId}/assays")]
+        public IEnumerable<ActivityDTO> GetProjectAssays(int projectId)
+        {
+            return _projectService.GetActivities(projectId,typeof(Assay));
+        }
+
+        [HttpGet("{projectId}/subjDataCollection")]
+        public IEnumerable<ActivityDTO> GetProjectSubjActivities(int projectId)
+        {
+            return _projectService.GetActivities(projectId, typeof(SubjectRecording));
+        }
+
+        [HttpGet("{projectId}/clinicalAssessments")]
+        public IEnumerable<ActivityDTO> GetProjectClinicalAssessments(int projectId)
+        {
+            return _projectService.GetActivities(projectId, typeof(Activity));
         }
 
         [HttpGet("{projectId}/datasets/clinical")]
@@ -120,7 +139,7 @@ namespace PlatformTM.API.Controllers
             try
             {
                 _projectService.UpdateProject(projectDTO, projectId);
-                return new CreatedAtActionResult("GET", "GetProjectById", new { projectId = projectDTO.Id }, projectDTO);
+                return new CreatedAtRouteResult("GetProjectById", new { projectId = projectDTO.Id }, projectDTO);
 
             }
             catch (Exception e)

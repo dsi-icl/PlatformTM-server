@@ -57,6 +57,13 @@ namespace PlatformTM.Services.Services
             return domains.Select(GetDatasetDTO).ToList();
         }
 
+        public List<DatasetDTO> GetSubjectTemplates()
+        {
+            var templates = _templateRepository.FindAll(
+                d => d.Class == "Animal Subjects" || d.Class == "Human Subjects", new List<string>() { "Fields" });
+            return templates.Select(GetDatasetDTO).OrderBy(d => d.Class).ToList();
+        }
+
         public List<DatasetDTO> GetAssayFeatureTemplates()
         {
             var templates = _templateRepository.FindAll(

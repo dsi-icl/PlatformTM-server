@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PlatformTM.Services.DTOs;
 using PlatformTM.Services.Services;
 using PlatformTM.Services.Services.HelperService;
@@ -77,6 +78,32 @@ namespace PlatformTM.API.Controllers
         {
             _datasetService.UnloadDataset(datasetId,fileId);
             return Ok();
+        }
+
+        [HttpGet("{datasetId}/descriptor")]
+        [AllowAnonymous]
+        public DatasetDTO DownloadDatasetDescriptor(int datasetId)
+        {
+            var json= _datasetDescriptorService.GetActivityDatasetDTO(datasetId);
+            //var datatable = await _datasetService.ConsolidateDataset(datasetId);
+            return json;
+            //byte[] outputBuffer = null;
+
+            //using (MemoryStream tempStream = new MemoryStream())
+            //{
+            //    using (StreamWriter writer = new StreamWriter(tempStream))
+            //    {
+            //        JsonSerializer serializer = new JsonSerializer();
+            //        //serialize object directly into file stream
+            //        serializer.Serialize(writer, json);
+            //        //IOhelper.WriteDataTable(datatable, writer, true);
+            //    }
+
+            //    outputBuffer = tempStream.ToArray();
+            //}
+            ////Response.Headers.Add("Content-Disposition", "inline; filename="+datatable.TableName + ".csv");
+            //return File(outputBuffer, "application/json", json.Name + ".json");
+
         }
 
         [HttpGet("{datasetId}/download")]

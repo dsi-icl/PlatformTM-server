@@ -103,7 +103,6 @@ namespace PlatformTM.Services.Services
             return dto;
         }
 
-
         public ProjectDTO AddProject(ProjectDTO projectDto, string ownerId)
         {
             var name = projectDto.Name;
@@ -178,11 +177,25 @@ namespace PlatformTM.Services.Services
             return projects;
         }
 
-        public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
+        public IEnumerable<ActivityDTO> GetActivities(int projectId, Type type)
         {
+             
             IEnumerable<Activity> Activities;
-            Activities = _activityRepository.FindAll(
+
+            if(type == null)
+            {
+                Activities = _activityRepository.FindAll(
                     d => d.ProjectId == projectId,
+                    new List<string>(){
+                        "Datasets.Template",
+                        "Project"
+                    }
+                );
+            }
+            else
+
+             Activities = _activityRepository.FindAll(
+                    d => d.ProjectId == projectId && d.GetType() == type,
                     new List<string>(){
                         "Datasets.Template",
                         "Project"
@@ -204,8 +217,6 @@ namespace PlatformTM.Services.Services
             }).ToList();
         }
 
-
-
         public List<UserDTO> GetProjectUsers(int projectId)
         {
             var project = _projectRepository.FindSingle(p => p.Id == projectId,
@@ -225,7 +236,7 @@ namespace PlatformTM.Services.Services
         {
             IEnumerable<Activity> Activities;
             Activities = _activityRepository.FindAll(
-                d => (d.ProjectId == projectId && typeof(Activity)==d.GetType()),
+                d => (d.ProjectId == projectId && (typeof(Activity)==d.GetType()|| typeof(SubjectRecording) == d.GetType())),
                     new List<string>(){
                         "Datasets.Template",
                         "Datasets.DataFiles.Datafile"
