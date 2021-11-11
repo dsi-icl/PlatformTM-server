@@ -180,7 +180,7 @@ namespace PlatformTM.Services.Services
         public IEnumerable<ActivityDTO> GetActivities(int projectId, Type type)
         {
              
-            IEnumerable<Activity> Activities;
+            IEnumerable<Activity> Activities = null;
 
             if(type == null)
             {
@@ -192,10 +192,26 @@ namespace PlatformTM.Services.Services
                     }
                 );
             }
-            else
+            else if (type == typeof(Activity))
 
              Activities = _activityRepository.FindAll(
-                    d => d.ProjectId == projectId && d.GetType() == type,
+                    d => d.ProjectId == projectId && d is Activity,
+                    new List<string>(){
+                        "Datasets.Template",
+                        "Project"
+                    }
+                );
+            else if (type == typeof(Assay))
+                Activities = _activityRepository.FindAll(
+                    d => d.ProjectId == projectId && d is Assay,
+                    new List<string>(){
+                        "Datasets.Template",
+                        "Project"
+                    }
+                );
+            else if (type == typeof(SubjectRecording))
+                Activities = _activityRepository.FindAll(
+                    d => d.ProjectId == projectId && d is SubjectRecording,
                     new List<string>(){
                         "Datasets.Template",
                         "Project"
@@ -207,7 +223,7 @@ namespace PlatformTM.Services.Services
                 Id = p.Id,
                 ProjectId = p.ProjectId,
                 ProjectAcc = p.Project.Accession,
-                isAssay = typeof(Assay) == p.GetType(),
+                isAssay = p is Assay,
                 datasets = p.Datasets.Select(m => new DatasetDTO
                 {
                     Name = m.Template.Domain,
@@ -236,12 +252,12 @@ namespace PlatformTM.Services.Services
         {
             IEnumerable<Activity> Activities;
             Activities = _activityRepository.FindAll(
-                d => (d.ProjectId == projectId && (typeof(Activity)==d.GetType()|| typeof(SubjectRecording) == d.GetType())),
+                d => (d.ProjectId == projectId && (d is Activity || d is SubjectRecording)),
                     new List<string>(){
                         "Datasets.Template",
                         "Datasets.DataFiles.Datafile"
                     }
-                );
+                ).ToList();
             var datasets = Activities.SelectMany(a => a.Datasets).Select(d=> new DatasetVM(){
                 Id = d.Id,
                 Name = d.Template.Domain,
@@ -259,7 +275,7 @@ namespace PlatformTM.Services.Services
         public List<AssayVM> GetProjectAssayDatasets(int projectId)
         {
             var assays = _assayRepository.FindAll(
-                d => (d.ProjectId == projectId && typeof(Assay) == d.GetType()),
+                d => (d.ProjectId == projectId),
                     new List<string>(){
                         "Datasets.Template",
                         "TechnologyType",

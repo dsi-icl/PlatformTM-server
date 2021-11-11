@@ -29,7 +29,7 @@ namespace PlatformTM.API.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTokenAsync([FromBody] CredentialsViewModel credentialsVM)
+        public async Task<IActionResult> GetTokenAsync([FromForm] CredentialsViewModel credentialsVM)
         {
             var user = Authenticate(credentialsVM).Result;
             if (user == null)
