@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Core.Domain.Model;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Explorer;
-using PlatformTM.Services.Services;
-using PlatformTM.Services.Services.UserManagement;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Explorer;
+using PlatformTM.Models.Services;
+using PlatformTM.Models.Services.UserManagement;
 
 namespace PlatformTM.API.Controllers
 {

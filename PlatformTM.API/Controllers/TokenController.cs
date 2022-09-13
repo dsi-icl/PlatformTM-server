@@ -9,7 +9,7 @@ using Newtonsoft.Json.Serialization;
 using PlatformTM.API.Auth;
 using PlatformTM.API.Services;
 using PlatformTM.Core.Application.AccountManagement;
-using PlatformTM.Services.Services.UserManagement;
+using PlatformTM.Models.Services.UserManagement;
 
 
 namespace PlatformTM.API.Controllers

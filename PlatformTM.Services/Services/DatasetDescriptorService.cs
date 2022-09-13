@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 using PlatformTM.Core.Domain.Interfaces;
+using PlatformTM.Core.Domain.Model.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.Templates;
-using PlatformTM.Services.DTOs;
-namespace PlatformTM.Services.Services
+using PlatformTM.Models.DTOs;
+namespace PlatformTM.Models.Services
 {
     public class DatasetDescriptorService
     {
@@ -138,6 +139,22 @@ namespace PlatformTM.Services.Services
 
             _datasetRepository.Insert(dataset);
             return _dataServiceUnit.Save().Equals("CREATED") ? dataset : null;
+        }
+
+        public DatasetDescriptor CreateDatasetDescriptor(DatasetDTO dto)
+        {
+            if(dto.Code == "observation")
+            {
+                var c = new ObservationDatasetDescriptor();
+                foreach (var variableDto in dto.Variables)
+                {
+                    if(variableDto.RoleId == "ObservedPropertyValue")
+                    {
+                        c.ObservedPropertyFields.Add(null);
+                    } 
+                }
+            }
+            return null;
         }
 
         public Dataset CreateDataset(DatasetDTO datasetDTO)

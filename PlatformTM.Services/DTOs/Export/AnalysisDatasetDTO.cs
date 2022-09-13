@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
 
-namespace PlatformTM.Services.DTOs.Export
+namespace PlatformTM.Models.DTOs.Export
 {
 	public class AnalysisDatasetDTO : Identifiable<Guid>
     {

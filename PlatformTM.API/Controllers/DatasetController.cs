@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services;
-using PlatformTM.Services.Services.HelperService;
-using PlatformTM.Services.Services.Loading.AssayData;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services;
+using PlatformTM.Models.Services.HelperService;
+using PlatformTM.Models.Services.Loading.AssayData;
 
 namespace PlatformTM.API.Controllers
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services;
 
 namespace PlatformTM.API.Controllers
 {

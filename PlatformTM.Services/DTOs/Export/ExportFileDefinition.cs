@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using PlatformTM.Core.Domain.Model.Base;
 
-namespace PlatformTM.Services.DTOs.Export
+namespace PlatformTM.Models.DTOs.Export
 {
 	public class ExportFileDefinition
     {

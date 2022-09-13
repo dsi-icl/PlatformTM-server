@@ -4,9 +4,9 @@ using System.Diagnostics;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.Services.Loading.SDTM
+namespace PlatformTM.Models.Services.Loading.SDTM
 {
     public class SDTMloader
     {
@@ -21,6 +21,14 @@ namespace PlatformTM.Services.Services.Loading.SDTM
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _dataFileRepository = uoW.GetRepository<DataFile, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
+        }
+
+        private void UpdateLoadingStatus(DataFile _dataFile, string state)
+        {
+            _dataFile.State = state;
+            _dataFile.IsLoadedToDB = state=="SAVED";
+            _dataFileRepository.Update(_dataFile);
+            _dataServiceUnit.Save();
         }
 
         public bool LoadSDTM(int datasetId, int fileId, DataTable dataTable)
@@ -38,11 +46,12 @@ namespace PlatformTM.Services.Services.Loading.SDTM
                 Debug.WriteLine("RECORD(s) SUCCESSFULLY DELETED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
             }
 
-            
+            //UpdateLoadingStatus(dataFile, "LOADING");
 
             var sdtmRowDescriptor = SdtmRowDescriptor.GetSdtmRowDescriptor(dataset);
             var SDTM = new List<SdtmRow>();
             var totalLoaded = 0.0;
+            var totalRecords = dataTable.Rows.Count;
             try
             {
                 foreach (DataRow row in dataTable.Rows)
@@ -59,33 +68,32 @@ namespace PlatformTM.Services.Services.Loading.SDTM
                     SDTM.Add(sdtmRow);
                    
 
-                    if (SDTM.Count % 100 == 0)
+                    if (SDTM.Count % 500 == 0)
                     {
                         _sdtmRepository.InsertMany(SDTM);
+
                         totalLoaded += SDTM.Count;
-                        dataFile.State = Math.Round(totalLoaded / dataTable.Rows.Count * 100).ToString("##");
-                        _dataFileRepository.Update(dataFile);
-                        _dataServiceUnit.Save();
+                        UpdateLoadingStatus(dataFile, Math.Round(totalLoaded / totalRecords * 100).ToString("##"));
+                        
                         SDTM.Clear();
                     }
                 }
                 _sdtmRepository.InsertMany(SDTM);
+
+                totalLoaded += SDTM.Count;
+                UpdateLoadingStatus(dataFile, Math.Round(totalLoaded / totalRecords * 100).ToString("##"));
+
                 Debug.WriteLine(dataTable.Rows.Count + " RECORD(s) SUCCESSFULLY ADDED FOR DATASET:" + datasetId + " ,DATAFILE:" + fileId);
             }
             catch (Exception e)
             {
-                dataFile.State = "FAILED";
-                dataFile.IsLoadedToDB = false;
-                _dataFileRepository.Update(dataFile);
-                _dataServiceUnit.Save();
+                UpdateLoadingStatus(dataFile, "FAILED");
+         
                 Debug.WriteLine(e.Message);
                 return false;
             }
 
-            dataFile.State = "SAVED";
-            _dataFileRepository.Update(dataFile);
-
-            _dataServiceUnit.Save();
+            UpdateLoadingStatus(dataFile, "SAVED");
             return true;
         }
     }

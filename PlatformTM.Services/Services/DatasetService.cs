@@ -11,11 +11,11 @@ using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Core.Domain.Model.Timing;
 using PlatformTM.Core.JoinEntities;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services.Loading.AssayData;
-using PlatformTM.Services.Services.Loading.SDTM;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services.Loading.AssayData;
+using PlatformTM.Models.Services.Loading.SDTM;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class DatasetService
     {

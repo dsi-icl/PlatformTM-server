@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services.HelperService;
-using PlatformTM.Services.Services.UserManagement;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services.HelperService;
+using PlatformTM.Models.Services.UserManagement;
 
 namespace PlatformTM.API.Controllers
 {

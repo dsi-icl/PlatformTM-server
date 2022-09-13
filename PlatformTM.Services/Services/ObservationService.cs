@@ -6,7 +6,7 @@ using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.JoinEntities;
 using Observation = PlatformTM.Core.Domain.Model.Observation;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class ObservationService
     {
@@ -442,7 +442,7 @@ namespace PlatformTM.Services.Services
                 obsDescriptor.DatafileId = dataFileId;
                 obsDescriptor.ProjectId = projectId;
 
-                obsDescriptor.DefaultQualifier = sdtmRowDescriptor.GetDefaultQualifier(observation.FirstOrDefault());
+               // obsDescriptor.DefaultQualifier = sdtmRowDescriptor.GetDefaultQualifier(observation.FirstOrDefault());
 
                
 

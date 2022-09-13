@@ -5,7 +5,7 @@
 
 using System.Collections.Generic;
 
-namespace PlatformTM.Services.DTOs
+namespace PlatformTM.Models.DTOs
 {
     public class ActivityDTO
     {

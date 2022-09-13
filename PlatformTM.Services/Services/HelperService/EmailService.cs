@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using PlatformTM.Services.Configuration;
+using PlatformTM.Models.Configuration;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System.Threading.Tasks;
-namespace PlatformTM.Services.Services.HelperService
+namespace PlatformTM.Models.Services.HelperService
 {
     public class EmailService
     {

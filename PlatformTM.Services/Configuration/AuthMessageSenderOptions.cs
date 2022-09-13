@@ -1,5 +1,5 @@
 ﻿using System;
-namespace PlatformTM.Services.Configuration
+namespace PlatformTM.Models.Configuration
 {
     public class AuthMessageSenderOptions
     {

@@ -6,9 +6,9 @@
 using System.Collections.Generic;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class StudyService
     {
@@ -44,9 +44,9 @@ namespace PlatformTM.Services.Services
 
         public StudyDTO Addstudy(StudyDTO studyDto)
         {
-            if (studyDto.ProjectAcc != null)
+            if (studyDto.ProjectId != 0)
             {
-                var project = _projectRepository.FindSingle(p => p.Accession == studyDto.ProjectAcc,
+                var project = _projectRepository.FindSingle(p => p.Id == studyDto.ProjectId,
                 new List<string>()
                 {
                     "Studies"
@@ -54,8 +54,9 @@ namespace PlatformTM.Services.Services
                 
                 if (project != null) {
                     var num = project.Studies.Count;
-                    var abbr = studyDto.ProjectAcc.Substring(2, 3);
-                    studyDto.Accession = "S-" + abbr + "-" + (num+1).ToString("00");
+                    //var abbr = studyDto.ProjectAcc.Substring(2, 3);
+                    //studyDto.Accession = "S-" + abbr + "-" + (num+1).ToString("00");
+                    studyDto.Accession = "S-" + project.Accession + "-" + (num + 1).ToString("00");
                     studyDto.ProjectId = project.Id;
                 }
             }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace PlatformTM.Services.DTOs.Explorer
+namespace PlatformTM.Models.DTOs.Explorer
 {
     public class SubjectExplorerDTO
     {

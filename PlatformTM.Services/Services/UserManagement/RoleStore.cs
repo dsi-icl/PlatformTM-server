@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using PlatformTM.Core.Application.AccountManagement;
 
-namespace PlatformTM.Services.Services.UserManagement
+namespace PlatformTM.Models.Services.UserManagement
 {
     public class RoleStore : IRoleStore<Role>
     {

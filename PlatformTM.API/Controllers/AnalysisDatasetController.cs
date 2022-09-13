@@ -3,10 +3,10 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Export;
-using PlatformTM.Services.Services;
-using PlatformTM.Services.Services.UserManagement;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Export;
+using PlatformTM.Models.Services;
+using PlatformTM.Models.Services.UserManagement;
 
 namespace PlatformTM.API.Controllers
 {

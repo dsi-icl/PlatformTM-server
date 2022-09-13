@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PlatformTM.Services.Services.UserManagement;
+using PlatformTM.Models.Services.UserManagement;
 
 namespace PlatformTM.API.Auth
 {

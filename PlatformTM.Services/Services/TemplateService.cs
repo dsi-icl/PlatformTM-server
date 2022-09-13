@@ -2,9 +2,9 @@
 using System.Linq;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model.Templates;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class TemplateService
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace PlatformTM.Services.DTOs.Explorer
+namespace PlatformTM.Models.DTOs.Explorer
 {
     public class ClinicalExplorerDTO
     {

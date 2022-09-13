@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Model.Users;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services.Authentication;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services.Authentication;
 
-namespace PlatformTM.Services.Services.UserManagement
+namespace PlatformTM.Models.Services.UserManagement
 {
     public class UserAccountService
     {

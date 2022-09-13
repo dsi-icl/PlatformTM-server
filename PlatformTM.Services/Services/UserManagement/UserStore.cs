@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Interfaces;
 
-namespace PlatformTM.Services.Services.UserManagement
+namespace PlatformTM.Models.Services.UserManagement
 {
     public class UserStore : IUserPasswordStore<UserAccount>, IUserClaimStore<UserAccount>, IUserSecurityStampStore<UserAccount>, IUserEmailStore<UserAccount>
     {

@@ -9,13 +9,13 @@ using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.JoinEntities;
-using PlatformTM.Services.Configuration;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services.Loading.AssayData;
-using PlatformTM.Services.Services.Loading.SDTM;
-using PlatformTM.Services.ViewModels;
+using PlatformTM.Models.Configuration;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services.Loading.AssayData;
+using PlatformTM.Models.Services.Loading.SDTM;
+using PlatformTM.Models.ViewModels;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class FileService
     {
@@ -44,6 +44,24 @@ namespace PlatformTM.Services.Services
             _observationRepository = uoW.GetRepository<Observation, int>();
         }
 
+        public bool InitLoading(int fileId, int datasetId)
+        {
+            try
+            {
+                var _dataFile = _fileRepository.Get(fileId);
+                _dataFile.State = "LOADING";
+                _dataFile.IsLoadedToDB = false;
+                _fileRepository.Update(_dataFile);
+                _dataServiceUnit.Save();
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+         
+            return true;
+        }
+
         public bool LoadFile(int fileId, int datasetId)
         {
             
@@ -53,6 +71,10 @@ namespace PlatformTM.Services.Services
             bool success;
             filePath = GetFullPath(file.ProjectId);
             dataTable = readDataFile(Path.Combine(filePath, file.FileName));
+            //datasetId descriptor will decide the type of the dataset
+            //loader is by type of dataset not by format
+
+
             switch (file.Format)
             {
                 case "SDTM":
@@ -545,7 +567,7 @@ namespace PlatformTM.Services.Services
             int ploaded;
 
             var dto = GetDTO(file);
-            if (file.State == "LOADED")
+            if (file.State == "LOADED" || file.State == "SAVED")
                 dto.PercentLoaded = 100;
             else if (int.TryParse(file.State, out ploaded))
                 dto.PercentLoaded = ploaded;

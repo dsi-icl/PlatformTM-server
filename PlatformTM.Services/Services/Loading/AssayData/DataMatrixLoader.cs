@@ -6,10 +6,10 @@ using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.ObservationModel;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
-namespace PlatformTM.Services.Services.Loading.AssayData
+namespace PlatformTM.Models.Services.Loading.AssayData
 {
     public class DataMatrixLoader
     {

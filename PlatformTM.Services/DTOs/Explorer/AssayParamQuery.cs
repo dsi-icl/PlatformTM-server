@@ -1,4 +1,4 @@
-﻿namespace PlatformTM.Services.DTOs.Explorer
+﻿namespace PlatformTM.Models.DTOs.Explorer
 {
     public class AssayParamQuery
     {

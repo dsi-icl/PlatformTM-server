@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.Services.HelperService
+namespace PlatformTM.Models.Services.HelperService
 {
     public class Formatter
     {

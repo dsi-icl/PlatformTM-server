@@ -74,6 +74,7 @@ namespace PlatformTM.Data.Repositories
 
             if (filter != null)
                 query[0] = query[0].Where(filter);
+            
 
             return query[0].ToListAsync<TEntity>();
         }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 
-namespace PlatformTM.Services.DTOs
+namespace PlatformTM.Models.DTOs
 {
     public class DataTemplateMap
     {

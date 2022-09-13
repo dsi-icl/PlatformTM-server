@@ -4,10 +4,10 @@ using System.Linq;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Export;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Export;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class AnalysisDatasetService
     {

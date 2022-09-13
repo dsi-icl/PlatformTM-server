@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PlatformTM.Services.DTOs
+namespace PlatformTM.Models.DTOs
 {
     public class UserDTO
     {

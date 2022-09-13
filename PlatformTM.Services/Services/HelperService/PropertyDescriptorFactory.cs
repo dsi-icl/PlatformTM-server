@@ -1,6 +1,6 @@
 ﻿using PlatformTM.Core.Domain.Model.ObservationModel;
 
-namespace PlatformTM.Services.Services.HelperService
+namespace PlatformTM.Models.Services.HelperService
 {
     public class PropertyDescriptorFactory
     {

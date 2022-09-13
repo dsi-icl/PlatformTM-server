@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.ViewModels
+namespace PlatformTM.Models.ViewModels
 {
     public class FileContentVM
     {

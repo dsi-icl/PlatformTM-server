@@ -9,7 +9,7 @@ using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.JoinEntities;
 
-namespace PlatformTM.Services.Services.Loading.SDTM
+namespace PlatformTM.Models.Services.Loading.SDTM
 {
     public class SubjectLoader
 

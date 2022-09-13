@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
-using PlatformTM.Services.DTOs.Export;
-using PlatformTM.Services.Services;
+using PlatformTM.Models.DTOs.Export;
+using PlatformTM.Models.Services;
 
 namespace PlatformTM.API.Controllers
 {

@@ -9,11 +9,11 @@ using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.Domain.Model.ObservationModel;
 using PlatformTM.Core.Domain.Model.Users.Queries;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Explorer;
 using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class QueryService
     {

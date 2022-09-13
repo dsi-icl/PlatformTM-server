@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.Timing;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.Services.Loading.SDTM
+namespace PlatformTM.Models.Services.Loading.SDTM
 {
     public class SDTMreader
     {

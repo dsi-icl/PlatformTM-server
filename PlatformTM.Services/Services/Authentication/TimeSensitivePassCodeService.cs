@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace PlatformTM.Services.Services.Authentication
+namespace PlatformTM.Models.Services.Authentication
 {
     public static class TimeSensitivePassCodeService
     {

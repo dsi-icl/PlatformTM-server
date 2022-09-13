@@ -207,27 +207,42 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.SDTM
             return descriptor;
         }
 
-        public VariableDefinition GetDefaultQualifier(SdtmRow sdtmRow)
+        public VariableDefinition GetDefaultQualifier(IEnumerable<SdtmRow> observations)
         {
             const string numResVar = "STRESN";
             const string charResVar = "STRESC";
             const string oriResVar = "ORRES";
             const string occurVar = "SEV";
+            
             if (ObsIsAFinding)
             {
+                List<string> x;
                 string s;
-                if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+numResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + numResVar] != "")
-                {
+                if(observations.FirstOrDefault().ResultQualifiers.TryGetValue(DomainCode + numResVar, out s))
+
+                    if (!observations.Select(o => o.ResultQualifiers[DomainCode + numResVar]).All(y => string.IsNullOrEmpty(y)))
+
+
+                // x =.ToList();
+
+                //if (observations.FirstOrDefault().ResultQualifiers.TryGetValue(DomainCode + charResVar, out s))
+                //observations.Select(o => o.ResultQualifiers[DomainCode + charResVar] != "");
+                //if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+numResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + numResVar] != "")
+                //{
                     return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + numResVar));
-                }
-                else if (sdtmRow.ResultQualifiers.TryGetValue(DomainCode+charResVar, out s) && sdtmRow.ResultQualifiers[DomainCode + charResVar] != "")
-                {
-                    return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + charResVar));
-                }
-                else
-                {
-                    return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + oriResVar));
-                }
+                //}
+                if (observations.FirstOrDefault().ResultQualifiers.TryGetValue(DomainCode+charResVar, out s) &&
+
+                    (!observations.Select(o => o.ResultQualifiers[DomainCode + charResVar]).All(y => string.IsNullOrEmpty(y))))
+
+                //    && sdtmRow.ResultQualifiers[DomainCode + charResVar] != "")
+                //{
+                   return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + charResVar));
+                //}
+                //else
+                //{
+                   return ResultVariables.Find(rv => rv.Name.Equals(DomainCode + oriResVar));
+                //}
             }
             if (ObsIsAnEvent)
             {

@@ -5,7 +5,7 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class BioSampleService
     {

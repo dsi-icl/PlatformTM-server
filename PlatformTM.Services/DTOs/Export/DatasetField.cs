@@ -1,6 +1,6 @@
 ﻿using PlatformTM.Core.Domain.Model.Users.Queries;
 
-namespace PlatformTM.Services.DTOs.Export
+namespace PlatformTM.Models.DTOs.Export
 {
     public class DatasetField
     {

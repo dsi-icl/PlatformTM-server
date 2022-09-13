@@ -8,9 +8,9 @@ using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Data.Configuration;
-using PlatformTM.Services.Configuration;
+using PlatformTM.Models.Configuration;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class DbInitializer
     {

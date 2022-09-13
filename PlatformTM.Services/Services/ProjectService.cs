@@ -10,10 +10,10 @@ using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
 using PlatformTM.Core.Domain.Model.Users.Queries;
 using PlatformTM.Core.JoinEntities;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Explorer;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class ProjectService
     {

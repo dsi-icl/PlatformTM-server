@@ -1,7 +1,7 @@
 ﻿using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class SubjectService
     {

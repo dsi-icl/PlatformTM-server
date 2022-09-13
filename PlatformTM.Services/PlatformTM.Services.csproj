@@ -19,12 +19,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="7.1.1" />
+    <PackageReference Include="CsvHelper" Version="28.0.1" />
     <PackageReference Include="Sendgrid" Version="9.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="DTOs\Export\" />
     <Folder Include="ViewModels\" />
+    <Folder Include="Services\FAIRifier\" />
+    <Folder Include="Services\FAIRifier\Models\" />
+    <Folder Include="Services\Loading\zeft\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Services\FAIRifier\" />
+    <None Remove="Services\FAIRifier\Models\" />
+    <None Remove="Services\Loading\zeft\" />
   </ItemGroup>
 </Project>

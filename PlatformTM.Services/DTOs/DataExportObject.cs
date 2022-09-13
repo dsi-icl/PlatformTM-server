@@ -5,7 +5,7 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.DesignElements;
 
-namespace PlatformTM.Services.DTOs
+namespace PlatformTM.Models.DTOs
 {
     public class DataExportObject
     {

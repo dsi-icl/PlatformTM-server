@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 
 
-namespace PlatformTM.Services.DTOs
+namespace PlatformTM.Models.DTOs
 {
     public class DataTable
     {

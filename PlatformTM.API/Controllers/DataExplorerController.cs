@@ -4,9 +4,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Explorer;
-using PlatformTM.Services.Services;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Explorer;
+using PlatformTM.Models.Services;
 
 namespace PlatformTM.API.Controllers
 {
@@ -40,16 +40,16 @@ namespace PlatformTM.API.Controllers
                 return Ok(data);
             return NotFound();
         }
-        //[HttpGet("projects/{projectId}/subjcharacteristics/browse")]
-        //public async Task<IActionResult> GetSubjectCharacteristicsAsync(int projectId)
-        //{
-        //    var subjChars = await _explorerService.GetSubjectCharacteristics(projectId);
-        //    if (subjChars != null)
-        //        return Ok(subjChars);
-        //    return NotFound();
-        //}
+        [HttpGet("projects/{projectId}/subjcharacteristics/browse")]
+        public async Task<IActionResult> GetSubjectCharacteristicsAsync(int projectId)
+        {
+            var subjChars = await _explorerService.GetSubjectCharacteristics(projectId);
+            if (subjChars != null)
+                return Ok(subjChars);
+            return NotFound();
+        }
 
-         
+
         [HttpPost("projects/{projectId}/subjects/search")]
         public  async Task<IActionResult> GetSubjectDataAsync(int projectId, [FromBody] List<ObservationRequestDTO> requestedSCs)
         {

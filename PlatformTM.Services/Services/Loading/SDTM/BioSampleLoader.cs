@@ -7,7 +7,7 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 
-namespace PlatformTM.Services.Services.Loading.SDTM
+namespace PlatformTM.Models.Services.Loading.SDTM
 {
     public class BioSampleLoader
     {

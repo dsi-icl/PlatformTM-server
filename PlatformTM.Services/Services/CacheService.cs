@@ -2,9 +2,9 @@
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using PlatformTM.Core.Domain.Interfaces;
-using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Models.DTOs.Explorer;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
     public class CacheService
     {

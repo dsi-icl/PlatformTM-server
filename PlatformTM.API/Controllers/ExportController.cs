@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PlatformTM.Services.Services;
+using PlatformTM.Models.Services;
 
 namespace PlatformTM.API.Controllers
 {

@@ -5,8 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using PlatformTM.Services.DTOs.Explorer;
-using PlatformTM.Services.Services;
+using PlatformTM.Models.DTOs.Explorer;
+using PlatformTM.Models.Services;
 
 namespace PlatformTM.API.Controllers
 {

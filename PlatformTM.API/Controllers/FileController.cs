@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Core.Domain.Model.DatasetModel;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.Services;
-using PlatformTM.Services.ViewModels;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.Services;
+using PlatformTM.Models.ViewModels;
 
 namespace PlatformTM.API.Controllers
 {
@@ -30,6 +30,16 @@ namespace PlatformTM.API.Controllers
         public FileDTO GetFile(int fileId)
         {
             return _fileService.GetFile(fileId);
+        }
+
+        [HttpGet]
+        [Route("{fileId}/initload/datasets/{datasetId}")]
+        public bool InitLoadFile(int fileId, int datasetId)
+        {
+            return _fileService.InitLoading(fileId, datasetId);
+            //if (success)
+            //    return Ok(true);
+            //return new BadRequestResult();
         }
 
         [HttpGet]

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PlatformTM.Services.DTOs
+namespace PlatformTM.Models.DTOs
 {
     public class DirectoryDTO
     {

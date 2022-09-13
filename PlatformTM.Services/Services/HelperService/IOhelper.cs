@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using PlatformTM.Services.DTOs;
+using PlatformTM.Models.DTOs;
 
-namespace PlatformTM.Services.Services.HelperService
+namespace PlatformTM.Models.Services.HelperService
 {
     public static class IOhelper
     {

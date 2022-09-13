@@ -9,10 +9,10 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.Domain.Model.Timing;
-using PlatformTM.Services.DTOs;
-using PlatformTM.Services.DTOs.Explorer;
+using PlatformTM.Models.DTOs;
+using PlatformTM.Models.DTOs.Explorer;
 
-namespace PlatformTM.Services.Services
+namespace PlatformTM.Models.Services
 {
 
     public class DataExplorerService
@@ -60,12 +60,12 @@ namespace PlatformTM.Services.Services
         }
 
         public async Task<SubjectExplorerDTO> GetInitSubjectData(int projectId){
-            var subjChars = GetSubjectCharacteristics(projectId);
-            var xfData = GetSubjectData(projectId);
-            var result = await subjChars;
-            SubjectExplorerDTO subjectExplorerDTO = await xfData;
-            result.Xfdata = subjectExplorerDTO.Xfdata;
-            return result;
+            //var subjChars = GetSubjectCharacteristics(projectId);
+            var xfData = await GetSubjectData(projectId);
+            //var result = await subjChars;
+            //SubjectExplorerDTO subjectExplorerDTO = await xfData;
+            //result.Xfdata = subjectExplorerDTO.Xfdata;
+            return xfData;
         }
 
         #endregion
@@ -366,13 +366,13 @@ namespace PlatformTM.Services.Services
 
         public async Task<SubjectExplorerDTO> GetSubjectData(int projectId, List<ObservationRequestDTO> reqObservations=null)
         {
-            var subjects = await _subjectRepository.FindAllAsync(
+            var subjects =  _subjectRepository.FindAll(
                 s => s.Study.ProjectId == projectId,
-                new List<string>()
-                {   "SubjectCharacteristics.CharacteristicFeature",
-                    "StudyArm",
-                    "Study"
-                });
+                    new List<string>()
+                    {
+                        "Study"
+                      
+                    });
 
             var dto = new SubjectExplorerDTO();
 
@@ -654,7 +654,8 @@ namespace PlatformTM.Services.Services
                     if (values != null && values.Count != 0)
                     {
                         values = values.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
-                        subjdata.Add(req.Name, values);
+                        if(values.Count  != 0)
+                            subjdata.Add(req.Name, values);
                         //subjdata.Add(req.Name, values.OrderByDescending(v => v));
                     }
                 }
