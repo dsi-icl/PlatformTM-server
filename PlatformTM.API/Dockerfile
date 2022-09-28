@@ -12,13 +12,13 @@ COPY PlatformTM.Data/PlatformTM.Data.csproj PlatformTM.Data/
 RUN dotnet restore -nowarn:msb3202,nu1503
 COPY . .
 WORKDIR /src/PlatformTM.API
-RUN dotnet build -c Release -o /app
+RUN dotnet build -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish -c Release -o /app
+RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app .
+COPY --from=publish /app/publish .
 COPY dbinit /app/app_data
 ENTRYPOINT ["dotnet", "PlatformTM.API.dll"]

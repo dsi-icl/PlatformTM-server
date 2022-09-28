@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using CsvHelper;
@@ -437,61 +438,113 @@ namespace PlatformTM.Models.Services
 
         private DataTable readDataFile(string filePath)
         {
-            DataTable dt = new DataTable();
+            DataTable _dt = new DataTable();
 
-            StreamReader reader = File.OpenText(filePath);
-            var parser = new CsvParser(reader);
-            string[] header = parser.Read();
-            if (!(header.Count() > 1))
+
+
+            using (var reader = new StreamReader(filePath))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
-                if (header[0].Contains("\t"))
+                // Do any configuration to `CsvReader` before creating CsvDataReader.
+                using (var dreader = new CsvDataReader(csv))
                 {
-                    parser.Configuration.Delimiter = "\t";
-                    header = header[0].Split('\t');
-                }
-            }
+                    var dt = new System.Data.DataTable();
+                    dt.Load(dreader);
 
-
-            foreach (string field in header)
-            {
-                dt.Columns.Add(field.Replace("\"", "").Replace(" ",""), typeof(string));
-            }
-
-            while (true)
-            {
-                try
-                {
-                    var row = parser.Read();
-                    if (row == null)
-                        break;
-
-                    DataRow dr = dt.NewRow();
-                    if (row.Length == 0 || row.Length != dt.Columns.Count)
+                    for (int i = 0; i < dt.Columns.Count; i++)
                     {
-                        Debug.WriteLine(row.Length + " " + dt.Columns.Count);
-                        return null;
+                        _dt.Columns.Add(dt.Columns[i].ColumnName,typeof(string));
                     }
 
-                    for (int i = 0; i < row.Length; i++)
+                    for (int i = 0; i < dt.Rows.Count; i++)
                     {
-                        if (row[i] == null)
-                            Debug.WriteLine(row);
-                        dr[i] = row[i];
+                        var srcDr = dt.Rows[i];
+                        DataRow dr = _dt.NewRow();
+
+                        for (int j = 0; i < srcDr.ItemArray.Length; j++)
+                        {
+                            dr[j] = srcDr[j];
+                        }
+                                
+                        _dt.Rows.Add(dr);
+
                     }
-                    dt.Rows.Add(dr);
-                }
-                catch (System.NullReferenceException e)
-                {
-                    Debug.WriteLine(e.Message);
-                    throw ;
                 }
             }
-            parser.Dispose();
-            reader.Dispose();
 
-            return dt;
+            return _dt;
+           
+
+            //StreamReader reader = File.OpenText(filePath);
+            //var parser = new CsvParser(reader);
+            //string[] header = parser.Read();
+            //if (!(header.Count() > 1))
+            //{
+            //    if (header[0].Contains("\t"))
+            //    {
+            //        parser.Configuration.Delimiter = "\t";
+            //        header = header[0].Split('\t');
+            //    }
+            //}
+
+
+            //foreach (string field in header)
+            //{
+            //    dt.Columns.Add(field.Replace("\"", "").Replace(" ", ""), typeof(string));
+            //}
+
+            //while (true)
+            //{
+            //    try
+            //    {
+            //        var row = parser.Read();
+            //        if (row == null)
+            //            break;
+
+            //        DataRow dr = dt.NewRow();
+            //        if (row.Length == 0 || row.Length != dt.Columns.Count)
+            //        {
+            //            Debug.WriteLine(row.Length + " " + dt.Columns.Count);
+            //            return null;
+            //        }
+
+            //        for (int i = 0; i < row.Length; i++)
+            //        {
+            //            if (row[i] == null)
+            //                Debug.WriteLine(row);
+            //            dr[i] = row[i];
+            //        }
+            //        dt.Rows.Add(dr);
+            //    }
+            //    catch (System.NullReferenceException e)
+            //    {
+            //        Debug.WriteLine(e.Message);
+            //        throw;
+            //    }
+
+
+        
+            //parser.Dispose();
+            //reader.Dispose();
+
+            //return dt;
         }
 
+        //private DataTable readDataFile(string filePath)
+        //{
+        //    System.Data.DataTable dt = new System.Data.DataTable();
+        //    using (var reader = new StreamReader(filePath))
+        //    using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+        //    {
+        //        // Do any configuration to `CsvReader` before creating CsvDataReader.
+        //        using (var dr = new CsvDataReader(csv))
+        //        {
+
+        //            dt.Load(dr);
+        //        }
+        //    }
+        //    return dt;
+        //}
         public List<Dictionary<string, string>> getFileColHeaders(string filePath)
         {
            

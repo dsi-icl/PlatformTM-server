@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   platformtm.api:
-    image: platformtm
+    image: iemam/platformtm-api:v2022
     build:
       context: .
       dockerfile: PlatformTM.API/Dockerfile

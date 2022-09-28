@@ -38,15 +38,15 @@ namespace Loader.MapperModels.SourceDataModels
             {
                 var subjectDataRow = new SubjectSrcDataRow();
                 subjectDataRow.SubjectId = row[SubjectIdVariableName].ToString();
-                dataTable.Columns.
+                //dataTable.Columns.
 
-                foreach (var v in sourceFile.DataVariables)
-                {
-                    if (v.IsDerived) continue;
-                    var tempColName = v.ColumnName.Split('_')[1];
-                    subjectDataRow.DataRecord[v.Identifier] = row[tempColName].ToString();
-                }
-                sourceFile.SubjectDataRows.Add(subjectDataRow);
+                //foreach (var v in sourceFile.DataVariables)
+                //{
+                //    if (v.IsDerived) continue;
+                //    var tempColName = v.ColumnName.Split('_')[1];
+                //    subjectDataRow.DataRecord[v.Identifier] = row[tempColName].ToString();
+                //}
+                //sourceFile.SubjectDataRows.Add(subjectDataRow);
             }
         }
     }

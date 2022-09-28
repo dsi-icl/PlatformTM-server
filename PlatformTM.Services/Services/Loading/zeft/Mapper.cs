@@ -42,7 +42,7 @@ namespace PlatformTM.Models.Services.Loading.zeft
 
                     };
 
-                    Regex rgx = new("(OBS_PROPERTY_)\\d{1}\\Z");
+                    Regex rgx = new Regex("(OBS_PROPERTY_)\\d{1}\\Z");
 
                     foreach (var col in csv.HeaderRecord)
                         if (rgx.IsMatch(col.ToString()))

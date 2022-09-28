@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using CsvHelper;
@@ -6,6 +7,7 @@ using Loader.MapperModels.SourceDataModels;
 using Loader.MapperModels.TabularMapperModels;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model.BMO;
+using PlatformTM.Core.Domain.Model.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.MapperModels;
 using PlatformTM.MapperModels.TabularMapperModels;
@@ -16,17 +18,21 @@ namespace PlatformTM
     public class MapperService
     {
         private readonly IRepository<PrimaryDataset, int> _PDSRepository;
+
+        
+
         public MapperService()
         {
             
-    }
+        }
 
-        public static List<TabularEntityMapper> ReadMappingFile(string MapperFilePath)
+        public static TabularMapper ReadMappingFile(string MapperFilePath)
         {
 
             var tabularMapper = new TabularMapper();
 
-            var records = new List<TabularEntityMapper>();
+            //var records = new List<TabularEntityMapper>();
+            
             using (var reader = new StreamReader(MapperFilePath))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
@@ -59,7 +65,7 @@ namespace PlatformTM
                         if (rgx.IsMatch(col.ToString()))
                         {
                             if (csv[col].ToString() == "") continue;
-                            record.MappedProperties.Add(new TabularEntityMapper.TabularPropMapper()
+                            record.ObservedPropertyMappers.Add(new TabularPropertyMapper()
                             {
                                 PropertyName = csv.GetField<string>(col),
                                 PropertyValue = csv.GetField<string>(col + "_VAL"),
@@ -67,20 +73,21 @@ namespace PlatformTM
                             });
 
                         }
-                    tabularMapper.ObsMappers.Add(record);
+                    tabularMapper.EntityMappers.Add(record);
                 }
             }
-            return records;
+            
+            return tabularMapper;
         }
 
-        public static Dictionary<string, DatasetMapper> ProcessTabularMapper(List<TabularEntityMapper> varMappers)
+        public static Dictionary<string, DatasetMapper> ProcessTabularMapper(TabularMapper tabularMapper)
         {
             Dictionary<string, DatasetMapper> DatasetMapper_map = new();
-            Dictionary<string, SourceDataFile> sourceDataFiles_map = new();
+            //Dictionary<string, SourceDataFile> sourceDataFiles_map = new();
 
             
 
-            foreach (var varMapper in varMappers)
+            foreach (var varMapper in tabularMapper.EntityMappers)
             {
                 if (varMapper.IsSkipped)
                     continue;
@@ -94,18 +101,19 @@ namespace PlatformTM
                     DatasetMapper_map.Add(varMapper.DatasetName,DatasetMapper);
                 }
 
-                if (!sourceDataFiles_map.TryGetValue(varMapper.SourceFileName, out SourceDataFile sourceDataFile))
-                {
-                    sourceDataFile = new(varMapper.SourceFileName, "");
+                //if (!sourceDataFiles_map.TryGetValue(varMapper.SourceFileName, out SourceDataFile sourceDataFile))
+                //{
+                //    sourceDataFile = new(varMapper.SourceFileName, "");
                   
-                    sourceDataFiles_map.Add(varMapper.SourceFileName, sourceDataFile);
-                }
+                //    sourceDataFiles_map.Add(varMapper.SourceFileName, sourceDataFile);
+                //}
 
                 //var filepath = Path.Combine(SourceFilesPath, file.SourceDataFileName);
                 //     DataTable dt = ReadDataTable(filepath);
                 //     Program.ImportSourceData(file,dt);
 
-                foreach (var prop in varMapper.MappedProperties)
+                //This is iterating over the properties that are in the same row / mapper record
+                foreach (var prop in varMapper.ObservedPropertyMappers)
                 {
                     var obsMapper = new ObservationMapper()
                     {
@@ -117,22 +125,105 @@ namespace PlatformTM
                     };
                     DatasetMapper.ObservationMappers.Add(obsMapper);
 
+                    //create a method that gets value if refernce instead of string
                     obsMapper.ObsFeatureValue.ValueString = varMapper.ObservedFeature;
                     obsMapper.Category = varMapper.ObservationCategory;
                     obsMapper.ObsGroupId = varMapper.ObservationGroupId;
-
-                    obsMapper.PropertyMapper.PropertyName = prop.PropertyName;
                     obsMapper.IsDerived = varMapper.IsDerived;
 
+                    //PropertyMappers
+                    obsMapper.PropertyMapper.PropertyName = prop.PropertyName;
+                    
                     obsMapper.PropertyMapper.PropertyValueMappers.Add(new PropertyValueMapper(prop.PropertyValue)
                     {
                         Unit = prop.PropertyValueUnit
                     });
                 }
+                //add studyId
 
 
             }
             return DatasetMapper_map;
+        }
+
+        public static List<ObservationDatasetDescriptor> InitObsDescriptors(List<DatasetMapper> datasetMappers)
+        {
+            List<ObservationDatasetDescriptor> descriptors = new();
+
+            foreach (var dsMapper in datasetMappers)
+            {
+                var obsDSdescriptor = new ObservationDatasetDescriptor();
+                descriptors.Add(obsDSdescriptor);
+
+                obsDSdescriptor.Title =  dsMapper.DatasetName;
+                obsDSdescriptor.SubjectIdentifierField = new IdentifierField()
+                    { Name= "SUBJID", Label="Subject Identifier"};
+                obsDSdescriptor.StudyIdentifierField = new IdentifierField()
+                    { Name = "STUDYID", Label = "Study Identifier" };
+                obsDSdescriptor.FeatureNameField = new DesignationField()
+                    { Name = "OBSFEAT", Designation="Name of Feature", Label = "Observed Feature" };
+                obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
+                {
+                    Name = "FEATCAT",
+                    Label = "Feature Category",
+                    Order = 1
+                });
+
+                obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
+                {
+                    Name = "FEATSCAT",
+                    Label = "Feature Subcategory",
+                    Order = 2
+                });
+
+                var dsObsProperties = dsMapper.GetPropertyFields();
+                foreach(var prop in dsObsProperties)
+                {
+                    obsDSdescriptor.PropertyValueFields.Add(new PropertyValueField()
+                    {
+                        Name = prop,
+                        Label = prop
+                    }) ;
+                }
+            }
+
+                return descriptors;
+        }
+
+        public static List<DataTable> TabulariseDescriptors(List<ObservationDatasetDescriptor> descriptors)
+        {
+            var descriptorsList = new List<DataTable>();
+            foreach (ObservationDatasetDescriptor descriptor in descriptors)
+            {
+                var descDT = new DataTable();
+                descDT.TableName = descriptor.Title;
+
+                descriptorsList.Add(descDT);
+
+                descDT.Columns.Add("FIELD_NAME");
+                descDT.Columns.Add("FIELD_LABEL");
+                descDT.Columns.Add("FIELD_DESCRIPTION");
+                descDT.Columns.Add("FIELD_TYPE");
+                descDT.Columns.Add("FIELD_NAME_TERMID");
+                descDT.Columns.Add("FIELD_NAME_TERMREF");
+
+                descDT.Rows.Add(descriptor.StudyIdentifierField.Name, descriptor.StudyIdentifierField.Label, "", "IdentifierField","","");
+                descDT.Rows.Add(descriptor.SubjectIdentifierField.Name, descriptor.SubjectIdentifierField.Label, "", "IdentifierField", "", "");
+
+                descriptor.ClassifierFields.Sort((a, b) => (a.Order.CompareTo(b.Order)));
+                foreach (var classifierField in descriptor.ClassifierFields)
+                {
+                    descDT.Rows.Add(classifierField.Name, classifierField.Label, "", "ClassifierFieldType", "", "");
+                }
+
+                descDT.Rows.Add(descriptor.FeatureNameField.Name, descriptor.FeatureNameField.Label, "", "DesignationField", "", "");
+
+                foreach (var propertyValueField in descriptor.PropertyValueFields)
+                {
+                    descDT.Rows.Add(propertyValueField.Name, "", "", "PropertyValueField", "", "");
+                }
+            }
+            return descriptorsList;
         }
 
         public static void CreateObsDatasets(Dictionary<string,DatasetMapper> datasetMappers)
@@ -141,7 +232,7 @@ namespace PlatformTM
             {
                 //new dataset
 
-                CreateDataset();
+               // CreateDataset();
 
                 foreach(var obsM in dsMapper.ObservationMappers)
                 {
@@ -149,20 +240,12 @@ namespace PlatformTM
                     var feature = new Feature();
                     feature.Name = obsM.GetFeatureName();
 
-                    obs.ObservedPhenomenon.ObservedFeature
+                    //obs.ObservedPhenomenon.ObservedFeature
                 }
             }
         }
 
-        private static void CreateDataset()
-        {
-            PrimaryDataset primaryDataset = new()
-            {
-                ProjectId = ,
-                StudyId = ,
-                n
-            }
-        }
+        
     }
 }
 

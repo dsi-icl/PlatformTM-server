@@ -12,6 +12,7 @@
     <None Remove="MapperModels\" />
     <None Remove="MapperModels\SourceDataModels\" />
     <None Remove="MapperModels\TabularMapperModels\" />
+    <None Remove="MapperModels\ObservationDatasetMapperModels\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="28.0.1" />
@@ -20,6 +21,7 @@
     <Folder Include="MapperModels\" />
     <Folder Include="MapperModels\SourceDataModels\" />
     <Folder Include="MapperModels\TabularMapperModels\" />
+    <Folder Include="MapperModels\ObservationDatasetMapperModels\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />

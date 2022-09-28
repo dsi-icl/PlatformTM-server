@@ -9,7 +9,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         public string Label { get; set; }
         public string Description { get; set; }
         public string ContentDataType { get; set; }
-        public string DataElementId { get; set; }
+        //public string DataElementId { get; set; }
 
         public DatasetField()
         {
