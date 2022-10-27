@@ -54,6 +54,7 @@ namespace PlatformTM.Models.Services
             reader.Dispose();
         }
 
+      
         public void LoadTemplates()
         {
 

@@ -20,34 +20,42 @@ namespace Loader.MapperModels.SourceDataModels
             DataVariables = new();
             DataRows = new();
 
+            
+           
+        }
+
+        public  void ReadSourceDataFile()
+        {
             try
             {
                 var filepath = Path.Combine(SourceFilePath, SourceFileName);
                 DataTable dt = TabularDataIO.ReadDataTable(filepath);
-                ImportSourceData(dt);
-            }catch(IOException _e)
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    SubjectSrcDataRow subjectDataRow = new SubjectSrcDataRow();
+                    subjectDataRow.SubjectId = row[SubjectIdVariableName].ToString();
+
+
+                    foreach (var v in DataVariables)
+                    {
+                        if (v.IsDerived) continue;
+                        //var tempColName = v.ColumnName.Split('_')[1];
+                        subjectDataRow.DataRecord[v.Identifier] = row[v.Name].ToString();
+                    }
+                    DataRows.Add(subjectDataRow);
+                }
+
+            }
+            catch (IOException _e)
             {
 
             }
-           
         }
 
-        public  void ImportSourceData(DataTable dataTable)
+        public List<string>? GetSubjectIds()
         {
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var subjectDataRow = new SubjectSrcDataRow();
-                subjectDataRow.SubjectId = row[SubjectIdVariableName].ToString();
-                //dataTable.Columns.
-
-                //foreach (var v in sourceFile.DataVariables)
-                //{
-                //    if (v.IsDerived) continue;
-                //    var tempColName = v.ColumnName.Split('_')[1];
-                //    subjectDataRow.DataRecord[v.Identifier] = row[tempColName].ToString();
-                //}
-                //sourceFile.SubjectDataRows.Add(subjectDataRow);
-            }
+           return DataRows.Select(r => r.SubjectId)?.ToList();
         }
     }
 }

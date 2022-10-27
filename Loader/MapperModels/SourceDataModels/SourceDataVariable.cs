@@ -5,6 +5,7 @@ namespace Loader.MapperModels.SourceDataModels
     {
         public string Name { get; set; }
         public string Identifier { get; set; }
+        public string Text { get; set; }
         public bool IsDerived { get; set; }
 
         public SourceDataVariable()

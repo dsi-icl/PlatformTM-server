@@ -8,12 +8,15 @@ namespace PlatformTM.Models
         }
 
         public Dictionary<string, string> DataDictionary { get; set; }
+        public bool IsCoded { get; set; }
+        public bool IsSrcValue { get; set; }
         public string ValueString { get; set; }
         public string Function { get; internal set; }
         public string[] SourceVariables { get; internal set; }
         public string TruthyValue { get; internal set; }
         public string FalsyValue { get; internal set; }
         public string ConditionValue { get; internal set; }
+        public bool IsValueString { get; private set; }
 
         public void ProcessValueExpression()
         {
@@ -63,12 +66,49 @@ namespace PlatformTM.Models
                     string[] kv = kvpair.Split("=");
                     if (kv.Length > 1)
                     {
-                        DataDictionary.Add(kv[0], kv[1]);
-                        //HasDictionary = true;
+                        DataDictionary.Add(kv[0], kv[1].Replace("\\","").Replace("/",""));
+                        IsCoded = true;
                     }
 
                 }
             }
+
+            else if (ValueString == "$VAL")
+            {
+                IsSrcValue = true;
+            }
+
+            else
+                IsValueString = true;
+        }
+
+        public string EvaluateExpression(string srcValue)
+        {
+            if (IsCoded)
+            {
+                if (DataDictionary.TryGetValue(srcValue, out string pv))
+                {
+                    if (!pv.Contains("$SKIP"))
+                        return pv;
+                    else
+                        return "";
+                }
+                return pv;
+                //else if (pvMapper.DataDictionary.ContainsKey("$VAL"))
+                //    obs.PropertyValues.Add(dataValue);
+
+            }
+            else if (IsSrcValue)
+            {
+                return srcValue;
+            }
+            else if (IsValueString)
+            {
+                return ValueString;
+            }
+            else
+                return "";
+           
         }
     }
 }

@@ -461,7 +461,7 @@ namespace PlatformTM.Models.Services
                         var srcDr = dt.Rows[i];
                         DataRow dr = _dt.NewRow();
 
-                        for (int j = 0; i < srcDr.ItemArray.Length; j++)
+                        for (int j = 0; j < srcDr.ItemArray.Length; j++)
                         {
                             dr[j] = srcDr[j];
                         }

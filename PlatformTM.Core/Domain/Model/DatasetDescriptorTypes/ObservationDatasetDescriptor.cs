@@ -16,13 +16,18 @@ namespace PlatformTM.Core.Domain.Model.DatasetDescriptorTypes
         public DesignationField FeatureNameField { get; set; }
         public List<ClassifierFieldType> ClassifierFields { get; set; } = new List<ClassifierFieldType>();
 
-        public DatasetField ObservationProperty { get; set; }
+        
 
 
         public List<PropertyValueField> PropertyValueFields { get; set; } = new List<PropertyValueField>();
         public List<QualifiedPropertyValueField> QualifiedPropertyValueFields { get; set; }
 
+        public PropertyField FeaturePropertyNameField { get; set; }
+        public PropertyValueField FeaturePropertyValueField { get; set; }
+
         public List<DatasetField> ObservedPropertyFields { get; set; }
+
+        public List<DatasetField> ObservationPropertyFields { get; set; }
 
 
         public TimeSeriesField TimeSeriesField { get; set; }
@@ -31,6 +36,12 @@ namespace PlatformTM.Core.Domain.Model.DatasetDescriptorTypes
         public ObservationDatasetDescriptor()
         {
 
+        }
+
+        public ClassifierFieldType GetClassifierField(int order)
+        {
+
+            return ClassifierFields.Find(f => f.Order == order);
         }
 
     }

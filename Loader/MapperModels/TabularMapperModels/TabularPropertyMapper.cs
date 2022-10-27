@@ -6,6 +6,7 @@ namespace Loader.MapperModels.TabularMapperModels
         public string? PropertyName { get; set; }
         public string? PropertyValue { get; set; }
         public string? PropertyValueUnit { get; set; }
+        public int PropertyOrder { get; set; }
 
         public TabularPropertyMapper()
         {

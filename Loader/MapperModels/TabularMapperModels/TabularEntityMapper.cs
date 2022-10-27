@@ -20,9 +20,10 @@ namespace PlatformTM.MapperModels.TabularMapperModels
         public string ObservationGroupId { get; set; }
 
         //This stores multiple property Maps that might be mapped in the same mapping record
-        public List<TabularPropertyMapper> ObservedPropertyMappers { get; set; }
+        public List<TabularPropertyMapper> PropertyMappers { get; set; }
         public bool IsDerived { get; internal set; }
         public bool IsSkipped { get; internal set; }
+        public bool IsFeatureProperty { get; internal set; }
 
         //public class TabularPropMapper
         //{
@@ -36,7 +37,7 @@ namespace PlatformTM.MapperModels.TabularMapperModels
 
         public TabularEntityMapper()
         {
-            ObservedPropertyMappers = new List<TabularPropertyMapper>();
+            PropertyMappers = new List<TabularPropertyMapper>();
         }
     }
 }

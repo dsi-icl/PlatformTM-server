@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Models.DTOs;
@@ -71,6 +73,14 @@ namespace PlatformTM.Models.Services
             return templates.Select(GetDatasetDTO).ToList();
         }
 
+        public DatasetTemplate  AddTemplate(DatasetTemplate dsTemplate)
+        {
+            var newTemplate = _templateRepository.Insert(dsTemplate);
+
+            _dataServiceUnit.Save();
+            return newTemplate;
+        }
+
         public List<DatasetDTO> GetAssaySampleTemplates()
         {
             var templates = _templateRepository.FindAll(
@@ -129,11 +139,11 @@ namespace PlatformTM.Models.Services
                         dv.IsRequired = true;
                 }
 
-                if(vt.Section == "HEADER")
+                if(vt.Section.ToUpper().Equals("HEADER"))
                     dto.HeaderFields.Add(dv);
                 if(vt.IsGeneric)
                     dto.GenericFields.Add(dv);
-                else if(vt.Section == "COLUMN")
+                else if(vt.Section.ToUpper().Equals("COLUMN"))
                     dto.Variables.Add(dv);
             }
             return dto;
