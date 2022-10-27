@@ -27,7 +27,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetDescriptorTypes
 
         public List<DatasetField> ObservedPropertyFields { get; set; }
 
-        public List<DatasetField> ObservationPropertyFields { get; set; }
+        public List<DatasetField> ObservationPropertyFields { get; set; } = new List<DatasetField>();
 
 
         public TimeSeriesField TimeSeriesField { get; set; }

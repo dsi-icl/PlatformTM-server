@@ -4,6 +4,8 @@ namespace PlatformTM.Models
     public class PropertyMapper
     {
         public string PropertyName { get; set; }
+        public string? Unit { get; set; }
+
         public bool? IsDerived { get; internal set; }
         public bool? IsMultiValued
         {
@@ -20,6 +22,11 @@ namespace PlatformTM.Models
         {
             PropertyName = _name;
             PropertyValueMappers = new();
+        }
+
+        public bool HasUnit()
+        {
+            return Unit != null && Unit != "";
         }
     }
 }

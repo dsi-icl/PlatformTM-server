@@ -66,7 +66,7 @@ namespace PlatformTM.Models
                     string[] kv = kvpair.Split("=");
                     if (kv.Length > 1)
                     {
-                        DataDictionary.Add(kv[0], kv[1].Replace("\\","").Replace("/",""));
+                        DataDictionary.Add(kv[0].Replace("\"", ""), kv[1].Replace("\"",""));
                         IsCoded = true;
                     }
 
@@ -88,10 +88,10 @@ namespace PlatformTM.Models
             {
                 if (DataDictionary.TryGetValue(srcValue, out string pv))
                 {
-                    if (!pv.Contains("$SKIP"))
-                        return pv;
-                    else
+                    if (pv.ToUpper() == "$SKIP")
                         return "";
+                    else
+                        return pv;
                 }
                 return pv;
                 //else if (pvMapper.DataDictionary.ContainsKey("$VAL"))
@@ -107,7 +107,7 @@ namespace PlatformTM.Models
                 return ValueString;
             }
             else
-                return "";
+                return null;
            
         }
     }

@@ -7,16 +7,10 @@ namespace Loader.MapperModels.TabularMapperModels
     {
         public List<TabularEntityMapper> EntityMappers { get; set; }
 
-        public TabularEntityMapper? SubjectIdMapper {
-            get { return EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$SUBJECTID"); }
-            
-        }
-        public TabularEntityMapper? StudyVisitMappper {
-            get { return EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISIT"); }
-        }
-        public TabularEntityMapper? StudyDateOfVisitMapper {
-            get { return EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISITDATE"); }
-        }
+        public TabularEntityMapper? SubjectIdMapper => EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$SUBJECTID");
+       
+
+
         public TabularMapper()
         {
             EntityMappers = new List<TabularEntityMapper>();
@@ -63,6 +57,20 @@ namespace Loader.MapperModels.TabularMapperModels
 
             return groupedByObsProperty;
         }
+
+        public List<TabularEntityMapper> GetPropertyMappers()
+        {
+            var propertyMappers = new List<TabularEntityMapper>();
+            propertyMappers.Add(EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISIT"));
+            propertyMappers.Add(EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISITDATE"));
+            return propertyMappers;
+        }
+
+        public string? GetSubjectVariableName()
+        {
+            return SubjectIdMapper?.SourceVariableName;
+        }
+        
 
         //This will group multiple rows that belong to the same obsFeature either through repition of the
         //same property like wheeze excaerbating factor, or through different 

@@ -3,11 +3,11 @@ namespace PlatformTM.Models
 {
     public class PropertyValueMapper
     {
-        public Dictionary<string, string>? DataDictionary { get; set; }
+        //public Dictionary<string, string>? DataDictionary { get; set; }
 
         public ValueExpression ValueExpression { get; set; }
 
-        public string? Unit { get; set; }
+        
 
 
         public string? SourceFileName { get; internal set; }

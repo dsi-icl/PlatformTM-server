@@ -27,6 +27,11 @@ namespace PlatformTM.Models
             return propMapper;
         }
 
+        public PropertyMapper? GetFeaturePropertyMapper()
+        {
+            return PropertyMappers.Find(p => p.IsFeatureProperty);
+        }
+
         internal string GetFeatureName()
         {
             throw new NotImplementedException();

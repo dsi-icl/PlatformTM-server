@@ -29,7 +29,17 @@ const string cdiscDescriptorDir = "/Users/iemam/Box/UNICORN - Data FAIRification
 //###################
 List<DatasetMapper> mappers = MapperService.ProcessTabularMapper(tabularMapper);
 
-var PrimaryDS = MapperService.CreateObsDatasets(mappers.First(), srcDataDir);
+foreach(var dsMapper in mappers)
+{
+    var PrimaryDS = MapperService.CreateObsDatasets(dsMapper, srcDataDir);
+    var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+    string jsonString = JsonSerializer.Serialize(PrimaryDS, options);
+
+
+    string JsonOutputFile = outputDir + PrimaryDS.DatasetDescriptor.Title + "_DATA.json";
+    File.WriteAllText(JsonOutputFile, jsonString);
+}
+
 
 //var descriptors = MapperService.InitObsDescriptors(mappers);
 //List<DataTable> descriptors_dtList = MapperService.TabulariseDescriptors(descriptors);
@@ -44,12 +54,12 @@ var PrimaryDS = MapperService.CreateObsDatasets(mappers.First(), srcDataDir);
 //foreach(var descriptor in descriptors)
 //{
 
-var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10 };
-string jsonString = JsonSerializer.Serialize(PrimaryDS, options);
+//var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+//string jsonString = JsonSerializer.Serialize(PrimaryDS, options);
 
 
-    string JsonOutputFile = outputDir + PrimaryDS.DatasetDescriptor.Title + "_DATA.json"; 
-   File.WriteAllText(JsonOutputFile, jsonString);
+//    string JsonOutputFile = outputDir + PrimaryDS.DatasetDescriptor.Title + "_DATA.json"; 
+//   File.WriteAllText(JsonOutputFile, jsonString);
 //}
 
 
