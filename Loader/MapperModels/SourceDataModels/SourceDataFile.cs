@@ -36,7 +36,6 @@ namespace Loader.MapperModels.SourceDataModels
                     SubjectSrcDataRow subjectDataRow = new SubjectSrcDataRow();
                     subjectDataRow.SubjectId = row[SubjectIdVariableName].ToString();
 
-
                     foreach (var v in DataVariables)
                     {
                         if (v.IsDerived) continue;

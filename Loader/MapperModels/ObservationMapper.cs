@@ -5,19 +5,30 @@ namespace PlatformTM.Models
     {
         public ObservationMapper()
         {
-            ObsFeatureValue = new();
+            FeatureNameExpression = new();
             PropertyMappers = new();
         }
 
-        
-        public string Category { get; internal set; }
-        public string SubCategory { get; internal set; }
+        public ObservationMapper(string featureNameExpString)
+        {
+            FeatureNameExpression = new(featureNameExpString);
+            PropertyMappers = new();
+        }
 
-        public string ObsGroupId { get; internal set; }
+        public string? SourceFileName { get; internal set; }
+        public string? SourceVariableId { get; internal set; }
+        //public string? SourceVariableName { get; internal set; }
+        //public string? SourceVariableText { get; internal set; }
+
+        public string? Category { get; internal set; }
+        public string? SubCategory { get; internal set; }
+
+        public string? ObsGroupId { get; internal set; }
         public bool IsDerived { get; internal set; }
 
-        public ValueExpression ObsFeatureValue { get; internal set; }
+        public ValueExpression FeatureNameExpression { get; internal set; }
         public List<PropertyMapper> PropertyMappers { get; internal set; }
+
 
 
         public PropertyMapper GetPropertyMapper(string propertyName)
@@ -30,11 +41,6 @@ namespace PlatformTM.Models
         public PropertyMapper? GetFeaturePropertyMapper()
         {
             return PropertyMappers.Find(p => p.IsFeatureProperty);
-        }
-
-        internal string GetFeatureName()
-        {
-            throw new NotImplementedException();
         }
     }
 }

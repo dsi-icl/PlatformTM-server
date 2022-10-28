@@ -154,64 +154,82 @@ namespace PlatformTM
         {
             List<DatasetMapper> DatasetMappers = new();
 
-
+            //GROUP BY DATASET
             Dictionary<string,List<TabularEntityMapper>> dsGroups = tabularMapper.GroupByDataset();
 
-            
-
-
+            //PROCESS EACH DATASET GROUP AND CREATE A DATASETMAPPER FOR EACH DATASET
             foreach (var datasetGroup in dsGroups)
             {
                 if (datasetGroup.Key == "")
                     continue;
+
                 DatasetMapper datasetMapper = new(){DatasetName = datasetGroup.Key, StudyName= datasetGroup.Value?.FirstOrDefault()?.StudyName};
                 DatasetMappers.Add(datasetMapper);
                 datasetMapper.SubjectVariableName = tabularMapper.GetSubjectVariableName();
 
-                //Process Property Fields that are applicable to all observations (e.g. visit, visit date...)
-                var dsPropertyMappers = tabularMapper.GetPropertyMappers();
-                foreach(var entityMapper in dsPropertyMappers)
+                //Get All Source Data Variables relevant to this dataset
+                foreach(var tabularMapperRow in datasetGroup.Value)
                 {
-                    var tabPropMapper = entityMapper?.PropertyMappers.FirstOrDefault();
+                    datasetMapper.SourceDataVariables.Add(new SourceDataVariable
+                    {
+                        Name = tabularMapperRow.SourceVariableName,
+                        Identifier = tabularMapperRow.SourceVariableId,
+                        Text = tabularMapperRow.SourceVariableText,
+                        SourceFileName = tabularMapperRow.SourceFileName
+                    });
+                }
 
+
+                //Process Property Fields that are applicable to all observations (e.g. visit, visit date...)
+                var otherMappers = tabularMapper.GetNonObsEntityMappers();
+                foreach(var entityMapper in otherMappers)
+                {
+
+
+                    //Create PropertMapper
+                    var tabPropMapper = entityMapper?.PropertyMappers.FirstOrDefault();
                     var PropMapper = new PropertyMapper(tabPropMapper.PropertyName);
                     PropMapper.PropertyValueMappers.Add(
-
                     new PropertyValueMapper(tabPropMapper.PropertyValue)
                     {
                         SourceFileName = entityMapper.SourceFileName,
                         SourceVariableId = entityMapper.SourceVariableId,
-                        SourceVariableName = entityMapper.SourceVariableName,
-                        SourceVariableText = entityMapper.SourceVariableText
                     });
                     datasetMapper.PropertyMappers.Add(PropMapper);
+
+
+                    //Add Corresponding Source Data Variable to the list of Dataset SourceDataVariables
+                    datasetMapper.SourceDataVariables.Add(new SourceDataVariable
+                    {
+                        Name = entityMapper.SourceVariableName,
+                        Identifier = entityMapper.SourceVariableId,
+                        Text = entityMapper.SourceVariableText,
+                        SourceFileName = entityMapper.SourceFileName
+                    });
                 }
 
-               
 
-
-
-
-
-
+                //NEXT PROCESS OBSERVATION FEATURES AND CREATE OBSERVATIONMAPPER FOR EACH FEATURE_GROUP
                 Dictionary<string, List<TabularEntityMapper>> groupedByFeature = tabularMapper.GroupByObsFeature(datasetGroup.Value);
 
                 foreach (var featGroup in groupedByFeature)
                 {
                     if (featGroup.Value == null) continue;
-                    var obsMapper = new ObservationMapper();
-                    datasetMapper.ObservationMappers.Add(obsMapper);
-
                     var feature = featGroup.Value.First();
-                    obsMapper.ObsFeatureValue.ValueString = feature.ObservedFeature;
+
+                    var obsMapper = new ObservationMapper(feature.ObservedFeature);
                     obsMapper.Category = feature.ObservationCategory;
                     obsMapper.SubCategory = feature.ObservationSubcategory;
                     obsMapper.ObsGroupId = feature.ObservationGroupId;
                     obsMapper.IsDerived = feature.IsDerived;
+
+                    obsMapper.SourceFileName = feature.SourceFileName;
+
+
+                    datasetMapper.ObservationMappers.Add(obsMapper);
+
                     foreach (var tabularObsMap in featGroup.Value)
                     {
- 
-                        
                         foreach (var tabularPropMap in tabularObsMap.PropertyMappers)
                         {
                             if (tabularPropMap.PropertyName == null|| tabularPropMap.PropertyValue == null) continue;
@@ -234,91 +252,13 @@ namespace PlatformTM
                             {
                                 SourceFileName = tabularObsMap.SourceFileName,
                                 SourceVariableId = tabularObsMap.SourceVariableId,
-                                SourceVariableName = tabularObsMap.SourceVariableName,
-                                SourceVariableText = tabularObsMap.SourceVariableText
+                                //SourceVariableName = tabularObsMap.SourceVariableName,
+                                //SourceVariableText = tabularObsMap.SourceVariableText
                             });
                         }
                     }
-
-                        //Dictionary<string, List<TabularEntityMapper>> groupedByProperty = tabularMapper.GroupByObservedProperty(featGroup.Value);
                 }
-
-                //    //UNIQUE OBSERAVTION INSTANCES PER DATASET
-                //    //foreach (var map in groupedByFeature)
-                //    {
-
-
-                //    }
-                //    //var uniq_observations = group.GroupBy(o => new { feat = o.Field<string>("OBSERVED_FEATURE"), seq = o.Field<string>("OBSERVATION_SEQ") });
-                //    //foreach (var obsRows in uniq_observations)
-
-
              }
-
-
-            //    foreach (var varMapper in tabularMapper.EntityMappers)
-            //{
-            //    if (varMapper.IsSkipped)
-            //        continue;
-            //    if (!DatasetMapper_map.TryGetValue(varMapper.DatasetName, out DatasetMapper DatasetMapper))
-            //    {
-            //        DatasetMapper = new DatasetMapper()
-            //        {
-            //            DatasetName = varMapper.DatasetName,
-            //            StudyName = varMapper.StudyName
-            //        };
-            //        DatasetMapper_map.Add(varMapper.DatasetName,DatasetMapper);
-            //    }
-
-                //WHAT IS THE OBS MAPPER REPRESENFINT?
-                //It's representing the observation
-                //so what is an observation?
-                //is it the one instance of observation feature and one property but with multi-valued properties?
-                // or is it the one observation feaure with ALL properties.
-                //For now I want to keep it that all properties are group with the obsFeature
-
-
-                //if (!sourceDataFiles_map.TryGetValue(varMapper.SourceFileName, out SourceDataFile sourceDataFile))
-                //{
-                //    sourceDataFile = new(varMapper.SourceFileName, "");
-
-                //    sourceDataFiles_map.Add(varMapper.SourceFileName, sourceDataFile);
-                //}
-
-                //var filepath = Path.Combine(SourceFilesPath, file.SourceDataFileName);
-                //     DataTable dt = ReadDataTable(filepath);
-                //     Program.ImportSourceData(file,dt);
-
-                //This is iterating over the properties that are in the same row / mapper record
-
-                //var obsMapper = new ObservationMapper()
-                //;
-                //obsMapper.ObsFeatureValue.ValueString = varMapper.ObservedFeature;
-                //obsMapper.Category = varMapper.ObservationCategory;
-                //obsMapper.ObsGroupId = varMapper.ObservationGroupId;
-                //obsMapper.IsDerived = varMapper.IsDerived;
-
-                //DatasetMapper.ObservationMappers.Add(obsMapper);
-
-                //foreach (var propMap in varMapper.PropertyMappers)
-                //{
-                    
-
-                    //create a method that gets value if refernce instead of string
-                    
-
-                    //PropertyMappers
-                    //obsMapper.PropertyMapper.PropertyName = propMap.PropertyName;
-                    
-                    //obsMapper.PropertyMapper.PropertyValueMappers = (new PropertyValueMapper(propMap.PropertyValue)
-                   // {
-                    //    Unit = propMap.PropertyValueUnit
-                    //});
-              //  }
-                //add studyId
-
-
-          //  }
             return DatasetMappers;
         }
 
@@ -334,43 +274,6 @@ namespace PlatformTM
                 return descriptors;
         }
 
-        //public static ObservationDatasetDescriptor InitObsDescriptor(DatasetMapper dsMapper)
-        //{
-        //    var obsDSdescriptor = new ObservationDatasetDescriptor
-        //    {
-        //        Title = dsMapper.DatasetName,
-        //        SubjectIdentifierField = new IdentifierField()
-        //        { Name = "SUBJID", Label = "Subject Identifier" },
-        //        StudyIdentifierField = new IdentifierField()
-        //        { Name = "STUDYID", Label = "Study Identifier" },
-        //        FeatureNameField = new DesignationField()
-        //        { Name = "OBSFEAT", Designation = "Name of Feature", Label = "Observed Feature" }
-        //    };
-        //    obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
-        //    {
-        //        Name = "FEATCAT",
-        //        Label = "Feature Category",
-        //        Order = 1
-        //    });
-
-        //    obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
-        //    {
-        //        Name = "FEATSCAT",
-        //        Label = "Feature Subcategory",
-        //        Order = 2
-        //    });
-
-        //    var dsObsProperties = dsMapper.GetPropertyFields();
-        //    foreach (var prop in dsObsProperties)
-        //    {
-        //        obsDSdescriptor.PropertyValueFields.Add(new PropertyValueField()
-        //        {
-        //            Name = prop,
-        //            Label = prop
-        //        });
-        //    }
-        //    return obsDSdescriptor;
-        //}
 
         public static List<DataTable> TabulariseDescriptors(List<ObservationDatasetDescriptor> descriptors)
         {
@@ -441,8 +344,7 @@ namespace PlatformTM
                 foreach (var oMapper in datasetMapper.ObservationMappers)
                 {
                     var datasetRecord = new DatasetRecord();
-                    PrimaryDataset.DataRecords.Add(datasetRecord);
-
+                  
 
                     //SubjectId
                     datasetRecord[datasetDescriptor.SubjectIdentifierField?.Name] = subjectId;
@@ -457,7 +359,12 @@ namespace PlatformTM
                     datasetRecord[datasetDescriptor.GetClassifierField(2)?.Name] = oMapper.SubCategory;
 
                     //FeatureName
-                    datasetRecord[datasetDescriptor.FeatureNameField.Name] = oMapper.ObsFeatureValue.ValueString;
+                    var featureName = datasetMapper.EvaluateFeatureMapper(subjectId, oMapper);
+                    if (featureName != "")
+                        datasetRecord[datasetDescriptor.FeatureNameField.Name] = featureName;
+                    else
+                        continue;
+
 
                     if (datasetMapper.HasFeatureProperties())
                     {
@@ -466,11 +373,10 @@ namespace PlatformTM
                         datasetRecord[datasetDescriptor.FeaturePropertyNameField.Name] = featPropMapper!= null ? featPropMapper.PropertyName : "";
 
                         //FeaturePropValue
-                        datasetRecord[datasetDescriptor.FeaturePropertyValueField.Name] = datasetMapper.GetPropValueForSubject(subjectId, featPropMapper);
+                        datasetRecord[datasetDescriptor.FeaturePropertyValueField.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectId, featPropMapper);
 
                     }
                     
-
                     
                     //ObservedPropertyValues
                     foreach (var field in datasetDescriptor.PropertyValueFields)
@@ -478,7 +384,7 @@ namespace PlatformTM
                         var propMapper = oMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
                         if (propMapper != null)
                         {
-                            datasetRecord[field.Name] = datasetMapper.GetPropValueForSubject(subjectId, propMapper);
+                            datasetRecord[field.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectId, propMapper);
                             if (propMapper.HasUnit())
                                 datasetRecord["UNIT[" + field.Name + "]"] = propMapper.Unit;
                         }
@@ -490,146 +396,14 @@ namespace PlatformTM
                     foreach(var field in datasetDescriptor.ObservationPropertyFields)
                     {
                         var propMapper = datasetMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
-                        datasetRecord[field?.Name] = datasetMapper.GetPropValueForSubject(subjectId, propMapper);
+                        datasetRecord[field?.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectId, propMapper);
                     }
-                    
 
-                    //foreach (var pMapper in oMapper.PropertyMappers)
-                    //{
-
-                    //    //TEMP
-                    //    //if (pMapper.IsDerived) continue;
-
-                    //    //FOR EACH pMapper here I want to retrieve the resepective value for ALL SUBJECTS from the source file and
-                    //    //AWEL BOM AHEIH! What is a unique DATASET RECORD? ONE PER SUBJECT PER FEATURE
-                    //    //The uniqeness of observation feature should be already established in the listed observation mappers in each dataset mapper
-                    //    //therefore for each observed feature instance a new subject record will be created 
-                    //    pMapper.
-
-
-                    //    foreach (var pvMapper in pMapper.PropertyValueMappers)
-                    //    {
-                    //        var sourceDataFile = sourceDataFiles.FirstOrDefault(f => f.SourceFileName == pvMapper.SourceFileName);
-                    //    }
-
-                    //    var dataValue = subjectRecord.DataRecord[pvMapper.SourceVariableId].ToString();
-
-                    //    //    foreach (SubjectDataRow subjectRecord in sourceDataFile.SubjectDataRows)
-
-                    //    //    {
-                    //    //        //ana hena 3awez ageeb el subject data menel files elli el dataset dih 3awza data menha
-                    //    //        //ya3ni el subject data hena momken tigi men kaza data file
-                    //    //        //yeb2a b2a 2a3temed 3ala kol line 3ashan a retrieve el datafile beta3o we sa3etha a iterate over el subject data elli fil file dah
-
-                    //    //        var obs = new Observation
-                    //    //        {
-                    //    //            Feature = oMapper.ObsFeature,
-                    //    //            Category = oMapper.Category,
-                    //    //            Property = pMapper.Property,
-                    //    //            IsMultiValued = pMapper.IsMultiValued,
-                    //    //            SubjectId = subjectRecord.SubjectId
-                    //    //        };
-                    //    //        Observations.Add(obs);
-
-
-                    //    //        foreach (var pvMapper in pMapper.PropertyValueMappers)
-                    //    //        {
-                    //    //            if (pvMapper.ValueString == "$VAL")
-                    //    //            {
-                    //    //                //string val = subjectVariableData.DataRow[pMapper.SourceVariableId].ToString();
-                    //    //                var dataValue = subjectRecord.DataRecord[pvMapper.SourceVariableId].ToString();
-                    //    //                if (dataValue != "-10")
-                    //    //                    obs.PropertyValues.Add(dataValue);
-                    //    //                if (dataValue == "-9")
-                    //    //                    obs.NotDone = true;
-
-
-                    //    //            }
-                    //    //            else if (pvMapper.HasDictionary)
-                    //    //            {
-                    //    //                var dataValue = subjectRecord.DataRecord[pvMapper.SourceVariableId].ToString();
-
-                    //    //                if (dataValue == "-9")
-                    //    //                    obs.NotDone = true;
-
-                    //    //                if (pvMapper.DataDictionary.TryGetValue(dataValue, out string pv))
-                    //    //                {
-                    //    //                    if (!pv.Contains("$SKIP"))
-                    //    //                        obs.PropertyValues.Add(pv);
-                    //    //                }
-
-                    //    //                else if (pvMapper.DataDictionary.ContainsKey("$VAL"))
-                    //    //                    obs.PropertyValues.Add(dataValue);
-
-                    //    //            }
-                    //    //            else if (pvMapper.IsExpression && pMapper.IsDerived)
-                    //    //            {
-                    //    //                if (pvMapper.Function == "ANY")
-                    //    //                {
-
-                    //    //                    List<string> values = pvMapper.SourceVariables.Select(p => subjectRecord.DataRecord[p]).ToList();
-                    //    //                    if (values.All(v => v == "-9"))
-                    //    //                    {
-                    //    //                        obs.NotDone = true;
-                    //    //                        obs.PropertyValues.Add("Subject Did Not Attend");
-                    //    //                        continue;
-                    //    //                    }
-
-                    //    //                    if (values.Contains(pvMapper.ConditionValue))
-                    //    //                        obs.PropertyValues.Add(pvMapper.TruthyValue);
-                    //    //                    else
-                    //    //                        obs.PropertyValues.Add(pvMapper.FalsyValue);
-                    //    //                }
-                    //    //            }
-                    //    //            else
-                    //    //            {
-                    //    //                obs.PropertyValues.Add(pvMapper.ValueString);
-                    //    //            }
-                    //    //        }
-                    //    //    }
-                    //    //}
-                    //    // }
-                    //    // return Observations;
-
-
-                    //}
+                    PrimaryDataset.DataRecords.Add(datasetRecord);
                 }
 
 
             }
-
-
-
-
-
-
-
-            //List<Observation> Observations = new();
-            //ITERATE OVER THE OBSERVATION MAPPERS, AND FOR EACH OBSERVATION MAPPER ITERATE OVER THE PROPERTIES
-
-            //foreach (DataRow row in dataTable.Rows)
-            //{
-            //    var sourceFile = sourceDataFiles[row.Field<string>("SOURCE_FILE")];
-
-            //    sourceFile.DataVariables.Add(
-            //        new SourceVariable
-            //        {
-            //            ColumnName = row.Field<string>("VARIABLE_NAME"),
-            //            Identifier = row.Field<string>("VARIABLE_ID"),
-            //            IsDerived = row[6].ToString().ToUpper().Equals("$DERIVED")
-            //        });
-            //}
-
-
-
-            //foreach(var obsM in datasetMapper.ObservationMappers)
-            //{
-            //    var obs = new Observation();
-            //    var feature = new Feature();
-            //    feature.Name = obsM.GetFeatureName();
-
-            //    //obs.ObservedPhenomenon.ObservedFeature
-            //}
 
             return PrimaryDataset;
 

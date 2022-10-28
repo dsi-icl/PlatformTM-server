@@ -8,19 +8,12 @@ namespace Loader.MapperModels.TabularMapperModels
         public List<TabularEntityMapper> EntityMappers { get; set; }
 
         public TabularEntityMapper? SubjectIdMapper => EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$SUBJECTID");
-       
-
 
         public TabularMapper()
         {
             EntityMappers = new List<TabularEntityMapper>();
         }
 
-        //public List<TabularEntityMapper> RemoveSkippedVariables()
-        //{
-        //    var skippedRemoved = new List<TabularEntityMapper>() { EntityMappers };
-        //    return EntityMappers.RemoveAll(r=>r.IsSkipped)
-        //}
 
         public Dictionary<string,List<TabularEntityMapper>> GroupByDataset()
         {
@@ -58,7 +51,7 @@ namespace Loader.MapperModels.TabularMapperModels
             return groupedByObsProperty;
         }
 
-        public List<TabularEntityMapper> GetPropertyMappers()
+        public List<TabularEntityMapper> GetNonObsEntityMappers()
         {
             var propertyMappers = new List<TabularEntityMapper>();
             propertyMappers.Add(EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISIT"));

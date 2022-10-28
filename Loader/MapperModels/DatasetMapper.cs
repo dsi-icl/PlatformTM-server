@@ -13,9 +13,11 @@ namespace PlatformTM.Models
         public string SubjectVariableName { get; set; }
         public string VisitDateVariableName { get; set; }
         public string VisitVariableName { get; set; }
-        public List<ObservationMapper> ObservationMappers { get; internal set; }
 
+
+        public List<ObservationMapper> ObservationMappers { get; internal set; }
         public List<PropertyMapper> PropertyMappers { get; set; }
+        public List<SourceDataVariable> SourceDataVariables { get; internal set; }
 
         public List<PropertyMapper> ClassifierFieldMappers;
 
@@ -29,6 +31,7 @@ namespace PlatformTM.Models
         {
             ObservationMappers = new List<ObservationMapper>();
             PropertyMappers = new List<PropertyMapper>();
+            SourceDataVariables = new();
         }
 
 
@@ -41,12 +44,19 @@ namespace PlatformTM.Models
             var sourceFileNames = new HashSet<string>();
             List<SourceDataFile> sourceDataFiles = new();
 
-            foreach (var propValueMapper in ObservationMappers
-                .SelectMany(obsMapper => obsMapper.PropertyMappers
-                .SelectMany(propMapper => propMapper.PropertyValueMappers)))
-            {
-                sourceFileNames.Add(propValueMapper.SourceFileName);
-            }
+            sourceFileNames = SourceDataVariables.Select(s => s.SourceFileName).ToHashSet();
+
+            //foreach (SourceDataVariable? srcVar in SourceDataVariables)
+            //{
+            //    sourceFileNames.Add(srcVar.SourceFileName);
+            //}
+
+            //foreach (var propValueMapper in ObservationMappers
+            //    .SelectMany(obsMapper => obsMapper.PropertyMappers
+            //    .SelectMany(propMapper => propMapper.PropertyValueMappers)))
+            //{
+            //    sourceFileNames.Add(propValueMapper.SourceFileName);
+            //}
 
             foreach (string filename in sourceFileNames)
             {
@@ -54,36 +64,41 @@ namespace PlatformTM.Models
                 srcDataFile.SubjectIdVariableName = SubjectVariableName;
                 sourceDataFiles.Add(srcDataFile);
 
-                foreach ( var propValMapper in ObservationMappers
-                    .SelectMany(obsMapper => obsMapper.PropertyMappers
-                    .SelectMany(propMapper => propMapper.PropertyValueMappers))
-                    )
-                {
-                    srcDataFile.DataVariables.Add(
-                    new SourceDataVariable
-                    {
-                        Name = propValMapper.SourceVariableName,
-                        Identifier = propValMapper.SourceVariableId,
-                        Text = propValMapper.SourceVariableText
-                        
-                    });
-                }
+                srcDataFile.DataVariables.AddRange(SourceDataVariables.Where(srcVar => srcVar.SourceFileName == filename));
 
-                foreach(var propMapper in PropertyMappers)
-                {
-                    var propValMapper = propMapper.PropertyValueMappers.FirstOrDefault();
-                    if(propValMapper != null)
-                    {
-                        srcDataFile.DataVariables.Add(
-                            new SourceDataVariable {
-                                Name = propValMapper.SourceVariableName,
-                                Identifier = propValMapper.SourceVariableId,
-                                Text = propValMapper.SourceVariableText
-                            });
-                    }
-                }
-                    
-                
+                //foreach ( var propValMapper in ObservationMappers
+                //    .SelectMany(obsMapper => obsMapper.PropertyMappers
+                //    .SelectMany(propMapper => propMapper.PropertyValueMappers))
+                //    )
+                //{
+                //    var mappedTo = SourceDataVariables.Find(v => v.Identifier == propValMapper.SourceVariableId);
+
+                //    if (mappedTo == null)
+                //        throw new Exception("Error finding mapped source variable");
+
+                //    srcDataFile.DataVariables.Add(mappedTo);
+                //}
+
+                //foreach(var propMapper in PropertyMappers)
+                //{
+                //    var propValMapper = propMapper.PropertyValueMappers.FirstOrDefault();
+                //    if(propValMapper != null)
+                //    {
+                //        var mappedTo = SourceDataVariables.Find(v => v.Identifier == propValMapper.SourceVariableId);
+
+                //        if (mappedTo == null)
+                //            throw new Exception("Error finding mapped source variable");
+
+                //        srcDataFile.DataVariables.Add(mappedTo);
+
+                //        //srcDataFile.DataVariables.Add(
+                //        //    new SourceDataVariable {
+                //        //        Name = propValMapper.SourceVariableName,
+                //        //        Identifier = propValMapper.SourceVariableId,
+                //        //        Text = propValMapper.SourceVariableText
+                //        //    });
+                //    }
+                //}
             }
             SourceFiles = sourceDataFiles;
 
@@ -184,27 +199,26 @@ namespace PlatformTM.Models
             return Properties.ToList();
         }
 
-        //private List<PropertyMapper> GetObservationPropertyFields()
-        //{
-
-        //}
-
-        //public List<string> GetDatasetFeature()
-        //{
-
-        //}
-
         public bool HasFeatureProperties()
         {
             return ObservationMappers.Exists(o => o.PropertyMappers.Exists(p => p.IsFeatureProperty));
         }
 
-        public string GetPropValueForSubject(string subjectId, PropertyMapper? propertyMapper)
+
+        //READ DATA FROM SRC FILES
+        internal PropertyMapper? GetPropertyMapper(string propertyName)
+        {
+            if (propertyName == null) return null;
+            PropertyMapper propMapper = PropertyMappers.Find(p => p.PropertyName.Equals(propertyName));
+            return propMapper;
+        }
+
+        public string? EvaluatePropertyValueMapper(string subjectId, PropertyMapper? propertyMapper)
         {
             if (propertyMapper == null)
-                return "";
+                return null;
             List<string> Values = new();
-            foreach(var pvMapper in propertyMapper.PropertyValueMappers)
+            foreach (var pvMapper in propertyMapper.PropertyValueMappers)
             {
                 var srcDataFile = SourceFiles.Find(f => f.SourceFileName == pvMapper.SourceFileName);
                 var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
@@ -234,20 +248,25 @@ namespace PlatformTM.Models
             }
         }
 
-
-        public PrimaryDataset CreatePrimaryDataset()
+        public string? EvaluateFeatureMapper(string subjectId, ObservationMapper obsMapper)
         {
-            PrimaryDataset PrimaryDataset = new() { };
-         
-            return null;
+            if (obsMapper == null | obsMapper?.SourceFileName == null)
+                return null;
+
+            var srcDataFile = SourceFiles.Find(f => f.SourceFileName == obsMapper.SourceFileName);
+            var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
+
+
+            //var srcValue = srcDataRow?.DataRecord[obsMapper.SourceVariableId];
+
+            var newVal = obsMapper.FeatureNameExpression.EvaluateExpression(srcDataRow.DataRecord);
+
+            if (newVal == null)
+                throw new Exception("Error evaluating value expression for PVmapper: " + obsMapper.FeatureNameExpression);
+            else
+                return newVal;
         }
 
-        internal PropertyMapper? GetPropertyMapper(string propertyName)
-        {
-            if (propertyName == null) return null;
-            PropertyMapper propMapper = PropertyMappers.Find(p => p.PropertyName.Equals(propertyName));
-            return propMapper;
-        }
     }
 }
 

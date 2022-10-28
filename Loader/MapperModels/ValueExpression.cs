@@ -3,13 +3,21 @@ namespace PlatformTM.Models
 {
     public class ValueExpression
     {
+        public ValueExpression(string expString)
+        {
+            ValueString = expString;
+            ProcessValueExpression();
+        }
+
         public ValueExpression()
         {
+
         }
 
         public Dictionary<string, string> DataDictionary { get; set; }
         public bool IsCoded { get; set; }
         public bool IsSrcValue { get; set; }
+        public bool IsRef { get; set; }
         public string ValueString { get; set; }
         public string Function { get; internal set; }
         public string[] SourceVariables { get; internal set; }
@@ -77,6 +85,15 @@ namespace PlatformTM.Models
             {
                 IsSrcValue = true;
             }
+            else if (ValueString.StartsWith('$'))
+            {
+                var srcVariable = ValueString[1..];
+                if (srcVariable != null)
+                {
+                    SourceVariables = new string[] { srcVariable };
+                    IsRef = true;
+                }   
+            }
 
             else
                 IsValueString = true;
@@ -108,7 +125,15 @@ namespace PlatformTM.Models
             }
             else
                 return null;
-           
+        }
+
+        public string? EvaluateExpression(Dictionary<string,string> dataRecord)
+        {
+            if (IsRef)
+                return dataRecord[SourceVariables[0]];
+            else if (IsValueString)
+                return ValueString;
+            else return null;
         }
     }
 }
