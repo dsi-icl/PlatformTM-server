@@ -9,6 +9,7 @@ namespace PlatformTM.MapperModels.TabularMapperModels
         public string SourceVariableId { get; set; }
         public string SourceVariableName { get; set; }
         public string SourceVariableText { get; set; }
+        public bool SourceVariableIsMultiVal { get; set; }
 
         public string StudyName { get; set; }
         public string MappedToEntity { get; set; }

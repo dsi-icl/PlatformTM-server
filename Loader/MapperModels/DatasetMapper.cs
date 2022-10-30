@@ -147,16 +147,23 @@ namespace PlatformTM.Models
             //Classifier Fields
             obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
             {
+                Name = "DOMAIN",
+                Label = "Dataset Domain",
+                Order = 1
+            });
+
+            obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
+            {
                 Name = "FEATCAT",
                 Label = "Feature Category",
-                Order = 1
+                Order = 2
             });
 
             obsDSdescriptor.ClassifierFields.Add(new ClassifierFieldType()
             {
                 Name = "FEATSCAT",
                 Label = "Feature Subcategory",
-                Order = 2
+                Order = 3
             });
 
 
@@ -213,27 +220,58 @@ namespace PlatformTM.Models
             return propMapper;
         }
 
-        public string? EvaluatePropertyValueMapper(string subjectId, PropertyMapper? propertyMapper)
+        public string? EvaluatePropertyValueMapper(SubjectSrcDataRow srcDataRow, PropertyMapper? propertyMapper)
         {
+            List<string> Values = new();
+
             if (propertyMapper == null)
                 return null;
-            List<string> Values = new();
+            
             foreach (var pvMapper in propertyMapper.PropertyValueMappers)
             {
-                var srcDataFile = SourceFiles.Find(f => f.SourceFileName == pvMapper.SourceFileName);
-                var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
+                //var srcDataFile = SourceFiles.Find(f => f.SourceFileName == pvMapper.SourceFileName);
+                //var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
+
+                //Account for data that has multiple timepoints or multiple rows per subjectId;
+                //var srcDataRows = srcDataFile?.DataRows.FindAll(r => r.SubjectId == subjectId);
+             
                 var srcValue = srcDataRow?.DataRecord[pvMapper.SourceVariableId];
 
-                var newVal = pvMapper.ValueExpression.EvaluateExpression(srcValue);
 
-                if (newVal == null)
-                    throw new Exception("Error evaluating value expression for PVmapper: " + pvMapper.ValueExpression);
+                string newVal;
+                
+                if (SourceDataVariables.Find(v=>v.Identifier == pvMapper.SourceVariableId).IsMultiVal)
+                {
+                    var vals = srcValue.Split(',');
+                    if(vals.Count() > 0)
+                    {
+                        foreach(var srcval in vals)
+                        {
+                            newVal = pvMapper.ValueExpression.EvaluateExpression(srcval);
+                            if (newVal == null)
+                                throw new Exception("Error evaluating value expression for PVmapper: " + pvMapper.ValueExpression);
+                            else
+                                Values.Add(newVal);
+                        }
+                    }else
+                        throw new Exception("Error evaluating multi value src expression for PVmapper: " + pvMapper.ValueExpression);
+                }
                 else
-                    Values.Add(newVal);
+                {
+                    newVal = pvMapper.ValueExpression.EvaluateExpression(srcValue);
+
+                    if (newVal == null)
+                        throw new Exception("Error evaluating value expression for PVmapper: " + pvMapper.ValueExpression);
+                    else
+                        Values.Add(newVal);
+                }
+
+                
             }
             if (Values.Count == 1) return Values[0];
             else
             {
+                Values = Values.Distinct().ToList();
                 Values.RemoveAll(v => v == "");
 
                 if (Values.Count == 0) return "";
@@ -248,13 +286,13 @@ namespace PlatformTM.Models
             }
         }
 
-        public string? EvaluateFeatureMapper(string subjectId, ObservationMapper obsMapper)
+        public string? EvaluateFeatureMapper(SubjectSrcDataRow srcDataRow, ObservationMapper obsMapper)
         {
             if (obsMapper == null | obsMapper?.SourceFileName == null)
                 return null;
 
-            var srcDataFile = SourceFiles.Find(f => f.SourceFileName == obsMapper.SourceFileName);
-            var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
+            //var srcDataFile = SourceFiles.Find(f => f.SourceFileName == obsMapper.SourceFileName);
+            //var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
 
 
             //var srcValue = srcDataRow?.DataRecord[obsMapper.SourceVariableId];

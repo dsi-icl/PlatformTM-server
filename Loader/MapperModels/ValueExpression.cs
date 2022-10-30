@@ -18,6 +18,7 @@ namespace PlatformTM.Models
         public bool IsCoded { get; set; }
         public bool IsSrcValue { get; set; }
         public bool IsRef { get; set; }
+        public bool HasPlaceholderRef { get; set; }
         public string ValueString { get; set; }
         public string Function { get; internal set; }
         public string[] SourceVariables { get; internal set; }
@@ -25,6 +26,7 @@ namespace PlatformTM.Models
         public string FalsyValue { get; internal set; }
         public string ConditionValue { get; internal set; }
         public bool IsValueString { get; private set; }
+        public string PlaceholderString { get; internal set; }
 
         public void ProcessValueExpression()
         {
@@ -74,7 +76,7 @@ namespace PlatformTM.Models
                     string[] kv = kvpair.Split("=");
                     if (kv.Length > 1)
                     {
-                        DataDictionary.Add(kv[0].Replace("\"", ""), kv[1].Replace("\"",""));
+                        DataDictionary.Add(kv[0].ToUpper().Replace("\"", ""), kv[1].Replace("\"",""));
                         IsCoded = true;
                     }
 
@@ -94,6 +96,14 @@ namespace PlatformTM.Models
                     IsRef = true;
                 }   
             }
+            else if (ValueString.Contains('$'))
+            {
+                PlaceholderString = ValueString.Split(" ").ToList().Find(s=>s.StartsWith('$'));
+
+                SourceVariables = new string[] { PlaceholderString?.Replace("$","") };
+
+                HasPlaceholderRef = true;
+            }
 
             else
                 IsValueString = true;
@@ -103,7 +113,16 @@ namespace PlatformTM.Models
         {
             if (IsCoded)
             {
-                if (DataDictionary.TryGetValue(srcValue, out string pv))
+                if (DataDictionary.ContainsKey("$ANY") && srcValue != "")
+                    return DataDictionary["$ANY"];
+
+                int num;
+                if(DataDictionary.ContainsKey("$Z+") && Int32.TryParse(srcValue, out num) && num >0)
+                    return DataDictionary["$Z+"];
+
+
+
+                if (DataDictionary.TryGetValue(srcValue.ToUpper(), out string pv))
                 {
                     if (pv.ToUpper() == "$SKIP")
                         return "";
@@ -131,8 +150,16 @@ namespace PlatformTM.Models
         {
             if (IsRef)
                 return dataRecord[SourceVariables[0]];
+
+            else if (HasPlaceholderRef)
+            {
+                var val = dataRecord[SourceVariables[0]];
+                return val != "" ? ValueString.Replace(PlaceholderString, val) : "";
+            }
+            
             else if (IsValueString)
                 return ValueString;
+
             else return null;
         }
     }

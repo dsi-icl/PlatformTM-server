@@ -8,6 +8,7 @@ namespace Loader.MapperModels.SourceDataModels
         public string Text { get; set; }
         public bool IsDerived { get; set; }
         public string SourceFileName { get; internal set; }
+        public bool IsMultiVal { get; internal set; }
 
         public SourceDataVariable()
         {

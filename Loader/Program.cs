@@ -9,11 +9,11 @@ using PlatformTM;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Models;
 
-TabularMapper tabularMapper = MapperService.ReadMappingFile("/Users/iemam/Box/UNICORN - Data FAIRification/BT/Mappers/v2/BT_RD_R_mapper.csv");
+TabularMapper tabularMapper = MapperService.ReadMappingFile("/Users/iemam/Box/UNICORN - Data FAIRification/STAGING/BT/Mappers/checked/BT_SurveySMS_mapper.csv");
 
-const string outputDir = "/Users/iemam/Box/UNICORN - Data FAIRification/BT/Output/";
-const string srcDataDir = "/Users/iemam/Box/UNICORN - Data FAIRification/BT/Data/";
-const string mappersDir = "/Users/iemam/Box/UNICORN - Data FAIRification/BT/Mappers/";
+const string outputDir = "/Users/iemam/Box/UNICORN - Data FAIRification/STAGING/BT/Output/SMSsurvey/";
+const string srcDataDir = "/Users/iemam/Box/UNICORN - Data FAIRification/STAGING/BT/Data/";
+const string mappersDir = "/Users/iemam/Box/UNICORN - Data FAIRification/STAGING/BT/Mappers/";
 const string cdiscTemplatesDir = "/Users/iemam/Box/UNICORN - Data FAIRification/Dataset Templates/";
 const string cdiscDescriptorDir = "/Users/iemam/Box/UNICORN - Data FAIRification/Dataset Templates/json_descriptors/";
 

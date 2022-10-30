@@ -50,6 +50,7 @@ namespace PlatformTM
                         SourceVariableId = csv.GetField<string>("SRC_VARIABLE_ID"),
                         SourceVariableName = csv.GetField<string>("SRC_VARIABLE_NAME"),
                         SourceVariableText = csv.GetField<string>("SRC_VARIABLE_TEXT"),
+                        SourceVariableIsMultiVal = csv.GetField<string>("SRC_VARIABLE_ISMULTIVAL").ToUpper().Equals("Y"),
                         MappedToEntity = csv.GetField<string>("MAP_TO"),
                         DatasetName = csv.GetField<string>("DATASET"),
                         ObservationCategory = csv.GetField<string>("OBS_CAT"),
@@ -85,70 +86,7 @@ namespace PlatformTM
             return tabularMapper;
         }
 
-        internal static DatasetTemplate CreateCDISCtemplate(string cdiscTemplatesDir, string v1, string v2)
-        {
-            var DSinfo = TabularDataIO.ReadDataTable(Path.Combine(cdiscTemplatesDir, v1));
-            var DSvarsInfo = TabularDataIO.ReadDataTable(Path.Combine(cdiscTemplatesDir, v2));
-
-            var Template = new DatasetTemplate();
-            Template.Domain = DSinfo.Rows[0]["Dataset Label"].ToString();
-            Template.Class = DSinfo.Rows[0]["Class"].ToString();
-            Template.Code = DSinfo.Rows[0]["Dataset Name"].ToString();
-            Template.Id = DSinfo.Rows[0]["OID"].ToString();
-            Template.Structure = DSinfo.Rows[0]["Structure"].ToString();
-            Template.Description = DSinfo.Rows[0]["Description"].ToString();
-            
-
-            foreach(DataRow row in DSvarsInfo.Rows)
-            {
-                Template.Fields.Add(new DatasetTemplateField()
-                {
-                    Name = row["Variable Name"].ToString(),
-                    Description = row["CDISC Notes"].ToString(),
-                    DataType = row["Type"].ToString(),
-                    Label = row["Variable Label"].ToString(),
-                    Order = Int32.Parse(row["Variable Order"].ToString()),
-                    Section = "Column",
-                    AllowMultipleValues = false,
-                    IsGeneric = false,
-                    Id = "VS-SDTM-"+Template.Code+"-"+ row["Variable Name"].ToString(),
-                    UsageId = GetUsageId(row["Core"].ToString()),
-                    RoleId = GetRoleId(row["Role"].ToString()),
-                    TemplateId = Template.Id
-                }) ;
-            }
-
-
-            return Template;
-        }
-
-        private static string GetUsageId(string usageTerm)
-        {
-            return usageTerm switch
-            {
-                "Req" => ("CL-Compliance-T-1"),
-                "Perm" => ("CL-Compliance-T-3"),
-                "Exp" => ("CL-Compliance-T-2"),
-                _ => "",
-            };
-        }
-
-        private static string GetRoleId(string usageTerm)
-        {
-            return usageTerm switch
-            {
-                "Identifier" => ("CL-Role-T-1"),
-                "Topic" => ("CL-Role-T-2"),
-                "Record Qualifier" => ("CL-Role-T-3"),
-                "Synonym Qualifier" => ("CL-Role-T-4"),
-                "Variable Qualifier" => ("CL-Role-T-5"),
-                "Timing" => ("CL-Role-T-6"),
-                "Grouping Qualifier" => ("CL-Role-T-7"),
-                "Result Qualifier" => ("CL-Role-T-8"),
-                "Rule" => ("CL-Role-T-9"),
-                _ => "",
-            };
-        }
+        
 
         public static List<DatasetMapper> ProcessTabularMapper(TabularMapper tabularMapper)
         {
@@ -175,7 +113,8 @@ namespace PlatformTM
                         Name = tabularMapperRow.SourceVariableName,
                         Identifier = tabularMapperRow.SourceVariableId,
                         Text = tabularMapperRow.SourceVariableText,
-                        SourceFileName = tabularMapperRow.SourceFileName
+                        SourceFileName = tabularMapperRow.SourceFileName,
+                        IsMultiVal = tabularMapperRow.SourceVariableIsMultiVal
                     });
                 }
 
@@ -339,69 +278,79 @@ namespace PlatformTM
              
             foreach (var subjectId in DatasetSubjectIds)
             {
-
-
-                foreach (var oMapper in datasetMapper.ObservationMappers)
+                //THIS NEEDS UPDATING when there are multiple source files
+                var subjectSrcDataRows = sourceDataFiles[0]?.DataRows.FindAll(r => r.SubjectId == subjectId);
+                foreach (var subjectDataRow in subjectSrcDataRows)
                 {
-                    var datasetRecord = new DatasetRecord();
-                  
 
-                    //SubjectId
-                    datasetRecord[datasetDescriptor.SubjectIdentifierField?.Name] = subjectId;
-
-                    //StudyName
-                    datasetRecord[datasetDescriptor.StudyIdentifierField?.Name] = datasetMapper.StudyName;
-
-                    //FeatureCategory
-                    datasetRecord[datasetDescriptor.GetClassifierField(1)?.Name] = oMapper.Category;
-
-                    //FeatureSubCategory
-                    datasetRecord[datasetDescriptor.GetClassifierField(2)?.Name] = oMapper.SubCategory;
-
-                    //FeatureName
-                    var featureName = datasetMapper.EvaluateFeatureMapper(subjectId, oMapper);
-                    if (featureName != "")
-                        datasetRecord[datasetDescriptor.FeatureNameField.Name] = featureName;
-                    else
-                        continue;
-
-
-                    if (datasetMapper.HasFeatureProperties())
+                    foreach (var oMapper in datasetMapper.ObservationMappers)
                     {
-                        var featPropMapper = oMapper.GetFeaturePropertyMapper();
-                        //FeatureProp
-                        datasetRecord[datasetDescriptor.FeaturePropertyNameField.Name] = featPropMapper!= null ? featPropMapper.PropertyName : "";
 
-                        //FeaturePropValue
-                        datasetRecord[datasetDescriptor.FeaturePropertyValueField.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectId, featPropMapper);
 
-                    }
-                    
-                    
-                    //ObservedPropertyValues
-                    foreach (var field in datasetDescriptor.PropertyValueFields)
-                    {
-                        var propMapper = oMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
-                        if (propMapper != null)
-                        {
-                            datasetRecord[field.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectId, propMapper);
-                            if (propMapper.HasUnit())
-                                datasetRecord["UNIT[" + field.Name + "]"] = propMapper.Unit;
-                        }
+
+                        var datasetRecord = new DatasetRecord(); //THIS WOULD bE ANOTHER TOP LEVEL RECORDSPERSUBJECT ID
+
+
+                        //SubjectId
+                        datasetRecord[datasetDescriptor.SubjectIdentifierField?.Name] = subjectId;
+
+                        //StudyName
+                        datasetRecord[datasetDescriptor.StudyIdentifierField?.Name] = datasetMapper.StudyName;
+
+                        //Dataset Domain
+                        datasetRecord[datasetDescriptor.GetClassifierField(1)?.Name] = datasetMapper.DatasetName;
+
+                        //FeatureCategory
+                        datasetRecord[datasetDescriptor.GetClassifierField(2)?.Name] = oMapper.Category;
+
+                        //FeatureSubCategory
+                        datasetRecord[datasetDescriptor.GetClassifierField(3)?.Name] = oMapper.SubCategory;
+
+                        //FeatureName
+                        var featureName = datasetMapper.EvaluateFeatureMapper(subjectDataRow, oMapper);
+                        if (featureName != "")
+                            datasetRecord[datasetDescriptor.FeatureNameField.Name] = featureName;
                         else
-                            datasetRecord[field.Name] = "";
+                            continue;
+
+
+                        if (datasetMapper.HasFeatureProperties())
+                        {
+                            var featPropMapper = oMapper.GetFeaturePropertyMapper();
+                            //FeatureProp
+                            datasetRecord[datasetDescriptor.FeaturePropertyNameField.Name] = featPropMapper != null ? featPropMapper.PropertyName : "";
+
+                            //FeaturePropValue
+                            datasetRecord[datasetDescriptor.FeaturePropertyValueField.Name] = featPropMapper != null ? datasetMapper.EvaluatePropertyValueMapper(subjectDataRow, featPropMapper) : "";
+
+                        }
+
+
+                        //ObservedPropertyValues
+                        foreach (var field in datasetDescriptor.PropertyValueFields)
+                        {
+                            var propMapper = oMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
+                            if (propMapper != null)
+                            {
+                                datasetRecord[field.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectDataRow, propMapper);
+                                if (propMapper.HasUnit())
+                                    datasetRecord["UNIT[" + field.Name + "]"] = propMapper.Unit;
+                            }
+                            else
+                                datasetRecord[field.Name] = "";
+                        }
+
+                        //Dataset Wide Observation Properties
+                        foreach (var field in datasetDescriptor.ObservationPropertyFields)
+                        {
+                            var propMapper = datasetMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
+                            datasetRecord[field?.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectDataRow, propMapper);
+                        }
+
+                        PrimaryDataset.DataRecords.Add(datasetRecord);
                     }
 
-                    //Dataset Wide Observation Properties
-                    foreach(var field in datasetDescriptor.ObservationPropertyFields)
-                    {
-                        var propMapper = datasetMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
-                        datasetRecord[field?.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectId, propMapper);
-                    }
-
-                    PrimaryDataset.DataRecords.Add(datasetRecord);
                 }
-
 
             }
 

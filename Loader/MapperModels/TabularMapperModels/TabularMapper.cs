@@ -54,8 +54,15 @@ namespace Loader.MapperModels.TabularMapperModels
         public List<TabularEntityMapper> GetNonObsEntityMappers()
         {
             var propertyMappers = new List<TabularEntityMapper>();
-            propertyMappers.Add(EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISIT"));
-            propertyMappers.Add(EntityMappers.FirstOrDefault(d => d.MappedToEntity == "$VISITDATE"));
+            if (EntityMappers.Exists(d => d.MappedToEntity.ToUpper() == "$VISIT"))
+                propertyMappers.Add(EntityMappers.First(d => d.MappedToEntity == "$VISIT"));
+
+            if (EntityMappers.Exists(d => d.MappedToEntity.ToUpper() == "$VISITDATE"))
+                propertyMappers.Add(EntityMappers.First(d => d.MappedToEntity == "$VISITDATE"));
+
+            if (EntityMappers.Exists(d => d.MappedToEntity.ToUpper() == "$EPOCH"))
+                propertyMappers.Add(EntityMappers.First(d => d.MappedToEntity == "$EPOCH"));
+
             return propertyMappers;
         }
 
