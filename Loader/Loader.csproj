@@ -13,9 +13,11 @@
     <None Remove="MapperModels\SourceDataModels\" />
     <None Remove="MapperModels\TabularMapperModels\" />
     <None Remove="MapperModels\ObservationDatasetMapperModels\" />
+    <None Remove="System.Configuration.ConfigurationManager" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="28.0.1" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MapperModels\" />

@@ -209,7 +209,6 @@ namespace PlatformTM
             {
                 descriptors.Add(dsMapper.InitObsDescriptor());
             }
-
                 return descriptors;
         }
 
@@ -245,6 +244,11 @@ namespace PlatformTM
                 foreach (var propertyValueField in descriptor.PropertyValueFields)
                 {
                     descDT.Rows.Add(propertyValueField.Name, "", "", "PropertyValueField", "", "");
+                }
+
+                foreach (var timeField in descriptor.ObservationPropertyFields)
+                {
+                    descDT.Rows.Add(timeField.Name, "", "", "PropertyValueField", "", "");
                 }
             }
             return descriptorsList;

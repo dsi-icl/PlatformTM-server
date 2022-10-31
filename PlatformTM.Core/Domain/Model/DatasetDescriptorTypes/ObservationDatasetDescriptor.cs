@@ -18,12 +18,14 @@ namespace PlatformTM.Core.Domain.Model.DatasetDescriptorTypes
 
         
 
-
+        //e.g. OCCURRENCE, DIAGNOSIS ...etc
         public List<PropertyValueField> PropertyValueFields { get; set; } = new List<PropertyValueField>();
         public List<QualifiedPropertyValueField> QualifiedPropertyValueFields { get; set; }
 
+        //e.g. Breathing NOISE - SOUND i.e. FA an event or treatment
         public PropertyField FeaturePropertyNameField { get; set; }
         public PropertyValueField FeaturePropertyValueField { get; set; }
+
 
         public List<DatasetField> ObservedPropertyFields { get; set; }
 
