@@ -11,6 +11,7 @@ using PlatformTM.Models.DTOs;
 using PlatformTM.Models.DTOs.Explorer;
 using PlatformTM.Models.Services;
 using PlatformTM.Models.Services.UserManagement;
+using PlatformTM.Services.DTOs;
 
 namespace PlatformTM.API.Controllers
 {
@@ -19,12 +20,14 @@ namespace PlatformTM.API.Controllers
     {
         private readonly ProjectService _projectService;
         private readonly UserAccountService _accountService;
+        private readonly DatasetDescriptorService _descriptorService;
 
 
-        public ProjectController(ProjectService projectService, UserAccountService accountService)
+        public ProjectController(ProjectService projectService, UserAccountService accountService, DatasetDescriptorService descriptorService)
         {
             _projectService = projectService;
             _accountService = accountService;
+            _descriptorService = descriptorService;
         }
 
         [HttpGet]
@@ -71,9 +74,9 @@ namespace PlatformTM.API.Controllers
         }
 
         [HttpGet("{projectId}/descriptors")]
-        public IEnumerable<ObservationDatasetDescriptor> GetProjectDescriptors(int projectId)
+        public IEnumerable<DatasetDescriptorDTO> GetProjectDescriptors(int projectId)
         {
-            return _projectService.GetDescriptors(projectId);
+            return _descriptorService.GetDatasetDescriptors(projectId);
         }
 
         [HttpGet("{projectId}/datasets/clinical")]

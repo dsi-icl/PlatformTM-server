@@ -290,97 +290,7 @@ namespace PlatformTM.Models.Services
             return _variableDefinitionRepository.FindAll(d => d.ProjectId.Equals(studyId));
         }
 
-        public DataTemplateMap GetTemplateMaps(int datasetId)
-        {
-            var map = new DataTemplateMap();
-
-            var ds = _datasetRepository.FindSingle(
-                d => d.Id.Equals(datasetId),
-                new List<string>()
-                {
-                    "Variables.VariableDefinition.Role",
-                    "Domain",
-                    "Activity"
-                });
-            //when querying for variables exclude synonym and variable qualifiers as these will be retrieved from their associated main variables
-            //CL-Role-4 & CL-Role 5
-            //Add a property in vardef and templatevar to reference a list of synonyms and a list of qualifier variables
-
-            map.Domain = ds.Template.Domain;
-            map.TopicColumns = new List<string>();
-            map.ObservationName = ds.Template.Domain.Substring(0, ds.Template.Domain.Length - 1);
-            //map.VarTypes = new List<Dictionary<string, List<DataTemplateMap.VariableMap>>>();
-            map.VarTypes = new List<DataTemplateMap.VariableType>();
-            var ignoredRoles = new List<string>() { "SynonymQualifier", "GroupingQualifier", "Rule" };
-            var observationRoles = new List<string>()
-            {
-                "Topic",
-                "RecordQualifier",
-                "ResultQualifier",
-                "VariableQualifier"
-            };
-
-            foreach (var vtg in ds.Variables
-                .OrderBy(o => o.VariableDefinition.RoleId) //should be variable.order
-                .GroupBy(v => v.VariableDefinition.Role.Name))
-            {
-                //if (vtg.Key.Equals("SynonymQualifier") || vtg.Key.Equals("GroupingQualifier")) continue;
-                if (ignoredRoles.Any(s => s.Equals(vtg.Key))) continue;
-
-                DataTemplateMap.VariableType varType = null;
-                if (vtg.Key.Equals("Identifier"))
-                {
-                    //map.VarTypes.Add("Identifiers", varList = new List<DataTemplateMap.VariableMap>());
-                    map.VarTypes.Add(varType = new DataTemplateMap.VariableType()
-                    {
-                        name = "Identifiers",
-                        vars = new List<DataTemplateMap.VariableMap>()
-                    });
-                }
-                if (vtg.Key.Equals("Timing"))
-                {
-                    //map.VarTypes.Add("Timing Descriptors", varList = new List<DataTemplateMap.VariableMap>());
-
-                    map.VarTypes.Add(varType = new DataTemplateMap.VariableType()
-                    {
-                        name = "Timing Descriptors",
-                        vars = new List<DataTemplateMap.VariableMap>()
-                    });
-                }
-
-                if (observationRoles.Any(s => s.Equals(vtg.Key)))
-                {
-                    if (!map.VarTypes.Exists(v => v.name.Equals("Observation Descriptors")))
-
-                        map.VarTypes.Add(varType = new DataTemplateMap.VariableType()
-                        {
-                            name = "Observation Descriptors",
-                            vars = new List<DataTemplateMap.VariableMap>()
-                        });
-                    else
-                    {
-                        varType = map.VarTypes.Find(vt => vt.name.Equals("Observation Descriptors"));
-                    }
-                }
-
-                foreach (var var in vtg.OrderBy(o => o.VariableDefinition.Id)) //orderby orderNo
-                {
-                    var vgmap = new DataTemplateMap.VariableMap
-                    {
-                        Label = var.VariableDefinition.Label,
-                        ShortName = var.VariableDefinition.Name,
-                        Description = var.VariableDefinition.Description,
-                        DataType = var.VariableDefinition.DataType,
-                        MapToStringValueList = new List<string>(),
-                        MapToColList = new List<ColHeaderDTO>()
-                    };
-                    varType.vars.Add(vgmap);
-                }
-            }
-
-
-            return map;
-        }
+        
 
         public DatasetDescriptor GetUploadedDescriptor(int projectId, string filename)
         {
@@ -414,5 +324,34 @@ namespace PlatformTM.Models.Services
             return _dataServiceUnit.Save().Equals("CREATED") ? dd : null;
             
         }
+
+        public DatasetDescriptor GetDatasetDescriptor(string descriptorId)
+        {
+            var dd = _DatasetDescriptorRepository.FindSingle(d => d.Id == Guid.Parse(descriptorId));
+            //var dto = new DatasetDescriptorDTO(dd);
+            return dd;
+        }
+
+        public List<DatasetDescriptorDTO> GetDatasetDescriptors(int projectId)
+        {
+            List<ObservationDatasetDescriptor> descriptors = _DatasetDescriptorRepository.FindAll(
+                d => d.ProjectId == projectId).ToList();
+            return descriptors.Select(s=> new DatasetDescriptorDTO(s)).ToList();
+        }
+
+        public void UpdateDescriptor(ObservationDatasetDescriptor descriptor, int projectId)
+        {
+            var studyToUpdate = _DatasetDescriptorRepository.Get(descriptor.Id);
+
+            //check that the owner of this dataset is the caller
+            //var dataset = ReadDTO(dto);
+            //var datasetToUpdate = _DatasetDescriptorRepository.FindSingle(d => d.Id == dataset.Id);
+            //datasetToUpdate.LastModified = DateTime.Today.ToString("f");
+            //datasetToUpdate.Description = dataset.Description;
+
+            _DatasetDescriptorRepository.Update(descriptor);
+        }
+
+
     }
 }

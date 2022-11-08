@@ -24,10 +24,10 @@ namespace PlatformTM.API.Controllers
             _fileService = fileService;
         }
 
-        [HttpGet("{datasetId}", Name = "GetDescriptorById")]
-        public DatasetDTO GetDatasetDescriptor(int datasetId)
+        [HttpGet("{descriptorId}", Name = "GetDescriptorById")]
+        public DatasetDescriptor GetDatasetDescriptor(string descriptorId)
         {
-            return _datasetDescriptorService.GetActivityDatasetDTO(datasetId);
+            return _datasetDescriptorService.GetDatasetDescriptor(descriptorId);
         }
 
         [HttpPost("upload/{projectId}")]
@@ -73,12 +73,26 @@ namespace PlatformTM.API.Controllers
             var addedDescriptor = _datasetDescriptorService.AddDescriptor(descriptor,projectId);
             if (addedDescriptor != null)
             {
-                return new CreatedAtActionResult("GET", "GetDescriptorById", new { datasetId = addedDescriptor.Id }, addedDescriptor);
+                return new CreatedAtActionResult("GET", "GetDescriptorById", new { descriptorId = addedDescriptor.Id }, addedDescriptor);
             }
             return new StatusCodeResult(StatusCodes.Status409Conflict);
         }
 
-        
+        [HttpPut("{descriptorId}")]
+        public IActionResult UpdateDescriptor([FromBody] ObservationDatasetDescriptor descriptor, int projectId)
+        {
+            try
+            {
+                _datasetDescriptorService.UpdateDescriptor(descriptor, projectId);
+                //return new CreatedAtActionResult("GET", "GetDescriptorById", new { descriptorId = descriptor.Id }, descriptor);
+                return new AcceptedResult();
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+        }
+
 
         //[HttpPut]
         //[Route("api/Dataset/{datasetId}")]

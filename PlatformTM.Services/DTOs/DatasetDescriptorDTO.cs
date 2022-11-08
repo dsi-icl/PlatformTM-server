@@ -10,6 +10,7 @@ namespace PlatformTM.Services.DTOs
     {
         public string Title { set; get; }
         public string Description { get; set; }
+        public string Id { get; set; }
         
         public string DatasetType { get; set; }
 
@@ -26,6 +27,7 @@ namespace PlatformTM.Services.DTOs
 
         public DatasetDescriptorDTO(ObservationDatasetDescriptor oDD)
         {
+            Id = oDD.Id.ToString();
             Title = oDD.Title;
             Description = oDD.Description;
             DatasetType = oDD.DatasetType.ToString();
