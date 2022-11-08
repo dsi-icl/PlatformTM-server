@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetFieldTypes;
 
-namespace PlatformTM.Core.Domain.Model.DatasetDescriptorTypes
+namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes
 {
     public class SubjectDatasetDescriptor : DatasetDescriptor
     {

@@ -67,9 +67,6 @@ namespace PlatformTM.Models
                     DataDictionary.Add("$VAL", "$VAL");
                 }
 
-
-
-
                 string[] keyValues = tempVE.Split("|");
                 foreach (string kvpair in keyValues)
                 {
@@ -79,7 +76,6 @@ namespace PlatformTM.Models
                         DataDictionary.Add(kv[0].ToUpper().Replace("\"", ""), kv[1].Replace("\"",""));
                         IsCoded = true;
                     }
-
                 }
             }
 
@@ -120,8 +116,6 @@ namespace PlatformTM.Models
                 if(DataDictionary.ContainsKey("$Z+") && Int32.TryParse(srcValue, out num) && num >0)
                     return DataDictionary["$Z+"];
 
-
-
                 if (DataDictionary.TryGetValue(srcValue.ToUpper(), out string pv))
                 {
                     if (pv.ToUpper() == "$SKIP")
@@ -130,8 +124,6 @@ namespace PlatformTM.Models
                         return pv;
                 }
                 return pv;
-                //else if (pvMapper.DataDictionary.ContainsKey("$VAL"))
-                //    obs.PropertyValues.Add(dataValue);
 
             }
             else if (IsSrcValue)

@@ -63,6 +63,9 @@ namespace Loader.MapperModels.TabularMapperModels
             if (EntityMappers.Exists(d => d.MappedToEntity.ToUpper() == "$EPOCH"))
                 propertyMappers.Add(EntityMappers.First(d => d.MappedToEntity == "$EPOCH"));
 
+            if (EntityMappers.Exists(d => d.MappedToEntity.ToUpper() == "$SRC"))
+                propertyMappers.Add(EntityMappers.First(d => d.MappedToEntity == "$SRC"));
+
             return propertyMappers;
         }
 

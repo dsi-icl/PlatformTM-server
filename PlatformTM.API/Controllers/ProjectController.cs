@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Models.DTOs;
 using PlatformTM.Models.DTOs.Explorer;
 using PlatformTM.Models.Services;
@@ -67,6 +68,12 @@ namespace PlatformTM.API.Controllers
         public IEnumerable<ActivityDTO> GetProjectClinicalAssessments(int projectId)
         {
             return _projectService.GetActivities(projectId, typeof(Activity));
+        }
+
+        [HttpGet("{projectId}/descriptors")]
+        public IEnumerable<ObservationDatasetDescriptor> GetProjectDescriptors(int projectId)
+        {
+            return _projectService.GetDescriptors(projectId);
         }
 
         [HttpGet("{projectId}/datasets/clinical")]

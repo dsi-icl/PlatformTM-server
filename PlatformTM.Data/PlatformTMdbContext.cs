@@ -13,6 +13,7 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Core.Domain.Model.Timing;
@@ -82,6 +83,15 @@ namespace PlatformTM.Data
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
+            if (typeof(TEntity).IsSubclassOf(typeof(DatasetDescriptor)))
+            {
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "unicorn_descriptors");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
             if (typeof(TEntity) == typeof(ExportFile))
             {
                 //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
@@ -113,6 +123,14 @@ namespace PlatformTM.Data
                 _repositories.Add(typeof(TEntity), MongoRepository);
                 return MongoRepository;
             }
+            //if (typeof(TEntity) == typeof(Datasetdes))
+            //{
+            //    //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+            //    //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+            //    var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "analysisDatasets");
+            //    _repositories.Add(typeof(TEntity), mongoRepository);
+            //    return mongoRepository;
+            //}
             var repository = new GenericRepository<TEntity, TPrimaryKey>(this);
             _repositories.Add(typeof(TEntity), repository);
 

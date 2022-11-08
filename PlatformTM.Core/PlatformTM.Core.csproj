@@ -18,12 +18,15 @@
 
   <ItemGroup>
     <Folder Include="Domain\Model\DatasetModel\ISATAB\" />
-    <Folder Include="Domain\Model\DatasetModel\New Folder\" />
-    <Folder Include="Domain\Model\DatasetDescriptorTypes\" />
     <Folder Include="Domain\Model\BMO\" />
+    <Folder Include="Domain\Model\DatasetModel\PDS\" />
+    <Folder Include="Domain\Model\DatasetModel\PDS\DatasetDescriptorTypes\" />
+    <Folder Include="Domain\Model\DatasetModel\PDS\DatasetFieldTypes\" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Domain\Model\DatasetDescriptorTypes\" />
     <None Remove="Domain\Model\BMO\" />
+    <None Remove="Domain\Model\DatasetModel\PDS\" />
+    <None Remove="Domain\Model\DatasetModel\PDS\DatasetDescriptorTypes\" />
+    <None Remove="Domain\Model\DatasetModel\PDS\DatasetFieldTypes\" />
   </ItemGroup>
 </Project>

@@ -2,7 +2,8 @@
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using System.Linq;
 using Loader.MapperModels.SourceDataModels;
-using PlatformTM.Core.Domain.Model.DatasetDescriptorTypes;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetFieldTypes;
 
 namespace PlatformTM.Models
 {
@@ -46,18 +47,6 @@ namespace PlatformTM.Models
 
             sourceFileNames = SourceDataVariables.Select(s => s.SourceFileName).ToHashSet();
 
-            //foreach (SourceDataVariable? srcVar in SourceDataVariables)
-            //{
-            //    sourceFileNames.Add(srcVar.SourceFileName);
-            //}
-
-            //foreach (var propValueMapper in ObservationMappers
-            //    .SelectMany(obsMapper => obsMapper.PropertyMappers
-            //    .SelectMany(propMapper => propMapper.PropertyValueMappers)))
-            //{
-            //    sourceFileNames.Add(propValueMapper.SourceFileName);
-            //}
-
             foreach (string filename in sourceFileNames)
             {
                 SourceDataFile srcDataFile = new(filename, srcDataPath, SubjectVariableName);
@@ -65,40 +54,6 @@ namespace PlatformTM.Models
                 sourceDataFiles.Add(srcDataFile);
 
                 srcDataFile.DataVariables.AddRange(SourceDataVariables.Where(srcVar => srcVar.SourceFileName == filename));
-
-                //foreach ( var propValMapper in ObservationMappers
-                //    .SelectMany(obsMapper => obsMapper.PropertyMappers
-                //    .SelectMany(propMapper => propMapper.PropertyValueMappers))
-                //    )
-                //{
-                //    var mappedTo = SourceDataVariables.Find(v => v.Identifier == propValMapper.SourceVariableId);
-
-                //    if (mappedTo == null)
-                //        throw new Exception("Error finding mapped source variable");
-
-                //    srcDataFile.DataVariables.Add(mappedTo);
-                //}
-
-                //foreach(var propMapper in PropertyMappers)
-                //{
-                //    var propValMapper = propMapper.PropertyValueMappers.FirstOrDefault();
-                //    if(propValMapper != null)
-                //    {
-                //        var mappedTo = SourceDataVariables.Find(v => v.Identifier == propValMapper.SourceVariableId);
-
-                //        if (mappedTo == null)
-                //            throw new Exception("Error finding mapped source variable");
-
-                //        srcDataFile.DataVariables.Add(mappedTo);
-
-                //        //srcDataFile.DataVariables.Add(
-                //        //    new SourceDataVariable {
-                //        //        Name = propValMapper.SourceVariableName,
-                //        //        Identifier = propValMapper.SourceVariableId,
-                //        //        Text = propValMapper.SourceVariableText
-                //        //    });
-                //    }
-                //}
             }
             SourceFiles = sourceDataFiles;
 
@@ -120,9 +75,9 @@ namespace PlatformTM.Models
 
         public ObservationDatasetDescriptor InitObsDescriptor()
         {
-            var obsDSdescriptor = new ObservationDatasetDescriptor
+            var obsDSdescriptor = new ObservationDatasetDescriptor(DatasetName)
             {
-                Title = DatasetName,
+                
                 SubjectIdentifierField = new IdentifierField()
                 { Name = "SUBJID", Label = "Subject Identifier" },
                 StudyIdentifierField = new IdentifierField()
@@ -168,17 +123,24 @@ namespace PlatformTM.Models
 
 
             //Property Value Fields
-            var dsObsProperties = GetPropertyFields();
-            foreach (var propertyName in dsObsProperties)
+            var dsObsPropMappers = GetPropertyMappers();
+            foreach (var pMap in dsObsPropMappers)
             {
-                obsDSdescriptor.PropertyValueFields.Add(new PropertyValueField()
+                obsDSdescriptor.ObservedPropertyValueFields.Add(new PropertyValueField()
                 {
-                    Name = propertyName,
-                    Label = propertyName,
+                    Name = pMap.PropertyName,
+                    Label = pMap.PropertyName,
                 });
-               // field2Mapper.put()
+                if (pMap.HasUnit())
+                {
+                    obsDSdescriptor.ObservedPropertyValueFields.Add(new PropertyValueField()
+                    {
+                        Name = "UNIT[" + pMap.PropertyName + "]",
+                        Label = "UNIT[" + pMap.PropertyName + "]",
+                    });
+                }
+                    
             }
-
 
             //Observation Property Fields (e.g. time, visits, epoch)
             foreach (var propMapper in PropertyMappers)
@@ -194,16 +156,19 @@ namespace PlatformTM.Models
             return obsDSdescriptor;
         }
 
-        private List<string> GetPropertyFields()
+        private List<PropertyMapper> GetPropertyMappers()
         {
-            HashSet<string> Properties = new();
+            Dictionary<string,PropertyMapper> Properties = new();
 
             foreach (var propMapper in ObservationMappers
                 .SelectMany(obsMapper => obsMapper.PropertyMappers).Where(p=>!p.IsFeatureProperty).OrderBy(pm => pm.Order))
             {
-                Properties.Add(propMapper.PropertyName);
+                if (Properties.ContainsKey(propMapper.PropertyName))
+                    continue;
+                else
+                    Properties.Add(propMapper.PropertyName,propMapper);
             }
-            return Properties.ToList();
+            return Properties.Values.ToList();
         }
 
         public bool HasFeatureProperties()
@@ -293,8 +258,6 @@ namespace PlatformTM.Models
 
             //var srcDataFile = SourceFiles.Find(f => f.SourceFileName == obsMapper.SourceFileName);
             //var srcDataRow = srcDataFile?.DataRows.Find(r => r.SubjectId == subjectId);
-
-
             //var srcValue = srcDataRow?.DataRecord[obsMapper.SourceVariableId];
 
             var newVal = obsMapper.FeatureNameExpression.EvaluateExpression(srcDataRow.DataRecord);

@@ -26,16 +26,6 @@ namespace PlatformTM.MapperModels.TabularMapperModels
         public bool IsSkipped { get; internal set; }
         public bool IsFeatureProperty { get; internal set; }
 
-        //public class TabularPropMapper
-        //{
-        //    public string? PropertyName { get; set; }
-        //    public string? PropertyValue { get; set; }
-        //    public string? PropertyValueUnit { get; set; }
-
-        //    public TabularPropMapper() { }
-
-        //}
-
         public TabularEntityMapper()
         {
             PropertyMappers = new List<TabularPropertyMapper>();

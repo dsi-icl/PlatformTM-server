@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PlatformTM.Core.Domain.Model.DatasetModel
+namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
 {
     public class DatasetRecord : Dictionary<string,string>
     {

@@ -1,19 +1,47 @@
 ﻿using System;
 using PlatformTM.Core.Domain.Interfaces;
-using PlatformTM.Core.Domain.Model.DatasetDescriptorTypes;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
+using System.Linq;
+using PlatformTM.Services.DTOs;
 
 namespace PlatformTM.Models.Services
 {
     public class PrimaryDatasetService
     {
         private IServiceUoW uoW;
+        private readonly IRepository<PrimaryDataset, int> _pdsRepository;
         public PrimaryDatasetService(IServiceUoW _uoW)
         {
             uoW = _uoW;
+            _pdsRepository = uoW.GetRepository<PrimaryDataset, int>();
         }
 
         public void ImportDataToPDS(DataFile dataFile, DatasetDescriptor datasetDescriptor)
+        {
+
+        }
+
+        public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int projectId)
+        {
+            IEnumerable<PrimaryDataset> primaryDatasets;
+
+            primaryDatasets = _pdsRepository.FindAll(d => d.ProjectId == projectId, new List<string>() { "Study","Project" });
+
+            return primaryDatasets.Select(d=> new PrimaryDatasetDTO()
+            {
+                Title = d.Title,
+                Description = d.Description,
+                ProjectName = d.Project.Name,
+                StudyName = d.Study.Name,
+                StudyAccronym = d.Study.Accession,
+                DatasetType = d.DatasetDescriptor.DatasetType.ToString()
+            }).ToList();
+        }
+
+        public void AddPrimaryDataset()
         {
 
         }
@@ -43,4 +71,6 @@ namespace PlatformTM.Models.Services
         //    return datasets;
         //}
     }
+
+
 }

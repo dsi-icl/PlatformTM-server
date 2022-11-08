@@ -33,9 +33,7 @@ namespace Loader.MapperModels.SourceDataModels
 
                 foreach (DataRow row in dt.Rows)
                 {
-                    //Skip rows until column header row
-                    //if (!row.ItemArray.Contains(DataVariables[0].Name))
-                    //    continue;
+                    
                     SubjectSrcDataRow subjectDataRow = new SubjectSrcDataRow();
                     subjectDataRow.SubjectId = row[SubjectIdVariableName].ToString();
 

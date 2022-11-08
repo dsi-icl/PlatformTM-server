@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using PlatformTM.Core.Domain.Interfaces;
-using PlatformTM.Core.Domain.Model.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Models.DTOs;
+using PlatformTM.Services.DTOs;
+
 namespace PlatformTM.Models.Services
 {
     public class DatasetDescriptorService
@@ -14,11 +18,18 @@ namespace PlatformTM.Models.Services
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<Dataset, int> _datasetRepository;
         private readonly IRepository<VariableDefinition, int> _variableDefinitionRepository;
-        public DatasetDescriptorService(IServiceUoW uoW, CacheService cacheService)
+
+        private readonly IRepository<ObservationDatasetDescriptor, Guid> _DatasetDescriptorRepository;
+
+        private readonly FileService _fileService;
+        public DatasetDescriptorService(IServiceUoW uoW, CacheService cacheService, FileService fileService)
         {
             _dataServiceUnit = uoW;
             _datasetRepository = uoW.GetRepository<Dataset, int>();
             _variableDefinitionRepository = uoW.GetRepository<VariableDefinition, int>();
+            _DatasetDescriptorRepository = uoW.GetRepository<ObservationDatasetDescriptor, Guid>();
+
+            _fileService = fileService;
         }
 
         /// <summary>
@@ -141,21 +152,21 @@ namespace PlatformTM.Models.Services
             return _dataServiceUnit.Save().Equals("CREATED") ? dataset : null;
         }
 
-        public DatasetDescriptor CreateDatasetDescriptor(DatasetDTO dto)
-        {
-            if(dto.Code == "observation")
-            {
-                var c = new ObservationDatasetDescriptor();
-                foreach (var variableDto in dto.Variables)
-                {
-                    if(variableDto.RoleId == "ObservedPropertyValue")
-                    {
-                        c.ObservedPropertyFields.Add(null);
-                    } 
-                }
-            }
-            return null;
-        }
+        //public DatasetDescriptor CreateDatasetDescriptor(DatasetDTO dto)
+        //{
+        //    if(dto.Code == "observation")
+        //    {
+        //        var c = new ObservationDatasetDescriptor(dto.Name);
+        //        foreach (var variableDto in dto.Variables)
+        //        {
+        //            if(variableDto.RoleId == "ObservedPropertyValue")
+        //            {
+        //                c.ObservedPropertyFields.Add(null);
+        //            } 
+        //        }
+        //    }
+        //    return null;
+        //}
 
         public Dataset CreateDataset(DatasetDTO datasetDTO)
         {
@@ -369,6 +380,39 @@ namespace PlatformTM.Models.Services
 
 
             return map;
+        }
+
+        public DatasetDescriptor GetUploadedDescriptor(int projectId, string filename)
+        {
+            string fullpath = Path.Combine(_fileService.GetFullPath(projectId), "temp", filename);
+
+            //string fileName = "WeatherForecast.json";
+            string jsonString = File.ReadAllText(fullpath);
+            var guid = Guid.NewGuid();
+            
+            
+           // var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10,  IgnoreNullValues= true };
+            ObservationDatasetDescriptor oDD = JsonSerializer.Deserialize<ObservationDatasetDescriptor>(jsonString)!;
+
+            var oDD_dto = new DatasetDescriptorDTO(oDD);
+
+            return oDD;
+
+        }
+
+        public DatasetDescriptor AddDescriptor(ObservationDatasetDescriptor dd, int projectId)
+        {
+            
+            if (dd == null)
+                return null;
+
+            dd.ProjectId = projectId;
+            dd.Id = Guid.NewGuid();
+
+
+            _DatasetDescriptorRepository.Insert(dd);
+            return _dataServiceUnit.Save().Equals("CREATED") ? dd : null;
+            
         }
     }
 }

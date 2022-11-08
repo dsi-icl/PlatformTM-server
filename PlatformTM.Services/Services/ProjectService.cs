@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
 using PlatformTM.Core.Domain.Model.Users.Queries;
@@ -101,6 +102,13 @@ namespace PlatformTM.Models.Services
             //var users = project.Users?.Select(u => new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList();
             //var ownusers.Add(proj);
             return dto;
+        }
+
+        public IEnumerable<ObservationDatasetDescriptor> GetDescriptors(int projectId)
+        {
+            var descriptors = new List<ObservationDatasetDescriptor>();
+            descriptors.Add(new ObservationDatasetDescriptor("MH Dataset Descriptor"));
+            return descriptors;
         }
 
         public ProjectDTO AddProject(ProjectDTO projectDto, string ownerId)

@@ -36,37 +36,37 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         }
     }
 
-    public abstract class FieldConstruct
-    {
-        public List<Field> Fields { get; set; }
+    //public abstract class FieldConstruct
+    //{
+    //    public List<Field> Fields { get; set; }
 
-    }
+    //}
 
-    public class Field
-    {
+    //public class Field
+    //{
 
-    }
+    //}
 
-    public class CodedTextFG : FieldConstruct
-    {
-        public Field Value { get; set; }
-        public Field Code { get; set; }
-        public Field Terminology { get; set; }
-    }
+    //public class CodedTextFG : FieldConstruct
+    //{
+    //    public Field Value { get; set; }
+    //    public Field Code { get; set; }
+    //    public Field Terminology { get; set; }
+    //}
 
-    public class ObsrvationDataset  
-    {
-        public CodedTextFG Topic { get; set; }
-        public List<FieldConstruct> ObservedProprties { get; set; }
-        public void AddObservedProperty()
-        {
-            var f = new CodedTextFG();
-            f.Code = new Field();
-            f.Value = new Field();
-            f.Terminology = new Field();
-            ObservedProprties.Add(f);
+    //public class ObsrvationDataset  
+    //{
+    //    public CodedTextFG Topic { get; set; }
+    //    public List<FieldConstruct> ObservedProprties { get; set; }
+    //    public void AddObservedProperty()
+    //    {
+    //        var f = new CodedTextFG();
+    //        f.Code = new Field();
+    //        f.Value = new Field();
+    //        f.Terminology = new Field();
+    //        ObservedProprties.Add(f);
 
-        }
-    }
+    //    }
+    //}
 
 }

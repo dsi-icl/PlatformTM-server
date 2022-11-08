@@ -1,17 +1,12 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using CsvHelper;
-using Loader;
 using Loader.MapperModels.SourceDataModels;
 using Loader.MapperModels.TabularMapperModels;
 using PlatformTM.Core.Domain.Interfaces;
-using PlatformTM.Core.Domain.Model.BMO;
-using PlatformTM.Core.Domain.Model.DatasetDescriptorTypes;
-using PlatformTM.Core.Domain.Model.DatasetModel;
-using PlatformTM.Core.Domain.Model.Templates;
-using PlatformTM.MapperModels;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.MapperModels.TabularMapperModels;
 using PlatformTM.Models;
 
@@ -85,8 +80,6 @@ namespace PlatformTM
             
             return tabularMapper;
         }
-
-        
 
         public static List<DatasetMapper> ProcessTabularMapper(TabularMapper tabularMapper)
         {
@@ -212,49 +205,18 @@ namespace PlatformTM
                 return descriptors;
         }
 
-
         public static List<DataTable> TabulariseDescriptors(List<ObservationDatasetDescriptor> descriptors)
         {
             var descriptorsList = new List<DataTable>();
             foreach (ObservationDatasetDescriptor descriptor in descriptors)
             {
-                var descDT = new DataTable();
-                descDT.TableName = descriptor.Title;
 
-                descriptorsList.Add(descDT);
-
-                descDT.Columns.Add("FIELD_NAME");
-                descDT.Columns.Add("FIELD_LABEL");
-                descDT.Columns.Add("FIELD_DESCRIPTION");
-                descDT.Columns.Add("FIELD_TYPE");
-                descDT.Columns.Add("FIELD_NAME_TERMID");
-                descDT.Columns.Add("FIELD_NAME_TERMREF");
-
-                descDT.Rows.Add(descriptor.StudyIdentifierField.Name, descriptor.StudyIdentifierField.Label, "", "IdentifierField","","");
-                descDT.Rows.Add(descriptor.SubjectIdentifierField.Name, descriptor.SubjectIdentifierField.Label, "", "IdentifierField", "", "");
-
-                descriptor.ClassifierFields.Sort((a, b) => (a.Order.CompareTo(b.Order)));
-                foreach (var classifierField in descriptor.ClassifierFields)
-                {
-                    descDT.Rows.Add(classifierField.Name, classifierField.Label, "", "ClassifierFieldType", "", "");
-                }
-
-                descDT.Rows.Add(descriptor.FeatureNameField.Name, descriptor.FeatureNameField.Label, "", "DesignationField", "", "");
-
-                foreach (var propertyValueField in descriptor.PropertyValueFields)
-                {
-                    descDT.Rows.Add(propertyValueField.Name, "", "", "PropertyValueField", "", "");
-                }
-
-                foreach (var timeField in descriptor.ObservationPropertyFields)
-                {
-                    descDT.Rows.Add(timeField.Name, "", "", "PropertyValueField", "", "");
-                }
+                descriptorsList.Add(descriptor.GetDatasetAsDatatable());
             }
             return descriptorsList;
         }
 
-        public static PrimaryDataset? CreateObsDatasets(DatasetMapper datasetMapper, string srcDataPath)
+        public static PrimaryDataset? CreateObsPDS(DatasetMapper datasetMapper, string srcDataPath)
         {
 
             //Initialise SourceDataFiles from DatasetMapper to init Soure Data Variables
@@ -290,9 +252,7 @@ namespace PlatformTM
                     foreach (var oMapper in datasetMapper.ObservationMappers)
                     {
 
-
-
-                        var datasetRecord = new DatasetRecord(); //THIS WOULD bE ANOTHER TOP LEVEL RECORDSPERSUBJECT ID
+                        var datasetRecord = new DatasetRecord(); 
 
 
                         //SubjectId
@@ -313,7 +273,7 @@ namespace PlatformTM
                         //FeatureName
                         var featureName = datasetMapper.EvaluateFeatureMapper(subjectDataRow, oMapper);
                         if (featureName != "")
-                            datasetRecord[datasetDescriptor.FeatureNameField.Name] = featureName;
+                            datasetRecord[datasetDescriptor.FeatureNameField.Name] = featureName?.ToUpper();
                         else
                             continue;
 
@@ -331,7 +291,7 @@ namespace PlatformTM
 
 
                         //ObservedPropertyValues
-                        foreach (var field in datasetDescriptor.PropertyValueFields)
+                        foreach (var field in datasetDescriptor.ObservedPropertyValueFields)
                         {
                             var propMapper = oMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
                             if (propMapper != null)
@@ -348,7 +308,7 @@ namespace PlatformTM
                         foreach (var field in datasetDescriptor.ObservationPropertyFields)
                         {
                             var propMapper = datasetMapper.GetPropertyMapper(field.Name); //THIS SHOULD COME FROM A MAP THAT LINKS PROPMAPPERS to DATASET FIELDS
-                            datasetRecord[field?.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectDataRow, propMapper);
+                            datasetRecord[field?.Name] = datasetMapper.EvaluatePropertyValueMapper(subjectDataRow, propMapper).ToUpper();
                         }
 
                         PrimaryDataset.DataRecords.Add(datasetRecord);
@@ -362,8 +322,63 @@ namespace PlatformTM
 
         }
 
-        
+        public static List<PrimaryDataset> ConsolidateDatasets(List<PrimaryDataset> datasets)
+        {
+            var datasetsByDomain  = datasets.GroupBy(p => p.DatasetDescriptor.Title);
+            var consolidatedDatasets = new List<PrimaryDataset>();
+            foreach(var datasetGroup in datasetsByDomain)
+            {
+                var newDataset = new PrimaryDataset();
+                //SHOULD NOT BE THE FIRST ONE, BUT tHE UNION OF ALL DATASETS in the same group.
+                var descriptors = datasetGroup.ToList().Select(d => d.DatasetDescriptor).ToList();
+                newDataset.DatasetDescriptor = GetConsolidatedDescriptor(descriptors);
+                foreach(var dataset in datasetGroup)//Im assuming here that all data records are in the same order
+                {
+                    newDataset.DataRecords.AddRange(dataset.DataRecords);
+                }
+                consolidatedDatasets.Add(newDataset);
+            }
+            return consolidatedDatasets;
+        }
 
+
+        public static DatasetDescriptor GetConsolidatedDescriptor(List<DatasetDescriptor> descriptors)
+        {
+            
+            ObservationDatasetDescriptor newDescriptor = new(descriptors?.FirstOrDefault()?.Title);
+
+            var firstDescriptor = (ObservationDatasetDescriptor)descriptors?.FirstOrDefault();
+
+            newDescriptor.ClassifierFields = firstDescriptor.ClassifierFields;
+            
+            foreach (ObservationDatasetDescriptor descriptor in descriptors)
+            {
+
+                if (descriptor.FeaturePropertyNameField != null)
+                    newDescriptor.FeaturePropertyNameField = descriptor.FeaturePropertyNameField;
+
+                if (descriptor.FeaturePropertyValueField != null)
+                    newDescriptor.FeaturePropertyValueField = descriptor.FeaturePropertyValueField;
+
+                foreach(var field in descriptor.ObservedPropertyValueFields)
+                {
+                    if (newDescriptor.GetDatasetFields().Exists(f => f.Name == field.Name))
+                        continue;
+                    newDescriptor.ObservedPropertyValueFields.Add(field);
+                }
+
+                foreach (var field in descriptor.ObservationPropertyFields)
+                {
+                    if (newDescriptor.GetDatasetFields().Exists(f => f.Name == field.Name))
+                        continue;
+                    newDescriptor.ObservationPropertyFields.Add(field);
+                }
+
+            }
+            return newDescriptor;
+        }
+
+        
     }
 }
 

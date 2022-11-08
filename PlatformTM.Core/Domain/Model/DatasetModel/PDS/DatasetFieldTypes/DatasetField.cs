@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using PlatformTM.Core.Domain.Model.Base;
 
-namespace PlatformTM.Core.Domain.Model.DatasetModel
+namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetFieldTypes
 {
-    public class DatasetField
+    public class DatasetField : Identifiable<int>
     {
         public string Name { get; set; }
         public string Label { get; set; }
         public string Description { get; set; }
         public string ContentDataType { get; set; }
+        public DatasetFieldType FieldType{ get; set; }
         //public string DataElementId { get; set; }
 
         public DatasetField()
@@ -19,24 +21,45 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
     public class IdentifierField : DatasetField
     {
         public string MasterEntity { get; set; }
+        public IdentifierField()
+        {
+            FieldType = DatasetFieldType.IdentifierFieldType;
+        } 
 
     }
     public class DesignationField : DatasetField
     {
+        public string MasterEntity { get; set; }
         public string Designation { get; set; }
+        public DesignationField()
+        {
+            FieldType = DatasetFieldType.DesignationFieldType;
+        }
     }
     public class ClassifierFieldType : DatasetField
     {
         public int Order { get; set; }
+        public ClassifierFieldType()
+        {
+            FieldType = DatasetFieldType.ClassifierFieldType;
+        }
+
     }
     public class PropertyField : DatasetField
     {
         public string ObjectClass { get; set; }
+        public PropertyField()
+        {
+            FieldType = DatasetFieldType.PropertyFieldType;
+        }
     }
     public class PropertyValueField : DatasetField
-    {
-        public string FeatureName { get; set; }
+    { 
         public string PropertyName { get; set; }
+        public PropertyValueField()
+        {
+            FieldType = DatasetFieldType.PropertyValueFieldType;
+        }
     }
     public class QualifiedPropertyValueField : DatasetField
     {
@@ -44,18 +67,13 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel
         public string QualifierTerm { get; set; }
     }
 
-
-    public class SubjectIdentifierField: IdentifierField
-    {
-
-    }
-
-
-
-
     public class TimeSeriesField : DatasetField
     {
         public string TimeSeriesProperty { get; set; }
+        public TimeSeriesField()
+        {
+            FieldType = DatasetFieldType.TimeSeriesFieldType;
+        }
     }
 
   

@@ -28,11 +28,11 @@
     <Folder Include="ViewModels\" />
     <Folder Include="Services\FAIRifier\" />
     <Folder Include="Services\FAIRifier\Models\" />
-    <Folder Include="Services\Loading\zeft\" />
+    <Folder Include="Services\Loading\PDS\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\FAIRifier\" />
     <None Remove="Services\FAIRifier\Models\" />
-    <None Remove="Services\Loading\zeft\" />
+    <None Remove="Services\Loading\PDS\" />
   </ItemGroup>
 </Project>
