@@ -30,6 +30,12 @@ namespace PlatformTM.API.Controllers
             return _datasetDescriptorService.GetDatasetDescriptor(descriptorId);
         }
 
+        [HttpGet("{descriptorId}/view", Name = "GetDescriptorViewById")]
+        public DatasetDescriptorDTO GetDatasetDescriptorDTO(string descriptorId)
+        {
+            return _datasetDescriptorService.GetDatasetDescriptorDTO(descriptorId);
+        }
+
         [HttpPost("upload/{projectId}")]
         public async Task<IActionResult> UploadFile(int projectId)
         {

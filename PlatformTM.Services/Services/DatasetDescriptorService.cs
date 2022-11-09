@@ -332,6 +332,14 @@ namespace PlatformTM.Models.Services
             return dd;
         }
 
+        public DatasetDescriptorDTO GetDatasetDescriptorDTO(string descriptorId)
+        {
+            var dd = _DatasetDescriptorRepository.FindSingle(d => d.Id == Guid.Parse(descriptorId));
+            var dto = new DatasetDescriptorDTO(dd);
+            return dto;
+        }
+
+
         public List<DatasetDescriptorDTO> GetDatasetDescriptors(int projectId)
         {
             List<ObservationDatasetDescriptor> descriptors = _DatasetDescriptorRepository.FindAll(

@@ -79,6 +79,8 @@ namespace PlatformTM.API.Controllers
             return _descriptorService.GetDatasetDescriptors(projectId);
         }
 
+        
+
         [HttpGet("{projectId}/datasets/clinical")]
         [AllowAnonymous]
         public IActionResult GetProjectClinicalDatasets(int projectId)
