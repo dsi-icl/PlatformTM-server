@@ -12,21 +12,22 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
 
         public string Title { get; set; }
         public string Description { get; set; }
+        public string Acronym { get; set; }
         public string Domain { get; set; }
 
-        //public int StudyId { get; set; }
-        public List<Study> Studies { get; set; }
+        public int ProjectId { get; set; }
+        public Project Project { get; set; }
 
-        public string DescriptorId { get; set; }
+        public Guid DescriptorId { get; set; }
         public DatasetDescriptor Descriptor { get; set; }
         
-        public ICollection<DataFile> DataFiles { get; set; }
-        public ICollection<Assessment> Assessments { get; set; }
+        public IList<DataFile> DataFiles { get; set; }
+        public IList<Assessment> Assessments { get; set; }
+        public IList<Study> Studies { get; set; }
 
         //ignore from DB
         public List<DatasetRecord> DataRecords { get; set; }
-
-
+        
 
         public PrimaryDataset()
         {

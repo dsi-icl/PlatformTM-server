@@ -21,13 +21,15 @@ namespace PlatformTM.API.Controllers
         private readonly ProjectService _projectService;
         private readonly UserAccountService _accountService;
         private readonly DatasetDescriptorService _descriptorService;
+        private readonly PrimaryDatasetService _primaryDatasetService;
 
 
-        public ProjectController(ProjectService projectService, UserAccountService accountService, DatasetDescriptorService descriptorService)
+        public ProjectController(ProjectService projectService, UserAccountService accountService, DatasetDescriptorService descriptorService, PrimaryDatasetService primaryDatasetService)
         {
             _projectService = projectService;
             _accountService = accountService;
             _descriptorService = descriptorService;
+            _primaryDatasetService = primaryDatasetService;
         }
 
         
@@ -103,13 +105,13 @@ namespace PlatformTM.API.Controllers
         [HttpGet("{projectId}/datasets", Name = "GetStudyPrimaryDatasets")]
         public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int projectId)
         {
-            return _assessmentService.GetPrimaryDatasetsForProject(projectId);
+            return _primaryDatasetService.GetPrimaryDatasetsForProject(projectId);
         }
 
         [HttpGet("{projectId}/datasets/{datasetId}", Name = "GetProjectDatasetById")]
-        public AssessmentDTO GetProjectDatasetById(int datasetId)
+        public PrimaryDatasetDTO GetProjectDatasetById(int datasetId)
         {
-            return _assessmentService.GetPrimaryDataset(datasetId);
+            return _primaryDatasetService.GetPrimaryDatasetInfo(datasetId);
         }
 
         [HttpPost("{projectId}/datasets")]
@@ -117,9 +119,9 @@ namespace PlatformTM.API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest();
-            var addedDataset = _assessmentService.AddStudyAssessment(primaryDatasetDTO);
+            var addedDataset = _primaryDatasetService.AddPrimaryDatasetInfo(primaryDatasetDTO);
             if (addedDataset != null)
-                return new CreatedAtRouteResult("GetProjectDatasetById", new { assessmentId = addedDataset.Id }, addedDataset);
+                return new CreatedAtRouteResult("GetProjectDatasetById", new { datasetId = addedDataset.Id }, addedDataset);
             return new StatusCodeResult(StatusCodes.Status409Conflict);
         }
 
@@ -128,8 +130,8 @@ namespace PlatformTM.API.Controllers
         {
             try
             {
-                _assessmentService.UpdatePrimaryDataset(primaryDatasetDTO, projectId);
-                return new AcceptedAtRouteResult("GetStudyAssessmentById", new { assessmentId = AssessmentDTO.Id }, AssessmentDTO);
+                _primaryDatasetService.UpdatePrimaryDatasetInfo(primaryDatasetDTO);
+                return new AcceptedAtRouteResult("GetProjectDatasetById", new { datasetId = primaryDatasetDTO.Id }, primaryDatasetDTO);
             }
             catch (Exception e)
             {

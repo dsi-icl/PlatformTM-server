@@ -15,19 +15,19 @@ namespace PlatformTM.Data.EntityConfigurations
             // Properties
             builder.Property(t => t.Id)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.Name)
-                .HasMaxLength(200);
+                .HasMaxLength(20);
 
             builder.Property(t => t.UrlPrefix)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Url)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Version)
-               .HasMaxLength(2000);
+               .HasMaxLength(10);
 
             // Table & Column Mappings
             builder.ToTable("Dbs");

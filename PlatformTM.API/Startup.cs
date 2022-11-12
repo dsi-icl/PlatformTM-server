@@ -28,6 +28,7 @@ using PlatformTM.Models.Services.UserManagement;
 using Swashbuckle.AspNetCore.Swagger;
 using Newtonsoft.Json.Serialization;
 using Microsoft.OpenApi.Models;
+using PlatformTM.Services.Services;
 
 namespace PlatformTM.API
 {
@@ -110,6 +111,11 @@ namespace PlatformTM.API
             services.AddScoped<DatasetDescriptorService>();
             services.AddScoped<ExportService>();
             services.AddScoped<FileService>();
+
+            services.AddScoped<AssessmentService>();
+            services.AddScoped<PrimaryDatasetService>();
+
+
 
             services.AddScoped<ProjectService>();
             services.AddScoped<SDTMreader>();

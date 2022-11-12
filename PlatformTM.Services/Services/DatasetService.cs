@@ -50,7 +50,7 @@ namespace PlatformTM.Models.Services
             var loaded = false;
 
             var dataFile = _dataFileRepository.Get(fileId);
-            if (dataFile.IsLoadedToDB)
+            if (dataFile.IsLoadedToDB.Value)
                 reload = true;
 
             try
@@ -157,7 +157,7 @@ namespace PlatformTM.Models.Services
             var file = _dataFileRepository.FindSingle(f => f.Id == fileId, new List<string>() {"Datasets"});
             bool result = true;
             //foreach (var dataset in file.)
-                result = result && await UnloadDataset(file.DatasetId, fileId);
+                result = result && await UnloadDataset(file.DatasetId.Value, fileId);
             return result;
         }
 

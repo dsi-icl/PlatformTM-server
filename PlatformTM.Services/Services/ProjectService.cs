@@ -67,10 +67,9 @@ namespace PlatformTM.Models.Services
                 new List<string>()
                 {
                    
-                    "Studies.Arms.Arm",
+                    "Studies.Cohorts",
                     "Studies.Subjects",
-                    "Activities",
-                    "Users.User"
+                    "Members"
                 });
             var dto =  new ProjectDTO()
             {
@@ -117,7 +116,11 @@ namespace PlatformTM.Models.Services
         {
             var name = projectDto.Name;
             string novowels = Regex.Replace(name, "(?<!^)[aouieyAOUIEY]", "");
-            //var accession = "P-" + novowels.Substring(0,3).ToUpper();
+
+            string accession;
+            if(novowels.Length >=3)
+
+             accession = "P-" + novowels.Substring(0,3).ToUpper();
 
             //var pExist = _projectRepository.FindSingle(p => p.Accession == accession);
             //if (pExist != null)
@@ -127,7 +130,7 @@ namespace PlatformTM.Models.Services
             //    else
             //        accession = accession + "01";
             //}
-            var accession = RandomString(5);
+            else accession = RandomString(5);
             var project = new Project()
             {
                 Name = projectDto.Name,
@@ -170,7 +173,7 @@ namespace PlatformTM.Models.Services
                 p=>p.Members.Select(u=>u).Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID || p.IsPublic, 
                 new List<string>()
                 {
-                   "Studies.Arms",
+                   "Studies.Cohorts",
                    "Studies.Subjects"
                 }).Select(p=> new ProjectDTO()
             {
@@ -197,7 +200,7 @@ namespace PlatformTM.Models.Services
                 Activities = _activityRepository.FindAll(
                     d => d.Study.Project.Id == projectId,
                     new List<string>(){
-                        "Datasets.Template",
+                        
                         "Study.Project"
                     }
                 );
@@ -205,48 +208,39 @@ namespace PlatformTM.Models.Services
             else if (type == typeof(Assessment))
 
              Activities = _activityRepository.FindAll(
-                    d => d.Study.Project.Id == projectId && d is Assessment,
-                    new List<string>(){
-                        "Datasets.Template",
-                        "Study.Project"
-                    }
+                    d => d.Study.Project.Id == projectId && d is Assessment
                 );
             else if (type == typeof(Assay))
                 Activities = _activityRepository.FindAll(
-                    d => d.Study.Project.Id == projectId && d is Assay,
-                    new List<string>(){
-                        "Datasets.Template",
-                       "Study.Project"
-                    }
+                    d => d.Study.Project.Id == projectId && d is Assay
                 );
             else if (type == typeof(SubjectRecording))
                 Activities = _activityRepository.FindAll(
-                    d => d.Study.Project.Id == projectId && d is SubjectRecording,
-                    new List<string>(){
-                        "Datasets.Template",
-                        "Study.Project"
-                    }
+                    d => d.Study.Project.Id == projectId && d is SubjectRecording
                 );
+
+            if (Activities == null)
+                return null;
             return Activities.Select(p => new ActivityDTO
             {
                 Name = p.Name,
                 Id = p.Id,
                 ProjectId = p.Id,
-                ProjectAcc = p.Study.Project.Accession,
+                //ProjectAcc = p.Study.Project.Accession,
                 isAssay = p is Assay,
-                datasets = p.Datasets.Select(m => new DatasetDTO
-                {
-                    Name = m.Domain,
-                    Id = m.Id,
-                    DomainId = m.Domain
-                }).ToList()
+                //datasets = p.Datasets.Select(m => new DatasetDTO
+                //{
+                //    Name = m.Domain,
+                //    Id = m.Id,
+                //    DomainId = m.Domain
+                //}).ToList()
             }).ToList();
         }
 
         public List<UserDTO> GetProjectUsers(int projectId)
         {
             var project = _projectRepository.FindSingle(p => p.Id == projectId,
-                new List<string>() {"Users.User"});
+                new List<string>() {"Members"});
             var users = project.Members.Select(u => new UserDTO()
             {
                 FirstName = u.FirstName,
@@ -292,7 +286,7 @@ namespace PlatformTM.Models.Services
                         "TechnologyType",
                         "TechnologyPlatform",
                         "MeasurementType",
-                        "Datasets.DataFiles.Datafile"
+                        "Datasets.DataFiles"
                     }
                 );
 

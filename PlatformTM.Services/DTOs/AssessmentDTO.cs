@@ -11,7 +11,7 @@ namespace PlatformTM.Services.DTOs
         public string Status { get; set; }
         public int StudyId { get; set; }
 
-        public List<AssessmentDatasetDTO> AssociatedDatasets;
+        public List<AssessmentDatasetDTO> AssociatedDatasets { get; set; }
 
         public AssessmentDTO()
         {
@@ -21,7 +21,7 @@ namespace PlatformTM.Services.DTOs
 
     public class AssessmentDatasetDTO
     {
-        public int Id;
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Domain { get; set; }

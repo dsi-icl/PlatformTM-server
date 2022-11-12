@@ -15,17 +15,17 @@ namespace PlatformTM.Data.EntityConfigurations
             // Properties
             builder.Property(t => t.OID)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.Accession)
-                .HasMaxLength(200);
+                .HasMaxLength(20);
 
             builder.Property(t => t.Description)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.DBId)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(20);
 
             // Table & Column Mappings
             builder.ToTable("DBxreferences");

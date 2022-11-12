@@ -18,10 +18,10 @@ namespace PlatformTM.Data.EntityConfigurations
             //.HasMaxLength(200);
 
             builder.Property(t => t.Name)
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
 
             builder.Property(t => t.Description)
-                .HasMaxLength(2000);
+                .HasMaxLength(40);
 
             // Table & Column Mappings
             builder.ToTable("Studies");

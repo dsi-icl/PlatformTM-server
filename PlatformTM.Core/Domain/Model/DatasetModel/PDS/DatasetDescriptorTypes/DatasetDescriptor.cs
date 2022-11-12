@@ -10,6 +10,8 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes
     {
         public string Title { set; get; }
         public string Description { get; set; }
+        public string Acronym { get; set; }
+        public string RecordStructure { get; set; }
 
         public DatasetType DatasetType { get; set; }
 
@@ -21,7 +23,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes
         //public int DatasetId { get; set; }
 
 
-        public List<DatasetField> GetDatasetFields()
+        public virtual List<DatasetField> GetDatasetFields()
         {
 
             throw new NotImplementedException();

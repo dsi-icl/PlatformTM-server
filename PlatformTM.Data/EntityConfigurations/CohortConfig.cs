@@ -14,7 +14,7 @@ namespace PlatformTM.Data.EntityConfigurations
 
             builder.Property(t => t.Name)
                 .IsRequired()
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
 
             builder
                 .Property(t => t.Code)

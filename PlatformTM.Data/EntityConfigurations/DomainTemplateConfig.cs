@@ -15,22 +15,22 @@ namespace PlatformTM.Data.EntityConfigurations
             // Properties
             builder.Property(t => t.Id)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.Domain)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Class)
-                .HasMaxLength(200);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Description)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Structure)
-                .HasMaxLength(200);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Code)
-                .HasMaxLength(200);
+                .HasMaxLength(127);
 
             // Table & Column Mappings
             builder.ToTable("DomainTemplates");

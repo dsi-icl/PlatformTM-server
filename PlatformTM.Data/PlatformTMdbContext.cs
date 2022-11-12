@@ -195,8 +195,6 @@ namespace PlatformTM.Data
             modelBuilder.AddConfiguration<User>(new UserConfig());
             modelBuilder.AddConfiguration<UserAccount>(new AccountConfig());
 
-
-            
             modelBuilder.AddConfiguration<UserClaim>(new ClaimConfig());
 
 
@@ -208,15 +206,7 @@ namespace PlatformTM.Data
             modelBuilder.AddConfiguration<Dbxref>(new DBxrefConfig());
             modelBuilder.AddConfiguration<Dictionary>(new DictionaryConfig());
 
-            
-            
-            
-            
 
-            modelBuilder.AddConfiguration<PlatformTM.Core.Domain.Model.Observation>(new ObservationConfig());
-            modelBuilder.AddConfiguration<ObservationQualifier>(new ObservationQualifiersConfig());
-            modelBuilder.AddConfiguration<ObservationSynonym>(new ObservationSynonymConfig());
-            modelBuilder.AddConfiguration<ObservationTiming>(new ObservationTimingsConfig());
 
             modelBuilder.AddConfiguration<Project>(new ProjectConfig());
             //modelBuilder.AddConfiguration<ProjectUser>(new ProjectUserConfig());
@@ -240,19 +230,27 @@ namespace PlatformTM.Data
 
             modelBuilder.AddConfiguration<TimePoint>(new TimePointConfig());
 
-          
+            //modelBuilder.AddConfiguration<PlatformTM.Core.Domain.Model.Observation>(new ObservationConfig());
+            //modelBuilder.AddConfiguration<ObservationQualifier>(new ObservationQualifiersConfig());
+            //modelBuilder.AddConfiguration<ObservationSynonym>(new ObservationSynonymConfig());
+            //modelBuilder.AddConfiguration<ObservationTiming>(new ObservationTimingsConfig());
+            modelBuilder.Ignore<PlatformTM.Core.Domain.Model.Observation>();
+            modelBuilder.Ignore<ObservationQualifier>();
+            modelBuilder.Ignore<ObservationSynonym>();
+            modelBuilder.Ignore<ObservationTiming>();
 
-
+            modelBuilder.Ignore<Dataset>();
             modelBuilder.Ignore<VariableDefinition>();
             modelBuilder.Ignore<VariableReference>();
             modelBuilder.Ignore<VariableQualifier>();
 
-            
+            modelBuilder.Ignore<DatasetDescriptor>();
 
             modelBuilder.Ignore<Core.Domain.Model.Activity>();
-            modelBuilder.Ignore<Dataset>();
+
             modelBuilder.Ignore<DatasetDatafile>();
             modelBuilder.Ignore<DatasetRecord>();
+
         }
 
         public Task<int> SaveChangesAsync()

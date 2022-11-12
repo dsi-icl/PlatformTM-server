@@ -15,13 +15,13 @@ namespace PlatformTM.Data.EntityConfigurations
             // Properties
             builder.Property(t => t.Id)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
             builder.Property(t => t.Name)
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
             builder.Property(t => t.Definition)
-               .HasMaxLength(2000);
+               .HasMaxLength(40);
             builder.Property(t => t.XrefId)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             // Table & Column Mappings
             builder.ToTable("Dictionaries");

@@ -15,35 +15,35 @@ namespace PlatformTM.Data.EntityConfigurations
             // Properties
             builder.Property(t => t.Id)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.Name)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.Description)
-                .HasMaxLength(2000);
+                .HasMaxLength(127);
 
             builder.Property(t => t.DataType)
-                .HasMaxLength(200);
+                .HasMaxLength(20);
 
             builder.Property(t => t.Label)
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
 
             builder.Property(t => t.TemplateId)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             //builder.Property(t => t.VariableTypeId)
             //    .HasMaxLength(200);
 
             builder.Property(t => t.RoleId)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.UsageId)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.ControlledVocabularyId)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             // Table & Column Mappings
             builder.ToTable("DomainTemplateVariables");

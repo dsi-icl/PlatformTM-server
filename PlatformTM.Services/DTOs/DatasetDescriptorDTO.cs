@@ -11,6 +11,8 @@ namespace PlatformTM.Services.DTOs
         public string Title { set; get; }
         public string Description { get; set; }
         public string Id { get; set; }
+        public string Acronym { get; set; }
+        public string RecordStructure { get; set; }
         
         public string DatasetType { get; set; }
 
@@ -25,7 +27,7 @@ namespace PlatformTM.Services.DTOs
             Fields = new List<DatasetFieldDescriptorDTO>();
         }
 
-        public DatasetDescriptorDTO(ObservationDatasetDescriptor oDD)
+        public DatasetDescriptorDTO(DatasetDescriptor oDD)
         {
             Id = oDD.Id.ToString();
             Title = oDD.Title;

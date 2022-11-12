@@ -220,7 +220,7 @@ namespace PlatformTM.Models.Services
             else
             {
                 file.Modified = fi.LastWriteTime.ToString("d") + " " + fi.LastWriteTime.ToString("t");
-                if (file.IsLoadedToDB || file.State == "FAILED TO LOAD")
+                if (file.IsLoadedToDB.Value || file.State == "FAILED TO LOAD")
                     file.State = "UPDATED";
                 _fileRepository.Update(file);
             }
@@ -643,7 +643,7 @@ namespace PlatformTM.Models.Services
                 state = file.State,
                 DataFileId = file.Id,
                 FolderId = file.FolderId,
-                IsLoaded = file.IsLoadedToDB
+                IsLoaded = file.IsLoadedToDB.Value
             };
             return dto;
         }

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
-using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 
 namespace PlatformTM.Core.Domain.Model

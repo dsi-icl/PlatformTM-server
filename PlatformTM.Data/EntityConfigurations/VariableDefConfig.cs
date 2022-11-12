@@ -38,22 +38,22 @@ namespace PlatformTM.Data.EntityConfigurations
             builder.Property(t => t.IsComputed).HasColumnType("bit");
             //builder.Property(t => t.ComputedVarExpression).IsOptional();
             builder.Property(t => t.Name)
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
 
             builder.Property(t => t.Description)
-                .HasMaxLength(2000);
+                .HasMaxLength(40);
 
             builder.Property(t => t.DataType)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.ProjectId);
             //.HasMaxLength(200);
 
             builder.Property(t => t.VariableTypeId)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             builder.Property(t => t.RoleId)
-                .HasMaxLength(200);
+                .HasMaxLength(10);
 
             // Table & Column Mappings
             builder.ToTable("VariableDefinitions");

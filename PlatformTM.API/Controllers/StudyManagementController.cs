@@ -93,7 +93,7 @@ namespace PlatformTM.API.Controllers
             return new StatusCodeResult(StatusCodes.Status409Conflict);
         }
 
-        [HttpPut("studies/{studyId}/assessments")]
+        [HttpPut("studies/{studyId}/assessments/{assessmentId}")]
         public IActionResult UpdateAssay(int assessmentId, [FromBody] AssessmentDTO AssessmentDTO)
         {
             try
@@ -133,7 +133,7 @@ namespace PlatformTM.API.Controllers
         {
             try
             {
-                _assessmentService.UpdateStudyDatasets(studyDTO, studyId);
+                //_assessmentService.UpdateStudyDatasets(studyDTO, studyId);
                 return new AcceptedAtRouteResult("GetStudyById", new { studyId = studyId }, studyDTO);
             }
             catch (Exception e)

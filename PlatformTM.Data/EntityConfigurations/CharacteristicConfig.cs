@@ -18,7 +18,7 @@ namespace PlatformTM.Data.EntityConfigurations
             builder.Property(t => t.VerbatimName).HasColumnName("CharacObjName");
 
             builder.Property(t => t.VerbatimName)
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
 
             builder.HasOne(p => p.Dataset)
                 .WithMany()

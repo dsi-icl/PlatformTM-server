@@ -54,7 +54,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes
             return ClassifierFields.Find(f => f.Order == order);
         }
 
-        public new List<DatasetField> GetDatasetFields()
+        public override List<DatasetField> GetDatasetFields()
         {
 
             var allFields = new List<DatasetField>();

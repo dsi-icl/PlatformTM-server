@@ -19,7 +19,7 @@ namespace PlatformTM.Data.EntityConfigurations
             // Properties
             builder.Property(t => t.TemplateId)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(10);
             // Table & Column Mappings
             builder.ToTable("Datasets");
             builder.Property(t => t.Id).HasColumnName("OID");

@@ -13,7 +13,7 @@ namespace PlatformTM.Data.EntityConfigurations
             builder.HasKey(t => t.Id);
 
             builder.Property(t => t.Name)
-                .HasMaxLength(2000);
+                .HasMaxLength(20);
 
             //builder.Property(t => t.StudyId)
             //    .IsRequired();
