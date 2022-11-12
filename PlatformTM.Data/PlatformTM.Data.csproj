@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>PlatformTM.Data</AssemblyName>
     <PackageId>PlatformTM.Data</PackageId>
     <AssertTargetFallback>$(AssertTargetFallback);dnxcore50</AssertTargetFallback>
@@ -18,14 +18,8 @@
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="6.14.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="3.2.7" /><!--    <PackageReference Include="MySqlConnector" Version="0.45.1" />
--->  <!--    <PackageReference Include="MySqlConnector" Version="0.45.1" />
--->  <!--    <PackageReference Include="MySqlConnector" Version="0.45.1" />
--->  
-<!--    <PackageReference Include="MySqlConnector" Version="0.45.1" />
--->  
-<!--    <PackageReference Include="MySqlConnector" Version="0.45.1" />
--->  </ItemGroup>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
+ </ItemGroup>
 
   <!--<ItemGroup>
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="2.0.2" />
@@ -34,7 +28,13 @@
   <ItemGroup>
     <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />
   </ItemGroup>
+
   <ItemGroup>
+    <None Remove="Microsoft.EntityFrameworkCore.Design" />
     <None Remove="Pomelo.EntityFrameworkCore.MySql" />
+    <None Remove="Migrations\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\" />
   </ItemGroup>
 </Project>

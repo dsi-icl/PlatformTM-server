@@ -75,8 +75,6 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes
             return allFields;
         }
 
-       
-
         public DataTable GetDatasetAsDatatable()
         {
             var descDT = new DataTable

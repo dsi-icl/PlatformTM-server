@@ -39,7 +39,7 @@ namespace PlatformTM.Data.MongoDBSerializers
                             //subject.Site= reader.ReadString();
                             break;
                         case "ARMCD":
-                            subject.ArmCode = reader.ReadString();
+                            subject.StudyCohort.Code = reader.ReadString();
                             break;
                         case "RFSTDTC":
                             string dateStr_s = reader.ReadString();

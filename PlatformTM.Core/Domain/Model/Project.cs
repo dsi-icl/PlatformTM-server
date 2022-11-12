@@ -14,20 +14,21 @@ namespace PlatformTM.Core.Domain.Model
         public string Accession { get; set;}
         public string Title { get; set; }
         public string Type { get; set; }
+        public bool IsPublic { get; set; }
+
+        public Guid OwnerId { get; set; }
+        public User Owner { get; set; }
+
         public ICollection<Study> Studies { get; set;}
-        public ICollection<DataFile> DataFiles { get; set; } 
+        public IList<User> Members { get; set; }
+
+        public ICollection<DataFile> DataFiles { get; set; }
+        //public ICollection<Assessment> Assessments { get; set; }
 
         public Project()
         {
             Studies = new List<Study>();
-            Users = new List<ProjectUser>();
+            Members = new List<User>();
         }
-
-        public ICollection<Activity> Activities { get; set; }
-        //public IList<User> Users { get; set; }
-        public IList<ProjectUser> Users { get; set; }
-        public User Owner { get; set; }
-        public Guid OwnerId { get; set; }
-        public bool IsPublic { get; set; }
     }
 }

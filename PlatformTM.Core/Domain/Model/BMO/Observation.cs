@@ -5,7 +5,7 @@ namespace PlatformTM.Core.Domain.Model.BMO
 {
     public class Observation
     {
-        public Subject ObservedSubject { get; set; }
+        public HumanSubject ObservedSubject { get; set; }
 
         public Biosample ObservedSample { get; set; }
 

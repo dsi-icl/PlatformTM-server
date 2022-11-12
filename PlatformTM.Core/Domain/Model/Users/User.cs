@@ -18,7 +18,7 @@ namespace PlatformTM.Core.Domain.Model.Users
 
         //public List<UserDataset> Datasets { get; set; }
 
-        public IList<ProjectUser> AffiliatedProjects { get; set; }
+        public IList<Project> AffiliatedProjects { get; set; }
 
       public User()
         {

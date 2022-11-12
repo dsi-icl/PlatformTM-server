@@ -147,7 +147,7 @@ namespace PlatformTM.Models.Services
             var file = new DataFile();
             file.FileName = folder.Name;
          
-            file.DateAdded = DateTime.Now.ToString("D");
+            file.Created = DateTime.Now.ToString("D");
             file.IsDirectory = true;
             file.ProjectId = project.Id;
             if (folder.ParentFolderId != 0) file.FolderId = folder.ParentFolderId;
@@ -208,7 +208,7 @@ namespace PlatformTM.Models.Services
                 file = new DataFile
                 {
                     FileName = fi.Name,
-                    DateAdded = fi.CreationTime.ToString("d") + " " + fi.CreationTime.ToString("t"),
+                    Created = fi.CreationTime.ToString("d") + " " + fi.CreationTime.ToString("t"),
                     State = "NEW",
                     //Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
                     IsDirectory = false,
@@ -219,7 +219,7 @@ namespace PlatformTM.Models.Services
             }
             else
             {
-                file.LastModified = fi.LastWriteTime.ToString("d") + " " + fi.LastWriteTime.ToString("t");
+                file.Modified = fi.LastWriteTime.ToString("d") + " " + fi.LastWriteTime.ToString("t");
                 if (file.IsLoadedToDB || file.State == "FAILED TO LOAD")
                     file.State = "UPDATED";
                 _fileRepository.Update(file);
@@ -309,7 +309,7 @@ namespace PlatformTM.Models.Services
             {
                 fileDto.percentMatched = 100;
                 fileDto.IsStandard = true;
-                file.IsStandard = true;
+                //file.IsStandard = true;
                 //TODO: depending on the dataset the format for the file should be set
                 file.Format = "SDTM";
                 _fileRepository.Update(file);
@@ -635,8 +635,8 @@ namespace PlatformTM.Models.Services
             var dto = new FileDTO()
             {
                 FileName = file.FileName,
-                dateAdded = file.DateAdded,
-                dateLastModified = file.LastModified ?? file.DateAdded,
+                dateAdded = file.Created,
+                dateLastModified = file.Modified ?? file.Created,
                 icon = "",
                 IsDirectory = file.IsDirectory,
                 selected = false,

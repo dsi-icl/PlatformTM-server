@@ -48,7 +48,7 @@ namespace PlatformTM.Models.Services.Loading.SDTM
 
             if (reload)
             {
-                _subjectRepository.DeleteMany(o => o.DatasetId == dataset.Id && o.DatafileId == datafileId);
+                _subjectRepository.DeleteMany(o => o.DatasetId == dataset.Id && o.SourceDatafileId == datafileId);
                 _dataContext.Save().Equals("CREATED");
             }
 
@@ -56,10 +56,10 @@ namespace PlatformTM.Models.Services.Loading.SDTM
             var scoList = _characteristicObjRepository.FindAll(s => s.ProjectId == projectId).ToList();
             var scos = scoList.ToDictionary(co => co.ShortName);
             //Project related studies
-            var studies = _studtRepository.FindAll(s => s.ProjectId == projectId, new List<string> { "Arms.Arm" }).ToList();
+            var studies = _studtRepository.FindAll(s => s.ProjectId == projectId, new List<string> { "Cohorts" }).ToList();
             var studyMap = studies.ToDictionary(study => study.Name);
             //Project related arms
-            var arms = studies.SelectMany(s => s.Arms.Select(a => a.Arm)).Distinct();
+            var arms = studies.SelectMany(s => s.Cohorts).Distinct();
             var armMap = arms.ToDictionary(arm => arm.Name);
 
             //Previously loaded subjects for this project that might be update by this load
@@ -78,10 +78,10 @@ namespace PlatformTM.Models.Services.Loading.SDTM
                         ProjectId = projectId
                     }; studyMap.Add(study.Name, study);
                 }
-                Arm arm;
+                Cohort arm;
                 if (!armMap.TryGetValue(sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name], out arm))
                 {
-                    arm = new Arm()
+                    arm = new Cohort()
                     {
                         Id = "P-"+ projectId + "-ARM-" + sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
                         Code = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
@@ -89,8 +89,8 @@ namespace PlatformTM.Models.Services.Loading.SDTM
                     };
                     armMap.Add(arm.Name, arm);
                 }
-                if (!arm.Studies.Exists(s => s.Study.Name == study.Name))
-                    arm.Studies.Add(new StudyArm() { Arm = arm, Study = study });
+                //if (!arm.Studies.Exists(s => s.Name == study.Name))
+                //    arm.Studies.Add(new Study() { C = arm, Study = study });
 
 
                 var subjNewFlag = false;
@@ -105,12 +105,12 @@ namespace PlatformTM.Models.Services.Loading.SDTM
                         Id = "P-" + projectId + "-" + sdtmSubject.USubjId,
                         UniqueSubjectId = sdtmSubject.USubjId,
                         SubjectStudyId = sdtmSubject.SubjectId,
-                        Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name], //Will put in characteristics for now
-                        ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name],
+                        //StudyCohort = new Cohort() { Name = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name], Code = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name] }, //Will put in characteristics for now
+                       
                         DatasetId = sdtmSubject.DatasetId,
-                        DatafileId = sdtmSubject.DatafileId,
+                        SourceDatafileId = sdtmSubject.DatafileId,
                         Study = study,
-                        StudyArm = arm
+                        StudyCohort = arm
                     };
                     subjNewFlag = true;
                 }
@@ -118,11 +118,11 @@ namespace PlatformTM.Models.Services.Loading.SDTM
                 {
                     subjNewFlag = false;
                     subject.DatasetId = dataset.Id;
-                    subject.DatafileId = sdtmSubject.DatafileId;
-                    subject.Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name];
-                    subject.ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name];
+                    subject.SourceDatafileId = sdtmSubject.DatafileId;
+                    //subject.Arm = sdtmSubject.QualifierSynonyms[descriptor.ArmVariable.Name];
+                    //subject.ArmCode = sdtmSubject.Qualifiers[descriptor.ArmCodeVariable.Name];
                     subject.Study = study;
-                    subject.StudyArm = arm;
+                    subject.StudyCohort = arm;
                 }
 
                 //SET/UPDATE SUBJECT CHARACTERISTICS
@@ -203,7 +203,7 @@ namespace PlatformTM.Models.Services.Loading.SDTM
         public bool UnloadSubjects(int datasetId, int fileId)
         {
 
-            _subjectRepository.DeleteMany(s=>s.DatasetId == datasetId && s.DatafileId == fileId);
+            _subjectRepository.DeleteMany(s=>s.DatasetId == datasetId && s.SourceDatafileId == fileId);
             _sdtmRepository.DeleteMany(s => s.DatafileId == fileId && s.DatasetId == datasetId);
 
             return _dataContext.Save() == "CREATED";

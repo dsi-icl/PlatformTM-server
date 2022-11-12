@@ -14,18 +14,21 @@
     <None Remove="MapperModels\TabularMapperModels\" />
     <None Remove="MapperModels\ObservationDatasetMapperModels\" />
     <None Remove="System.Configuration.ConfigurationManager" />
+    <None Remove="PlatformTM.Core" />
+    <None Remove="Pomelo.EntityFrameworkCore.MySql" />
+    <None Remove="DB\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="28.0.1" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
+    <PackageReference Include="PlatformTM.Core" Version="1.0.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="MapperModels\" />
     <Folder Include="MapperModels\SourceDataModels\" />
     <Folder Include="MapperModels\TabularMapperModels\" />
     <Folder Include="MapperModels\ObservationDatasetMapperModels\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PlatformTM.Core\PlatformTM.Core.csproj" />
+    <Folder Include="DB\" />
   </ItemGroup>
 </Project>

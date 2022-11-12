@@ -9,21 +9,21 @@ namespace PlatformTM.Data.EntityConfigurations
     {
         public override void Configure(EntityTypeBuilder<StudyDataset> builder)
         {
-            builder
-                .HasKey(t => new { t.DatasetId, t.StudyId });
+            //builder
+            //    .HasKey(t => new { t.DatasetId, t.StudyId });
 
-            builder
-               .ToTable("Study_Datasets");
+            //builder
+            //   .ToTable("Study_Datasets");
 
-            builder
-                .HasOne(dd => dd.Dataset)
-                .WithMany(d => d.Studies)
-                .HasForeignKey(dd => dd.DatasetId);
+            //builder
+            //    .HasOne(dd => dd.Dataset)
+            //    .WithMany(d => d.Studies)
+            //    .HasForeignKey(dd => dd.DatasetId);
 
-            builder
-                .HasOne(dd => dd.Study)
-                .WithMany(d => d.Datasets)
-                .HasForeignKey(dd => dd.StudyId);
+            //builder
+            //    .HasOne(dd => dd.Study)
+            //    .WithMany(d => d.Datasets)
+            //    .HasForeignKey(dd => dd.StudyId);
                 
         }
     }

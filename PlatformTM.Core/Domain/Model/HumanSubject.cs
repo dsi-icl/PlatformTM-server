@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.Core.Domain.Model.DesignElements;
 
 namespace PlatformTM.Core.Domain.Model
@@ -17,19 +18,16 @@ namespace PlatformTM.Core.Domain.Model
         public DateTime SubjectStartDate { get; set; }
         public DateTime SubjectEndDate { get; set; }
 
-        public string Arm { get; set; } //Should be replace by ARM class reference
-        public string ArmCode { get; set; } //Should be replace by ARM class reference
+        public Cohort StudyCohort { get; set; }
+        public string StudyCohortId { get; set; }
 
-        public Arm StudyArm { get; set; }
-        public string StudyArmId { get; set; }
-
-        public Dataset Dataset { get; set; }
+        public PrimaryDataset Dataset { get; set; }
         public int DatasetId { get; set; }
 
         public IList<SubjectCharacteristic> SubjectCharacteristics { get; set; }
 
         public DataFile SourceDataFile { get; set; }
-        public int? DatafileId { get; set; }
+        public int? SourceDatafileId { get; set; }
 
         public HumanSubject()
         {

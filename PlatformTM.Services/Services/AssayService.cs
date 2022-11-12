@@ -37,14 +37,15 @@ namespace PlatformTM.Models.Services
                         "TechnologyType",
                         "TechnologyPlatform",
                         "MeasurementType",
-                        "DesignType"
+                        "DesignType",
+                        "Study"
                 }
             );
 
             var assayDTO = new AssayDTO();
             assayDTO.Name = assay.Name;
             assayDTO.Id = assay.Id;
-            assayDTO.ProjectId = assay.ProjectId;
+            assayDTO.ProjectId = assay.Study.ProjectId;
 
             assayDTO.Type = assay.MeasurementType?.Id;
             assayDTO.Technology = assay.TechnologyType?.Id;
@@ -73,7 +74,7 @@ namespace PlatformTM.Models.Services
             //    .Equals(assayDto.ProjectAcc));
 
             assay.Name = assayDto.Name;
-            assay.ProjectId = assayDto.ProjectId;
+            //assay.ProjectId = assayDto.ProjectId;
             assay.TechnologyPlatformId = assayDto.Platform;
             assay.TechnologyTypeId = assayDto.Technology;
             //assay.DesignType = getCVterm(assayDto.AssayDesignType);
@@ -83,17 +84,17 @@ namespace PlatformTM.Models.Services
             if (assayDto.FeaturesDataset != null) assayDto.FeaturesDataset.ProjectId = assayDto.ProjectId;
             if (assayDto.ObservationsDataset != null) assayDto.ObservationsDataset.ProjectId = assayDto.ProjectId;
 
-            var BSdataset = _datasetDescriptorService.CreateDataset(assayDto.SamplesDataset);
-            if (BSdataset != null)
-                assay.Datasets.Add(BSdataset);
+            //var BSdataset = _datasetDescriptorService.CreateDataset(assayDto.SamplesDataset);
+            //if (BSdataset != null)
+            //    assay.Datasets.Add(BSdataset);
 
-            var FEdataset = _datasetDescriptorService.CreateDataset(assayDto.FeaturesDataset);
-            if (FEdataset != null)
-                assay.Datasets.Add(FEdataset);
+            //var FEdataset = _datasetDescriptorService.CreateDataset(assayDto.FeaturesDataset);
+            //if (FEdataset != null)
+            //    assay.Datasets.Add(FEdataset);
 
-            var OBdataset = _datasetDescriptorService.CreateDataset(assayDto.ObservationsDataset);
-            if (OBdataset != null)
-                assay.Datasets.Add(OBdataset);
+            //var OBdataset = _datasetDescriptorService.CreateDataset(assayDto.ObservationsDataset);
+            //if (OBdataset != null)
+            //    assay.Datasets.Add(OBdataset);
 
             assay = _assayRepository.Insert(assay);
 
@@ -131,7 +132,7 @@ namespace PlatformTM.Models.Services
                 if (datasetDto.IsNew)
                 {
                     var dataset = _datasetDescriptorService.CreateDataset(datasetDto);
-                    assayToUpdate.Datasets.Add(dataset);
+                    //assayToUpdate.Datasets.Add(dataset);
                     _assayRepository.Update(assayToUpdate);
                 }
                 else

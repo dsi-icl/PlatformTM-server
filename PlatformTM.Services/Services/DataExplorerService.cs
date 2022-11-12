@@ -101,16 +101,16 @@ namespace PlatformTM.Models.Services
 
             var armSC = new ObservationRequestDTO()
             {
-                O3 = nameof(Arm),
+                O3 = nameof(Cohort),
                 O3code = "ARM",
                 O3id = 999,
                 DataType = "string",
                 IsDesignElement = true,
-                DesignElementType = nameof(Arm),
+                DesignElementType = nameof(Cohort),
                 QO2 = "Name",
                 QueryFrom = nameof(HumanSubject),
-                QueryFor = nameof(HumanSubject.StudyArm),
-                QuerySelectProperty = nameof(Arm.Name),
+                QueryFor = nameof(HumanSubject.StudyCohort),
+                QuerySelectProperty = nameof(Cohort.Name),
                 ProjectId = projectId
             };
             var studySC = new ObservationRequestDTO()
@@ -282,10 +282,11 @@ namespace PlatformTM.Models.Services
 
         public async Task<List<AssayBrowserDTO>> GetProjectAssays(int projectId)
         {
-            var assays = await _assayRepository.FindAllAsync(a => a.ProjectId == projectId, new List<string>(){
+            var assays = await _assayRepository.FindAllAsync(a => a.Study.ProjectId == projectId, new List<string>(){
                     "MeasurementType",
                     "TechnologyPlatform",
                     "TechnologyType",
+                    "Study"
                 });
 
             if (assays.Count == 0)

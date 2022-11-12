@@ -101,19 +101,19 @@ namespace PlatformTM.Models.Services.Loading.SDTM
 
                 //CHECK IF ASSAY HAS TEMOPORALDATA
                
-                if (bioSample.CollectionStudyDay?.Number != null && !assay.HasTemporalData)
-                {
+                //if (bioSample.CollectionStudyDay?.Number != null && !assay.HasTemporalData)
+                //{
                     
-                    if (sampleDayMap.ContainsKey(bioSample.SubjectId)
-                        && sampleDayMap[bioSample.SubjectId] != bioSample.CollectionStudyDay.Number.Value
-                        && !assay.HasTemporalData)
-                        assay.HasTemporalData = true;
-                    else
-                    {
-                        if(!sampleDayMap.ContainsKey(bioSample.SubjectId)) 
-                            sampleDayMap.Add(bioSample.SubjectId, bioSample.CollectionStudyDay.Number.Value);
-                    }
-                }
+                //    if (sampleDayMap.ContainsKey(bioSample.SubjectId)
+                //        && sampleDayMap[bioSample.SubjectId] != bioSample.CollectionStudyDay.Number.Value
+                //        && !assay.HasTemporalData)
+                //        assay.HasTemporalData = true;
+                //    else
+                //    {
+                //        if(!sampleDayMap.ContainsKey(bioSample.SubjectId)) 
+                //            sampleDayMap.Add(bioSample.SubjectId, bioSample.CollectionStudyDay.Number.Value);
+                //    }
+                //}
 
                 //ADD CHARACTERISTIC FEATURE IN BSTEST
                 string charValue;

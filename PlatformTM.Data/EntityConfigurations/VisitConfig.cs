@@ -27,7 +27,7 @@ namespace PlatformTM.Data.EntityConfigurations
 
             // Relationships
             builder.HasOne(t => t.Study)
-                .WithMany(s => s.Visits)
+                .WithMany(s => s.TimeEvents)
                 .IsRequired()
                 .HasForeignKey(t => t.StudyId);
 

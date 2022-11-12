@@ -8,6 +8,7 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel.SDTM;
+using PlatformTM.Core.Domain.Model.Users;
 using PlatformTM.Core.Domain.Model.Users.Datasets;
 using PlatformTM.Core.Domain.Model.Users.Queries;
 using PlatformTM.Core.JoinEntities;
@@ -19,12 +20,12 @@ namespace PlatformTM.Models.Services
     public class ProjectService
     {
         private readonly IRepository<Project, int> _projectRepository;
-        private readonly IRepository<Activity, int> _activityRepository;
+        private readonly IRepository<Assessment, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;
-
+        private readonly IRepository<User, Guid> _userRepository;
 
         private IServiceUoW uoW;
 
@@ -32,11 +33,12 @@ namespace PlatformTM.Models.Services
         {
             this.uoW = uoW;
             _projectRepository = uoW.GetRepository<Project, int>();
-            _activityRepository = uoW.GetRepository<Activity, int>();
+            _activityRepository = uoW.GetRepository<Assessment, int>();
             _assayRepository = uoW.GetRepository<Assay, int>();
             _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
             _datasetRepository = uoW.GetRepository<Dataset, int>();
+            _userRepository = uoW.GetRepository<User, Guid>();
         }
 
         public ProjectDTO GetProjectById(int projectId)
@@ -64,7 +66,7 @@ namespace PlatformTM.Models.Services
             var project = _projectRepository.FindSingle(p=>p.Id == projectId, 
                 new List<string>()
                 {
-                   "Studies.Project",
+                   
                     "Studies.Arms.Arm",
                     "Studies.Subjects",
                     "Activities",
@@ -79,10 +81,10 @@ namespace PlatformTM.Models.Services
                 Type = project.Type,
                 Id = project.Id,
                 StudyCount = project.Studies.Count,
-                CohortCount = project.Studies.Sum(s => s.Arms.Count),
+                CohortCount = project.Studies.Sum(s => s.Cohorts.Count),
                 SubjectCount = project.Studies.Sum(s => s.Subjects.Count),
-                Users = project.Users?
-                    .Select(u => u.User) //STUPID EF1.1
+                Users = project.Members?
+                    .Select(u => u) //STUPID EF1.1
                     .Select(u => new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
                 //Users = project.Users?.Select(u=>new StringBuilder(u.LastName + ", " + u.FirstName).ToString()).ToList(),
                 Studies = project.Studies.Select(
@@ -94,8 +96,8 @@ namespace PlatformTM.Models.Services
                         ProjectId = s.ProjectId,
                         Name = s.Name,
                         Id = s.Id,
-                        ArmCount = s.Arms.Count,
-                        ArmNames = s.Arms.Select(a=>a.Arm).SelectMany(a => new string[] { a.Name })
+                        ArmCount = s.Cohorts.Count,
+                        ArmNames = s.Cohorts.SelectMany(a => new string[] { a.Name })
                         //ArmNames = s.Arms.SelectMany(a=>new string[] {a.Name} )
                     }).ToList()
             };
@@ -137,9 +139,9 @@ namespace PlatformTM.Models.Services
             };
 
 
-            //var owner =_userRepository.Get(Guid.Parse(ownerId));
-            //project.Users = new List<User>() {owner};
-            project.Users.Add(new ProjectUser() {ProjectId = projectDto.Id,UserId = Guid.Parse(ownerId) });
+            var owner =_userRepository.Get(Guid.Parse(ownerId));
+            project.Members = new List<User>() {owner};
+            //project.Members.Add(new User() {  ProjectId = projectDto.Id,UserId = Guid.Parse(ownerId) });
             project = _projectRepository.Insert(project);
 
 
@@ -165,7 +167,7 @@ namespace PlatformTM.Models.Services
         {
             var guidUserID = Guid.Parse(userId);
             var projects = _projectRepository.FindAll(
-                p=>p.Users.Select(u=>u.User).Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID || p.IsPublic, 
+                p=>p.Members.Select(u=>u).Any(s=>s.Id == guidUserID) || p.OwnerId==guidUserID || p.IsPublic, 
                 new List<string>()
                 {
                    "Studies.Arms",
@@ -179,7 +181,7 @@ namespace PlatformTM.Models.Services
                 Desc = p.Description,
                 Type = p.Type,
                 StudyCount = p.Studies.Count,
-                CohortCount = p.Studies.Sum(s=>s.Arms.Count),
+                CohortCount = p.Studies.Sum(s=>s.Cohorts.Count),
                 SubjectCount = p.Studies.Sum(s=>s.Subjects.Count)
             });
             return projects;
@@ -188,55 +190,55 @@ namespace PlatformTM.Models.Services
         public IEnumerable<ActivityDTO> GetActivities(int projectId, Type type)
         {
              
-            IEnumerable<Activity> Activities = null;
+            IEnumerable<Assessment> Activities = null;
 
             if(type == null)
             {
                 Activities = _activityRepository.FindAll(
-                    d => d.ProjectId == projectId,
+                    d => d.Study.Project.Id == projectId,
                     new List<string>(){
                         "Datasets.Template",
-                        "Project"
+                        "Study.Project"
                     }
                 );
             }
-            else if (type == typeof(Activity))
+            else if (type == typeof(Assessment))
 
              Activities = _activityRepository.FindAll(
-                    d => d.ProjectId == projectId && d is Activity,
+                    d => d.Study.Project.Id == projectId && d is Assessment,
                     new List<string>(){
                         "Datasets.Template",
-                        "Project"
+                        "Study.Project"
                     }
                 );
             else if (type == typeof(Assay))
                 Activities = _activityRepository.FindAll(
-                    d => d.ProjectId == projectId && d is Assay,
+                    d => d.Study.Project.Id == projectId && d is Assay,
                     new List<string>(){
                         "Datasets.Template",
-                        "Project"
+                       "Study.Project"
                     }
                 );
             else if (type == typeof(SubjectRecording))
                 Activities = _activityRepository.FindAll(
-                    d => d.ProjectId == projectId && d is SubjectRecording,
+                    d => d.Study.Project.Id == projectId && d is SubjectRecording,
                     new List<string>(){
                         "Datasets.Template",
-                        "Project"
+                        "Study.Project"
                     }
                 );
             return Activities.Select(p => new ActivityDTO
             {
                 Name = p.Name,
                 Id = p.Id,
-                ProjectId = p.ProjectId,
-                ProjectAcc = p.Project.Accession,
+                ProjectId = p.Id,
+                ProjectAcc = p.Study.Project.Accession,
                 isAssay = p is Assay,
                 datasets = p.Datasets.Select(m => new DatasetDTO
                 {
-                    Name = m.Template.Domain,
+                    Name = m.Domain,
                     Id = m.Id,
-                    DomainId = m.TemplateId
+                    DomainId = m.Domain
                 }).ToList()
             }).ToList();
         }
@@ -245,12 +247,12 @@ namespace PlatformTM.Models.Services
         {
             var project = _projectRepository.FindSingle(p => p.Id == projectId,
                 new List<string>() {"Users.User"});
-            var users = project.Users.Select(u => new UserDTO()
+            var users = project.Members.Select(u => new UserDTO()
             {
-                FirstName = u.User.FirstName,
-                LastName = u.User.LastName,
-                Organization = u.User.Organization,
-                Email = u.User.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Organization = u.Organization,
+                Email = u.Email,
                 
             }).ToList();
             return users;
@@ -258,34 +260,35 @@ namespace PlatformTM.Models.Services
 
         public List<DatasetVM> GetProjectClinicalDatasets(int projectId)
         {
-            IEnumerable<Activity> Activities;
-            Activities = _activityRepository.FindAll(
-                d => (d.ProjectId == projectId && (d is Activity || d is SubjectRecording)),
-                    new List<string>(){
-                        "Datasets.Template",
-                        "Datasets.DataFiles.Datafile"
-                    }
-                ).ToList();
-            var datasets = Activities.SelectMany(a => a.Datasets).Select(d=> new DatasetVM(){
-                Id = d.Id,
-                Name = d.Template.Domain,
-                Files = d.DataFiles.Select(df => new FileVM(){
-                    Id = df.DatafileId,
-                    FileName = df.Datafile.FileName,
-                    DataType = df.Datafile.DataType,
-                    DateLastModified = df.Datafile.LastModified
-                }).ToList()
-            }).ToList();
+            //IEnumerable<Assessment> Activities;
+            //Activities = _activityRepository.FindAll(
+            //    d => (d.ProjectId == projectId && (d is Assessment || d is SubjectRecording)),
+            //        new List<string>(){
+            //            "Datasets.Template",
+            //            "Datasets.DataFiles.Datafile"
+            //        }
+            //    ).ToList();
+            //var datasets = Activities.SelectMany(a => a.Datasets).Select(d=> new DatasetVM(){
+            //    Id = d.Id,
+            //    Name = d.Template.Domain,
+            //    Files = d.DataFiles.Select(df => new FileVM(){
+            //        Id = df.DatafileId,
+            //        FileName = df.Datafile.FileName,
+            //        DataType = df.Datafile.DataType,
+            //        DateLastModified = df.Datafile.LastModified
+            //    }).ToList()
+            //}).ToList();
 
-            return datasets;
+            return null;
         }
 
         public List<AssayVM> GetProjectAssayDatasets(int projectId)
         {
             var assays = _assayRepository.FindAll(
-                d => (d.ProjectId == projectId),
+                d => (d.Study.Project.Id == projectId),
                     new List<string>(){
                         "Datasets.Template",
+                        "Project",
                         "TechnologyType",
                         "TechnologyPlatform",
                         "MeasurementType",
@@ -303,13 +306,13 @@ namespace PlatformTM.Models.Services
                 Datasets = a.Datasets.Select(d => new DatasetVM()
                 {
                     Id = d.Id,
-					Name = d.Template.Code == "BS"?"Samples Annotation":d.Template.Domain,
+					Name = d.Descriptor.Title == "BS"?"Samples Annotation":d.Domain,
                     Files = d.DataFiles.Select(df => new FileVM()
                     {
-                        Id = df.DatafileId,
-                        FileName = df.Datafile.FileName,
-                        DataType = df.Datafile.DataType,
-                        DateLastModified = df.Datafile.LastModified
+                        Id = df.Id,
+                        FileName = df.FileName,
+                        DataType = df.Type,
+                        DateLastModified = df.Modified
                     }).ToList()
                 }).ToList()
             }).ToList();

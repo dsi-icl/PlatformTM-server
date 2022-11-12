@@ -12,7 +12,7 @@ namespace PlatformTM.Models.DTOs
         public List<SdtmRow> Observations { get; set; }
         public List<SubjectCharacteristic> SubjChars { get; set; }
         public List<Visit> Visits { get; set; }
-        public List<Arm> Arms { get; set; }
+        public List<Cohort> Arms { get; set; }
         public List<Study> Studies { get; set; }
         public List<HumanSubject> Subjects { get; set; }
         public List<Biosample> Samples { get; set; }
@@ -30,7 +30,7 @@ namespace PlatformTM.Models.DTOs
             Observations = new List<SdtmRow>();
             SubjChars = new List<SubjectCharacteristic>();
             Visits = new List<Visit>();
-            Arms = new List<Arm>();
+            Arms = new List<Cohort>();
             Studies = new List<Study>();
             Samples = new List<Biosample>();
             SampleCharacteristics = new List<SampleCharacteristic>();
@@ -40,7 +40,7 @@ namespace PlatformTM.Models.DTOs
         {
             //filter subjects by arms
             if (Arms.Any())
-                Subjects = Subjects.FindAll(s => Arms.Select(a=>a.Id).Contains(s.StudyArmId)).ToList();
+                Subjects = Subjects.FindAll(s => Arms.Select(a=>a.Id).ToList().Contains(s.StudyCohortId)).ToList();
 
             Debug.WriteLine(Subjects.Count," AFTER ARMS");
 

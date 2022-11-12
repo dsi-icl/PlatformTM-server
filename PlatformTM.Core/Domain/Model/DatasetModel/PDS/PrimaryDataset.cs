@@ -1,35 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 
 namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
 {
-    public class PrimaryDataset : Identifiable<int>
+    public class PrimaryDataset : Versionable<int>
     {
 
         public string Title { get; set; }
         public string Description { get; set; }
         public string Domain { get; set; }
 
-        public string DateCreated { get; set; }
-        public string Version { get; set; }
-        public string LastUpdated { get; set; }
+        //public int StudyId { get; set; }
+        public List<Study> Studies { get; set; }
 
+        public string DescriptorId { get; set; }
+        public DatasetDescriptor Descriptor { get; set; }
+        
+        public ICollection<DataFile> DataFiles { get; set; }
+        public ICollection<Assessment> Assessments { get; set; }
 
-        public Project Project { get; set; }
-        public int ProjectId { get; set; }
-
-        public Study Study { get; set; }
-        public int StudyId { get; set; }
-
- 
-        public DatasetDescriptor DatasetDescriptor { get; set; }
-        public int DescriptorId { get; set; }
-
-
-
+        //ignore from DB
         public List<DatasetRecord> DataRecords { get; set; }
 
 
@@ -41,6 +35,10 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
 
         public void GetDatasetFeatures()
         {
+            var dd = (ObservationDatasetDescriptor)Descriptor;
+
+
+            var uniqueFeatures = DataRecords.Select(r => r[dd.FeatureNameField.Name]).Distinct();
 
         }
 
@@ -73,10 +71,10 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
         public DataTable TabulariseDataset()
         {
             var datasetDT = new DataTable();
-            datasetDT.TableName = DatasetDescriptor.Title;
+            datasetDT.TableName = Descriptor.Title;
 
             //Add Fields
-            var allFields = ((ObservationDatasetDescriptor)DatasetDescriptor).GetDatasetFields();
+            var allFields = ((ObservationDatasetDescriptor)Descriptor).GetDatasetFields();
             foreach (var field in allFields)
             {
                 datasetDT.Columns.Add(field.Name);

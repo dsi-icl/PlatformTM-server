@@ -22,7 +22,7 @@ namespace PlatformTM.Models.Services
         private readonly IRepository<SubjectCharacteristic, int> _subjectCharacteristicRepository;
         private readonly IRepository<SampleCharacteristic, int> _sampleCharacteristicRepository;
         private readonly IRepository<Study, int> _studyRepository;
-        private readonly IRepository<Arm, string> _armRepository;
+        private readonly IRepository<Cohort, string> _armRepository;
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<Visit, int> _visitRepository;
         private readonly IRepository<Biosample, int> _biosampleRepository;
@@ -35,7 +35,7 @@ namespace PlatformTM.Models.Services
             _subjectRepository = uoW.GetRepository<HumanSubject, string>();
             _subjectCharacteristicRepository = uoW.GetRepository<SubjectCharacteristic, int>();
             _sampleCharacteristicRepository = uoW.GetRepository<SampleCharacteristic, int>();
-            _armRepository = uoW.GetRepository<Arm, string>();
+            _armRepository = uoW.GetRepository<Cohort, string>();
             _studyRepository = uoW.GetRepository<Study, int>();
             _visitRepository = uoW.GetRepository<Visit, int>();
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
@@ -187,7 +187,7 @@ namespace PlatformTM.Models.Services
         public CombinedQueryDTO GetNewCqueryForProject(int projectId, string userId)
         {
             var dto = new CombinedQueryDTO();
-            var assays = _assayRepository.FindAll(a => a.ProjectId == projectId).ToList();
+            var assays = _assayRepository.FindAll(a => a.Study.Project.Id == projectId).ToList();
             dto.IsSavedByUser = false;
             dto.ProjectId = projectId;
 
@@ -269,14 +269,14 @@ namespace PlatformTM.Models.Services
             {
                 switch (deQuery.QueryFor)
                 {
-                    case nameof(HumanSubject.StudyArm):
+                    case nameof(HumanSubject.StudyCohort):
                         if (deQuery.IsFiltered)
                             queryResult.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s => s.Study).All(s => s.ProjectId == projectId)
+                                a => a.Studies.Select(s => s).All(s => s.ProjectId == projectId)
                                 && deQuery.FilterExactValues.Contains(a.Name)).ToList();
                         else
                             queryResult.Arms = _armRepository.FindAll(
-                                a => a.Studies.Select(s => s.Study.ProjectId).Contains(projectId)).ToList();
+                                a => a.Studies.Select(s => s.ProjectId).Contains(projectId)).ToList();
                         break;
                     case nameof(HumanSubject.Study):
                         if (deQuery.IsFiltered)

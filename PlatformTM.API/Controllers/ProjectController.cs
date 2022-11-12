@@ -30,24 +30,7 @@ namespace PlatformTM.API.Controllers
             _descriptorService = descriptorService;
         }
 
-        [HttpGet]
-        public IEnumerable<ProjectDTO> Get()
-        {
-            var userId = User.FindFirst(ClaimTypes.UserData).Value;
-            return !User.Identity.IsAuthenticated ? null :  _projectService.GetProjects(userId);
-        }
-
-        [HttpGet("accession/{projectId}", Name = "GetProjectByAcc")]
-        public ProjectDTO GetProjectFull(int projectId)
-        {
-            return _projectService.GetProjectFullDetails(projectId);
-        }
-
-        [HttpGet("{projectId}", Name = "GetProjectById")]
-        public ProjectDTO GetProject(int projectId)
-        {
-            return _projectService.GetProjectById(projectId);
-        }
+        
 
         [HttpGet("{projectId}/allactivities")]
         public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
@@ -79,8 +62,6 @@ namespace PlatformTM.API.Controllers
             return _descriptorService.GetDatasetDescriptors(projectId);
         }
 
-        
-
         [HttpGet("{projectId}/datasets/clinical")]
         [AllowAnonymous]
         public IActionResult GetProjectClinicalDatasets(int projectId)
@@ -103,7 +84,6 @@ namespace PlatformTM.API.Controllers
             return new OkObjectResult(result);
         }
 
-
         [HttpGet("{projectId}/users")]
         public IActionResult GetProjectUsers(int projectId)
         {
@@ -113,14 +93,78 @@ namespace PlatformTM.API.Controllers
             return NotFound();
         }
 
-        [HttpGet]
-        [Route("{projectId}/remove")]
-        public void DeleteProject(int projectId) 
+
+
+
+        /**
+         * Project Primary Datasets
+         */
+
+        [HttpGet("{projectId}/datasets", Name = "GetStudyPrimaryDatasets")]
+        public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int projectId)
         {
-            _projectService.DeleteProject(projectId);
+            return _assessmentService.GetPrimaryDatasetsForProject(projectId);
         }
 
-        
+        [HttpGet("{projectId}/datasets/{datasetId}", Name = "GetProjectDatasetById")]
+        public AssessmentDTO GetProjectDatasetById(int datasetId)
+        {
+            return _assessmentService.GetPrimaryDataset(datasetId);
+        }
+
+        [HttpPost("{projectId}/datasets")]
+        public IActionResult AddDataset([FromBody] PrimaryDatasetDTO primaryDatasetDTO)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest();
+            var addedDataset = _assessmentService.AddStudyAssessment(primaryDatasetDTO);
+            if (addedDataset != null)
+                return new CreatedAtRouteResult("GetProjectDatasetById", new { assessmentId = addedDataset.Id }, addedDataset);
+            return new StatusCodeResult(StatusCodes.Status409Conflict);
+        }
+
+        [HttpPut("{projectId}/datasets")]
+        public IActionResult UpdateAssay(int projectId, [FromBody] PrimaryDatasetDTO primaryDatasetDTO)
+        {
+            try
+            {
+                _assessmentService.UpdatePrimaryDataset(primaryDatasetDTO, projectId);
+                return new AcceptedAtRouteResult("GetStudyAssessmentById", new { assessmentId = AssessmentDTO.Id }, AssessmentDTO);
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(e.Message);
+            }
+        }
+
+
+
+
+        /**
+         * 
+         * Project CRUD
+         */
+
+
+        [HttpGet]
+        public IEnumerable<ProjectDTO> Get()
+        {
+            var userId = User.FindFirst(ClaimTypes.UserData).Value;
+            return !User.Identity.IsAuthenticated ? null : _projectService.GetProjects(userId);
+        }
+
+        [HttpGet("accession/{projectId}", Name = "GetProjectByAcc")]
+        public ProjectDTO GetProjectFull(int projectId)
+        {
+            return _projectService.GetProjectFullDetails(projectId);
+        }
+
+        [HttpGet("{projectId}", Name = "GetProjectById")]
+        public ProjectDTO GetProject(int projectId)
+        {
+            return _projectService.GetProjectById(projectId);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddProject([FromBody] ProjectDTO projectDTO)
         {
@@ -159,5 +203,16 @@ namespace PlatformTM.API.Controllers
                 return new BadRequestObjectResult(e.Message);
             }
         }
+
+        [HttpGet]
+        [Route("{projectId}/remove")]
+        public void DeleteProject(int projectId)
+        {
+            _projectService.DeleteProject(projectId);
+        }
+
+
+
+
     }
 }

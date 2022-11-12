@@ -9,6 +9,9 @@ using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.MapperModels.TabularMapperModels;
 using PlatformTM.Models;
+using Loader.DB;
+using System.Configuration;
+using System.Text.Json;
 
 namespace PlatformTM
 {
@@ -16,13 +19,38 @@ namespace PlatformTM
     {
         private readonly IRepository<PrimaryDataset, int> _PDSRepository;
         private static int val;
+        private string Mapperfullpath { get; set; }
+        private int ProjectId { get; set; }
+        private string SourceDataPath;
+        private string OutputDataPath;
 
-        public MapperService()
+        public MapperService(int projectId, string srcDataPath, string outDataPath, string mapperFilePath)
         {
-            
+
+            Mapperfullpath = mapperFilePath;
+            ProjectId = projectId;
+            SourceDataPath = srcDataPath;
+            OutputDataPath = outDataPath;
         }
 
-        public static TabularMapper ReadMappingFile(string MapperFilePath)
+        public List<PrimaryDataset> CreatePrimaryDataset()
+        {            
+
+            TabularMapper tabularMapper = ReadMappingFile(Mapperfullpath);
+
+            List<DatasetMapper> mappers = ProcessTabularMapper(tabularMapper);
+
+            List<PrimaryDataset> datasets = new();
+            foreach (var dsMapper in mappers)
+            {
+                var PrimaryDS = CreateObsPDS(dsMapper, SourceDataPath);
+
+                if (PrimaryDS != null) datasets.Add(PrimaryDS);
+            }
+            return datasets;
+        }
+
+        public TabularMapper ReadMappingFile(string MapperFilePath)
         {
 
             var tabularMapper = new TabularMapper();
@@ -81,7 +109,7 @@ namespace PlatformTM
             return tabularMapper;
         }
 
-        public static List<DatasetMapper> ProcessTabularMapper(TabularMapper tabularMapper)
+        public List<DatasetMapper> ProcessTabularMapper(TabularMapper tabularMapper)
         {
             List<DatasetMapper> DatasetMappers = new();
 
@@ -241,6 +269,7 @@ namespace PlatformTM
 
             PrimaryDataset PrimaryDataset = new();
             PrimaryDataset.DatasetDescriptor = datasetDescriptor;
+            PrimaryDataset.Id = Guid.Empty;
              
             foreach (var subjectId in DatasetSubjectIds)
             {
@@ -341,7 +370,6 @@ namespace PlatformTM
             return consolidatedDatasets;
         }
 
-
         public static DatasetDescriptor GetConsolidatedDescriptor(List<DatasetDescriptor> descriptors)
         {
             
@@ -378,7 +406,23 @@ namespace PlatformTM
             return newDescriptor;
         }
 
-        
+        public FileInfo WriteDSToJSON(PrimaryDataset? PrimaryDS)
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
+            string jsonString = JsonSerializer.Serialize(PrimaryDS, options);
+
+            var datasetFileName = PrimaryDS?.DatasetDescriptor.Title + "_DATA.json";
+            string JsonOutputFile = Path.Combine(OutputDataPath, datasetFileName);
+
+            Directory.CreateDirectory(OutputDataPath);
+
+
+            File.WriteAllText(JsonOutputFile, jsonString);
+
+            var fi = new FileInfo(JsonOutputFile);
+            return fi;
+            //fileService.AddOrUpdateFile(ProjectId, fi);
+        }
     }
 }
 

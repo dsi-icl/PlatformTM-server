@@ -95,8 +95,9 @@ namespace PlatformTM.API
             services.Configure<AuthMessageSenderOptions>(Configuration);
 
             #region DI Registration
+            var serverVersion = ServerVersion.AutoDetect(Configuration.GetSection("DBSettings")["MySQLconn"]);
             services.AddDbContext<PlatformTMdbContext>
-                    (x => x.UseMySql(Configuration.GetSection("DBSettings")["MySQLconn"], sqlOptions =>{
+                    (x => x.UseMySql(Configuration.GetSection("DBSettings")["MySQLconn"], serverVersion, sqlOptions =>{
                          sqlOptions.EnableRetryOnFailure(7, System.TimeSpan.FromSeconds(5), null);}));
             services.AddScoped<IServiceUoW, PlatformTMdbContext>();
 

@@ -156,8 +156,8 @@ namespace PlatformTM.Models.Services
         {
             var file = _dataFileRepository.FindSingle(f => f.Id == fileId, new List<string>() {"Datasets"});
             bool result = true;
-            foreach (var dataset in file.Datasets)
-                result = result && await UnloadDataset(dataset.DatasetId, fileId);
+            //foreach (var dataset in file.)
+                result = result && await UnloadDataset(file.DatasetId, fileId);
             return result;
         }
 

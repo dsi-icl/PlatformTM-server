@@ -15,9 +15,9 @@ namespace PlatformTM.Data.EntityConfigurations
             builder.Property(t => t.Id).HasColumnName("SubjectDBId");
 
             // Relationships
-            builder.HasOne(t => t.StudyArm)
+            builder.HasOne(t => t.StudyCohort)
                    .WithMany()
-                   .HasForeignKey(t => t.StudyArmId);
+                   .HasForeignKey(t => t.StudyCohortId);
 
             builder.HasOne(t => t.Study)
                .WithMany(s=>s.Subjects)
@@ -32,7 +32,7 @@ namespace PlatformTM.Data.EntityConfigurations
             builder.HasOne(t => t.SourceDataFile)
                    .WithMany()
                    .IsRequired()
-                   .HasForeignKey(t => t.DatafileId);
+                   .HasForeignKey(t => t.SourceDatafileId);
         }
     }
 }

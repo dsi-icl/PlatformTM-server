@@ -10,6 +10,8 @@ using System.Configuration;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using System.Text.Json.Serialization;
+using Loader.DB;
+
 
 //const string outputDir = "/Users/iemam/Box/UNICORN - Data FAIRification/STAGING/BT/Output/SMSsurvey/";
 //const string srcDataDir = "/Users/iemam/Box/UNICORN - Data FAIRification/STAGING/BT/Data/";
@@ -18,56 +20,93 @@ using System.Text.Json.Serialization;
 //const string cdiscDescriptorDir = "/Users/iemam/Box/UNICORN - Data FAIRification/Dataset Templates/json_descriptors/";
 
 
-//CreatePrimaryDatasets();
-CreateDatasetDescriptors();
+var mapperFileNames = ConfigurationManager.AppSettings.Get("MapperFileNames").Split(',');
+var sourcDataPath = ConfigurationManager.AppSettings.Get("SourceDataDirectory");
+var outputDataPath = ConfigurationManager.AppSettings.Get("OutputDirectory");
+var mappersPath = ConfigurationManager.AppSettings.Get("MappersDirectory");
+
+int projectId;
+int.TryParse(ConfigurationManager.AppSettings.Get("ProjectId"), out projectId);
+
+FileService fileService = new FileService(projectId);
 
 
-void CreatePrimaryDatasets()
+
+CreatePrimaryDatasets();
+//CreateAndConsolidateDatasets
+//CreateDatasetDescriptors();
+
+
+
+void CreateAndConsolidateDatasets(string outputFolderName)
 {
-    var mapperFileNames = ConfigurationManager.AppSettings.Get("MapperFileNames").Split(',');
-    var sourcDataPath = ConfigurationManager.AppSettings.Get("SourceDataDirectory");
-    var outputDataPath = ConfigurationManager.AppSettings.Get("OutputDirectory");
-    List<PrimaryDataset> datasets = new();
 
+    var studyFolderName ="";
+    var subFolderName = outputFolderName;
+    var outputFolderPath = Path.Combine(outputDataPath, studyFolderName, subFolderName);
+
+    List<PrimaryDataset> datasets = new();
     foreach (var mapperFileName in mapperFileNames)
     {
-        var mapperfullpath = Path.Combine(ConfigurationManager.AppSettings.Get("MappersDirectory"), mapperFileName);
+        //CHECK THESE EXIST FIRST BEFORE PROCEEDING
+        studyFolderName = mapperFileName.Split('_')[0];
+        
+        var mapperFileFullPath = Path.Combine(mappersPath, studyFolderName, mapperFileName);
+        var currSrcDataPath = Path.Combine(sourcDataPath, studyFolderName);
 
-        TabularMapper tabularMapper = MapperService.ReadMappingFile(mapperfullpath);
+        
 
-        List<DatasetMapper> mappers = MapperService.ProcessTabularMapper(tabularMapper);
+        // A new mapper service instance per mapper file
+        MapperService mapper = new MapperService(projectId, currSrcDataPath, "", mapperFileFullPath);
 
-        foreach (var dsMapper in mappers)
-        {
-            var PrimaryDS = MapperService.CreateObsPDS(dsMapper, sourcDataPath);
-
-            datasets.Add(PrimaryDS);
-            
-            //WriteDSToJSON(PrimaryDS, Path.Combine(outputDataPath, mapperFileName.Replace("_mapper", "").Replace(".csv","")));
-
-        }
+        var dss= mapper.CreatePrimaryDataset();
+        if (dss != null) datasets.AddRange(dss);
     }
 
     var consolidatedDatasets = MapperService.ConsolidateDatasets(datasets);
-    foreach(var ds in consolidatedDatasets)
+    
+    foreach (var ds in consolidatedDatasets)
     {
-       // var datatable = ds.TabulariseDataset();
+        // var datatable = ds.TabulariseDataset();
         //TabularDataIO.WriteDataFile(Path.Combine(outputDataPath, datatable.TableName+".csv"), datatable);
 
-       WriteDSToJSON(ds, outputDataPath);
+        MapperService mapper = new MapperService(projectId, "", outputFolderPath, "");
+        var fileInfo = mapper.WriteDSToJSON(ds);
+        fileService.AddOrUpdateFile(studyFolderName, subFolderName, fileInfo);
     }
 }
 
-void WriteDSToJSON(PrimaryDataset? PrimaryDS, string outputDir)
+void CreatePrimaryDatasets()
 {
-    var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
-    string jsonString = JsonSerializer.Serialize(PrimaryDS, options);
-
-    string JsonOutputFile = Path.Combine(outputDir,PrimaryDS?.DatasetDescriptor.Title + "_DATA.json");
-    Directory.CreateDirectory(outputDir);
+ 
+    List<PrimaryDataset> datasets = new();
     
-    File.WriteAllText(JsonOutputFile, jsonString);
+    foreach (var mapperFileName in mapperFileNames)
+    {
+
+        //CHECK THESE EXIST FIRST BEFORE PROCEEDING
+        var studyFolderName = mapperFileName.Split('_')[0];
+        var subFolderName = mapperFileName.Replace("_mapper", "").Replace(".csv", "");
+        var mapperFileFullPath = Path.Combine(mappersPath, studyFolderName, mapperFileName);
+        var currSrcDataPath = Path.Combine(sourcDataPath, studyFolderName);
+        var outputFolderPath = Path.Combine(outputDataPath,studyFolderName,subFolderName); 
+
+        // A new mapper service instance per mapper file
+        MapperService mapper = new MapperService(projectId, currSrcDataPath, outputFolderPath, mapperFileFullPath);
+
+        datasets = mapper.CreatePrimaryDataset();
+
+        foreach (var dataset in datasets)
+        {
+
+            var fileInfo = mapper.WriteDSToJSON(dataset);
+            fileService.AddOrUpdateFile(studyFolderName, subFolderName, fileInfo);
+            
+        }
+    }
 }
+
+
 
 void WriteDescriptorToJSON(ObservationDatasetDescriptor? obsDescriptor, string outputDir)
 {
@@ -88,14 +127,25 @@ void CreateDatasetDescriptors()
 
     List<DatasetMapper> alldatasetmappers = new List<DatasetMapper>();
     List<DatasetDescriptor> allDescriptors = new();
-    foreach (var mapper in mapperFileNames)
+
+    //var mapper = new MapperService(projectId,sourcDataPath,outputDataPath);
+    foreach (var mapperFileName in mapperFileNames)
     {
-        var mapperfullpath = Path.Combine(ConfigurationManager.AppSettings.Get("MappersDirectory"), mapper);
+
+        //CHECK THESE EXIST FIRST BEFORE PROCEEDING
+        var studyFolderName = mapperFileName.Split('_')[0];
+        var subFolderName = mapperFileName.Replace("_mapper", "").Replace(".csv", "");
+        var mapperFileFullPath = Path.Combine(mappersPath, studyFolderName, mapperFileName);
+        var currSrcDataPath = Path.Combine(sourcDataPath, studyFolderName);
+        var outputFolderPath = Path.Combine(outputDataPath, studyFolderName, subFolderName);
+
+        // A new mapper service instance per mapper file
+        MapperService mapper = new MapperService(projectId, currSrcDataPath, outputFolderPath, mapperFileFullPath);
 
 
-        TabularMapper tabularMapper = MapperService.ReadMappingFile(mapperfullpath);
+        TabularMapper tabularMapper = mapper.ReadMappingFile(mapperFileFullPath);
 
-        List<DatasetMapper> mappers = MapperService.ProcessTabularMapper(tabularMapper);
+        List<DatasetMapper> mappers = mapper.ProcessTabularMapper(tabularMapper);
 
         allDescriptors.AddRange(MapperService.InitObsDescriptors(mappers));
 

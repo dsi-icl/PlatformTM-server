@@ -13,6 +13,7 @@ using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.Domain.Model.Templates;
@@ -191,14 +192,11 @@ namespace PlatformTM.Data
 
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.AddConfiguration<User>(new UserConfig());
             modelBuilder.AddConfiguration<UserAccount>(new AccountConfig());
-            modelBuilder.AddConfiguration<Core.Domain.Model.Activity>(new ActivityConfig());
-            modelBuilder.AddConfiguration<Arm>(new ArmConfig());
-            modelBuilder.AddConfiguration<Assay>(new AssayConfig());
 
-            modelBuilder.AddConfiguration<Biosample>(new BioSampleConfig());
-            modelBuilder.AddConfiguration<Characteristic>(new CharacteristicConfig());
-            modelBuilder.AddConfiguration<CharacteristicFeature>(new CharacteristicObjectConfig());
+
+            
             modelBuilder.AddConfiguration<UserClaim>(new ClaimConfig());
 
 
@@ -211,9 +209,9 @@ namespace PlatformTM.Data
             modelBuilder.AddConfiguration<Dictionary>(new DictionaryConfig());
 
             
-            modelBuilder.AddConfiguration<DataFile>(new DatafileConfig());
-            modelBuilder.AddConfiguration<Dataset>(new DatasetConfig());
-            modelBuilder.AddConfiguration<DatasetDatafile>(new DatasetDatafileConfig());
+            
+            
+            
 
             modelBuilder.AddConfiguration<PlatformTM.Core.Domain.Model.Observation>(new ObservationConfig());
             modelBuilder.AddConfiguration<ObservationQualifier>(new ObservationQualifiersConfig());
@@ -221,25 +219,40 @@ namespace PlatformTM.Data
             modelBuilder.AddConfiguration<ObservationTiming>(new ObservationTimingsConfig());
 
             modelBuilder.AddConfiguration<Project>(new ProjectConfig());
-            modelBuilder.AddConfiguration<ProjectUser>(new ProjectUserConfig());
+            //modelBuilder.AddConfiguration<ProjectUser>(new ProjectUserConfig());
 
             modelBuilder.AddConfiguration<Study>(new StudyConfig());
-            modelBuilder.AddConfiguration<StudyDataset>(new StudyDatasetConfig());
-            modelBuilder.AddConfiguration<StudyArm>(new StudyArmConfig());
+            //modelBuilder.AddConfiguration<StudyDataset>(new StudyDatasetConfig());
+            //modelBuilder.AddConfiguration<StudyArm>(new StudyArmConfig());
+            //modelBuilder.AddConfiguration<Assessment>(new AssessmentConfig());
+            modelBuilder.AddConfiguration<Assay>(new AssayConfig());
+            //modelBuilder.AddConfiguration<PrimaryDataset>(new PrimaryDatasetConfig());
+            modelBuilder.AddConfiguration<DataFile>(new DatafileConfig());
+
 
             modelBuilder.AddConfiguration<HumanSubject>(new SubjectConfig());
+            modelBuilder.AddConfiguration<Biosample>(new BioSampleConfig());
+            modelBuilder.AddConfiguration<Characteristic>(new CharacteristicConfig());
+            modelBuilder.AddConfiguration<CharacteristicFeature>(new CharacteristicObjectConfig());
+
+            modelBuilder.AddConfiguration<Cohort>(new CohortConfig());
+            modelBuilder.AddConfiguration<Visit>(new VisitConfig());
 
             modelBuilder.AddConfiguration<TimePoint>(new TimePointConfig());
 
-            modelBuilder.AddConfiguration<User>(new UserConfig());
+          
 
 
-            modelBuilder.AddConfiguration<VariableDefinition>(new VariableDefConfig());
-            modelBuilder.AddConfiguration<VariableReference>(new VariableRefConfig());
-            modelBuilder.AddConfiguration(new VariableQualifierConfig());
+            modelBuilder.Ignore<VariableDefinition>();
+            modelBuilder.Ignore<VariableReference>();
+            modelBuilder.Ignore<VariableQualifier>();
 
-            modelBuilder.AddConfiguration<Visit>(new VisitConfig());
+            
 
+            modelBuilder.Ignore<Core.Domain.Model.Activity>();
+            modelBuilder.Ignore<Dataset>();
+            modelBuilder.Ignore<DatasetDatafile>();
+            modelBuilder.Ignore<DatasetRecord>();
         }
 
         public Task<int> SaveChangesAsync()

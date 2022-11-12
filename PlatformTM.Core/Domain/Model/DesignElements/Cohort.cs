@@ -4,17 +4,20 @@ using PlatformTM.Core.JoinEntities;
 
 namespace PlatformTM.Core.Domain.Model.DesignElements
 {
-    public class Arm : Identifiable<string>
+    public class Cohort : Identifiable<string>
     {
-        //CONSIDER PUTTING BACK WHEN EF SUPPORTS M-2-M RELATIONSHIPS
-        //public List<Study> Studies { get; set; }
-        public List<StudyArm> Studies { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
 
-        public Arm()
+        public List<Study> Studies { get; set; }
+
+        public List<HumanSubject> Subjects { get; set; }
+        
+
+        public Cohort()
         {
-            Studies = new List<StudyArm>();
+            Studies = new List<Study>();
+            Subjects = new List<HumanSubject>();
         }
     }
 }

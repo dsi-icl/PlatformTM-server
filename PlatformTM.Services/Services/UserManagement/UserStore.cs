@@ -189,7 +189,7 @@ namespace PlatformTM.Models.Services.UserManagement
             {
                 throw new ArgumentNullException(nameof(userAccount));
             }
-            return Task.FromResult(userAccount.User.Email);
+            return Task.FromResult(userAccount.User?.Email);
         }
 
         public Task<bool> GetEmailConfirmedAsync(UserAccount user, CancellationToken cancellationToken)

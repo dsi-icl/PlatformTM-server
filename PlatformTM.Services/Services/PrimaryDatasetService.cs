@@ -24,24 +24,34 @@ namespace PlatformTM.Models.Services
 
         }
 
-        public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int projectId)
+        public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int studyId)
         {
             IEnumerable<PrimaryDataset> primaryDatasets;
 
-            primaryDatasets = _pdsRepository.FindAll(d => d.ProjectId == projectId, new List<string>() { "Study","Project" });
+            primaryDatasets = _pdsRepository.FindAll(d => d.StudyId == studyId, new List<string>() { "Study" });
 
             return primaryDatasets.Select(d=> new PrimaryDatasetDTO()
             {
                 Title = d.Title,
                 Description = d.Description,
-                ProjectName = d.Project.Name,
+                ProjectName = d.Study.Project.Name,
                 StudyName = d.Study.Name,
                 StudyAccronym = d.Study.Accession,
-                DatasetType = d.DatasetDescriptor.DatasetType.ToString()
+                DatasetType = d.Descriptor.DatasetType.ToString()
             }).ToList();
         }
 
-        public void AddPrimaryDataset()
+        public PrimaryDatasetDTO GetPrimaryDatasetInfo(int datasetId)
+        {
+
+        }
+
+        public void AddPrimaryDatasetInfo()
+        {
+
+        }
+
+        public void UpdatePrimaryDatasetInfo()
         {
 
         }

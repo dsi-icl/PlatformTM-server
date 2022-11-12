@@ -5,9 +5,9 @@ using PlatformTM.Data.Extensions;
 
 namespace PlatformTM.Data.EntityConfigurations
 {
-    public class ArmConfig : EntityTypeConfiguration<Arm>
+    public class CohortConfig : EntityTypeConfiguration<Cohort>
     {
-        public override void Configure(EntityTypeBuilder<Arm> builder)
+        public override void Configure(EntityTypeBuilder<Cohort> builder)
         {
             // Primary Key
             builder.HasKey(t => t.Id);
@@ -22,10 +22,10 @@ namespace PlatformTM.Data.EntityConfigurations
             //.HasMaxLength(200);
 
             // Table & Column Mappings
-            builder.ToTable("Arms");
-            builder.Property(t => t.Id).HasColumnName("ArmId");
-            builder.Property(t => t.Name).HasColumnName("ArmName");
-            builder.Property(t => t.Code).HasColumnName("ArmCode");
+            builder.ToTable("Cohorts");
+            builder.Property(t => t.Id).HasColumnName("CohortId");
+            builder.Property(t => t.Name).HasColumnName("CohortName");
+            builder.Property(t => t.Code).HasColumnName("CohortCode");
 
             //CONSIDER WHEN M-2-M realtionships are supported again
 
