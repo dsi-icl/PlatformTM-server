@@ -13,12 +13,12 @@ namespace PlatformTM.Models.Services
     {
         private IServiceUoW _dataContext;
         private readonly IRepository<PrimaryDataset, int> _pdsRepository;
-        private readonly IRepository<DatasetDescriptor, Guid> _datasetDescriptorRepository;
+        private readonly IRepository<ObservationDatasetDescriptor, Guid> _datasetDescriptorRepository;
         public PrimaryDatasetService(IServiceUoW _uoW)
         {
             _dataContext = _uoW;
             _pdsRepository = _dataContext.GetRepository<PrimaryDataset, int>();
-            _datasetDescriptorRepository = _dataContext.GetRepository<DatasetDescriptor, Guid>();
+            _datasetDescriptorRepository = _dataContext.GetRepository<ObservationDatasetDescriptor, Guid>();
         }
 
        
@@ -26,13 +26,13 @@ namespace PlatformTM.Models.Services
         public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int projectId)
         {
             IEnumerable<PrimaryDataset> primaryDatasets;
-            primaryDatasets = _pdsRepository.FindAll(d => d.ProjectId == projectId);
+            primaryDatasets = _pdsRepository.FindAll(d => d.ProjectId == projectId, new List<string>() { "Project", "Studies"} );
             return primaryDatasets.Select(s=>WriteToDTO(s,false)).ToList();
         }
 
         public PrimaryDatasetDTO GetPrimaryDatasetInfo(int datasetId)
         {
-            var primaryDataset = _pdsRepository.FindSingle(d => d.Id == datasetId);
+            var primaryDataset = _pdsRepository.FindSingle(d => d.Id == datasetId, new List<string>() { "Project", "Studies" });
 
             if (primaryDataset == null)
                 return null;
@@ -42,10 +42,13 @@ namespace PlatformTM.Models.Services
         public PrimaryDataset AddPrimaryDatasetInfo(PrimaryDatasetDTO dto)
         {
             var newPDS = ReadFromDTO(dto, new PrimaryDataset()
-                                            { ProjectId = dto.ProjectId,
-                                              Created = DateTime.Now.ToString("D"),
-                                              DescriptorId = Guid.Parse(dto.DescriptorId)
-                                            });
+            {
+                ProjectId = dto.ProjectId,
+                Created = DateTime.Now.ToString("D"),
+                DescriptorId = Guid.Parse(dto.DescriptorId),
+                Version = "v1.0"
+            });
+
             newPDS = _pdsRepository.Insert(newPDS);
             return (_dataContext.Save().Equals("CREATED")) ? newPDS : null;
         }
@@ -71,6 +74,7 @@ namespace PlatformTM.Models.Services
             {
                 datasetDTO = new PrimaryDatasetDTO()
                 {
+                    Id = dataset.Id,
                     Title = dataset.Title,
                     Description = dataset.Description,
                     Acronym = dataset.Acronym,

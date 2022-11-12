@@ -84,7 +84,7 @@ namespace PlatformTM.Data
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
-            if (typeof(TEntity).IsSubclassOf(typeof(DatasetDescriptor)))
+            if (typeof(TEntity) == typeof(DatasetDescriptor) || typeof(TEntity).IsSubclassOf(typeof(DatasetDescriptor)))
             {
                 //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
                 //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
