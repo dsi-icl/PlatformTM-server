@@ -278,40 +278,40 @@ namespace PlatformTM.Models.Services
 
         public List<AssayVM> GetProjectAssayDatasets(int projectId)
         {
-            var assays = _assayRepository.FindAll(
-                d => (d.Study.Project.Id == projectId),
-                    new List<string>(){
-                        "Datasets.Template",
-                        "Project",
-                        "TechnologyType",
-                        "TechnologyPlatform",
-                        "MeasurementType",
-                        "Datasets.DataFiles"
-                    }
-                );
+     //       var assays = _assayRepository.FindAll(
+     //           d => (d.Study.Project.Id == projectId),
+     //               new List<string>(){
+                        
+     //                   "Project",
+     //                   "TechnologyType",
+     //                   "TechnologyPlatform",
+     //                   "MeasurementType",
+     //                   "Datasets.DataFiles"
+     //               }
+     //           );
 
-            var assayVMs = assays.Select(a => new AssayVM()
-            {
-                Id = a.Id,
-                Name = a.Name,
-                Platform = a.TechnologyPlatform?.Name,
-                Technology = a.TechnologyType?.Name,
-                Type = a.MeasurementType?.Name,
-                Datasets = a.Datasets.Select(d => new DatasetVM()
-                {
-                    Id = d.Id,
-					Name = d.Descriptor.Title == "BS"?"Samples Annotation":d.Domain,
-                    Files = d.DataFiles.Select(df => new FileVM()
-                    {
-                        Id = df.Id,
-                        FileName = df.FileName,
-                        DataType = df.Type,
-                        DateLastModified = df.Modified
-                    }).ToList()
-                }).ToList()
-            }).ToList();
+     //       var assayVMs = assays.Select(a => new AssayVM()
+     //       {
+     //           Id = a.Id,
+     //           Name = a.Name,
+     //           Platform = a.TechnologyPlatform?.Name,
+     //           Technology = a.TechnologyType?.Name,
+     //           Type = a.MeasurementType?.Name,
+     //           Datasets = a.Datasets.Select(d => new DatasetVM()
+     //           {
+     //               Id = d.Id,
+					//Name = d.Descriptor.Title == "BS"?"Samples Annotation":d.Domain,
+     //               Files = d.DataFiles.Select(df => new FileVM()
+     //               {
+     //                   Id = df.Id,
+     //                   FileName = df.FileName,
+     //                   DataType = df.Type,
+     //                   DateLastModified = df.Modified
+     //               }).ToList()
+     //           }).ToList()
+     //       }).ToList();
 
-            return assayVMs;
+            return null;
         }
 
 

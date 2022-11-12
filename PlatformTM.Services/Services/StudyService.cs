@@ -56,7 +56,8 @@ namespace PlatformTM.Models.Services
                     var num = project.Studies.Count;
                     //var abbr = studyDto.ProjectAcc.Substring(2, 3);
                     //studyDto.Accession = "S-" + abbr + "-" + (num+1).ToString("00");
-                    studyDto.Accession = "S-" + project.Accession + "-" + (num + 1).ToString("00");
+                    //studyDto.Accession = "S-" + project.Accession + "-" + (num + 1).ToString("00");
+                    studyDto.Accession = "S-" + project.Accession.Substring(project.Accession.IndexOf('-')+1) + "-" + studyDto.Name;
                     studyDto.ProjectId = project.Id;
                 }
             }
