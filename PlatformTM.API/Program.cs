@@ -21,9 +21,9 @@ namespace PlatformTM.API
                     try
                     {
                         var dbContext = services.GetRequiredService<PlatformTMdbContext>();
-                        dbContext.InitDB();
-                        var dbInitializer = services.GetRequiredService<Data.DbInitializer>();
-                        dbInitializer.SeedDB();
+                        //dbContext.InitDB();
+                        //var dbInitializer = services.GetRequiredService<Data.DbInitializer>();
+                        //dbInitializer.SeedDB();
                     }
                     catch (Exception ex)
                     {
