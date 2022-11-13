@@ -11,6 +11,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>PlatformTM.Data</RootNamespace>
     <Authors>Ibrahim Emam</Authors>
+    <ReleaseVersion>V0.2</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>

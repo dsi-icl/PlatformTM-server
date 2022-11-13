@@ -7,6 +7,7 @@
     <DockerLaunchBrowser>True</DockerLaunchBrowser>
     <DockerServiceUrl>http://localhost:{ServicePort}</DockerServiceUrl>
     <DockerServiceName>platformtm.api</DockerServiceName>
+    <ReleaseVersion>V0.2</ReleaseVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">

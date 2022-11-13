@@ -11,6 +11,7 @@
     <RootNamespace>PlatformTM.API</RootNamespace>
     <DockerComposeProjectPath>../docker-compose.dcproj</DockerComposeProjectPath>
         <UserSecretsId>98241d1e-431b-46cc-88b4-ddd827abd192</UserSecretsId>
+        <ReleaseVersion>V0.2</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>

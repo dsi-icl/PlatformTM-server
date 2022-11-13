@@ -29,6 +29,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using Newtonsoft.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using PlatformTM.Services.Services;
+using PlatformTM.Services.LoadingWizard;
 
 namespace PlatformTM.API
 {
@@ -114,7 +115,7 @@ namespace PlatformTM.API
 
             services.AddScoped<AssessmentService>();
             services.AddScoped<PrimaryDatasetService>();
-
+            services.AddScoped<LoadingWizardService>(); 
 
 
             services.AddScoped<ProjectService>();

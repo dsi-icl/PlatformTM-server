@@ -11,6 +11,7 @@
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <RootNamespace>PlatformTM.Services</RootNamespace>
     <Authors>Ibrahim Emam</Authors>
+    <ReleaseVersion>V0.2</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,10 +30,14 @@
     <Folder Include="Services\FAIRifier\" />
     <Folder Include="Services\FAIRifier\Models\" />
     <Folder Include="Services\Loading\PDS\" />
+    <Folder Include="LoadingWizard\" />
+    <Folder Include="LoadingWizard\dto\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\FAIRifier\" />
     <None Remove="Services\FAIRifier\Models\" />
     <None Remove="Services\Loading\PDS\" />
+    <None Remove="LoadingWizard\" />
+    <None Remove="LoadingWizard\dto\" />
   </ItemGroup>
 </Project>

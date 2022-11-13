@@ -62,10 +62,7 @@ namespace PlatformTM.Models.Services
             return _dataContext.Save().Equals("CREATED") ? primaryDataset : null;
         }
 
-        public void ImportDataToPDS(DataFile dataFile, DatasetDescriptor datasetDescriptor)
-        {
-
-        }
+     
 
         private PrimaryDatasetDTO WriteToDTO(PrimaryDataset dataset, bool addDescriptor)
         {

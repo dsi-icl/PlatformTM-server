@@ -33,7 +33,7 @@ namespace PlatformTM.API.Controllers
         }
 
         
-
+        
         [HttpGet("{projectId}/allactivities")]
         public IEnumerable<ActivityDTO> GetProjectActivities(int projectId)
         {

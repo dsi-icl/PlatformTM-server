@@ -12,5 +12,7 @@ namespace PlatformTM.Models.DTOs
         public string ProjectAcc { get; set; }
         public int ArmCount { get; set; }
         public IEnumerable<string> ArmNames { get; set; }
+
+       
     }
 }

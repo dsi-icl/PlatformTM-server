@@ -26,6 +26,7 @@ namespace PlatformTM.Services.DTOs
         public string Description { get; set; }
         public string Domain { get; set; }
         public bool IsSelected { get; set; }
+        public string Acronym { get; set; }
     }
 }
 

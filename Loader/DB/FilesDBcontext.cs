@@ -5,6 +5,7 @@ using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.Domain.Model.Templates;
 using PlatformTM.Core.Domain.Model.Timing;
@@ -15,7 +16,7 @@ namespace Loader.DB
 {
     public class FilesDBcontext : DbContext
     {
-        const string connectionString = "server=146.169.11.152;user id=root;password=imperial;persistsecurityinfo=True;database=eTRIKSdata;Allow User Variables=True";
+        const string connectionString = "server=146.169.11.152;user id=root;password=imperial;persistsecurityinfo=True;database=unicorn;Allow User Variables=True";
         public DbSet<DataFile> Files { get; set; }
         public DbSet<Project> Projects { get; set; }
 
@@ -47,7 +48,7 @@ namespace Loader.DB
 
             modelBuilder.Ignore<UserAccount>();
             modelBuilder.Ignore<PlatformTM.Core.Domain.Model.Activity>();
-            modelBuilder.Ignore<Arm>();
+            modelBuilder.Ignore<Cohort>();
             modelBuilder.Ignore<Assay>();
 
             modelBuilder.Ignore<Biosample>();
@@ -105,6 +106,8 @@ namespace Loader.DB
 
             modelBuilder.Ignore<Dataset>();
             modelBuilder.Ignore<DatasetDatafile>();
+
+            modelBuilder.Ignore<DatasetRecord>();
 
             modelBuilder.Ignore<PlatformTM.Core.Domain.Model.Observation>();
             modelBuilder.Ignore<ObservationQualifier>();

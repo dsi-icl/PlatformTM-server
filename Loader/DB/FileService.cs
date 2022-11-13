@@ -37,7 +37,7 @@ namespace Loader.DB
                 file = new DataFile
                 {
                     FileName = fileInfo.Name, 
-                    DateAdded = fileInfo.CreationTime.ToString("d") + " " + fileInfo.CreationTime.ToString("t"),
+                    Created = fileInfo.CreationTime.ToString("d") + " " + fileInfo.CreationTime.ToString("t"),
                     State = "NEW",
                     //Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
                     IsDirectory = false,
@@ -48,7 +48,7 @@ namespace Loader.DB
             }
             else
             {
-                file.LastModified = fileInfo.LastWriteTime.ToString("d") + " " + fileInfo.LastWriteTime.ToString("t");
+                file.Modified = fileInfo.LastWriteTime.ToString("d") + " " + fileInfo.LastWriteTime.ToString("t");
                 file.State = "UPDATED";
                 dBcontext.Files.Update(file);
             }
@@ -77,7 +77,7 @@ namespace Loader.DB
                     FileName = studyFolderName,
                     IsDirectory = true,
                     ProjectId = projectId,
-                    DateAdded = DateTime.Now.ToString("D")
+                    Created = DateTime.Now.ToString("D")
                 };
 
                 dBcontext.Files.Add(folder);
@@ -96,7 +96,7 @@ namespace Loader.DB
                     FileName = subFolderName,
                     IsDirectory = true,
                     ProjectId = projectId,
-                    DateAdded = DateTime.Now.ToString("D"),
+                    Created = DateTime.Now.ToString("D"),
                     FolderId = pFolder.Id
                 };
 

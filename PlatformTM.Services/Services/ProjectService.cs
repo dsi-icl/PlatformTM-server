@@ -22,6 +22,7 @@ namespace PlatformTM.Models.Services
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Assessment, int> _activityRepository;
         private readonly IRepository<Assay, int> _assayRepository;
+
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
         private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
         private readonly IRepository<Dataset, int> _datasetRepository;

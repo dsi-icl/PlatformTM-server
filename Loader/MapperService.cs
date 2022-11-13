@@ -268,8 +268,8 @@ namespace PlatformTM
             //IE ALL OBSERVED PHENOMENONS OBSERVED FOR A SINGLE OBSERVED FEATURE (THAT IS WHAT WOULD BE ONE DATASET RECORD IN THE PRIMARY DATASET
 
             PrimaryDataset PrimaryDataset = new();
-            PrimaryDataset.DatasetDescriptor = datasetDescriptor;
-            PrimaryDataset.Id = Guid.Empty;
+            PrimaryDataset.Descriptor = datasetDescriptor;
+            PrimaryDataset.Id = 0;
              
             foreach (var subjectId in DatasetSubjectIds)
             {
@@ -353,14 +353,14 @@ namespace PlatformTM
 
         public static List<PrimaryDataset> ConsolidateDatasets(List<PrimaryDataset> datasets)
         {
-            var datasetsByDomain  = datasets.GroupBy(p => p.DatasetDescriptor.Title);
+            var datasetsByDomain  = datasets.GroupBy(p => p.Descriptor.Title);
             var consolidatedDatasets = new List<PrimaryDataset>();
             foreach(var datasetGroup in datasetsByDomain)
             {
                 var newDataset = new PrimaryDataset();
                 //SHOULD NOT BE THE FIRST ONE, BUT tHE UNION OF ALL DATASETS in the same group.
-                var descriptors = datasetGroup.ToList().Select(d => d.DatasetDescriptor).ToList();
-                newDataset.DatasetDescriptor = GetConsolidatedDescriptor(descriptors);
+                var descriptors = datasetGroup.ToList().Select(d => d.Descriptor).ToList();
+                newDataset.Descriptor = GetConsolidatedDescriptor(descriptors);
                 foreach(var dataset in datasetGroup)//Im assuming here that all data records are in the same order
                 {
                     newDataset.DataRecords.AddRange(dataset.DataRecords);
@@ -411,7 +411,7 @@ namespace PlatformTM
             var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
             string jsonString = JsonSerializer.Serialize(PrimaryDS, options);
 
-            var datasetFileName = PrimaryDS?.DatasetDescriptor.Title + "_DATA.json";
+            var datasetFileName = PrimaryDS?.Descriptor.Title + "_DATA.json";
             string JsonOutputFile = Path.Combine(OutputDataPath, datasetFileName);
 
             Directory.CreateDirectory(OutputDataPath);
