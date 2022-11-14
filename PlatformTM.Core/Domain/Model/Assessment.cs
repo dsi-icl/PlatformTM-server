@@ -9,7 +9,7 @@ namespace PlatformTM.Core.Domain.Model
     public class Assessment : Identifiable<int>
     {
 
-        public string Name { get; set; }
+        public string Name { get; set; } 
         public string Description { get; set; }
         public string Status { get; set; }
 
@@ -25,6 +25,8 @@ namespace PlatformTM.Core.Domain.Model
         public Assessment()
         {
             Datasets = new List<PrimaryDataset>();
+            StudyId = 0;
+            Name=Description=Status="";
         }
     }
 }

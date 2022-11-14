@@ -32,6 +32,7 @@
     <Folder Include="Services\Loading\PDS\" />
     <Folder Include="LoadingWizard\" />
     <Folder Include="LoadingWizard\dto\" />
+    <Folder Include="DatasetExplorer\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\FAIRifier\" />
@@ -39,5 +40,6 @@
     <None Remove="Services\Loading\PDS\" />
     <None Remove="LoadingWizard\" />
     <None Remove="LoadingWizard\dto\" />
+    <None Remove="DatasetExplorer\" />
   </ItemGroup>
 </Project>

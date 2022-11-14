@@ -6,7 +6,7 @@ namespace PlatformTM.Core.JoinEntities
     public class ObservationSynonym
     {
         public int ObservationId { get; set; }
-        public Observation Observation { get; set; }
+        //public Observation Observation { get; set; }
         public int QualifierId { get; set; }
         public VariableDefinition Qualifier { get; set; }
     }

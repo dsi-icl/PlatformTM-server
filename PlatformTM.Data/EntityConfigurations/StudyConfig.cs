@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.BMO;
 using PlatformTM.Data.Extensions;
 
 namespace PlatformTM.Data.EntityConfigurations
@@ -32,26 +33,6 @@ namespace PlatformTM.Data.EntityConfigurations
                 .WithMany(s => s.Studies)
                 .IsRequired()
                 .HasForeignKey(t => t.ProjectId);
-
-
-            //this.HasMany(t => t.Observations)
-            //    .WithMany(t => t.Studies)
-            //    .Map(mc =>
-            //    {
-            //        mc.ToTable("Study_Observations");
-            //        mc.MapLeftKey("StudyId");
-            //        mc.MapRightKey("ObservationId");
-
-            //    });
-            //this.HasMany(t => t.Datasets)
-            //    .WithMany(t => t.Studies)
-            //    .Map(mc =>
-            //    {
-            //        mc.ToTable("Study_Datasets");
-            //        mc.MapLeftKey("StudyId");
-            //        mc.MapRightKey("DatasetId");
-
-            //    });
         }
     }
 }

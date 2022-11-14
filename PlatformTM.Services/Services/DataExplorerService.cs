@@ -357,8 +357,8 @@ namespace PlatformTM.Models.Services
         {
             var sdtmObservations = _getObservations(reqObservations, projectId);
 
-            var subjFindings = sdtmObservations.FindAll(s => s.Class.ToLower() == "findings").ToList();
-            var subjEvents = sdtmObservations.FindAll(s => s.Class.ToLower() == "events").ToList();
+            //var subjFindings = sdtmObservations.FindAll(s => s.Class.ToLower() == "findings").ToList();
+            //var subjEvents = sdtmObservations.FindAll(s => s.Class.ToLower() == "events").ToList();
 
             var clinicalData = _getClinicalDataJson(sdtmObservations, reqObservations);
 
@@ -554,7 +554,8 @@ namespace PlatformTM.Models.Services
             }
             return sdtmObservations;
         }
-
+        /*
+         * 
         private Hashtable _getFindingsJson(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations)
         {
             var header = new HashSet<string>();
@@ -601,6 +602,7 @@ namespace PlatformTM.Models.Services
                 {"keys", header}
             };
         }
+        */
 
         private Hashtable _getClinicalDataJson(List<SdtmRow> observations, IList<ObservationRequestDTO> reqObservations)
         {
@@ -697,6 +699,9 @@ namespace PlatformTM.Models.Services
 
         }
 
+
+        /*
+         * 
         private Hashtable _getEventsJson(List<SdtmRow> events, IList<ObservationRequestDTO> reqObservations)
         {
 
@@ -753,7 +758,9 @@ namespace PlatformTM.Models.Services
             }
             return result;
         }
+        */
 
+        /**
         private DataTable _getFindingsDataTable(List<SdtmRow> findings, IList<ObservationRequestDTO> reqObservations)
         {
             #region Build Table columns
@@ -920,6 +927,8 @@ namespace PlatformTM.Models.Services
             datatable.Rows = datatable.Rows.OrderBy(row => row["subjectId"]).ToList();
             return datatable;
         }
+
+        **/
 
         private ObservationNode createObsNode(Observation obsObject)
         {

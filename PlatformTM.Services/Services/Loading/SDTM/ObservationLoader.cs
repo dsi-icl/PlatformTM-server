@@ -91,7 +91,7 @@ namespace PlatformTM.Models.Services.Loading.SDTM
                     obsDescriptor.Qualifiers.AddRange(sdtmRowDescriptor.ResultVariables.Select(
                         qualifier => new ObservationQualifier()
                         {
-                            Observation = obsDescriptor,
+                            //Observation = obsDescriptor,
                             Qualifier = qualifier
                         }));
                 //sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList())};
@@ -99,14 +99,14 @@ namespace PlatformTM.Models.Services.Loading.SDTM
                 obsDescriptor.Qualifiers.AddRange(sdtmRowDescriptor.QualifierVariables.Select(
                          qualifier => new ObservationQualifier()
                          {
-                             Observation = obsDescriptor,
+                             //Observation = obsDescriptor,
                              Qualifier = qualifier
                          }));
 
                 obsDescriptor.Timings.AddRange(sdtmRowDescriptor.TimeVariables.Select(
                         qualifier => new ObservationTiming()
                         {
-                            Observation = obsDescriptor,
+                           // Observation = obsDescriptor,
                             Qualifier = qualifier
                         }));
 

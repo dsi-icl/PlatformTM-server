@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlatformTM.Data;
 
@@ -10,9 +11,10 @@ using PlatformTM.Data;
 namespace PlatformTM.Data.Migrations
 {
     [DbContext(typeof(PlatformTMdbContext))]
-    partial class PlatformTMdbContextModelSnapshot : ModelSnapshot
+    [Migration("20221114032344_BMO-migration")]
+    partial class BMOmigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,31 +221,31 @@ namespace PlatformTM.Data.Migrations
                         .HasColumnName("FeatureId");
 
                     b.Property<string>("Category")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("ControlledTerm")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<int>("DatasetId")
                         .HasColumnType("int");
 
                     b.Property<string>("Domain")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("Subcategory")
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)");
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
 
                     b.Property<string>("TermURI")
-                        .HasMaxLength(200)
-                        .HasColumnType("varchar(200)");
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
 
                     b.HasKey("Id");
 
@@ -276,31 +278,6 @@ namespace PlatformTM.Data.Migrations
                     b.HasIndex("ObservedPropertyId");
 
                     b.ToTable("ObservablePhenomena", (string)null);
-                });
-
-            modelBuilder.Entity("PlatformTM.Core.Domain.Model.BMO.ObservationProperty", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("ControlledTerm")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("StudyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TermURI")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudyId");
-
-                    b.ToTable("ObservationProperties", (string)null);
                 });
 
             modelBuilder.Entity("PlatformTM.Core.Domain.Model.BMO.Property", b =>
@@ -660,8 +637,8 @@ namespace PlatformTM.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(40)
-                        .HasColumnType("varchar(40)")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
                         .HasColumnName("CohortName");
 
                     b.HasKey("Id");
@@ -1246,17 +1223,6 @@ namespace PlatformTM.Data.Migrations
                     b.Navigation("ObservedFeature");
 
                     b.Navigation("ObservedProperty");
-                });
-
-            modelBuilder.Entity("PlatformTM.Core.Domain.Model.BMO.ObservationProperty", b =>
-                {
-                    b.HasOne("PlatformTM.Core.Domain.Model.Study", "Study")
-                        .WithMany()
-                        .HasForeignKey("StudyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Study");
                 });
 
             modelBuilder.Entity("PlatformTM.Core.Domain.Model.BMO.Property", b =>

@@ -1,8 +1,8 @@
 version: '3.4'
 
 services:
-  platformtm.api:
+  ptm-server:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
     ports:
-      - "80"
+      - "80:80"

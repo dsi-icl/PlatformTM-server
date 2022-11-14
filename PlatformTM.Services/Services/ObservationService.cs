@@ -418,21 +418,21 @@ namespace PlatformTM.Models.Services
                     obsDescriptor.Qualifiers.AddRange(sdtmRowDescriptor.ResultVariables.Select(
                         qualifier => new ObservationQualifier()
                         {
-                            Observation = obsDescriptor, Qualifier = qualifier
+                           // Observation = obsDescriptor, Qualifier = qualifier
                         }));
                     //sdtmRowDescriptor.ResultVariables.Union(sdtmRowDescriptor.QualifierVariables).ToList())};
                 else
                     obsDescriptor.Qualifiers.AddRange(sdtmRowDescriptor.QualifierVariables.Select(
                          qualifier => new ObservationQualifier()
                          {
-                             Observation = obsDescriptor,
+                            // Observation = obsDescriptor,
                              Qualifier = qualifier
                          }));
 
                 obsDescriptor.Timings.AddRange(sdtmRowDescriptor.GetAllTimingVariables().FindAll(v=>v!=null).Select(
                         qualifier => new ObservationTiming()
                         {
-                            Observation = obsDescriptor,
+                          //  Observation = obsDescriptor,
                             Qualifier = qualifier
                         }));
 

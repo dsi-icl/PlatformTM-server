@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using Microsoft.Extensions.Options;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
+using PlatformTM.Core.Domain.Model.BMO;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
+using PlatformTM.Models.Configuration;
 using PlatformTM.Models.DTOs;
 using PlatformTM.Models.Services;
 using PlatformTM.Services.LoadingWizard.DTO;
@@ -17,16 +23,35 @@ namespace PlatformTM.Services.LoadingWizard
         private readonly IRepository<Study, int> _studyRepository;
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<DataFile, int> _fileRepository;
+        private readonly IRepository<PrimaryDataset, int> _pdsRepository;
+        private readonly IRepository<ObservablePhenomenon, int> _phenoRepository;
+        private readonly IRepository<ObservationDatasetDescriptor, Guid> _datasetDescriptorRepository;
+        private readonly IRepository<ObservationProperty, int> _observationStudyPropertyRepository;
+        private readonly IRepository<Feature, int> _featureRepository;
+        private readonly IRepository<Assessment, int> _assessmentRepository;
+        private readonly IRepository<Core.Domain.Model.BMO.Observation, Guid> _observationRepository;
         private readonly FileService FileService;
+        private FileStorageSettings ConfigSettings { get; set; }
+        private readonly string dataFilesDirectory;
 
 
-        public LoadingWizardService(IServiceUoW uoW, FileService fileService)
+        public LoadingWizardService(IServiceUoW uoW, FileService fileService, IOptions<FileStorageSettings> settings)
         {
             _loadingDBContext = uoW;
             _studyRepository = uoW.GetRepository<Study, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
             _fileRepository = uoW.GetRepository<DataFile, int>();
+            _pdsRepository = uoW.GetRepository<PrimaryDataset, int>();
+            _datasetDescriptorRepository = uoW.GetRepository<ObservationDatasetDescriptor, Guid>();
+            _phenoRepository = uoW.GetRepository<ObservablePhenomenon, int>();
+            _featureRepository = uoW.GetRepository<Feature, int>();
+            _assessmentRepository = uoW.GetRepository<Assessment, int>();
+            _observationStudyPropertyRepository = uoW.GetRepository<ObservationProperty, int>();
+            _observationRepository = uoW.GetRepository<Core.Domain.Model.BMO.Observation, Guid>();
+
             FileService = fileService;
+            ConfigSettings = settings.Value;
+            dataFilesDirectory = ConfigSettings.UploadFileDirectory;
 
         }
 
@@ -76,36 +101,229 @@ namespace PlatformTM.Services.LoadingWizard
             return true;
         }
 
-        //public void ImportDataToPDS(DataFile dataFile, DatasetDescriptor datasetDescriptor)
-        //{
-
-        //}
-        public bool LoadFile(int fileId, int datasetId)
+        public void LoadFile(int fileId, int datasetId, int assessmentId)
         {
-
             var file = _fileRepository.Get(fileId);
-            string filePath;
-            DataTable dataTable;
-            bool success=true;
-            filePath = FileService.GetFullPath(file.ProjectId);
-            dataTable = FileService.ReadDataFile(Path.Combine(filePath, file.FileName));
-            //datasetId descriptor will decide the type of the dataset
-            //loader is by type of dataset not by format
+
+            var assessment = _assessmentRepository.Get(assessmentId);
+
+            if (file == null)
+                return;
+
+            //GET DATASET
+            var primaryDataset = _pdsRepository.FindSingle(d => d.Id == datasetId);
+
+            if (primaryDataset == null)
+                return;
+
+            //GET DSCRIPTOR
+            var dd = _datasetDescriptorRepository.FindSingle(d => d.Id == primaryDataset.DescriptorId);
 
 
-            switch (file.Format)
+            //READ DATASET RECORDS
+            string fullpath = Path.Combine(dataFilesDirectory, file.Path,file.FileName);
+            string jsonString = File.ReadAllText(fullpath);
+            // var options = new JsonSerializerOptions { WriteIndented = true, MaxDepth = 10,  IgnoreNullValues= true };
+            PrimaryDataset pdsData = JsonSerializer.Deserialize<PrimaryDataset>(jsonString)!;
+
+
+            //Get frorm the descriptor the feature fields
+
+            //REMEMBER DOMAIN/CATEGORY/SUBCATEGROY
+            var groupedByFeatures = pdsData.DataRecords.GroupBy(r => new
             {
-                case "SDTM":
-                    //var sdtmLoader = new SDTMloader(_dataServiceUnit);
-                    //success = sdtmLoader.LoadSDTM(datasetId, fileId, dataTable);
-                    return success;
-                case "ADTM":
-                    //var hdDataloader = new HDloader(_dataServiceUnit);
-                    //success = hdDataloader.LoadHDdata(datasetId, fileId, dataTable);
-                    return success;
+                domain = r[dd.ClassifierFields.Find(c => c.Order == 1).Name],
+                cat = r[dd.ClassifierFields.Find(c => c.Order == 2).Name],
+                subcat = r[dd.ClassifierFields.Find(c => c.Order == 3).Name],
+                feat = r[dd.FeatureNameField.Name]
+
+            }).Distinct().ToList();
+
+
+            //Dataset previously created phenomena
+            var createdObsPhenomena = _phenoRepository
+                .FindAll(f => f.DatasetId == datasetId, new List<string>() { "ObservedFeature", "ObservedProperty"}).ToList();
+
+            var createdStudyProperties = _observationStudyPropertyRepository
+                .FindAll(op => op.StudyId == assessment.StudyId).ToList();
+
+
+
+            List<ObservablePhenomenon> phenomenonsToAdd = new();
+            List<ObservationProperty> obPropertiesToAdd = new();
+            List<Core.Domain.Model.BMO.Observation> observationsToAdd = new();
+
+
+            List<Property> createdProperties = createdObsPhenomena.Select(p => p.ObservedProperty).ToList();
+            List<Feature> createdFeatures = createdObsPhenomena.Select(p => p.ObservedFeature).ToList();
+
+            Feature feature=null;
+            foreach (var group in groupedByFeatures)
+            {
+
+                ObservablePhenomenon phenomenon;
+
+                foreach (var obsPropertyField in dd.ObservedPropertyValueFields)
+                {
+                    if (!group.First().ContainsKey(obsPropertyField.Name))
+                        continue;
+                    if (group.All(v => v[obsPropertyField.Name] == ""))
+                        continue;
+
+
+                    //Create or find phenomenon
+                    phenomenon = (createdObsPhenomena.Find(
+                        p => p.ObservedFeature.Category == group.Key.cat
+                        && p.ObservedFeature.Subcategory == group.Key.subcat
+                        && p.ObservedFeature.Name == group.Key.feat
+                        && p.ObservedProperty.Name == obsPropertyField.Name));
+
+                    if (phenomenon == null)
+                    {
+
+                        //Create or find Feature
+                        feature = createdFeatures.Find(
+                            f => f.Category == group.Key.cat
+                            && f.Subcategory == group.Key.subcat
+                            && f.Name == group.Key.feat);
+                        if (feature == null)
+                        {
+                            feature = new Feature
+                            {
+                                Name = group.Key.feat,
+                                Domain = group.Key.domain,
+                                Category = group.Key.cat,
+                                Subcategory = group.Key.subcat,
+                                DatasetId = datasetId,
+                            };
+                            createdFeatures.Add(feature);
+                        }
+   
+
+                        //Create or find Property
+                        Property property;
+                        if (createdProperties.Exists(p => p.Name == obsPropertyField.Name))
+                            property = createdProperties.Find(p => p.Name == obsPropertyField.Name);
+                        else
+                        {
+                            property = new Property() { Name = obsPropertyField.Name };
+                            createdProperties.Add(property);
+                        }
+
+
+                        //Create new phenomenon
+                        phenomenon = new ObservablePhenomenon()
+                        {
+                            ObservedFeature = feature,
+                            ObservedProperty = property,
+                            DatasetId = datasetId
+                        };
+
+                        phenomenonsToAdd.Add(phenomenon);
+                    }
+                    feature = phenomenon.ObservedFeature;
+                    
+                }
+
+                if (dd.FeaturePropertyNameField != null && !group.All(v => v[dd.FeaturePropertyNameField.Name] == ""))
+                {
+                    var featname = group.First(r => r[dd.FeaturePropertyNameField.Name] != "")[dd.FeaturePropertyNameField.Name];
+                    feature.FeatureProperties.Add(new Property() { Name = featname });
+                }
+
             }
-            return false;
+            primaryDataset.ObservedFeatures = phenomenonsToAdd.Select(ph => ph.ObservedFeature).ToList();
+            _pdsRepository.Update(primaryDataset);
+
+            _phenoRepository.InsertMany(phenomenonsToAdd);
+
+            foreach(var opField in dd.ObservationPropertyFields)
+            {
+                if(!createdStudyProperties.Exists(sp=>sp.Name == opField.Name)){
+                    var op = new ObservationProperty();
+                    op.StudyId = assessment.StudyId;
+                    op.Name = opField.Name;
+                    obPropertiesToAdd.Add(op);
+                }
+            }
+
+            _observationStudyPropertyRepository.InsertMany(obPropertiesToAdd);
+
+            _loadingDBContext.Save();
+            //NOW LOAD OBSERVATIONS TO MONGO
+
+
+            var savedFeatures = _featureRepository
+                .FindAll(f => f.DatasetId == datasetId, new List<string>() { "ObservablePhenomena", "FeatureProperties" }).ToList();
+
+            var savedObsProperties = _observationStudyPropertyRepository
+                .FindAll(op => op.StudyId == assessment.StudyId).ToList();
+
+            foreach(var sfeature in savedFeatures)
+            {
+                var recs = groupedByFeatures
+                    .Where(g => g.Key.domain == sfeature.Domain
+                    && g.Key.cat == sfeature.Category
+                    && g.Key.subcat == sfeature.Subcategory
+                    && g.Key.feat == sfeature.Name).First();
+
+                foreach (var rec in recs)
+                {
+                    
+                    var observation = new Core.Domain.Model.BMO.Observation();
+                    observation.SubjectId = rec[dd.SubjectIdentifierField.Name];
+                    observation.FeatureOfInterestId = sfeature.Id;
+                    observation.DatasetId = datasetId;
+                    observation.Id = Guid.NewGuid();
+
+                    //FEATURE PROPERTIES (observation ABOUT the observed feature)(E.G. TYPE OF RASH, SOUND OF WHEEZE)
+                    foreach (var p in sfeature.FeatureProperties)
+                    {
+                        if (rec.ContainsKey(p.Name))
+                            observation.ObservedFeatureProperties.Add(new NominalObsResult()
+                            {
+                                ObservedPhenomenonId = p.Id,
+                                Value = rec[p.Name]
+                            });
+                    }
+
+                    //OBSERVED PHENOMENA
+                    foreach (var p in sfeature.ObservablePhenomena)
+                    {
+                        if(rec.ContainsKey(p.ObservedProperty.Name))
+                            observation.ObservedPhenomena.Add(new NominalObsResult()
+                            {
+                                ObservedPhenomenonId = p.Id,
+                                Value = rec[p.ObservedProperty.Name]
+                            });
+                    }
+
+                    //OBSERVATION PROPERTIES (E.G. VISIT, EPOCH, DOV)
+                    foreach(var op in savedObsProperties)
+                    {
+                        //somewhere here I need to reference the observation properties e.g. visit epoch ..etc
+                        if (rec.ContainsKey(op.Name))
+                        {
+                            observation.ObservationProperties.Add(new NominalObsResult()
+                            {
+                                ObservedPhenomenonId = op.Id,
+                                Value = rec[op.Name]
+                            });
+                        }
+
+                    }
+
+                    observationsToAdd.Add(observation);
+                }
+            }
+            _observationRepository.InsertMany(observationsToAdd);
+
+            
+
         }
+
+
+        
 
         public FileDTO GetFileProgress(int fileId)
         {

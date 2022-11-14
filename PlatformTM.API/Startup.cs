@@ -30,6 +30,7 @@ using Newtonsoft.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using PlatformTM.Services.Services;
 using PlatformTM.Services.LoadingWizard;
+using PlatformTM.Services.DatasetExplorer;
 
 namespace PlatformTM.API
 {
@@ -115,7 +116,8 @@ namespace PlatformTM.API
 
             services.AddScoped<AssessmentService>();
             services.AddScoped<PrimaryDatasetService>();
-            services.AddScoped<LoadingWizardService>(); 
+            services.AddScoped<LoadingWizardService>();
+            services.AddScoped<DatasetExplorerService>();
 
 
             services.AddScoped<ProjectService>();

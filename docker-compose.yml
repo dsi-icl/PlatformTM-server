@@ -1,8 +1,17 @@
 version: '3.4'
 
 services:
-  platformtm.api:
-    image: iemam/platformtm-api:v2022
+  ptm-server:
+    image: iemam/platformtm-server:unicorn1.2
     build:
-      context: .
+      context: PlatformTM-server
       dockerfile: PlatformTM.API/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+    restart: unless-stopped
+    volumes:
+      - "ptmappdata:/app_data"
+    ports:
+      - "80:80"
+volumes:
+  ptmappdata:

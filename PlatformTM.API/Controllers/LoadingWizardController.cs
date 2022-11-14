@@ -40,10 +40,10 @@ namespace PlatformTM.API.Controllers
         }
 
         [HttpGet]
-        [Route("files/{fileId}/load/datasets/{datasetId}")]
-        public void LoadFile(int fileId, int datasetId)
+        [Route("files/{fileId}/load/datasets/{datasetId}/assessments/{assessmentId}")]
+        public void LoadFile(int fileId, int datasetId, int assessmentId)
         {
-            var success = _loadingWizardService.LoadFile(fileId, datasetId);
+             _loadingWizardService.LoadFile(fileId, datasetId, assessmentId);
             //if (success)
             //    return Ok(true);
             //return new BadRequestResult();

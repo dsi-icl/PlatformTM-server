@@ -39,7 +39,7 @@ namespace Loader.DB
                     FileName = fileInfo.Name, 
                     Created = fileInfo.CreationTime.ToString("d") + " " + fileInfo.CreationTime.ToString("t"),
                     State = "NEW",
-                    //Path = fi.DirectoryName.Substring(fi.DirectoryName.IndexOf("P-" + projectId)),
+                    Path = Path.Combine(studyFolderName,subFolderName).ToString(),
                     IsDirectory = false,
                     ProjectId = projectId,
                     FolderId = fileFolderId

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.BMO;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetDescriptorTypes;
 
 namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
@@ -24,6 +25,7 @@ namespace PlatformTM.Core.Domain.Model.DatasetModel.PDS
         public IList<DataFile> DataFiles { get; set; }
         public IList<Assessment> Assessments { get; set; }
         public IList<Study> Studies { get; set; }
+        public IList<Feature> ObservedFeatures { get; set; }
 
         //ignore from DB
         public List<DatasetRecord> DataRecords { get; set; }

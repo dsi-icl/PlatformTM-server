@@ -21,39 +21,18 @@ namespace PlatformTM.Services.Services
 
         }
 
-        public AssessmentDTO GetAssessmentForStudy(int assessmentId)
+        public AssessmentDTO GetAssessmentForStudy(int studyId, int assessmentId)
         {
-            var assessment = _assessmentRepository
+
+            Assessment assessment = (assessmentId == 0)
+                ? new Assessment() { StudyId = studyId }
+                : _assessmentRepository
                 .FindSingle(d => d.Id == assessmentId, new List<string>(){ "Datasets"});
 
-            var studyDatasets = _pdsRepository.FindAll(d => d.Studies.Any(s=>s.Id == assessment.StudyId)).ToList();
+            var studyDatasets = _pdsRepository.FindAll(d => d.Studies.Any(s=>s.Id == studyId)).ToList();
             //m => m.Roles.Any(r => roles.Contains(r.Name))
 
             var assessmentDTO = WriteToDTO(assessment,studyDatasets);
-
-            //if (assessment != null)
-            //{
-            //    assessmentDTO = new AssessmentDTO()
-            //    {
-            //        Id = assessment.Id,
-            //        Name = assessment.Name,
-            //        Description = assessment.Description,
-            //        Status = assessment.Status,
-            //        StudyId = assessment.StudyId
-            //    };
-
-            //    foreach(var ds in studyDatasets)
-            //    {
-            //        assessmentDTO.AssociatedDatasets.Add(new AssessmentDatasetDTO()
-            //        {
-            //            Title = ds.Title,
-            //            Description = ds.Description,
-            //            Domain = ds.Domain,
-            //            Id = ds.Id,
-            //            IsSelected = ((List<PrimaryDataset>)assessment.Datasets).Exists(d => d.Id == ds.Id)
-            //        }); 
-            //    }
-            //}
 
             return assessmentDTO;
         }
@@ -61,7 +40,7 @@ namespace PlatformTM.Services.Services
         public List<AssessmentDTO> GetStudyAssessments(int studyId)
         {
             List<Assessment> assessments = _assessmentRepository
-               .FindAll(d => d.StudyId == studyId, new List<string>() { "Datasets","Project" }).ToList();
+               .FindAll(d => d.StudyId == studyId, new List<string>() { "Datasets" }).ToList();
 
             var studyDatasets = _pdsRepository.FindAll(d => d.Studies.Any(s => s.Id == studyId)).ToList();
 
@@ -108,6 +87,7 @@ namespace PlatformTM.Services.Services
             }
             return assessment;
         }
+
 
         private AssessmentDTO WriteToDTO(Assessment assessment, List<PrimaryDataset> studyDatasets)
         {

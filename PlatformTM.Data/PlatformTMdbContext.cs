@@ -11,6 +11,7 @@ using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Interfaces;
 using PlatformTM.Core.Domain.Model;
 using PlatformTM.Core.Domain.Model.Base;
+using PlatformTM.Core.Domain.Model.BMO;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
@@ -90,6 +91,15 @@ namespace PlatformTM.Data
                 //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
 
                 var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "unicorn_descriptors");
+                _repositories.Add(typeof(TEntity), mongoRepository);
+                return mongoRepository;
+            }
+            if (typeof(TEntity) == typeof(Core.Domain.Model.BMO.Observation))
+            {
+                //var mongoClient = new MongoClient(_dbsettings.Value.MongoDBconnection);
+                //var mongodb = mongoClient.GetDatabase(_dbsettings.Value.noSQLDatabaseName);
+
+                var mongoRepository = new GenericMongoRepository<TEntity, TPrimaryKey>(_mongodb, "unicorn_observations");
                 _repositories.Add(typeof(TEntity), mongoRepository);
                 return mongoRepository;
             }
@@ -230,11 +240,13 @@ namespace PlatformTM.Data
 
             modelBuilder.AddConfiguration<TimePoint>(new TimePointConfig());
 
-            //modelBuilder.AddConfiguration<PlatformTM.Core.Domain.Model.Observation>(new ObservationConfig());
-            //modelBuilder.AddConfiguration<ObservationQualifier>(new ObservationQualifiersConfig());
-            //modelBuilder.AddConfiguration<ObservationSynonym>(new ObservationSynonymConfig());
-            //modelBuilder.AddConfiguration<ObservationTiming>(new ObservationTimingsConfig());
-            modelBuilder.Ignore<PlatformTM.Core.Domain.Model.Observation>();
+            //BMO
+            modelBuilder.AddConfiguration<ObservablePhenomenon>(new ObservablePhenomenonConfig());
+            modelBuilder.AddConfiguration<ObservationProperty>(new ObservationPropertyConfig());
+            modelBuilder.AddConfiguration<Feature>(new FeatureConfig());
+            modelBuilder.AddConfiguration<TimePoint>(new TimePointConfig());
+
+            //modelBuilder.Ignore<PlatformTM.Core.Domain.Model.Observation>();
             modelBuilder.Ignore<ObservationQualifier>();
             modelBuilder.Ignore<ObservationSynonym>();
             modelBuilder.Ignore<ObservationTiming>();
@@ -251,6 +263,8 @@ namespace PlatformTM.Data
             modelBuilder.Ignore<DatasetDatafile>();
             modelBuilder.Ignore<DatasetRecord>();
 
+            modelBuilder.Ignore<Core.Domain.Model.BMO.Observation>();
+            modelBuilder.Ignore<Core.Domain.Model.BMO.ObservationResult>();
         }
 
         public Task<int> SaveChangesAsync()

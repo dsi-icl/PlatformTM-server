@@ -102,7 +102,7 @@ namespace PlatformTM.API.Controllers
          * Project Primary Datasets
          */
 
-        [HttpGet("{projectId}/datasets", Name = "GetStudyPrimaryDatasets")]
+        [HttpGet("{projectId}/datasets", Name = "GetProjectPrimaryDatasets")]
         public List<PrimaryDatasetDTO> GetPrimaryDatasetsForProject(int projectId)
         {
             return _primaryDatasetService.GetPrimaryDatasetsForProject(projectId);

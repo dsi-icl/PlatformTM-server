@@ -77,8 +77,8 @@ namespace PlatformTM.Models.Services
                     Acronym = dataset.Acronym,
                     Domain = dataset.Domain,
                     ProjectName = dataset.Project.Name,
-                    StudyNames = dataset.Studies.Select(s=>s.Name).ToList(),
-                    StudyAccronyms = dataset.Studies.Select(s=> s.Accession).ToList(),
+                    StudyNames = dataset.Studies.Select(s=>s.Description).ToList(),
+                    StudyAccronyms = dataset.Studies.Select(s=> s.Name).ToList(),
                     DateCreated = dataset.Created,
                     DateModified = dataset.Modified,
                     

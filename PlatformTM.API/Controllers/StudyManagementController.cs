@@ -77,9 +77,9 @@ namespace PlatformTM.API.Controllers
         }
 
         [HttpGet("studies/{studyId}/assessments/{assessmentId}", Name = "GetStudyAssessmentById")]
-        public AssessmentDTO GetStudyAssessmentById(int assessmentId)
+        public AssessmentDTO GetStudyAssessmentById(int studyId, int assessmentId)
         {
-            return _assessmentService.GetAssessmentForStudy(assessmentId);
+            return _assessmentService.GetAssessmentForStudy(studyId,assessmentId);
         }
 
         [HttpPost("studies/{studyId}/assessments")]
