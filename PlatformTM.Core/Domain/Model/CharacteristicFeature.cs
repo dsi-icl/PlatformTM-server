@@ -1,5 +1,6 @@
 ﻿using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 
 namespace PlatformTM.Core.Domain.Model
 {
@@ -15,8 +16,8 @@ namespace PlatformTM.Core.Domain.Model
        
 
         
-        public Activity Activity { get; set; }
-        public int? ActivityId { get; set; }
+        public PrimaryDataset Dataset { get; set; }
+        public int? DatasetId { get; set; }
 
         public Project Project { get; set; }
         public int ProjectId { get; set; }

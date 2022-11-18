@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Models.DTOs;
 using PlatformTM.Models.Services;
+using PlatformTM.Models.Services.HelperService;
 using PlatformTM.Models.ViewModels;
 
 namespace PlatformTM.API.Controllers
@@ -17,12 +19,12 @@ namespace PlatformTM.API.Controllers
     public class FileController : Controller
     {
         private readonly FileService _fileService;
-        private readonly DatasetService _datasetService;
+       
 
-        public FileController(FileService fileService, DatasetService datasetService)
+        public FileController(FileService fileService)
         {
             _fileService = fileService;
-            _datasetService = datasetService;
+         
           
         }
 
@@ -83,7 +85,27 @@ namespace PlatformTM.API.Controllers
         }
 
 
+        //[HttpGet("{datasetId}/download")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> DownloadDataset(int datasetId)
+        //{
+        //    //var datatable = await _datasetService.ConsolidateDataset(datasetId);
 
+        //    //byte[] outputBuffer = null;
+
+        //    //using (MemoryStream tempStream = new MemoryStream())
+        //    //{
+        //    //    using (StreamWriter writer = new StreamWriter(tempStream))
+        //    //    {
+        //    //        IOhelper.WriteDataTable(datatable, writer, true);
+        //    //    }
+
+        //    //    outputBuffer = tempStream.ToArray();
+        //    //}
+        //    ////Response.Headers.Add("Content-Disposition", "inline; filename="+datatable.TableName + ".csv");
+        //    //return File(outputBuffer, "text/csv", datatable.TableName + ".csv");
+
+        //}
 
         [HttpPost("projects/{projectId}/drive/folders")]
         public IActionResult CreateDirectory(int projectId, [FromBody] DirectoryDTO dir)
@@ -129,8 +151,8 @@ namespace PlatformTM.API.Controllers
         [Route("{fileId}/remove")]
         public async void DeleteFile(int fileId)
         {
-            if(await _datasetService.UnloadFileDatasets(fileId))
-            _fileService.DeleteFile(fileId);
+            //if(await _datasetService.UnloadFileDatasets(fileId))
+            //_fileService.DeleteFile(fileId);
         }
 
         

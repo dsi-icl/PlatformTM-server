@@ -21,7 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Domain\Model\DatasetModel\ISATAB\" />
     <Folder Include="Domain\Model\BMO\" />
     <Folder Include="Domain\Model\DatasetModel\PDS\" />
     <Folder Include="Domain\Model\DatasetModel\PDS\DatasetDescriptorTypes\" />
@@ -34,4 +33,14 @@
     <None Remove="Domain\Model\DatasetModel\PDS\DatasetFieldTypes\" />
   </ItemGroup>
   
+  <ItemGroup>
+    <Compile Remove="Domain\Model\DatasetModel\SDTM\SdtmRowDescriptor.cs" />
+    <Compile Remove="Domain\Model\DatasetModel\SDTM\SdtmSampleDescriptor.cs" />
+    <Compile Remove="Domain\Model\DatasetModel\SDTM\SdtmSubjectDescriptor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Domain\Model\DatasetModel\SDTM\SdtmRowDescriptor.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Domain\Model\DatasetModel\SDTM\SdtmSampleDescriptor.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Domain\Model\DatasetModel\SDTM\SdtmSubjectDescriptor.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+  </ItemGroup>
 </Project>

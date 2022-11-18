@@ -12,8 +12,7 @@ using PlatformTM.Core.Domain.Model.DatasetModel;
 using PlatformTM.Core.JoinEntities;
 using PlatformTM.Models.Configuration;
 using PlatformTM.Models.DTOs;
-using PlatformTM.Models.Services.Loading.AssayData;
-using PlatformTM.Models.Services.Loading.SDTM;
+
 using PlatformTM.Models.ViewModels;
 
 namespace PlatformTM.Models.Services
@@ -23,26 +22,26 @@ namespace PlatformTM.Models.Services
         private readonly IServiceUoW _dataServiceUnit;
         private readonly IRepository<DataFile, int> _fileRepository;
         private readonly IRepository<Project, int> _projectRepository;
-        private readonly IRepository<Dataset, int> _datasetRepository;
+
         
         private FileStorageSettings ConfigSettings { get; set; }
         private readonly string _uploadFileDirectory;
         private readonly string _downloadFileDirectory;
 
 
-        private readonly IRepository<Observation, int> _observationRepository;
+
 
         public FileService(IServiceUoW uoW, IOptions<FileStorageSettings> settings)
         {
             _dataServiceUnit = uoW;
             _fileRepository = uoW.GetRepository<DataFile, int>();
             _projectRepository = uoW.GetRepository<Project, int>();
-            _datasetRepository = uoW.GetRepository<Dataset, int>();
+ 
 
             ConfigSettings = settings.Value;
             _uploadFileDirectory = ConfigSettings.UploadFileDirectory;
             _downloadFileDirectory = ConfigSettings.DownloadFileDirectory;
-            _observationRepository = uoW.GetRepository<Observation, int>();
+
         }
 
         

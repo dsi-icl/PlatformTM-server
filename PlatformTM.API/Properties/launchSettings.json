@@ -20,14 +20,15 @@
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "http://localhost:5000/swagger/#",
+      "applicationUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "applicationUrl": "http://localhost:5000/"
+      }
     },
     "IIS": {
       "commandName": "IISExpress",
-      "launchBrowser": true
+      "launchBrowser": true,
+      "environmentVariables": {}
     }
   }
 }

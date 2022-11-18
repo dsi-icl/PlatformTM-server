@@ -21,11 +21,9 @@ namespace PlatformTM.Models.Services
     {
         private readonly IRepository<Project, int> _projectRepository;
         private readonly IRepository<Assessment, int> _activityRepository;
-        private readonly IRepository<Assay, int> _assayRepository;
 
         private readonly IRepository<SdtmRow, Guid> _sdtmRepository;
-        private readonly IRepository<CombinedQuery, Guid> _combinedQueryRepository;
-        private readonly IRepository<Dataset, int> _datasetRepository;
+
         private readonly IRepository<User, Guid> _userRepository;
 
         private IServiceUoW uoW;
@@ -35,10 +33,9 @@ namespace PlatformTM.Models.Services
             this.uoW = uoW;
             _projectRepository = uoW.GetRepository<Project, int>();
             _activityRepository = uoW.GetRepository<Assessment, int>();
-            _assayRepository = uoW.GetRepository<Assay, int>();
-            _combinedQueryRepository = uoW.GetRepository<CombinedQuery, Guid>();
+
             _sdtmRepository = uoW.GetRepository<SdtmRow, Guid>();
-            _datasetRepository = uoW.GetRepository<Dataset, int>();
+
             _userRepository = uoW.GetRepository<User, Guid>();
         }
 

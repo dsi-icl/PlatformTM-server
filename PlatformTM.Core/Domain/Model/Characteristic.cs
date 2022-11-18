@@ -1,6 +1,7 @@
 ﻿using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 
 namespace PlatformTM.Core.Domain.Model
 {
@@ -24,7 +25,7 @@ namespace PlatformTM.Core.Domain.Model
         public DataFile Datafile { get; set; }
         public int? DatafileId { get; set; }
 
-        public Dataset Dataset { get; set; }
+        public PrimaryDataset Dataset { get; set; }
         public int DatasetId { get; set; }
     }
 }

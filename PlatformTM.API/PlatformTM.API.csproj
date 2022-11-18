@@ -23,6 +23,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" />
+    <None Include="Controllers\CheckoutController.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Controllers\DataExplorerController.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Controllers\QueryController.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Controllers\ExportController.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
   </ItemGroup>
   <ItemGroup>
     <None Update="wwwroot\**\*">
@@ -56,4 +60,10 @@
     <Folder Include="DevControllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Controllers\CheckoutController.cs" />
+    <Compile Remove="Controllers\DataExplorerController.cs" />
+    <Compile Remove="Controllers\QueryController.cs" />
+    <Compile Remove="Controllers\ExportController.cs" />
+  </ItemGroup>
 </Project>

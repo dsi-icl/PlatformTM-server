@@ -6,7 +6,6 @@ using PlatformTM.Core.Domain.Model.BMO;
 using System.Collections;
 using PlatformTM.Models.DTOs.Explorer;
 using System.Threading.Tasks;
-using PlatformTM.Core.Domain.Model.ObservationModel;
 using System.Data;
 
 namespace PlatformTM.Services.DatasetExplorer
@@ -430,7 +429,7 @@ namespace PlatformTM.Services.DatasetExplorer
                 IsMultipleObservations = IsMultiple,
                 IsOntologyEntry = IsOntologyEntry,
                 ProjectId = 1,
-                QueryFrom = nameof(ObservationPhenomenon)
+                QueryFrom = nameof(ObservablePhenomenon)
 
                 //TermIds = termIds,
                 //Id = obsObject.Name.ToLower() + "_" + variableDefinition.Name

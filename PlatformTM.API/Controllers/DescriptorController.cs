@@ -109,13 +109,6 @@ namespace PlatformTM.API.Controllers
         //    return "FAILED to update datasetId";
         //}
 
-        [HttpPost("{datasetId}/update")]
-        public string UpdateDatasetPost(int datasetId, [FromBody] DatasetDTO datasetDTO)
-        {
-            if (datasetDTO.Id == datasetId)
-                return _datasetDescriptorService.UpdateDataset(datasetDTO);
-            return "FAILED to update datasetId";
-        }
-
+       
     }
 }

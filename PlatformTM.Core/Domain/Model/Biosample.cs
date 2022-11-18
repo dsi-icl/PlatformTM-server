@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS;
 using PlatformTM.Core.Domain.Model.DesignElements;
 using PlatformTM.Core.Domain.Model.Timing;
 
@@ -23,7 +24,7 @@ namespace PlatformTM.Core.Domain.Model
         public Assay Assay { get; set; }
         public int AssayId { get; set; }
 
-        public Dataset Dataset { get; set; }
+        public PrimaryDataset Dataset { get; set; }
         public int DatasetId { get; set; }
 
         public DataFile DataFile { get; set; }

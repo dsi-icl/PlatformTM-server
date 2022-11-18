@@ -14,7 +14,6 @@ using MongoDB.Bson.Serialization;
 using PlatformTM.API.Auth;
 using PlatformTM.Core.Application.AccountManagement;
 using PlatformTM.Core.Domain.Interfaces;
-using PlatformTM.Core.Domain.Model.ObservationModel;
 using PlatformTM.Core.Domain.Model.Users.Queries;
 using PlatformTM.Data;
 using PlatformTM.Data.Configuration;
@@ -22,10 +21,9 @@ using PlatformTM.Models.Configuration;
 using PlatformTM.Models.DTOs.Explorer;
 using PlatformTM.Models.Services;
 using PlatformTM.Models.Services.HelperService;
-using PlatformTM.Models.Services.Loading.AssayData;
-using PlatformTM.Models.Services.Loading.SDTM;
+
 using PlatformTM.Models.Services.UserManagement;
-using Swashbuckle.AspNetCore.Swagger;
+
 using Newtonsoft.Json.Serialization;
 using Microsoft.OpenApi.Models;
 using PlatformTM.Services.Services;
@@ -104,14 +102,13 @@ namespace PlatformTM.API
                          sqlOptions.EnableRetryOnFailure(7, System.TimeSpan.FromSeconds(5), null);}));
             services.AddScoped<IServiceUoW, PlatformTMdbContext>();
 
-            services.AddScoped<ActivityService>();
+
             services.AddScoped<AssayService>();
             services.AddScoped<BioSampleService>();
             services.AddScoped<CVtermService>();
-            services.AddScoped<DataExplorerService>();
-            services.AddScoped<DatasetService>();
+
             services.AddScoped<DatasetDescriptorService>();
-            services.AddScoped<ExportService>();
+
             services.AddScoped<FileService>();
 
             services.AddScoped<AssessmentService>();
@@ -121,21 +118,12 @@ namespace PlatformTM.API
 
 
             services.AddScoped<ProjectService>();
-            services.AddScoped<SDTMreader>();
+
             services.AddScoped<StudyService>();
             
             services.AddScoped<TemplateService>();
             services.AddScoped<AnalysisDatasetService>();
             services.AddScoped<UserAccountService>();
-            services.AddScoped<CheckoutService>();
-            services.AddScoped<QueryService>();
-            services.AddScoped<CacheService>();
-
-            services.AddScoped<SubjectLoader>();
-            services.AddScoped<BioSampleLoader>();
-            services.AddScoped<DataMatrixLoader>();
-            services.AddScoped<HDloader>();
-            services.AddScoped<ObservationLoader>();
 
             services.AddScoped<Formatter>();
             services.AddScoped<Data.DbInitializer>();
@@ -147,13 +135,6 @@ namespace PlatformTM.API
             BsonClassMap.RegisterClassMap<ObservationNode>();
             BsonClassMap.RegisterClassMap<GroupNode>();
             BsonClassMap.RegisterClassMap<MedDRAGroupNode>();
-            BsonClassMap.RegisterClassMap<MissingValue>();
-            BsonClassMap.RegisterClassMap<Observation>();
-            BsonClassMap.RegisterClassMap<ObservedPropertyValue>();
-            BsonClassMap.RegisterClassMap<CategoricalValue>();
-            BsonClassMap.RegisterClassMap<OrdinalValue>();
-            BsonClassMap.RegisterClassMap<NumericalValue>();
-            BsonClassMap.RegisterClassMap<IntervalValue>();
             BsonClassMap.RegisterClassMap<ObservationQuery>();
             #endregion
 

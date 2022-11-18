@@ -52,11 +52,7 @@ namespace PlatformTM.API.Controllers
             return _projectService.GetActivities(projectId, typeof(SubjectRecording));
         }
 
-        [HttpGet("{projectId}/clinicalAssessments")]
-        public IEnumerable<ActivityDTO> GetProjectClinicalAssessments(int projectId)
-        {
-            return _projectService.GetActivities(projectId, typeof(Activity));
-        }
+
 
         [HttpGet("{projectId}/descriptors")]
         public IEnumerable<DatasetDescriptorDTO> GetProjectDescriptors(int projectId)

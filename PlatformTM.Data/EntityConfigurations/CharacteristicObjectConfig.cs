@@ -19,9 +19,9 @@ namespace PlatformTM.Data.EntityConfigurations
                 .WithMany()
                 .HasForeignKey(t => t.CVtermId);
 
-            builder.HasOne(t => t.Activity)
-                .WithMany()
-                .HasForeignKey(t => t.ActivityId);
+            //builder.HasOne(t => t.Activity)
+            //    .WithMany()
+            //    .HasForeignKey(t => t.ActivityId);
 
             builder.HasOne(t => t.Project)
                 .WithMany()

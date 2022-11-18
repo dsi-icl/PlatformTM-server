@@ -27,7 +27,6 @@ using PlatformTM.Data.Configuration;
 using PlatformTM.Data.EntityConfigurations;
 using PlatformTM.Data.Extensions;
 using PlatformTM.Data.Repositories;
-using Observation = PlatformTM.Core.Domain.Model.ObservationModel.Observation;
 
 namespace PlatformTM.Data
 {
@@ -247,20 +246,11 @@ namespace PlatformTM.Data
             modelBuilder.AddConfiguration<TimePoint>(new TimePointConfig());
 
             //modelBuilder.Ignore<PlatformTM.Core.Domain.Model.Observation>();
-            modelBuilder.Ignore<ObservationQualifier>();
-            modelBuilder.Ignore<ObservationSynonym>();
-            modelBuilder.Ignore<ObservationTiming>();
-
-            modelBuilder.Ignore<Dataset>();
-            modelBuilder.Ignore<VariableDefinition>();
-            modelBuilder.Ignore<VariableReference>();
-            modelBuilder.Ignore<VariableQualifier>();
+           
 
             modelBuilder.Ignore<DatasetDescriptor>();
 
-            modelBuilder.Ignore<Core.Domain.Model.Activity>();
-
-            modelBuilder.Ignore<DatasetDatafile>();
+           
             modelBuilder.Ignore<DatasetRecord>();
 
             modelBuilder.Ignore<Core.Domain.Model.BMO.Observation>();

@@ -33,6 +33,7 @@
     <Folder Include="LoadingWizard\" />
     <Folder Include="LoadingWizard\dto\" />
     <Folder Include="DatasetExplorer\" />
+    <Folder Include="Services\Loading\AssayData\" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Services\FAIRifier\" />
@@ -41,5 +42,28 @@
     <None Remove="LoadingWizard\" />
     <None Remove="LoadingWizard\dto\" />
     <None Remove="DatasetExplorer\" />
+    <None Remove="Services\Loading\AssayData\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Services\Loading\SDTM\SDTMreader.cs" />
+    <Compile Remove="Services\QueryService.cs" />
+    <Compile Remove="Services\CheckoutService.cs" />
+    <Compile Remove="Services\DatasetService.cs" />
+    <Compile Remove="Services\DataExplorerService.cs" />
+    <Compile Remove="Services\ExportService.cs" />
+    <Compile Remove="Services\Loading\SDTM\BioSampleLoader.cs" />
+    <Compile Remove="Services\Loading\SDTM\SDTMloader.cs" />
+    <Compile Remove="Services\Loading\SDTM\SubjectLoader.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Services\Loading\SDTM\SDTMreader.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\QueryService.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\CheckoutService.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\DatasetService.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\DataExplorerService.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\ExportService.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\Loading\SDTM\BioSampleLoader.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\Loading\SDTM\SDTMloader.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
+    <None Include="Services\Loading\SDTM\SubjectLoader.cs" Condition=" '$(EnableDefaultCompileItems)' == 'true' " />
   </ItemGroup>
 </Project>

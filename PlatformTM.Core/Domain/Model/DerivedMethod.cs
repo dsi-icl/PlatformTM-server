@@ -2,6 +2,7 @@
 using PlatformTM.Core.Domain.Model.Base;
 using PlatformTM.Core.Domain.Model.ControlledTerminology;
 using PlatformTM.Core.Domain.Model.DatasetModel;
+using PlatformTM.Core.Domain.Model.DatasetModel.PDS.DatasetFieldTypes;
 
 namespace PlatformTM.Core.Domain.Model
 {
@@ -14,8 +15,8 @@ namespace PlatformTM.Core.Domain.Model
         public string DerivedVariableId { get; set; }
         public string DerivedValueTypeId { get; set; }
 
-        public virtual VariableDefinition DerivedVariable { get; set; }
+        public virtual DatasetField DerivedField { get; set; }
         public CVterm DerivedValueType { get; set; }
-        public virtual ICollection<VariableDefinition> SourceVariables {get; set;}
+        public virtual ICollection<DatasetField> SourceFields {get; set;}
     }
 }

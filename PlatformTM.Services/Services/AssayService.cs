@@ -28,43 +28,43 @@ namespace PlatformTM.Models.Services
         * Assay Methods
         * */
 
-        public AssayDTO GetAssay(int assayId)
-        {
-            var assay = _assayRepository.FindSingle(
-                d => d.Id.Equals(assayId),
-                new List<string>(){
-                        "Datasets.Template",
-                        "TechnologyType",
-                        "TechnologyPlatform",
-                        "MeasurementType",
-                        "DesignType",
-                        "Study"
-                }
-            );
+        //public AssayDTO GetAssay(int assayId)
+        //{
+        //    var assay = _assayRepository.FindSingle(
+        //        d => d.Id.Equals(assayId),
+        //        new List<string>(){
+        //                "Datasets.Template",
+        //                "TechnologyType",
+        //                "TechnologyPlatform",
+        //                "MeasurementType",
+        //                "DesignType",
+        //                "Study"
+        //        }
+        //    );
 
-            var assayDTO = new AssayDTO();
-            assayDTO.Name = assay.Name;
-            assayDTO.Id = assay.Id;
-            assayDTO.ProjectId = assay.Study.ProjectId;
+        //    var assayDTO = new AssayDTO();
+        //    assayDTO.Name = assay.Name;
+        //    assayDTO.Id = assay.Id;
+        //    assayDTO.ProjectId = assay.Study.ProjectId;
 
-            assayDTO.Type = assay.MeasurementType?.Id;
-            assayDTO.Technology = assay.TechnologyType?.Id;
-            assayDTO.Platform = assay.TechnologyPlatform?.Id;
-            assayDTO.Design = assay.DesignType?.Id;
+        //    assayDTO.Type = assay.MeasurementType?.Id;
+        //    assayDTO.Technology = assay.TechnologyType?.Id;
+        //    assayDTO.Platform = assay.TechnologyPlatform?.Id;
+        //    assayDTO.Design = assay.DesignType?.Id;
 
 
-            foreach (var dst in assay.Datasets.Select(ds => _datasetDescriptorService.GetActivityDatasetDTO(ds.Id)))
-            {
-                //TODO: convert to enums or CVterms
-                if (dst.Class == "Assay Samples")
-                    assayDTO.SamplesDataset = dst;
-                if (dst.Class == "Assay Observations")
-                    assayDTO.ObservationsDataset = dst;
-                if (dst.Class == "Assay Features")
-                    assayDTO.FeaturesDataset = dst;
-            }
-            return assayDTO;
-        }
+        //    foreach (var dst in assay.Datasets.Select(ds => _datasetDescriptorService.GetActivityDatasetDTO(ds.Id)))
+        //    {
+        //        //TODO: convert to enums or CVterms
+        //        if (dst.Class == "Assay Samples")
+        //            assayDTO.SamplesDataset = dst;
+        //        if (dst.Class == "Assay Observations")
+        //            assayDTO.ObservationsDataset = dst;
+        //        if (dst.Class == "Assay Features")
+        //            assayDTO.FeaturesDataset = dst;
+        //    }
+        //    return assayDTO;
+        //}
 
         public AssayDTO AddAssay(AssayDTO assayDto)
         {
@@ -107,39 +107,39 @@ namespace PlatformTM.Models.Services
             return null;
         }
 
-        public string UpdateAssay(AssayDTO assayDTO, int assayId)
-        {
-            Assay assayToUpdate = _assayRepository.Get(assayId);
+        //public string UpdateAssay(AssayDTO assayDTO, int assayId)
+        //{
+            //Assay assayToUpdate = _assayRepository.Get(assayId);
 
 
-            assayToUpdate.Name = assayDTO.Name;
-            assayToUpdate.TechnologyPlatformId = assayDTO.Platform;
-            assayToUpdate.TechnologyTypeId = assayDTO.Technology;
-            //assay.DesignType = getCVterm(assayDto.AssayDesignType);
-            assayToUpdate.MeasurementTypeId = assayDTO.Type;
+            //assayToUpdate.Name = assayDTO.Name;
+            //assayToUpdate.TechnologyPlatformId = assayDTO.Platform;
+            //assayToUpdate.TechnologyTypeId = assayDTO.Technology;
+            ////assay.DesignType = getCVterm(assayDto.AssayDesignType);
+            //assayToUpdate.MeasurementTypeId = assayDTO.Type;
 
-            assayDTO.Datasets.Clear();
-            assayDTO.Datasets.Add(assayDTO.FeaturesDataset);
-            assayDTO.Datasets.Add(assayDTO.SamplesDataset);
-            assayDTO.Datasets.Add(assayDTO.ObservationsDataset);
+            //assayDTO.Datasets.Clear();
+            //assayDTO.Datasets.Add(assayDTO.FeaturesDataset);
+            //assayDTO.Datasets.Add(assayDTO.SamplesDataset);
+            //assayDTO.Datasets.Add(assayDTO.ObservationsDataset);
 
 
-            foreach (var datasetDto in assayDTO.Datasets)
-            {
+            //foreach (var datasetDto in assayDTO.Datasets)
+            //{
 
-                if (datasetDto == null) continue;
-                datasetDto.ProjectId = assayDTO.ProjectId;
-                if (datasetDto.IsNew)
-                {
-                    var dataset = _datasetDescriptorService.CreateDataset(datasetDto);
-                    //assayToUpdate.Datasets.Add(dataset);
-                    _assayRepository.Update(assayToUpdate);
-                }
-                else
-                    _datasetDescriptorService.UpdateDataset(datasetDto);
-            }
-            return _dataContext.Save();
-        }
+            //    if (datasetDto == null) continue;
+            //    datasetDto.ProjectId = assayDTO.ProjectId;
+            //    if (datasetDto.IsNew)
+            //    {
+            //        var dataset = _datasetDescriptorService.CreateDataset(datasetDto);
+            //        //assayToUpdate.Datasets.Add(dataset);
+            //        _assayRepository.Update(assayToUpdate);
+            //    }
+            //    else
+            //        _datasetDescriptorService.UpdateDataset(datasetDto);
+            //}
+            //return _dataContext.Save();
+        //}
 
         
 
